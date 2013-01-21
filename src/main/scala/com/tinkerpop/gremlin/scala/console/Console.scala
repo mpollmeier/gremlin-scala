@@ -36,7 +36,7 @@ class GremlinILoop extends ILoop {
     //printWelcome() is the only decent place to init the intp while process() is setting things up...
     intp beQuietDuring {
       //calling addImports separately for each import is really slow, so only call it once
-      val imports = Imports.getImports.map(_.replace("*", "_")) :+ "com.tinkerpop.gremlin.scala._"
+      val imports = Imports.getImports.map(_.replace("static ", "").replace("*", "_")) :+ "com.tinkerpop.gremlin.scala._"
       intp.addImports(imports: _*)
     }
   }
