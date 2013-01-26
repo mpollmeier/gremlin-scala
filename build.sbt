@@ -1,6 +1,8 @@
 name := "gremlin-scala"
 
-version := "2.2.0"
+version := "2.2.0-SNAPSHOT"
+
+organization := "com.tinkerpop.gremlin"
 
 scalaVersion := "2.10.0"
 
@@ -28,6 +30,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.scala-lang" % "jline" % scalaVersion,
     // test dependencies
     "junit" % "junit" % junitVersion % "test",
+    "com.novocode" % "junit-interface" % "0.8" % "test->default",
     "com.tinkerpop.gremlin" % "gremlin-test" % gremlinVersion % "test"
   )
 }
