@@ -4,13 +4,13 @@ gremlin-scala
 =============
 A thin wrapper for Gremlin so that it feels natural to use the awesome Gremlin graph DSL in Scala. 
 Gremlin is a domain specific language for traversing a number of graph databases including:
-[Neo4j](http://neo4j.org/)
-[OrientDB](http://www.orientechnologies.com/)
-[DEX](http://www.sparsity-technologies.com/dex)
-[InfiniteGraph](http://www.infinitegraph.com/)
-[Titan](http://thinkaurelius.github.com/titan/)
+[Neo4j](http://neo4j.org/),
+[OrientDB](http://www.orientechnologies.com/),
+[DEX](http://www.sparsity-technologies.com/dex),
+[InfiniteGraph](http://www.infinitegraph.com/),
+[Titan](http://thinkaurelius.github.com/titan/),
 [Rexster graph server](http://rexster.tinkerpop.com)
-[Sesame 2.0 compliant RDF stores](http://www.openrdf.org)
+and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
 
 Sample usage
 =============
