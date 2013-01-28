@@ -342,6 +342,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
     super.cap().asInstanceOf[GremlinScalaPipeline[S, _]];
   }
 
+  def apply[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
+  
   def transform[T](function: E => T): GremlinScalaPipeline[S, T] = {
     super.transform(new ScalaPipeFunction(function)).asInstanceOf[GremlinScalaPipeline[S, T]]
   }
