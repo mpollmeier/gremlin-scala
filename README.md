@@ -2,7 +2,7 @@
 
 gremlin-scala
 =============
-A thin wrapper for Gremlin so that it feels natural to use the awesome Gremlin graph DSL in Scala. 
+A thin wrapper for Gremlin so that it feels natural to use the Gremlin graph DSL in Scala. 
 Gremlin is a domain specific language for traversing a number of graph databases including
 [Neo4j](http://neo4j.org/),
 [OrientDB](http://www.orientechnologies.com/),
@@ -71,8 +71,7 @@ Getting started
 ```shell
 git clone https://github.com/mpollmeier/gremlin-scala.git
 mvn test      #run all tests - should find all dependencies and run the tests fine
-mvn install   #install into your local maven repository so that you can use it (groupId=com.tinkerpop.gremlin,
-artifactId=gremlin-scala
+mvn install   #install into your local maven repository so that you can use it (groupId=com.tinkerpop.gremlin, artifactId=gremlin-scala
 ```
 
 Known Issues
