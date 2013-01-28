@@ -3,7 +3,7 @@
 gremlin-scala
 =============
 A thin wrapper for Gremlin so that it feels natural to use the awesome Gremlin graph DSL in Scala. 
-Gremlin is a domain specific language for traversing a number of graph databases including:
+Gremlin is a domain specific language for traversing a number of graph databases including
 [Neo4j](http://neo4j.org/),
 [OrientDB](http://www.orientechnologies.com/),
 [DEX](http://www.sparsity-technologies.com/dex),
@@ -11,6 +11,9 @@ Gremlin is a domain specific language for traversing a number of graph databases
 [Titan](http://thinkaurelius.github.com/titan/),
 [Rexster graph server](http://rexster.tinkerpop.com)
 and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
+
+For more information about Gremlin see the excellent [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
+[Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods) will give you a quick deep dive. 
 
 Sample usage
 =============
@@ -74,8 +77,6 @@ artifactId=gremlin-scala
 
 Known Issues
 =============
-** Console doesn't seem to work at the moment. Just use it in a test (see SampleUSageTest for some examples)
-
-For details about Gremlin see the excellent "wiki":https://github.com/tinkerpop/gremlin/wiki
+* Console doesn't seem to work at the moment. Just use it in a test (see SampleUSageTest for some examples)
 
 Kudos go to [Zach Cox](http://theza.ch) for starting this project and the whole [Tinkerpop](http://www.tinkerpop.com) team for creating a whole awesome stack around graph databases.
