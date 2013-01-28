@@ -1,25 +1,21 @@
-gremlin-scala
-=============
-
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
 
+gremlin-scala
+=============
+A thin wrapper for Gremlin so that it feels natural to use the awesome Gremlin graph DSL in Scala. 
 Gremlin is a domain specific language for traversing a number of graph databases including:
-* Graph database connectivity:
-** "TinkerGraph":https://github.com/tinkerpop/blueprints/wiki/TinkerGraph in-memory graph
-** "Neo4j":http://neo4j.org/ graph database
-** "OrientDB":http://www.orientechnologies.com/ graph database
-** "DEX":http://www.sparsity-technologies.com/dex graph database
-** "InfiniteGraph":http://www.infinitegraph.com/ graph database
-** "Titan":http://thinkaurelius.github.com/titan/ graph database
-** "Rexster":http://rexster.tinkerpop.com graph server
-** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
-* Supporting extensions:
-** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
-** "GraphSON Reader/Writer":http://www.json.org/ library
-** "GML Reader/Writer":http://en.wikipedia.org/wiki/Graph_Modelling_Language library
-** "Java Universal/Graph":http://jung.sourceforge.net/ framework
+* [Neo4j](http://neo4j.org/)
 
-Gremlin-Scala is just a thin wrapper for Gremlin so that it feels natural in Scala:
+* [OrientDB](http://www.orientechnologies.com/)
+* "DEX":http://www.sparsity-technologies.com/dex graph database
+* "InfiniteGraph":http://www.infinitegraph.com/ graph database
+* "Titan":http://thinkaurelius.github.com/titan/ graph database
+* "Rexster":http://rexster.tinkerpop.com graph server
+* "Sesame 2.0":http://www.openrdf.org compliant RDF stores
+
+Sample usage
+=============
+
 ```scala
   // this is an executable ScalaTest specification - see SampleUsageTest.scala for full setup
   describe("Gremlin-Scala") {
