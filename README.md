@@ -73,11 +73,11 @@ You can play with Gremlin in an interactive console:
          \,,,/
          (o o)
 -----oOOo-(_)-oOOo-----
-// create a sample in-memory graph
+# create a sample in-memory graph
 gremlin> val g = TinkerGraphFactory.createTinkerGraph
 ==> tinkergraph[vertices:6 edges:6]
 
-// list all vertices
+# list all vertices
 gremlin> g.V
 ==> v[3]
 ==> v[2]
@@ -86,7 +86,7 @@ gremlin> g.V
 ==> v[5]
 ==> v[4]
 
-// show properties map of the vertices
+# show properties map of the vertices
 gremlin> g.V.map
 ==> {name=lop, lang=java}
 ==> {name=vadas, age=27}
@@ -95,14 +95,14 @@ gremlin> g.V.map
 ==> {name=ripple, lang=java}
 ==> {name=josh, age=32}
 
-// get marko's vertex
+# get marko's vertex
 gremlin> val marko = g.v(1)
 ==> v[1]
 
 gremlin> marko("age")
 ==> 29
 
-// find marko's friends' names
+# find marko's friends' names
 gremlin> marko.out("knows")(_("name"))
 ==> vadas
 ==> josh
