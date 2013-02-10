@@ -76,7 +76,6 @@ class GremlinILoop extends ILoop {
     }
   }
 
-  // TODO: currently it always blindly repeats the input - omit that
   class GremlinInterpreter extends ILoopInterpreter {
     override lazy val reporter: ReplReporter = new ReplReporter(this) {
       /**Stop ReplReporter from printing to console. Instead we print in GremlinILoop.command. */
