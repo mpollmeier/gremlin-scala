@@ -17,6 +17,7 @@ object Console extends App {
 
 class GremlinILoop extends ILoop {
   override def prompt = "gremlin> "
+
   addThunk {
     intp.beQuietDuring {
       val imports = Imports.getImports.map(
@@ -49,9 +50,8 @@ class GremlinILoop extends ILoop {
     //TODO handle compiler error
     //TODO handle exception
     //TODO handle something like class on multilines
-    if (result.keepRunning && result.lineToRecord.isDefined) {
-      printLastValue()
-    }
+    if (result.keepRunning && result.lineToRecord.isDefined)
+      printLastValue
 
     result
   }
