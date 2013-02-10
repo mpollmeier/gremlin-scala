@@ -4,7 +4,6 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.interpreter.{ ILoop, ReplReporter }
 import com.tinkerpop.gremlin.Imports
-
 import scala.collection.JavaConversions._
 
 /**http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/compiler/scala/tools/nsc/interpreter/package.html */
@@ -13,54 +12,33 @@ object Console extends App {
   settings.usejavacp.value = true
   settings.deprecation.value = true
 
-  // TODO: remove once console works
-  settings.classpath.append("com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory")
-  println(settings.classpath)
-
-  new GremlinILoop().process(settings)
+  val loop = new GremlinILoop
+  loop.process(settings)
 }
 
 class GremlinILoop extends ILoop {
   override def prompt = "gremlin> "
+  addThunk {
+    intp.beQuietDuring {
+      val imports = Imports.getImports.map(
+        _.replace("static ", "")
+          .replace("*", "_")
+          .replace("$", ".")) :+ "com.tinkerpop.gremlin.scala._"
+      intp.addImports(imports: _*)
+    }
+  }
 
   override def printWelcome() {
     echo("\n" +
       "         \\,,,/\n" +
       "         (o o)\n" +
       "-----oOOo-(_)-oOOo-----")
-
-    helpCommand("")
-
-    //printWelcome() is the only decent place to init the intp while process() is setting things up...
-    intp beQuietDuring {
-      //calling addImports separately for each import is really slow, so only call it once
-      val imports = Imports.getImports.map(_.replace("static ", "").replace("*", "_")) :+ "com.tinkerpop.gremlin.scala._"
-
-      //      val imports = Imports.getImports.map(_.replace("static ", "")
-      //        .replace("*", "_")) :+ "com.tinkerpop.gremlin.scala._"
-
-      //      val imports = Seq("java.lang._")
-      //      val imports = Seq()
-      //              val imports = Seq("com.tinkerpop.gremlin.java._")
-      //      val imports = Seq("com.tinkerpop.blueprints.TransactionalGraph#Conclusion._")
-      //      println(imports)
-      //      println(imports.filterNot(_.contains("$")))
-      //      intp.addImports(imports.filterNot(_.contains("$")): _*)
-      //      intp.addImports(imports: _*)
-      //      intp.addImports("com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory")
-      //      intp.addImports("com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory")
-    }
   }
 
   var gremlinIntp: GremlinInterpreter = _
   override def createInterpreter() {
     if (addedClasspath != "")
       settings.classpath.append(addedClasspath)
-
-    // TODO: remove once console works
-    //    val imports = Imports.getImports.map(_.replace("static ", "").replace("*", "_")) :+ "com.tinkerpop.gremlin.scala._"
-    //    imports.foreach(i ⇒ settings.classpath.append(i))
-    //    settings.classpath.append("com.tinkerpop.gremlin.scala._")
     gremlinIntp = new GremlinInterpreter
     intp = gremlinIntp
   }
@@ -98,13 +76,12 @@ class GremlinILoop extends ILoop {
     }
   }
 
+  // TODO: currently it always blindly repeats the input - omit that
   class GremlinInterpreter extends ILoopInterpreter {
-    //TODO: do we really need that?
-    //    override lazy val reporter: ReplReporter = new ReplReporter(this) {
-    //      /**Stop ReplReporter from printing to console. Instead we print in GremlinILoop.command. */
-    //      override def printMessage(msg: String) {}
-    //    }
-
+    override lazy val reporter: ReplReporter = new ReplReporter(this) {
+      /**Stop ReplReporter from printing to console. Instead we print in GremlinILoop.command. */
+      override def printMessage(msg: String) {}
+    }
     def prevRequest: Option[Request] = prevRequestList.lastOption
 
     /**Returns the last value evaluated by this interpreter. See https://issues.scala-lang.org/browse/SI-4899 for details. */
