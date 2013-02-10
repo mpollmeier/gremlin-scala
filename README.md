@@ -12,7 +12,7 @@ Gremlin is a domain specific language for traversing a number of graph databases
 [Rexster graph server](http://rexster.tinkerpop.com)
 and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
 
-For more information about Gremlin see the excellent [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
+For more information about Gremlin see the [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
 [Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods) will give you a quick deep dive. 
 
 Sample usage
@@ -66,16 +66,57 @@ Sample usage
   }
 ```
 
-Getting started
+Gremlin-Console
+=============
+You can play with Gremlin in an interactive console:
+```shell
+         \,,,/
+         (o o)
+-----oOOo-(_)-oOOo-----
+// create a sample in-memory graph
+gremlin> val g = TinkerGraphFactory.createTinkerGraph
+==> tinkergraph[vertices:6 edges:6]
+
+// list all vertices
+gremlin> g.V
+==> v[3]
+==> v[2]
+==> v[1]
+==> v[6]
+==> v[5]
+==> v[4]
+
+// show properties map of the vertices
+gremlin> g.V.map
+==> {name=lop, lang=java}
+==> {name=vadas, age=27}
+==> {name=marko, age=29}
+==> {name=peter, age=35}
+==> {name=ripple, lang=java}
+==> {name=josh, age=32}
+
+// get marko's vertex
+gremlin> val marko = g.v(1)
+==> v[1]
+
+gremlin> marko("age")
+==> 29
+
+// find marko's friends' names
+gremlin> marko.out("knows")(_("name"))
+==> vadas
+==> josh
+
+For many more examples (in Gremlin-Groovy syntax) see the [Getting started page of Gremlin (in groovy syntax)]https://github.com/tinkerpop/gremlin/wiki/Getting-Started].
+This is a normal Scala REPL, so you run arbitrary Scala code here. 
+```
+
+Building Gremlin-Scala
 =============
 ```shell
 git clone https://github.com/mpollmeier/gremlin-scala.git
 mvn test      #run all tests - should find all dependencies and run the tests fine
 mvn install   #install into your local maven repository so that you can use it (groupId=com.tinkerpop.gremlin, artifactId=gremlin-scala
 ```
-
-Known Issues
-=============
-* Console doesn't seem to work at the moment. Just use it in a test (see SampleUSageTest for some examples)
 
 Kudos go to [Zach Cox](http://theza.ch) for starting this project and the whole [Tinkerpop](http://www.tinkerpop.com) team for creating a whole awesome stack around graph databases.
