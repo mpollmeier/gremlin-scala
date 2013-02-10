@@ -12,8 +12,7 @@ object Console extends App {
   settings.usejavacp.value = true
   settings.deprecation.value = true
 
-  val loop = new GremlinILoop
-  loop.process(settings)
+  new GremlinILoop().process(settings)
 }
 
 class GremlinILoop extends ILoop {
