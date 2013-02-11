@@ -58,7 +58,7 @@ class GremlinILoop extends ILoop {
 
   /**Prints the last value by expanding its elements if it's iterator-like or collection-like. */
   def printLastValue() = gremlinIntp.lastValue match {
-    case Right(value)    ⇒ for (v ← toIterator(value)) out.println("==> " + v)
+    case Right(value)    ⇒ for (v ← toIterator(value)) out.println("==>" + v)
     case Left(throwable) ⇒ throwable.printStackTrace(out)
   }
 
