@@ -347,9 +347,13 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def transform[T](function: E => T): GremlinScalaPipeline[S, T] = {
     super.transform(new ScalaPipeFunction(function)).asInstanceOf[GremlinScalaPipeline[S, T]]
   }
-  
-  def order[T](compareFunction: com.tinkerpop.pipes.util.structures.Pair[E,E] => JInteger): GremlinScalaPipeline[S, T] = {
-    super.order(new ScalaPipeFunction(compareFunction)).asInstanceOf[GremlinScalaPipeline[S, T]]
+
+  override def order: GremlinScalaPipeline[S, E] = {
+    super.order().asInstanceOf[GremlinScalaPipeline[S, E]]
+  }
+
+  def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] = {
+    super.order({ x: TPair[E, E] => compareFunction.compute(x).asInstanceOf[JInteger] }).asInstanceOf[GremlinScalaPipeline[S, E]]
   }
   
   //////////////////////
