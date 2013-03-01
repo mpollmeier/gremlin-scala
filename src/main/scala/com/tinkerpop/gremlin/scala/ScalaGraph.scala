@@ -1,11 +1,11 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.blueprints.{Graph, Vertex, Edge}
+import com.tinkerpop.blueprints.{ Graph, Vertex, Edge }
 
-/**Adds convenience methods to [[com.tinkerpop.blueprints.Graph]]. */
+/**Adds convenience methods to [com.tinkerpop.blueprints.Graph] */
 class ScalaGraph(val graph: Graph) {
   /**Returns all vertices. */
-  def V: GremlinScalaPipeline[Vertex, Vertex] =
+  def V: GremlinScalaPipeline[Vertex, Vertex] = //TODO: get rid of these casts
     new GremlinScalaPipeline[Graph, Vertex].start(graph).V(graph).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
 
   /**Returns the vertices with the specified IDs. */
@@ -29,7 +29,13 @@ class ScalaGraph(val graph: Graph) {
   def -> : GremlinScalaPipeline[Graph, Graph] =
     new GremlinScalaPipeline[Graph, Graph].start(graph).asInstanceOf[GremlinScalaPipeline[Graph, Graph]];
 
-  //TODO def += for addVertex and addEdge?
+  /** add vertex */
+  def addV() = graph.addVertex(null)
+  def addV(id: Any) = graph.addVertex(id)
+
+  /** add edge */
+  def addE(id: Any, outVertex: Vertex, inVertex: Vertex, label: String) = graph.addEdge(id, outVertex, inVertex, label)
+  def addE(outVertex: Vertex, inVertex: Vertex, label: String) = graph.addEdge(null, outVertex, inVertex, label)
 }
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Graph]] and [[com.tinkerpop.gremlin.scala.ScalaGraph]]. */

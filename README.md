@@ -107,6 +107,12 @@ gremlin> marko.out("knows")(_("name"))
 ==> vadas
 ==> josh
 
+# create a new graph with two vertices and an edge between them
+val g = new TinkerGraph()
+val v1 = graph.addV()
+val v2 = graph.addV()
+graph.addE(v1, v2, "label")
+
 For many more examples (in Gremlin-Groovy syntax) see the [Getting started page of Gremlin (in groovy syntax)]https://github.com/tinkerpop/gremlin/wiki/Getting-Started].
 This is a normal Scala REPL, so you run arbitrary Scala code here. 
 ```
