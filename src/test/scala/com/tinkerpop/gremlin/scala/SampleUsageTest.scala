@@ -23,6 +23,11 @@ class SampleUsageTest extends FunSpec with ShouldMatchers {
           "{name=peter, age=35}, {name=ripple, lang=java}, {name=josh, age=32}]")
     }
 
+    it("finds all names of vertices") {
+      val names = vertices.property("name").toList
+      names.toString should be("[lop, vadas, marko, peter, ripple, josh]")
+    }
+
     it("can get a specific vertex by id and get it's properties") {
       val marko = graph.v(1)
       marko("name") should be("marko")

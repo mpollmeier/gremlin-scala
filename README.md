@@ -95,6 +95,15 @@ gremlin> g.V.map
 ==> {name=ripple, lang=java}
 ==> {name=josh, age=32}
 
+# show names of all vertices
+gremlin> g.V.property("name")
+==>lop
+==>vadas
+==>marko
+==>peter
+==>ripple
+==>josh
+
 # get marko's vertex
 gremlin> val marko = g.v(1)
 ==> v[1]
