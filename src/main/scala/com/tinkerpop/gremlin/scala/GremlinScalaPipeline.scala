@@ -95,6 +95,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def dedup(dedupFunction: E ⇒ _): GremlinScalaPipeline[S, E] = super.dedup(new ScalaPipeFunction(dedupFunction))
 
   override def except(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.except(collection)
+  override def except(namedSteps: String*): GremlinScalaPipeline[S, E] = super.except(namedSteps: _*)
 
   def filter(filterFunction: E ⇒ JBoolean): GremlinScalaPipeline[S, E] = super.filter(new ScalaPipeFunction(filterFunction))
 
@@ -105,6 +106,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   override def range(low: Int, high: Int): GremlinScalaPipeline[S, E] = super.range(low, high)
 
   override def retain(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.retain(collection)
+  override def retain(namedSteps: String*): GremlinScalaPipeline[S, E] = super.retain(namedSteps: _*)
 
   override def simplePath: GremlinScalaPipeline[S, E] = super.simplePath()
 
