@@ -294,7 +294,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def apply[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
 
   def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] =
-    super.order({ x: TPair[E, E] ⇒ compareFunction.compute(x).asInstanceOf[JInteger] })
+    super.order({ x: TPair[E, E] ⇒ new JInteger(compareFunction.compute(x)) })
 
   override def order: GremlinScalaPipeline[S, E] = super.order()
   override def order(by: Tokens.T) = super.order(by)
