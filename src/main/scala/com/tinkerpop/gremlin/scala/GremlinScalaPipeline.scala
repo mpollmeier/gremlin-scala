@@ -9,6 +9,8 @@ import java.util.{ Map ⇒ JMap, List ⇒ JList, Iterator ⇒ JIterator, Collect
 import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger }
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
+import com.tinkerpop.pipes.transform.TransformPipe
+import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -357,13 +359,40 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
     super.transform(new ScalaPipeFunction(function)).asInstanceOf[GremlinScalaPipeline[S, T]]
   }
 
-  override def order: GremlinScalaPipeline[S, E] = {
-    super.order().asInstanceOf[GremlinScalaPipeline[S, E]]
-  }
-
-  def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] = {
+  def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] =
     super.order({ x: TPair[E, E] ⇒ compareFunction.compute(x).asInstanceOf[JInteger] }).asInstanceOf[GremlinScalaPipeline[S, E]]
-  }
+
+  override def order: GremlinScalaPipeline[S, E] = super.order().asInstanceOf[GremlinScalaPipeline[S, E]]
+  override def order(by: Tokens.T) = super.order(by).asInstanceOf[GremlinScalaPipeline[S, E]]
+  override def order(by: TransformPipe.Order) = super.order(by).asInstanceOf[GremlinScalaPipeline[S, E]]
+
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param order if the values implement Comparable, then a increment or decrement sort is usable
+   * @return the extended Pipeline
+   */
+  override def orderMap(by: Tokens.T) = super.orderMap(by).asInstanceOf[GremlinScalaPipeline[S, E]]
+
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param order if the values implement Comparable, then a increment or decrement sort is usable
+   * @return the extended Pipeline
+   */
+  override def orderMap(by: TransformPipe.Order) = super.orderMap(by).asInstanceOf[GremlinScalaPipeline[S, E]]
+
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param compareFunction a function to compare to map entries
+   * @return the extended Pipeline
+   */
+  def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer) =
+    super.orderMap(new ScalaPipeFunction(by)).asInstanceOf[GremlinScalaPipeline[S, E]]
 
   //////////////////////
   /// UTILITY PIPES ///
