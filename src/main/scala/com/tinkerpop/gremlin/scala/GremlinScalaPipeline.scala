@@ -333,6 +333,16 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
     super.select(stepNames, stepFunctions: _*).asInstanceOf[GremlinScalaPipeline[S, Row[_]]]
   }
 
+  /**
+   * Add a ShufflePipe to the end of the Pipeline.
+   * All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
+   * as a List.
+   *
+   * @return the extended Pipeline
+   */
+  override def shuffle: GremlinScalaPipeline[S, JList[_]] =
+    super.shuffle().asInstanceOf[GremlinScalaPipeline[S, JList[_]]]
+
   override def scatter: GremlinScalaPipeline[S, _] = {
     super.scatter().asInstanceOf[GremlinScalaPipeline[S, _]]
   }
