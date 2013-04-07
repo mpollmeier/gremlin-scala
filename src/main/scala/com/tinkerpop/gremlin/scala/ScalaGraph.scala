@@ -12,7 +12,7 @@ class ScalaGraph(val graph: Graph) {
   def V(ids: Any*): Iterable[Vertex] = ids.map(graph.getVertex(_)) //TODO should'nt V and V(1,2) return the same type???
 
   /**Returns the vertex with the specified ID. */
-  def v(id: Any): Vertex = graph getVertex id
+  def v(id: Any): ScalaVertex = graph getVertex id
 
   /**Returns all edges. */
   def E: GremlinScalaPipeline[Edge, Edge] =
@@ -24,7 +24,7 @@ class ScalaGraph(val graph: Graph) {
   }
 
   /**Returns the edge with the specified ID. */
-  def e(id: Any): Edge = graph getEdge id
+  def e(id: Any): ScalaEdge = graph getEdge id
 
   def -> : GremlinScalaPipeline[Graph, Graph] =
     new GremlinScalaPipeline[Graph, Graph].start(graph).asInstanceOf[GremlinScalaPipeline[Graph, Graph]];

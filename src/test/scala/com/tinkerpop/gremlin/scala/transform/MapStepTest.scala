@@ -8,10 +8,6 @@ import com.tinkerpop.blueprints.Vertex
 class MapStepTest extends com.tinkerpop.gremlin.test.transform.MapStepTest {
   val g = TinkerGraphFactory.createTinkerGraph()
 
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
-
   def test_g_v1_map() {
     super.test_g_v1_map(g.v(1).->.map.asInstanceOf[GremlinScalaPipeline[Vertex, java.util.Map[String, Object]]])
   }

@@ -1,17 +1,15 @@
 package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints.Element
-import java.util.{Map => JMap}
-
-/**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
+import java.util.{ Map ⇒ JMap }
 
 abstract class ScalaElement(val element: Element) {
 
-  def as[T](key: String): Option[T] = Option(element.getProperty(key)).map(_.asInstanceOf[T])
+  def get[T](key: String): Option[T] = Option(element.getProperty(key).asInstanceOf[T])
 
   def id: Any = element.getId
 
-  def apply(key: String): Object = element.getProperty(key)
+  //TODO remove getProperty, rename property to getProperty
+  def getProperty(key: String): Object = element.getProperty(key)
+  def apply(key: String): Object = getProperty(key)
 }

@@ -3,7 +3,7 @@ package com.tinkerpop.gremlin.scala.filter
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.blueprints.Vertex
-import java.util.{HashSet, ArrayList}
+import java.util.{ HashSet, ArrayList }
 import com.tinkerpop.gremlin.scala._
 
 /**
@@ -13,10 +13,6 @@ import com.tinkerpop.gremlin.scala._
 class RetainStepTest extends com.tinkerpop.gremlin.test.filter.RetainStepTest {
 
   val g = TinkerGraphFactory.createTinkerGraph();
-
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
 
   def test_g_v1_out_retainXg_v2X() {
     val x = new ArrayList[Vertex]();

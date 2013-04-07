@@ -3,7 +3,7 @@ package com.tinkerpop.gremlin.scala.filter
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.blueprints.Vertex
-import java.util.{ArrayList, HashSet}
+import java.util.{ ArrayList, HashSet }
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.pipes.Pipe
 
@@ -14,10 +14,6 @@ import com.tinkerpop.pipes.Pipe
 class ExceptStepTest extends com.tinkerpop.gremlin.test.filter.ExceptStepTest {
 
   val g = TinkerGraphFactory.createTinkerGraph();
-
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
 
   def test_g_v1_out_exceptXg_v2X() {
     val x = new ArrayList[Vertex]();
@@ -32,7 +28,14 @@ class ExceptStepTest extends com.tinkerpop.gremlin.test.filter.ExceptStepTest {
 
   def test_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_propertyXnameX() {
     import scala.collection.JavaConversions._
-    super.test_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_propertyXnameX(g.v(1).out("created").in("created").except(List(g.v(1))).property("name").asInstanceOf[Pipe[Vertex, String]])
+    val v1 = g.v(1).vertex
+
+    super.test_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_propertyXnameX(
+      g.v(1)
+        .out("created")
+        .in("created")
+        .except(List(v1))
+        .property("name").asInstanceOf[Pipe[Vertex, String]])
   }
 
 }

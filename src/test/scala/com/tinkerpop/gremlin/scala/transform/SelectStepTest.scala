@@ -14,16 +14,12 @@ class SelectStepTest extends com.tinkerpop.gremlin.test.transform.SelectStepTest
 
   val g = TinkerGraphFactory.createTinkerGraph()
 
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
-
   def test_g_v1_asXaX_outXknowsX_asXbX_select() {
     super.test_g_v1_asXaX_outXknowsX_asXbX_select(g.v(1).->.as("a").out("knows").as("b").select())
   }
 
   def test_g_v1_asXaX_outXknowsX_asXbX_selectXnameX() {
-    super.test_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(g.v(1).->.as("a").out("knows").as("b").select({v: Vertex => v("name")}))
+    super.test_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(g.v(1).->.as("a").out("knows").as("b").select({ v: Vertex ⇒ v("name") }))
   }
 
   def test_g_v1_asXaX_outXknowsX_asXbX_selectXaX() {
@@ -31,6 +27,6 @@ class SelectStepTest extends com.tinkerpop.gremlin.test.transform.SelectStepTest
   }
 
   def test_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX() {
-    super.test_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(g.v(1).->.as("a").out("knows").as("b").select(Arrays.asList("a"), {v: Vertex => v("name")}))
+    super.test_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(g.v(1).->.as("a").out("knows").as("b").select(Arrays.asList("a"), { v: Vertex ⇒ v("name") }))
   }
 }

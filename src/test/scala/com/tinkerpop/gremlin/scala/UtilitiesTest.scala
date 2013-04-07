@@ -12,10 +12,6 @@ class UtilitiesTest extends com.tinkerpop.gremlin.test.UtilitiesTest {
 
   val g = TinkerGraphFactory.createTinkerGraph()
 
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
-
   def test_g_v1_out_toList() {
     super.test_g_v1_out_toList(g.v(1).out.toList)
   }

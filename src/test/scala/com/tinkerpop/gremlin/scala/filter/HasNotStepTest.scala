@@ -13,10 +13,6 @@ class HasNotStepTest extends com.tinkerpop.gremlin.test.filter.HasNotStepTest {
 
   val g = TinkerGraphFactory.createTinkerGraph();
 
-  override def testCompliance() {
-    ComplianceTest.testCompliance(this.getClass)
-  }
-
   def test_g_V_hasNotXname_markoX() {
     super.test_g_V_hasNotXname_markoX(g.V.hasNot("name", "marko"));
   }
