@@ -15,7 +15,7 @@
         <gremlin.version>2.3.0</gremlin.version>
         <blueprints.version>2.3.0</blueprints.version>
         <pipes.version>2.3.0</pipes.version>
-        <scala.version>2.10.1</scala.version>
+        <scala.version>2.10.0</scala.version>
     </properties>
     <developers>
         <developer>
