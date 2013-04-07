@@ -164,6 +164,100 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   override def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
   override def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
 
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param order if the values implement Comparable, then a increment or decrement sort is usable
+   * @return the extended Pipeline
+   */
+  override def orderMap(by: Tokens.T): GremlinScalaPipeline[S, _] = super.orderMap(by)
+
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param order if the values implement Comparable, then a increment or decrement sort is usable
+   * @return the extended Pipeline
+   */
+  override def orderMap(by: TransformPipe.Order): GremlinScalaPipeline[S, _] = super.orderMap(by)
+
+  /**
+   * Add a OrderMapPipe to the end of the Pipeline
+   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   * @param compareFunction a function to compare to map entries
+   * @return the extended Pipeline
+   */
+  def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer): GremlinScalaPipeline[S, _] =
+    super.orderMap(new ScalaPipeFunction(by))
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
+   *
+   * @param label     the edge label
+   * @param namedStep the step name that has the other vertex to link to
+   * @return the extended Pipeline
+   */
+  override def linkOut(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
+    super.linkOut(label, namedStep)
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
+   *
+   * @param label     the edge label
+   * @param namedStep the step name that has the other vertex to link to
+   * @return the extended Pipeline
+   */
+  override def linkIn(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
+    super.linkIn(label, namedStep)
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
+   *
+   * @param label     the edge label
+   * @param namedStep the step name that has the other vertex to link to
+   * @return the extended Pipeline
+   */
+  override def linkBoth(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
+    super.linkBoth(label, namedStep)
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
+   *
+   * @param label the edge label
+   * @param other the other vertex
+   * @return the extended Pipeline
+   */
+  override def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+    super.linkOut(label, other)
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
+   *
+   * @param label the edge label
+   * @param other the other vertex
+   * @return the extended Pipeline
+   */
+  override def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+    super.linkIn(label, other)
+
+  /**
+   * Add a LinkPipe to the end of the Pipeline.
+   * Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
+   *
+   * @param label the edge label
+   * @param other the other vertex
+   * @return the extended Pipeline
+   */
+  override def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+    super.linkBoth(label, other)
+
   ///////////////////////
   /// TRANSFORM PIPES ///
   ///////////////////////
