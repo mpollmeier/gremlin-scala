@@ -56,8 +56,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def property[F <: Element](key: String) = super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
-  def step[F](f: JIterator[E] ⇒ F): GremlinScalaPipeline[S, F] =
-    super.step(new ScalaPipeFunction(f)).asInstanceOf[GremlinScalaPipeline[S, F]]
+  def step[F](f: JIterator[E] ⇒ F): GremlinScalaPipeline[S, _] = super.step(new ScalaPipeFunction(f))
 
   ////////////////////
   /// BRANCH PIPES ///
@@ -264,8 +263,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   /// TRANSFORM PIPES ///
   ///////////////////////
   override def gather: GremlinScalaPipeline[S, JList[_]] = super.gather()
-  def gather(function: JList[_] ⇒ JList[_]): GremlinScalaPipeline[S, JList[_]] =
-    super.gather(new ScalaPipeFunction(function)).asInstanceOf[GremlinScalaPipeline[S, JList[_]]]
+  def gather(function: JList[_] ⇒ JList[_]): GremlinScalaPipeline[S, _] = super.gather(new ScalaPipeFunction(function))
 
   override def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
   override def memoize(numberedStep: Int): GremlinScalaPipeline[S, E] = super.memoize(numberedStep)
