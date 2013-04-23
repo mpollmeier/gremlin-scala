@@ -100,12 +100,11 @@ Sample usage
 
 Adding dependency to your project
 =============
-sbt:
 ```scala
-"com.michaelpollmeier" % "gremlin-scala" % "VERSION"
+/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "VERSION"
 ```
-Maven:
 ```xml
+<!-- Maven -->
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
   <artifactId>gremlin-scala</artifactId>
