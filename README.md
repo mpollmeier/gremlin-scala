@@ -98,6 +98,21 @@ Sample usage
     }
 ```
 
+Adding dependency to your project
+=============
+sbt:
+```scala
+"com.michaelpollmeier" % "gremlin-scala" % "VERSION"
+```
+Maven:
+```xml
+<dependency>
+  <groupId>com.michaelpollmeier</groupId>
+  <artifactId>gremlin-scala</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
 Gremlin-Console
 =============
 You can play with Gremlin in an interactive console:

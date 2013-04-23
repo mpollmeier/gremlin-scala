@@ -19,3 +19,4 @@ project/plugins/project/
 .classpath
 .project
 .settings
+*.swp
