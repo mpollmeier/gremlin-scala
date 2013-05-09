@@ -8,23 +8,21 @@ class ScalaGraph(val graph: Graph) {
   def V: GremlinScalaPipeline[Vertex, Vertex] = //TODO: get rid of these casts
     new GremlinScalaPipeline[Graph, Vertex].start(graph).V(graph).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
 
-  /**Returns the vertices with the specified IDs. */
-  def V(ids: Any*): Iterable[Vertex] = ids.map(graph.getVertex(_)) //TODO should'nt V and V(1,2) return the same type???
-
-  /**Returns the vertex with the specified ID. */
-  def v(id: Any): ScalaVertex = graph getVertex id
-
   /**Returns all edges. */
-  def E: GremlinScalaPipeline[Edge, Edge] =
+  def E: GremlinScalaPipeline[Edge, Edge] = //TODO: get rid of these casts
     new GremlinScalaPipeline[Graph, Edge].start(graph).E(graph).asInstanceOf[GremlinScalaPipeline[Edge, Edge]]
 
+  /**Returns the vertices with the specified IDs. */
+  def V(ids: Any*): Iterable[ScalaVertex] = ids.map(id ⇒ ScalaVertex(graph.getVertex(id)))
+
   /**Returns the edges with the specified IDs. */
-  def E(ids: Any*): Iterable[Edge] = ids map {
-    graph getEdge _
-  }
+  def E(ids: Any*): Iterable[ScalaEdge] = ids.map(id ⇒ ScalaEdge(graph.getEdge(id)))
+
+  /**Returns the vertex with the specified ID. */
+  def v(id: Any): ScalaVertex = graph.getVertex(id)
 
   /**Returns the edge with the specified ID. */
-  def e(id: Any): ScalaEdge = graph getEdge id
+  def e(id: Any): ScalaEdge = graph.getEdge(id)
 
   def -> : GremlinScalaPipeline[Graph, Graph] =
     new GremlinScalaPipeline[Graph, Graph].start(graph).asInstanceOf[GremlinScalaPipeline[Graph, Graph]];
@@ -34,13 +32,12 @@ class ScalaGraph(val graph: Graph) {
   def addV(id: Any) = graph.addVertex(id)
 
   /** add edge */
-  def addE(id: Any, outVertex: Vertex, inVertex: Vertex, label: String) = graph.addEdge(id, outVertex, inVertex, label)
-  def addE(outVertex: Vertex, inVertex: Vertex, label: String) = graph.addEdge(null, outVertex, inVertex, label)
+  def addE(id: Any, out: ScalaVertex, in: ScalaVertex, label: String) = graph.addEdge(id, out, in, label)
+  def addE(out: ScalaVertex, in: ScalaVertex, label: String) = graph.addEdge(null, out, in, label)
 }
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Graph]] and [[com.tinkerpop.gremlin.scala.ScalaGraph]]. */
 object ScalaGraph {
   implicit def wrap(graph: Graph) = new ScalaGraph(graph)
-
   implicit def unwrap(wrapper: ScalaGraph) = wrapper.graph
 }
