@@ -16,7 +16,7 @@
         <gremlin.version>2.3.0</gremlin.version>
         <blueprints.version>2.3.0</blueprints.version>
         <pipes.version>2.3.0</pipes.version>
-        <scala.version>2.10.0</scala.version>
+        <scala.version>2.10.1</scala.version>
     </properties>
     <developers>
         <developer>
@@ -124,6 +124,17 @@
             <artifactId>blueprints-rexster-graph</artifactId>
             <version>${blueprints.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- jsr223 script engine -->
+        <dependency>
+            <groupId>com.googlecode.scalascriptengine</groupId>
+            <artifactId>scalascriptengine</artifactId>
+            <version>1.3.2-${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-compiler</artifactId>
+            <version>${scala.version}</version>
         </dependency>
         <!-- TESTING -->
         <dependency>

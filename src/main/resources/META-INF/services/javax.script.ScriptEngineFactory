@@ -1,1 +1,1 @@
-com.tinkerpop.gremlin.groovy.jsr223.GremlinGroovyScriptEngineFactory
+com.tinkerpop.gremlin.scala.jsr223.GremlinScalaScriptEngineFactory
