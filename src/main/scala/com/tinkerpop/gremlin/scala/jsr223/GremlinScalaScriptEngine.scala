@@ -3,13 +3,12 @@ package com.tinkerpop.gremlin.scala.jsr223
 import javax.script._
 import java.io.Reader
 import scala.annotation.tailrec
+import com.tinkerpop.gremlin.scala.Gremlin
 
 class GremlinScalaScriptEngine extends AbstractScriptEngine {
-  private val manager = new ScriptEngineManager
-  private val engine = manager.getEngineByName("scala")
-  lazy val factory = new GremlinScalaScriptEngineFactory
+  private lazy val factory = new GremlinScalaScriptEngineFactory
 
-  def eval(script: String, context: ScriptContext) = engine.eval(script, context)
+  def eval(script: String, context: ScriptContext) = "dumy response" //engine.eval(script, context)
   def eval(reader: Reader, context: ScriptContext) = eval(readFully(reader), context)
   def createBindings(): Bindings = new SimpleBindings
   def getFactory() = factory
@@ -24,4 +23,11 @@ class GremlinScalaScriptEngine extends AbstractScriptEngine {
     }
     go(new StringBuilder)
   }
+}
+
+/**
+ * implemented by script file
+ */
+trait ScalaScript {
+  def result: Any
 }
