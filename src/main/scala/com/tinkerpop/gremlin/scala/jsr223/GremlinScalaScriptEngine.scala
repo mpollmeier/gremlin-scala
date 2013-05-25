@@ -3,12 +3,28 @@ package com.tinkerpop.gremlin.scala.jsr223
 import javax.script._
 import java.io.Reader
 import scala.annotation.tailrec
+
 import com.tinkerpop.gremlin.scala.Gremlin
 
 class GremlinScalaScriptEngine extends AbstractScriptEngine {
   private lazy val factory = new GremlinScalaScriptEngineFactory
 
-  def eval(script: String, context: ScriptContext) = "dumy response" //engine.eval(script, context)
+  def eval(script: String, context: ScriptContext) = {
+    import scala.collection.JavaConversions._
+    //    context.getScopes foreach {
+    //      println(_)
+    //    }
+    //TODO do this in file
+    Option(context.getBindings(ScriptContext.ENGINE_SCOPE)) foreach { binding ⇒
+      println(s"engine: $binding")
+    }
+    Option(context.getBindings(ScriptContext.GLOBAL_SCOPE)) foreach {
+      println(_)
+    }
+    com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory.createTinkerGraph
+    //"dumy response" 
+    //engine.eval(script, context)
+  }
   def eval(reader: Reader, context: ScriptContext) = eval(readFully(reader), context)
   def createBindings(): Bindings = new SimpleBindings
   def getFactory() = factory
