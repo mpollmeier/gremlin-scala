@@ -11,7 +11,11 @@ import com.googlecode.scalascriptengine.ScalaScriptEngine
 import scala.collection.mutable
 
 object GremlinScalaScriptEngine {
-  val ScalaLine = """\w*\s*(\w?)\s*=?\s*(.*)""".r
+  //  val ScalaLine = """(\w*)\s*=?\s*(.*)""".r
+  //		  val ScalaLine = """\w*\s*(\w?)\s*=?\s*(.*)""".r
+  //  val ScalaLine = """(\w*)\s*=?(.*)""".r
+  //  val ScalaLine = """\w*\b\s*(\w*)\s*=?\s*(.*)""".r
+  //  val ScalaLine = """\w*\s*(\w*)\s*=?\s*(.*)""".r
 }
 
 class GremlinScalaScriptEngine(workDir: String = "work") extends AbstractScriptEngine {
@@ -44,13 +48,27 @@ class GremlinScalaScriptEngine(workDir: String = "work") extends AbstractScriptE
     }
   }
 
-  def parseLine(line: String) = line.trim match {
-    case ScalaLine(returnName, command) ⇒
-      if ("".equals(returnName))
-        ParseResult(None, command.trim)
-      else
-        ParseResult(Some(returnName.trim), command.trim)
+  def parseLine(line: String) = {
+    line.trim.split("=").toList match {
+      case command :: Nil               ⇒ ParseResult(None, command.trim)
+      case assignment :: command :: Nil ⇒ ParseResult(Some(assignment), command.trim)
+    }
+    //    val line = l.trim
+    //    if (!line.contains("=")) 
+    //      ParseResult(None, line)
+    //    else {
+    //      line.split("=")
+    //    }
+
   }
+  //  def parseLine(line: String) = line.trim match {
+  //    case ScalaLine(returnName, command) ⇒
+  //      println(s"line: $line -> $returnName :: $command")
+  //      if ("".equals(returnName))
+  //        ParseResult(None, command.trim)
+  //      else
+  //        ParseResult(Some(returnName.trim), command.trim)
+  //  }
 
   def writeScript(script: String) {
     val file = new FileWriter(s"$dir/Script.scala")
