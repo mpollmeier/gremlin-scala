@@ -10,7 +10,12 @@ import java.io.FileWriter
 import com.googlecode.scalascriptengine.ScalaScriptEngine
 import scala.collection.mutable
 
+object GremlinScalaScriptEngine {
+  val ScalaLine = """\w*\s*(\w?)\s*=?\s*(.*)""".r
+}
+
 class GremlinScalaScriptEngine(workDir: String = "work") extends AbstractScriptEngine {
+  import GremlinScalaScriptEngine._
   private lazy val factory = new GremlinScalaScriptEngineFactory
   val dir = s"$workDir/jsr223"
   val scriptDir = new File(dir)
@@ -20,12 +25,31 @@ class GremlinScalaScriptEngine(workDir: String = "work") extends AbstractScriptE
   val vals = mutable.Map.empty[String, Any]
 
   def eval(script: String, context: ScriptContext) = {
-    writeScript(script)
-    engine.refresh
-    val scalaScript = engine.constructors[ScalaScript]("Script").newInstance(vals)
+    Option(context.getBindings(ScriptContext.ENGINE_SCOPE)) map { bindings ⇒
+      bindings.keySet foreach { key ⇒
+        println(s"engine scope: $key = ${bindings.get(key)}")
+      }
+    }
 
-    /** jsr223 forces us to return an object. primitives won't work as return values ;( */
-    scalaScript.result.asInstanceOf[Object]
+    try {
+      writeScript(script)
+      engine.refresh
+      val scalaScript = engine.constructors[ScalaScript]("Script").newInstance(vals)
+      val result = scalaScript.result
+
+      /** jsr223 forces us to return an object... ;( */
+      result.asInstanceOf[Object]
+    } catch {
+      case e: Throwable ⇒ "that didn't work ;("
+    }
+  }
+
+  def parseLine(line: String) = line.trim match {
+    case ScalaLine(returnName, command) ⇒
+      if ("".equals(returnName))
+        ParseResult(None, command.trim)
+      else
+        ParseResult(Some(returnName.trim), command.trim)
   }
 
   def writeScript(script: String) {
@@ -67,3 +91,5 @@ class Script(vals: mutable.Map[String, Any]) extends ScalaScript {""" +
 trait ScalaScript {
   def result: Any
 }
+
+case class ParseResult(returnName: Option[String], command: String)

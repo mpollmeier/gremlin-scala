@@ -12,6 +12,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
 import org.scalatest.mock.MockitoSugar
 import javax.script.ScriptContext
+import GremlinScalaScriptEngine._
 
 @RunWith(classOf[JUnitRunner])
 class ScalaScriptEngineTest extends FunSpec with ShouldMatchers with MockitoSugar {
@@ -21,6 +22,18 @@ class ScalaScriptEngineTest extends FunSpec with ShouldMatchers with MockitoSuga
 
     it("runs a simple command") {
       target.eval(""" "dummy response" """, mock[ScriptContext]) should be("dummy response")
+    }
+
+    it("parses lines in different variations") {
+      //      val ScalaLine = """(val|var|def)?\s*?a\s?=""".r
+
+      target.parseLine("\"dummy response\"") should be(ParseResult(None, "\"dummy response\""))
+      target.parseLine("""a = "dummy response"""") should be(ParseResult(Some("a"), "\"dummy response\""))
+      target.parseLine("""val a = "dummy response"""") should be(ParseResult(Some("a"), "\"dummy response\""))
+    }
+
+    it("removes the assignment for the script") {
+      target.eval(""" val a = "dummy response" """, mock[ScriptContext]) should be("dummy response")
     }
 
     ignore("stores values for the next execution") {}
