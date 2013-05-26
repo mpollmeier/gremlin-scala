@@ -150,6 +150,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.tinkerpop.gremlin</groupId>
             <artifactId>gremlin-test</artifactId>
             <version>${gremlin.version}</version>
