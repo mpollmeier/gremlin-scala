@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util
+END
+VirtualDirectoryWrapper.scala
+K 25
+svn:wc:ra_dav:version-url
+V 158
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util/VirtualDirectoryWrapper.scala
+END
+FileWrapper.scala
+K 25
+svn:wc:ra_dav:version-url
+V 146
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util/FileWrapper.scala
+END
+Wrapper.scala
+K 25
+svn:wc:ra_dav:version-url
+V 142
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util/Wrapper.scala
+END
+GenericFileWrapperTrait.scala
+K 25
+svn:wc:ra_dav:version-url
+V 158
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util/GenericFileWrapperTrait.scala
+END
+SplittingDirectory.scala
+K 25
+svn:wc:ra_dav:version-url
+V 153
+/repos/asf/!svn/ver/1452124/clerezza/trunk/scala-scripting/script-engine/src/main/scala/org/apache/clerezza/scala/scripting/util/SplittingDirectory.scala
+END
