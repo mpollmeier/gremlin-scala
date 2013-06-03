@@ -1,6 +1,6 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.blueprints.{Vertex, Edge}
+import com.tinkerpop.blueprints.{ Vertex, Edge }
 
 /**Adds convenience methods to [[com.tinkerpop.blueprints.Edge]]. */
 class ScalaEdge(val edge: Edge) extends ScalaElement(edge) {
@@ -19,7 +19,7 @@ class ScalaEdge(val edge: Edge) extends ScalaElement(edge) {
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Edge]] and [[com.tinkerpop.gremlin.scala.ScalaEdge]]. */
 object ScalaEdge {
+  def apply(edge: Edge) = wrap(edge)
   implicit def wrap(edge: Edge) = new ScalaEdge(edge)
-
   implicit def unwrap(wrapper: ScalaEdge) = wrapper.edge
 }

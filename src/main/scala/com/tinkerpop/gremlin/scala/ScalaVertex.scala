@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
-import java.util.{Map => JMap}
-import com.tinkerpop.blueprints.{Vertex, Edge}
+import java.util.{ Map ⇒ JMap }
+import com.tinkerpop.blueprints.{ Vertex, Edge }
 
 /**Adds convenience methods to [[com.tinkerpop.blueprints.Vertex]]. */
 class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
@@ -47,7 +47,7 @@ class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Vertex]] and [[com.tinkerpop.gremlin.scala.ScalaVertex]]. */
 object ScalaVertex {
+  def apply(vertex: Vertex) = wrap(vertex)
   implicit def wrap(vertex: Vertex) = new ScalaVertex(vertex)
-
   implicit def unwrap(wrapper: ScalaVertex) = wrapper.vertex
 }

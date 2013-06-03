@@ -98,7 +98,7 @@ Sample usage
     }
 ```
 
-Adding dependency to your project
+Adding Gremlin-Scala as a dependency to your project
 =============
 ```scala
 /* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "VERSION"
