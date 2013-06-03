@@ -139,38 +139,36 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
      * returns an accessible class or interface that is implemented by class,
      * is doesn't look for superinterfaces of implement interfaces
      */
-    private def getAccessibleClass(clazz: Class[_]): Class[_] = {
+    private def getAccessibleClass(clazz: Class[_]): Class[_] =
       if (isAccessible(clazz)) {
-        return clazz
+        clazz
       } else {
         val foo: Class[_] = clazz.getInterfaces()(0)
         for (implementedInterface ← clazz.getInterfaces()) {
           if (isAccessible(implementedInterface)) return implementedInterface
         }
+        getAccessibleSuperClass(clazz)
       }
-      getAccessibleSuperClass(clazz)
-    }
 
     private def getAccessibleSuperClass(clazz: Class[_]): Class[_] = {
       val superClass = clazz.getSuperclass
       if (superClass == null) {
         throw new RuntimeException("No upper class to be checked for accessibility for " + clazz)
       }
-      if (isAccessible(superClass)) {
+      if (isAccessible(superClass))
         superClass
-      } else {
+      else
         getAccessibleSuperClass(superClass)
-      }
+
     }
 
-    private def isAccessible(clazz: Class[_]) = {
+    private def isAccessible(clazz: Class[_]) =
       try {
         Class.forName(clazz.getName)
         true
       } catch {
         case e: Exception ⇒ false
       }
-    }
   }
 }
 
