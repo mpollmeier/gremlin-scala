@@ -7,13 +7,13 @@ import javax.script.ScriptEngineManager
 import com.tinkerpop.gremlin.scala.Gremlin
 import java.io.File
 import java.io.FileWriter
-import com.googlecode.scalascriptengine.ScalaScriptEngine
+//import com.googlecode.scalascriptengine.ScalaScriptEngine
 import scala.collection.mutable
 import scala.collection.JavaConversions._
 import javax.script.Compilable
-import org.apache.clerezza.scala.scripting.ScriptEngineFactory
-import org.apache.felix.scr.annotations.Service
-import org.osgi.util.tracker.ServiceTracker
+//import org.apache.clerezza.scala.scripting.ScriptEngineFactory
+//import org.apache.felix.scr.annotations.Service
+//import org.osgi.util.tracker.ServiceTracker
 
 object ScriptExecutor extends App {
   //  val scriptFile = "src/test/resources/jsr223/Script.scala"
