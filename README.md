@@ -180,4 +180,9 @@ mvn test      #run all tests - should find all dependencies and run the tests fi
 mvn install   #install into your local maven repository so that you can use it (groupId=com.tinkerpop.gremlin, artifactId=gremlin-scala
 ```
 
-Kudos go to [Zach Cox](http://theza.ch) for starting this project and the whole [Tinkerpop](http://www.tinkerpop.com) team for creating a whole awesome stack around graph databases.
+Contributors
+=============
+[Michael Pollmeier](http://www.michaelpollmeier.com] - project maintainer since Gremlin 2.2
+[Zach Cox](http://theza.ch) - started this project
+[Tinkerpop team](http://www.tinkerpop.com) - created a whole awesome stack around graph databases
+[Antonio](https://twitter.com/Vantonio) - helped with jsr223 script engine
