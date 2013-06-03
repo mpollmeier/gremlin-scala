@@ -38,27 +38,24 @@ import javax.script.{
 }
 import scala.actors.DaemonActor
 import scala.tools.nsc.interpreter._
-import scala.tools.nsc.io.VirtualDirectory
 import _root_.scala.collection.JavaConversions._
+import com.tinkerpop.gremlin.scala.Gremlin
 
 /**
  * Copied and adapted from clerazza scala script engine: https://github.com/apache/clerezza
  * The code isn't really idiomatic scala, but it works...
  */
-//TODO have the interpretatin function back running, consider using http://code.google.com/p/scalascriptengine
-class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with BundleListener*/ {
-  val compilerService = new CompilerService
+class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
   val interpreter: IMain = new GremlinScalaInterpreter(new PrintWriter(System.out))
-  var classCounter = 0
-  val virtualDirectory = new VirtualDirectory("(memory)", None)
   val msgWriter = new StringWriter
 
+  val name = "gremlin-scala"
   override def getEngineName() = "Scala Scripting Engine for OSGi"
-  override def getEngineVersion() = "0.3/scala 2.10.1"
-  override def getExtensions() = java.util.Collections.singletonList("scala")
+  override def getEngineVersion() = Gremlin.version
+  override def getExtensions() = java.util.Collections.singletonList(name)
   override def getMimeTypes() = java.util.Collections.singletonList("application/x-scala")
-  override def getNames() = java.util.Collections.singletonList("scala")
-  override def getLanguageName() = "Scala"
+  override def getNames() = java.util.Collections.singletonList(name)
+  override def getLanguageName() = name
   override def getLanguageVersion = "2.10.1"
   override def getParameter(key: String) = key match {
     case ScriptEngine.ENGINE           ⇒ getEngineName
@@ -103,13 +100,9 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
                 import _root_.scala.collection.JavaConversions._
                 for (
                   scope ← context.getScopes if (context.getBindings(scope.intValue) != null);
-                  entry ← context.getBindings(scope.intValue)
-                ) {
-                  interpreter.bind(entry._1,
-                    getAccessibleClass(entry._2.getClass).getName, entry._2)
-                }
+                  (name, obj) ← context.getBindings(scope.intValue)
+                ) interpreter.bind(name, getAccessibleClass(obj.getClass).getName, obj)
                 interpreter.interpret(script)
-                interpreter.visibleTermNames.foreach(println)
                 if (interpreter.reporter.hasErrors) {
                   throw new ScriptException("some error", "script-file", 1)
                 }
@@ -123,7 +116,7 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
     }
     interpreterAction.start()
 
-    override def eval(script: String, context: ScriptContext): Object = {
+    override def eval(script: String, context: ScriptContext): Object =
       interpreterAction !? ((script, context)) match {
         case GremlinScalaScriptEngineFactory.ActorException(e) ⇒ throw e
         case x: Object ⇒ x match {
@@ -131,66 +124,12 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
           case None            ⇒ null
         }
       }
-    }
 
     override def getFactory() = GremlinScalaScriptEngineFactory.this
     override def createBindings(): Bindings = new SimpleBindings
 
-    override def compile(script: Reader): CompiledScript = {
-      val scriptStringWriter = new StringWriter()
-      var ch = script.read
-      while (ch != -1) {
-        scriptStringWriter.write(ch)
-        ch = script.read
-      }
-      compile(scriptStringWriter.toString)
-    }
-
-    override def compile(script: String): CompiledScript = {
-      AccessController.doPrivileged(new PrivilegedAction[CompiledScript]() {
-        override def run() = {
-          val objectName = "CompiledScript" + classCounter
-          classCounter += 1
-          val code = s"""
-          	class $objectName {
-              def run(m: Map[String, Object]) = {
-                script
-              }
-            }"""
-
-          val sources = List(code.toCharArray)
-          val clazz = try {
-            compilerService.compile(sources)(0)
-          } catch {
-            case e: CompileErrorsException ⇒ throw new ScriptException(e.getMessage, "script", -1);
-            case e: Throwable              ⇒ throw e
-          }
-          val scriptObject = clazz.newInstance
-
-          new CompiledScript() {
-            override def eval(context: ScriptContext) = {
-              var map = Map[String, Object]()
-              for (
-                scope ← context.getScopes;
-                if (context.getBindings(scope.intValue) != null);
-                entry ← context.getBindings(scope.intValue)
-              ) {
-                map = map + (entry._1 -> entry._2)
-              }
-              val runMethod = clazz.getMethod("run", classOf[Map[String, Object]])
-              try {
-                runMethod.invoke(scriptObject, map)
-              } catch {
-                case e: InvocationTargetException ⇒ {
-                  throw e.getCause
-                }
-              }
-            }
-            override def getEngine = GremlinScalaScriptEngine.this
-          }
-        }
-      })
-    }
+    override def compile(script: Reader): CompiledScript = ???
+    override def compile(script: String): CompiledScript = ???
 
     /**
      * returns an accessible class or interface that is implemented by class,
@@ -232,5 +171,5 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
 }
 
 object GremlinScalaScriptEngineFactory {
-  case class ActorException(e: Throwable);
+  case class ActorException(e: Throwable)
 }
