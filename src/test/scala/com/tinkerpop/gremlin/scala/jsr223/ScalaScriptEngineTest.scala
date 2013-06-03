@@ -12,6 +12,7 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
 import javax.script.ScriptEngineManager
 import javax.script.ScriptException
+import com.tinkerpop.gremlin.scala.Imports
 
 @RunWith(classOf[JUnitRunner])
 class ScalaScriptEngineTest extends FunSpec with ShouldMatchers {

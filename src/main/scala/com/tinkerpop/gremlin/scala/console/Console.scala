@@ -19,7 +19,7 @@ class GremlinILoop extends ILoop {
 
   addThunk {
     intp.beQuietDuring {
-      intp.addImports(Imports.get: _*)
+      intp.addImports(Imports.forConsole: _*)
     }
   }
 
