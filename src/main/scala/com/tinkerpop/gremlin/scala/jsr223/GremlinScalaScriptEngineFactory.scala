@@ -36,7 +36,6 @@ import javax.script.{
   SimpleBindings,
   ScriptException
 }
-import scala.actors.DaemonActor
 import scala.tools.nsc.interpreter._
 import _root_.scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.scala.Gremlin
@@ -85,49 +84,26 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
       eval(scriptStringWriter.toString, context)
     }
 
-    val interpreterAction = new DaemonActor {
-      def act() {
-        while (true) {
-          receive {
-            case (script: String, context: ScriptContext) ⇒
-              try {
-                for (
-                  scope ← context.getScopes if (context.getBindings(scope.intValue) != null);
-                  (name, obj) ← context.getBindings(scope.intValue)
-                ) interpreter.bind(name, getAccessibleClass(obj.getClass).getName, obj)
-
-                val result = interpreter.interpret(script)
-                if (interpreter.reporter.hasErrors) {
-                  throw new ScriptException("some error", "script-file", 1)
-                }
-
-                sender ! responseLine(interpreter.lastRequest)
-              } catch {
-                case e: Throwable ⇒
-                  println(s"error while executing script: [$script]")
-                  sender ! GremlinScalaScriptEngineFactory.ActorException(e)
-              }
-          }
-        }
-      }
-    }
-    interpreterAction.start()
-
     import GremlinScalaScriptEngineFactory.this.interpreter.Request
-    private def responseLine(request: Request) = (request.termNames, request.getEval) match {
-      case (name :: _, Some(eval)) ⇒ Some(s"$name: ${request.typeOf(name)} = $eval")
-      case (name :: _, None)       ⇒ Some(s"$name: ${request.typeOf(name)}")
-      case (Nil, _)                ⇒ None
+    private def responseLine(request: Request): String = (request.termNames, request.getEval) match {
+      case (name :: _, Some(eval)) ⇒ s"$name: ${request.typeOf(name)} = $eval"
+      case (name :: _, None)       ⇒ s"$name: ${request.typeOf(name)}"
+      case (Nil, _)                ⇒ ""
     }
 
-    override def eval(script: String, context: ScriptContext): Object =
-      interpreterAction !? ((script, context)) match {
-        case GremlinScalaScriptEngineFactory.ActorException(e) ⇒ throw e
-        case x: Object ⇒ x match {
-          case Some(y: Object) ⇒ y
-          case None            ⇒ null
-        }
+    override def eval(script: String, context: ScriptContext): Object = {
+      for (
+        scope ← context.getScopes if (context.getBindings(scope.intValue) != null);
+        (name, obj) ← context.getBindings(scope.intValue)
+      ) interpreter.bind(name, getAccessibleClass(obj.getClass).getName, obj)
+
+      val result = interpreter.interpret(script)
+      if (interpreter.reporter.hasErrors) {
+        throw new ScriptException("some error", "script-file", 1)
       }
+
+      responseLine(interpreter.lastRequest)
+    }
 
     override def getFactory() = GremlinScalaScriptEngineFactory.this
     override def createBindings(): Bindings = new SimpleBindings
@@ -170,8 +146,4 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
         case e: Exception ⇒ false
       }
   }
-}
-
-object GremlinScalaScriptEngineFactory {
-  case class ActorException(e: Throwable)
 }
