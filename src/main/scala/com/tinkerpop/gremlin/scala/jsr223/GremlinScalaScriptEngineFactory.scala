@@ -39,60 +39,40 @@ import javax.script.{
 import scala.actors.DaemonActor
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.io.VirtualDirectory
+import _root_.scala.collection.JavaConversions._
 
+/**
+ * Copied and adapted from clerazza scala script engine: https://github.com/apache/clerezza
+ * The code isn't really idiomatic scala, but it works...
+ */
 //TODO have the interpretatin function back running, consider using http://code.google.com/p/scalascriptengine
 class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with BundleListener*/ {
+  val compilerService = new CompilerService
+  val interpreter: IMain = new GremlinScalaInterpreter(new PrintWriter(System.out))
+  var classCounter = 0
+  val virtualDirectory = new VirtualDirectory("(memory)", None)
+  val msgWriter = new StringWriter
 
-  private var factory: InterpreterFactory = new InterpreterFactory
-  private var compilerService: CompilerService = null
-  var _interpreter: IMain = null
-  //private var bundleContext: BundleContext = null
-  def interpreter = {
-    if (_interpreter == null) {
-      this.synchronized {
-        if (_interpreter == null) {
-          _interpreter = factory.createInterpreter(new PrintWriter(System.out))
-        }
-      }
-    }
-    _interpreter
-  }
-
-  //methods from GremlinScalaScriptEngineFactory
   override def getEngineName() = "Scala Scripting Engine for OSGi"
-  override def getEngineVersion() = "0.3/scala 2.10.0"
+  override def getEngineVersion() = "0.3/scala 2.10.1"
   override def getExtensions() = java.util.Collections.singletonList("scala")
   override def getMimeTypes() = java.util.Collections.singletonList("application/x-scala")
   override def getNames() = java.util.Collections.singletonList("scala")
   override def getLanguageName() = "Scala"
-  override def getLanguageVersion = "2.10.0"
-  override def getParameter(key: String) = {
-    key match {
-      case ScriptEngine.ENGINE           ⇒ getEngineName
-      case ScriptEngine.ENGINE_VERSION   ⇒ getEngineVersion
-      case ScriptEngine.NAME             ⇒ getNames.get(0)
-      case ScriptEngine.LANGUAGE         ⇒ getLanguageName
-      case ScriptEngine.LANGUAGE_VERSION ⇒ getLanguageVersion
-      case _                             ⇒ null
-    }
+  override def getLanguageVersion = "2.10.1"
+  override def getParameter(key: String) = key match {
+    case ScriptEngine.ENGINE           ⇒ getEngineName
+    case ScriptEngine.ENGINE_VERSION   ⇒ getEngineVersion
+    case ScriptEngine.NAME             ⇒ getNames.get(0)
+    case ScriptEngine.LANGUAGE         ⇒ getLanguageName
+    case ScriptEngine.LANGUAGE_VERSION ⇒ getLanguageVersion
+    case _                             ⇒ null
   }
-  override def getMethodCallSyntax(obj: String,
-                                   m: String,
-                                   args: String*) = {
-    obj + "." + m + "(" + args.mkString(",") + ")"
-  }
+
+  override def getMethodCallSyntax(obj: String, m: String, args: String*) = s"$obj.$m(${args.mkString(",")})"
   override def getOutputStatement(toDisplay: String) = "println(\"" + toDisplay + "\")"
   override def getProgram(statements: String*) = statements.mkString("\n")
   override def getScriptEngine: ScriptEngine = GremlinScalaScriptEngine
-
-  def bindInterpreterFactory(f: InterpreterFactory) = {
-    factory = f
-  }
-
-  def unbindInterpreterFactory(f: InterpreterFactory) = {
-    factory = null
-    _interpreter = null
-  }
 
   /**
    * Inner object as it accesse interpreter
@@ -115,39 +95,28 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
         //also using react with a final invocation of act() different exception from interprter.bind have been seen
         while (true) {
           receive {
-            case (script: String, context: ScriptContext) ⇒ {
-              //not yet threadsafe, but the test isn't failing
-              //should pass jobs to actor that guarantees they are executed sequentially
-              //and binding to not inferfere
+            case (script: String, context: ScriptContext) ⇒
               try {
                 val jTypeMap: java.util.Map[String, java.lang.reflect.Type] =
                   new java.util.HashMap[String, java.lang.reflect.Type]()
                 val valueMap = new java.util.HashMap[String, Any]()
                 import _root_.scala.collection.JavaConversions._
                 for (
-                  scope ← context.getScopes;
-                  if (context.getBindings(scope.intValue) != null);
+                  scope ← context.getScopes if (context.getBindings(scope.intValue) != null);
                   entry ← context.getBindings(scope.intValue)
                 ) {
                   interpreter.bind(entry._1,
                     getAccessibleClass(entry._2.getClass).getName, entry._2)
                 }
-                interpreter.interpret("val zzScriptResult = {" + script + "}")
-                println("visible stuff:")
-                System.out.println("stuff stuff stuff");
-                println("interpreter.valueOfTerm(\"zzScriptResult\"): " + interpreter.valueOfTerm("zzScriptResult"))
+                interpreter.interpret(script)
                 interpreter.visibleTermNames.foreach(println)
                 if (interpreter.reporter.hasErrors) {
                   throw new ScriptException("some error", "script-file", 1)
                 }
-                sender ! interpreter.valueOfTerm("zzScriptResult")
+                sender ! Some("done")
               } catch {
-                case e ⇒ sender ! GremlinScalaScriptEngineFactory.ActorException(e)
+                case e: Throwable ⇒ sender ! GremlinScalaScriptEngineFactory.ActorException(e)
               }
-            }
-            case GremlinScalaScriptEngineFactory.RefreshInterpreter ⇒ {
-              _interpreter = null;
-            }
           }
         }
       }
@@ -155,11 +124,6 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
     interpreterAction.start()
 
     override def eval(script: String, context: ScriptContext): Object = {
-      /*val timeout = 180*1000
-			interpreterAction !? (timeout, (script, context)) match {
-				case Some(x : Object) => x
-				case x => throw new RuntimeException("Timeout executing script")
-			}*/
       interpreterAction !? ((script, context)) match {
         case GremlinScalaScriptEngineFactory.ActorException(e) ⇒ throw e
         case x: Object ⇒ x match {
@@ -182,59 +146,50 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
       compile(scriptStringWriter.toString)
     }
 
-    var classCounter = 0
-
-    val virtualDirectory = new VirtualDirectory("(memory)", None)
-    var msgWriter = new StringWriter
-
     override def compile(script: String): CompiledScript = {
-      try {
-        AccessController.doPrivileged(new PrivilegedAction[CompiledScript]() {
-          override def run() = {
-            val objectName = "CompiledScript" + classCounter
-            classCounter += 1
-            val classCode = "class " + objectName + """ {
-							|	def run($: Map[String, Object]) = {
-							|""".stripMargin + script + """
-							|	}
-							|}""".stripMargin
-            val sources: List[Array[Char]] = List(classCode.toCharArray)
-            val clazz = try {
-              compilerService.compile(sources)(0)
-            } catch {
-              case e: CompileErrorsException ⇒ throw new ScriptException(e.getMessage, "script", -1);
-              case e                         ⇒ throw e
-            }
-            val scriptObject = clazz.newInstance()
+      AccessController.doPrivileged(new PrivilegedAction[CompiledScript]() {
+        override def run() = {
+          val objectName = "CompiledScript" + classCounter
+          classCounter += 1
+          val code = s"""
+          	class $objectName {
+              def run(m: Map[String, Object]) = {
+                script
+              }
+            }"""
 
-            new CompiledScript() {
-              override def eval(context: ScriptContext) = {
+          val sources = List(code.toCharArray)
+          val clazz = try {
+            compilerService.compile(sources)(0)
+          } catch {
+            case e: CompileErrorsException ⇒ throw new ScriptException(e.getMessage, "script", -1);
+            case e: Throwable              ⇒ throw e
+          }
+          val scriptObject = clazz.newInstance
 
-                var map = Map[String, Object]()
-                import _root_.scala.collection.JavaConversions._
-                for (
-                  scope ← context.getScopes;
-                  if (context.getBindings(scope.intValue) != null);
-                  entry ← context.getBindings(scope.intValue)
-                ) {
-                  map = map + (entry._1 -> entry._2)
-                }
-                val runMethod = clazz.getMethod("run", classOf[Map[String, Object]])
-                try {
-                  runMethod.invoke(scriptObject, map)
-                } catch {
-                  case e: InvocationTargetException ⇒ {
-                    throw e.getCause
-                  }
+          new CompiledScript() {
+            override def eval(context: ScriptContext) = {
+              var map = Map[String, Object]()
+              for (
+                scope ← context.getScopes;
+                if (context.getBindings(scope.intValue) != null);
+                entry ← context.getBindings(scope.intValue)
+              ) {
+                map = map + (entry._1 -> entry._2)
+              }
+              val runMethod = clazz.getMethod("run", classOf[Map[String, Object]])
+              try {
+                runMethod.invoke(scriptObject, map)
+              } catch {
+                case e: InvocationTargetException ⇒ {
+                  throw e.getCause
                 }
               }
-              override def getEngine = GremlinScalaScriptEngine.this
             }
+            override def getEngine = GremlinScalaScriptEngine.this
           }
-        })
-      } catch {
-        case e: PrivilegedActionException ⇒ throw e.getCause
-      }
+        }
+      })
     }
 
     /**
@@ -278,5 +233,4 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory /*with Bundle
 
 object GremlinScalaScriptEngineFactory {
   case class ActorException(e: Throwable);
-  case object RefreshInterpreter;
 }

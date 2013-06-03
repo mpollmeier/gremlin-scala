@@ -23,17 +23,17 @@ import scala.tools.nsc.interpreter._;
 import java.io.PrintWriter
 import scala.tools.nsc.reporters.Reporter
 
+/**
+ * Copied and adapted from clerazza scala script engine: https://github.com/apache/clerezza
+ */
+class GremlinScalaInterpreter(out: PrintWriter) extends IMain(new Settings, out) {
 
-
-class GremlinScalaInterpreter( out: PrintWriter)
-		extends IMain(new Settings, out) {
-
-	override lazy val classLoader: AbstractFileClassLoader = {
-		new AbstractFileClassLoader(virtualDirectory, this.getClass.getClassLoader())
-	}
-	override protected def newCompiler(settings: Settings, reporter: Reporter) = {
-		settings.outputDirs setSingleOutput virtualDirectory
-		new GremlinScalaCompiler( settings, reporter)
-	}
+  override lazy val classLoader: AbstractFileClassLoader = {
+    new AbstractFileClassLoader(virtualDirectory, this.getClass.getClassLoader())
+  }
+  override protected def newCompiler(settings: Settings, reporter: Reporter) = {
+    settings.outputDirs setSingleOutput virtualDirectory
+    new GremlinScalaCompiler(settings, reporter)
+  }
 }
 
