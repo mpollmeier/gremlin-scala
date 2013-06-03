@@ -44,8 +44,8 @@ import com.tinkerpop.gremlin.scala.Gremlin
  * Copied and adapted from clerazza scala script engine: https://github.com/apache/clerezza
  * The code isn't really idiomatic scala, but it works...
  */
-class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
-  val interpreter = new GremlinScalaInterpreter(new PrintWriter(System.out))
+class ScriptEngineFactory() extends JavaxEngineFactory {
+  val interpreter = new Interpreter(new PrintWriter(System.out))
   val msgWriter = new StringWriter
 
   val name = "gremlin-scala"
@@ -84,7 +84,7 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
       eval(scriptStringWriter.toString, context)
     }
 
-    import GremlinScalaScriptEngineFactory.this.interpreter.Request
+    import ScriptEngineFactory.this.interpreter.Request
     private def responseLine(request: Request): String = (request.termNames, request.getEval) match {
       case (name :: _, Some(eval)) ⇒ s"$name: ${request.typeOf(name)} = $eval"
       case (name :: _, None)       ⇒ s"$name: ${request.typeOf(name)}"
@@ -105,7 +105,7 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
       responseLine(interpreter.lastRequest)
     }
 
-    override def getFactory() = GremlinScalaScriptEngineFactory.this
+    override def getFactory() = ScriptEngineFactory.this
     override def createBindings(): Bindings = new SimpleBindings
 
     override def compile(script: Reader): CompiledScript = ???
