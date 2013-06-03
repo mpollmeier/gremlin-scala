@@ -16,7 +16,7 @@
         <gremlin.version>2.3.0</gremlin.version>
         <blueprints.version>2.3.0</blueprints.version>
         <pipes.version>2.3.0</pipes.version>
-        <scala.version>2.10.0</scala.version>
+        <scala.version>2.10.1</scala.version>
     </properties>
     <developers>
         <developer>
@@ -52,26 +52,6 @@
     </scm>
     <dependencies>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-actors</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>2.10.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.tinkerpop.gremlin</groupId>
             <artifactId>gremlin-groovy</artifactId>
             <version>${gremlin.version}</version>
@@ -91,7 +71,6 @@
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
-        <!-- CONSOLE -->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-compiler</artifactId>
@@ -102,7 +81,16 @@
             <artifactId>jline</artifactId>
             <version>${scala.version}</version>
         </dependency>
-        <!-- Blueprints impls for repl -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-actors</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-jung</artifactId>
