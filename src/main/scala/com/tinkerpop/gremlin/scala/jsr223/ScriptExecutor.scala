@@ -14,7 +14,8 @@ import javax.script.Compilable
 object ScriptExecutor extends App {
   val factory = new ScriptEngineManager
   val engine = factory.getEngineByName("gremlin-scala")
-  println(engine.eval("42"))
-  println(engine.eval("val a = 42"))
-  println(engine.eval("a + 42"))
+
+  println(engine.eval("42") + "\n")
+  println(engine.eval("val a = 42") + "\n")
+  println(engine.eval("a + 42") + "\n")
 }

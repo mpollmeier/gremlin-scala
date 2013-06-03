@@ -50,24 +50,24 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
   val msgWriter = new StringWriter
 
   val name = "gremlin-scala"
-  override def getEngineName() = "Scala Scripting Engine for OSGi"
+  override def getEngineName() = name
   override def getEngineVersion() = Gremlin.version
-  override def getExtensions() = java.util.Collections.singletonList(name)
-  override def getMimeTypes() = java.util.Collections.singletonList("application/x-scala")
-  override def getNames() = java.util.Collections.singletonList(name)
+  override def getExtensions() = List(name)
+  override def getMimeTypes() = List("application/x-scala")
+  override def getNames() = List(name)
   override def getLanguageName() = name
   override def getLanguageVersion = "2.10.1"
   override def getParameter(key: String) = key match {
     case ScriptEngine.ENGINE           ⇒ getEngineName
     case ScriptEngine.ENGINE_VERSION   ⇒ getEngineVersion
-    case ScriptEngine.NAME             ⇒ getNames.get(0)
+    case ScriptEngine.NAME             ⇒ name
     case ScriptEngine.LANGUAGE         ⇒ getLanguageName
     case ScriptEngine.LANGUAGE_VERSION ⇒ getLanguageVersion
     case _                             ⇒ null
   }
 
   override def getMethodCallSyntax(obj: String, m: String, args: String*) = s"$obj.$m(${args.mkString(",")})"
-  override def getOutputStatement(toDisplay: String) = "println(\"" + toDisplay + "\")"
+  override def getOutputStatement(toDisplay: String) = s"""println("$toDisplay")"""
   override def getProgram(statements: String*) = statements.mkString("\n")
   override def getScriptEngine: ScriptEngine = GremlinScalaScriptEngine
 
@@ -87,34 +87,38 @@ class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
 
     val interpreterAction = new DaemonActor {
       def act() {
-        //not using loop { react {, as this method doesn't seem to guarantee
-        //asynchronous execution
-        //also using react with a final invocation of act() different exception from interprter.bind have been seen
         while (true) {
           receive {
             case (script: String, context: ScriptContext) ⇒
               try {
-                val jTypeMap: java.util.Map[String, java.lang.reflect.Type] =
-                  new java.util.HashMap[String, java.lang.reflect.Type]()
-                val valueMap = new java.util.HashMap[String, Any]()
-                import _root_.scala.collection.JavaConversions._
                 for (
                   scope ← context.getScopes if (context.getBindings(scope.intValue) != null);
                   (name, obj) ← context.getBindings(scope.intValue)
                 ) interpreter.bind(name, getAccessibleClass(obj.getClass).getName, obj)
-                interpreter.interpret(script)
+
+                val result = interpreter.interpret(script)
                 if (interpreter.reporter.hasErrors) {
                   throw new ScriptException("some error", "script-file", 1)
                 }
-                sender ! Some("done")
+
+                sender ! responseLine(interpreter.lastRequest)
               } catch {
-                case e: Throwable ⇒ sender ! GremlinScalaScriptEngineFactory.ActorException(e)
+                case e: Throwable ⇒
+                  println(s"error while executing script: [$script]")
+                  sender ! GremlinScalaScriptEngineFactory.ActorException(e)
               }
           }
         }
       }
     }
     interpreterAction.start()
+
+    import GremlinScalaScriptEngineFactory.this.interpreter.Request
+    private def responseLine(request: Request) = (request.termNames, request.getEval) match {
+      case (name :: _, Some(eval)) ⇒ Some(s"$name: ${request.typeOf(name)} = $eval")
+      case (name :: _, None)       ⇒ Some(s"$name: ${request.typeOf(name)}")
+      case (Nil, _)                ⇒ None
+    }
 
     override def eval(script: String, context: ScriptContext): Object =
       interpreterAction !? ((script, context)) match {

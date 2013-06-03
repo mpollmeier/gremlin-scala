@@ -35,5 +35,6 @@ class GremlinScalaInterpreter(out: PrintWriter) extends IMain(new Settings, out)
     settings.outputDirs setSingleOutput virtualDirectory
     new GremlinScalaCompiler(settings, reporter)
   }
+
 }
 
