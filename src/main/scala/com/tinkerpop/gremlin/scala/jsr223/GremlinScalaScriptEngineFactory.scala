@@ -45,7 +45,7 @@ import com.tinkerpop.gremlin.scala.Gremlin
  * The code isn't really idiomatic scala, but it works...
  */
 class GremlinScalaScriptEngineFactory() extends JavaxEngineFactory {
-  val interpreter: IMain = new GremlinScalaInterpreter(new PrintWriter(System.out))
+  val interpreter = new GremlinScalaInterpreter(new PrintWriter(System.out))
   val msgWriter = new StringWriter
 
   val name = "gremlin-scala"

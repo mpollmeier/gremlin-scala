@@ -34,12 +34,12 @@ class GremlinScalaInterpreter(out: PrintWriter) extends IMain(new Settings, out)
     addImports(Imports.get: _*)
   }
 
-  override lazy val classLoader: AbstractFileClassLoader = {
-    new AbstractFileClassLoader(virtualDirectory, this.getClass.getClassLoader())
-  }
+  override lazy val classLoader = new AbstractFileClassLoader(virtualDirectory, getClass.getClassLoader)
+
   override protected def newCompiler(settings: Settings, reporter: Reporter) = {
-    settings.outputDirs setSingleOutput virtualDirectory
-    new GremlinScalaCompiler(settings, reporter)
+    settings.outputDirs.setSingleOutput(virtualDirectory)
+    settings.usejavacp.value = true
+    new Global(settings, reporter) with ReplGlobal
   }
 
 }
