@@ -1,1 +1,2 @@
 com.tinkerpop.gremlin.scala.jsr223.GremlinScalaScriptEngineFactory
+org.apache.clerezza.scala.scripting.ScriptEngineFactory

@@ -136,6 +136,11 @@
             <artifactId>scala-compiler</artifactId>
             <version>${scala.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.clerezza.scala</groupId>
+            <artifactId>script-engine</artifactId>
+            <version>0.2-incubating-SNAPSHOT</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
