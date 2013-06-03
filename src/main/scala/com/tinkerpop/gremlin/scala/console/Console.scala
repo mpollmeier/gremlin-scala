@@ -3,8 +3,7 @@ package com.tinkerpop.gremlin.scala.console
 import scala.tools.nsc.Settings
 import scala.tools.nsc.reporters.ConsoleReporter
 import scala.tools.nsc.interpreter.{ ILoop, ReplReporter }
-import com.tinkerpop.gremlin.Imports
-import scala.collection.JavaConversions._
+import com.tinkerpop.gremlin.scala.Imports
 
 /**http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/compiler/scala/tools/nsc/interpreter/package.html */
 object Console extends App {
@@ -20,11 +19,7 @@ class GremlinILoop extends ILoop {
 
   addThunk {
     intp.beQuietDuring {
-      val imports = Imports.getImports.map(
-        _.replace("static ", "")
-          .replace("*", "_")
-          .replace("$", ".")) :+ "com.tinkerpop.gremlin.scala._"
-      intp.addImports(imports: _*)
+      intp.addImports(Imports.get: _*)
     }
   }
 

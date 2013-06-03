@@ -28,34 +28,5 @@ import java.io.{ PrintWriter, StringWriter, File }
 class GremlinScalaCompiler(settings: Settings, reporter: Reporter)
     extends Global(settings, reporter) with ReplGlobal { self ⇒
   settings.usejavacp.value = true
-  //TODO: need to set classpaths
-  //  override lazy val platform: ThisPlatform = {
-  //    new { val global: self.type = self } with JavaPlatform {
-  //      override lazy val classPath = {
-  //        createClassPath[AbstractFile](super.classPath)
-  //      }
-  //    }
-  //  }
-  //
-  //  override def classPath = platform.classPath
-  //
-  //  def createClassPath[T](original: ClassPath[T]) = {
-  //
-  //    var result = ListBuffer(original)
-  //    for (bundle ← bundleContext.getBundles; if bundle.getResource("/") != null) {
-  //      try {
-  //        val files = BundleClassPathBuilder.fromBundle(bundle)
-  //        files.foreach(file ⇒ {
-  //          //debug("Adding bundle " + file + " to the Scala compiler classpath")
-  //          result += original.context.newClassPath(file)
-  //        })
-  //      } catch {
-  //        case e: Exception ⇒ logger.debug(e.toString)
-  //      }
-  //
-  //    }
-  //    new MergedClassPath(result.toList.reverse, original.context)
-  //  }
-
 }
 

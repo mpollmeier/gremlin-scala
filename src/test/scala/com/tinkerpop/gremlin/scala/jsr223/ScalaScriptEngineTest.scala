@@ -35,6 +35,11 @@ class ScalaScriptEngineTest extends FunSpec with ShouldMatchers {
       }
     }
 
+    it("can create a graph") {
+      engine.eval("val g = TinkerGraphFactory.createTinkerGraph").toString should
+        be("g: com.tinkerpop.blueprints.impls.tg.TinkerGraph = tinkergraph[vertices:6 edges:6]")
+    }
+
   }
 
 }

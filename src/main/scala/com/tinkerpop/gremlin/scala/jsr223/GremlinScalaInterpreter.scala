@@ -18,15 +18,21 @@
  */
 package com.tinkerpop.gremlin.scala.jsr223
 
-import scala.tools.nsc._;
-import scala.tools.nsc.interpreter._;
+import scala.collection.JavaConversions._
+import scala.tools.nsc._
+import scala.tools.nsc.interpreter._
 import java.io.PrintWriter
 import scala.tools.nsc.reporters.Reporter
+import com.tinkerpop.gremlin.scala.Imports
 
 /**
  * Copied and adapted from clerazza scala script engine: https://github.com/apache/clerezza
  */
 class GremlinScalaInterpreter(out: PrintWriter) extends IMain(new Settings, out) {
+
+  beQuietDuring {
+    addImports(Imports.get: _*)
+  }
 
   override lazy val classLoader: AbstractFileClassLoader = {
     new AbstractFileClassLoader(virtualDirectory, this.getClass.getClassLoader())
