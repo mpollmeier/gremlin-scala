@@ -4,17 +4,11 @@ import com.tinkerpop.blueprints.{ Vertex, Edge }
 
 /**Adds convenience methods to [[com.tinkerpop.blueprints.Edge]]. */
 class ScalaEdge(val edge: Edge) extends ScalaElement(edge) {
-  def inV: GremlinScalaPipeline[Edge, Vertex] =
-    new GremlinScalaPipeline[Edge, Vertex].start(edge).inV().asInstanceOf[GremlinScalaPipeline[Edge, Vertex]]
+  def inV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).inV
+  def outV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).outV
+  def bothV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).bothV
 
-  def outV: GremlinScalaPipeline[Edge, Vertex] =
-    new GremlinScalaPipeline[Edge, Vertex].start(edge).outV().asInstanceOf[GremlinScalaPipeline[Edge, Vertex]]
-
-  def bothV: GremlinScalaPipeline[Edge, Vertex] =
-    new GremlinScalaPipeline[Edge, Vertex].start(edge).bothV().asInstanceOf[GremlinScalaPipeline[Edge, Vertex]]
-
-  def -> : GremlinScalaPipeline[Edge, Edge] =
-    new GremlinScalaPipeline[Edge, Edge].start(edge).asInstanceOf[GremlinScalaPipeline[Edge, Edge]];
+  def -> : GremlinScalaPipeline[Edge, Edge] = new GremlinScalaPipeline[Edge, Edge].start(edge)
 }
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Edge]] and [[com.tinkerpop.gremlin.scala.ScalaEdge]]. */

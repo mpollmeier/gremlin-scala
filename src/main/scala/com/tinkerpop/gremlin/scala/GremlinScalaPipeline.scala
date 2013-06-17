@@ -11,6 +11,10 @@ import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
 import com.tinkerpop.pipes.transform.TransformPipe
 import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
+import com.tinkerpop.pipes.filter.IdFilterPipe
+import com.tinkerpop.pipes.filter.LabelFilterPipe
+import com.tinkerpop.pipes.filter.PropertyFilterPipe
+import com.tinkerpop.pipes.filter.FilterFunctionPipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -21,17 +25,52 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] = manualStart(graph.getVertices)
   def E(graph: Graph): GremlinScalaPipeline[Edge, Edge] = manualStart(graph.getEdges)
 
-  def has[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
-    super.has(key, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //  def hasXX[F <: Element, T](key: String, values: T*): GremlinScalaPipeline[S, F] =
+  //    super.has(key, Tokens.T.eq, values: _*).asInstanceOf[GremlinScalaPipeline[S, F]]
 
-  def has[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
-    super.has(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  def hasXXX[S, F <: Element](key: String, by: Tokens.T, values: AnyRef*): GremlinScalaPipeline[S, F] = {
+    val compare = Tokens.mapCompare(by)
+    key match {
+      case Tokens.ID ⇒
+        val b = this.add(new IdFilterPipe(compare, values: _*))
+        //GremlinPipeline[S,com.tinkerpop.blueprints.Element]
+        b.asInstanceOf[GremlinScalaPipeline[S, F]]
+      //      case Tokens.ID    ⇒ this.add(new IdFilterPipe(compare, values: _*))
+      //      case Tokens.ID    ⇒ ???
+      case Tokens.LABEL ⇒
+        println("SSSSS"); ??? //this.add(new LabelFilterPipe(compare, values: _*))
+      case _ ⇒
+        val pipe = new PropertyFilterPipe[S, AnyRef](key, compare, values: _*)
+        //        if (this.doQueryOptimization)
+        //          GremlinFluentUtility.optimizePipelineForGraphQuery(this, pipe)
+        //        else this.add(pipe)
+        add(pipe).asInstanceOf[GremlinScalaPipeline[S, F]]
+    }
+  }
 
-  def hasNot[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
-    super.hasNot(key, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //  public GremlinPipeline<S, ? extends Element> has(final String key, final Tokens.T compare, final Object... values) {
+  //        final Query.Compare queryCompare = Tokens.mapCompare(compare);
+  //        if (key.equals(Tokens.ID)) {
+  //            return this.add(new IdFilterPipe(queryCompare, values));
+  //        } else if (key.equals(Tokens.LABEL)) {
+  //            return this.add(new LabelFilterPipe(queryCompare, (String[]) values));
+  //        } else {
+  //            final Pipe pipe = new PropertyFilterPipe(key, queryCompare, values);
+  //            return this.doQueryOptimization ? GremlinFluentUtility.optimizePipelineForGraphQuery(this, pipe) : this.add(pipe);
+  //        }
+  //    }
 
-  def hasNot[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
-    super.hasNot(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //  def has[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+  //    super.has(key, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //
+  //  def has[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
+  //    super.has(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //
+  //  def hasNot[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+  //    super.hasNot(key, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //
+  //  def hasNot[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
+  //    super.hasNot(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
@@ -97,7 +136,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   override def except(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.except(collection)
   override def except(namedSteps: String*): GremlinScalaPipeline[S, E] = super.except(namedSteps: _*)
 
-  def filter(filterFunction: E ⇒ JBoolean): GremlinScalaPipeline[S, E] = super.filter(new ScalaPipeFunction(filterFunction))
+  def filter(filterFunction: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ filterFunction(e) }
 
   override def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.or(pipes: _*)
 

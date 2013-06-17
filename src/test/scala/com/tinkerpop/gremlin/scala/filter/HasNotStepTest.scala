@@ -13,15 +13,15 @@ class HasNotStepTest extends com.tinkerpop.gremlin.test.filter.HasNotStepTest {
 
   val g = TinkerGraphFactory.createTinkerGraph();
 
-  def test_g_V_hasNotXname_markoX() {
-    super.test_g_V_hasNotXname_markoX(g.V.hasNot("name", "marko"));
-  }
-
-  def test_g_V_hasNotXname_blahX() {
-    super.test_g_V_hasNotXname_blahX(g.V.hasNot("name", "blah"));
-  }
-
-  def test_g_V_hasNotXage_gt_32X() {
-    super.test_g_V_hasNotXage_gt_32X(g.V.hasNot("age", T.gt, 32));
-  }
+  //  def test_g_V_hasNotXname_markoX() {
+  //    super.test_g_V_hasNotXname_markoX(g.V.hasNot("name", "marko"));
+  //  }
+  //
+  //  def test_g_V_hasNotXname_blahX() {
+  //    super.test_g_V_hasNotXname_blahX(g.V.hasNot("name", "blah"));
+  //  }
+  //
+  //  def test_g_V_hasNotXage_gt_32X() {
+  //    super.test_g_V_hasNotXage_gt_32X(g.V.hasNot("age", T.gt, 32));
+  //  }
 }

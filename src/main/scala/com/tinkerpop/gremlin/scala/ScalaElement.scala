@@ -10,6 +10,6 @@ abstract class ScalaElement(val element: Element) {
   def id: Any = element.getId
 
   //TODO remove getProperty, rename property to getProperty
-  def getProperty(key: String): Object = element.getProperty(key)
-  def apply(key: String): Object = getProperty(key)
+  def getProperty(key: String): AnyRef = element.getProperty(key)
+  def apply(key: String): AnyRef = getProperty(key)
 }

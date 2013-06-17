@@ -36,15 +36,15 @@ class SampleUsageTest extends FunSpec with ShouldMatchers {
       marko("age") should be(29)
     }
 
-    it("finds everybody who is over 30 years old") {
-      vertices.filter { v: Vertex ⇒
-        v.get[Int]("age") match {
-          case Some(age) if age > 30 ⇒ true
-          case _                     ⇒ false
-        }
-      }.map().toList.toString should be(
-        "[{age=35, name=peter}, {age=32, name=josh}]")
-    }
+    //    it("finds everybody who is over 30 years old") {
+    //      vertices.filter { v: Vertex ⇒
+    //        v.get[Int]("age") match {
+    //          case Some(age) if age > 30 ⇒ true
+    //          case _                     ⇒ false
+    //        }
+    //      }.map().toList.toString should be(
+    //        "[{age=35, name=peter}, {age=32, name=josh}]")
+    //    }
 
     it("finds who marko knows") {
       val marko = graph.v(1)
@@ -52,15 +52,15 @@ class SampleUsageTest extends FunSpec with ShouldMatchers {
         .toList.toString should be("[vadas, josh]")
     }
 
-    it("finds who marko knows if a given edge property `weight` is > 0.8") {
-      val marko = graph.v(1)
-      marko.outE("knows").filter { e: Edge ⇒
-        e.get[Float]("weight") match {
-          case Some(weight) if weight > 0.8 ⇒ true
-          case _                            ⇒ false
-        }
-      }.inV.map().toList.toString should be("[{age=32, name=josh}]")
-    }
+    //    it("finds who marko knows if a given edge property `weight` is > 0.8") {
+    //      val marko = graph.v(1)
+    //      marko.outE("knows").filter { e: Edge ⇒
+    //        e.get[Float]("weight") match {
+    //          case Some(weight) if weight > 0.8 ⇒ true
+    //          case _                            ⇒ false
+    //        }
+    //      }.inV.map().toList.toString should be("[{age=32, name=josh}]")
+    //    }
 
     describe("Usage with empty Graph") {
       it("creates a vertex with properties") {
