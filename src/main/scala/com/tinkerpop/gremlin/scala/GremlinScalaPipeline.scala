@@ -42,8 +42,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   override def label: GremlinScalaPipeline[S, String] = super.label
 
-  def map[F <: Element](keys: String*): GremlinScalaPipeline[S, JMap[String, Object]] = super.map(keys: _*)
-  def map[F <: Element]: GremlinScalaPipeline[S, JMap[String, Object]] = super.map()
+  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, JMap[String, Object]] = super.map(keys: _*)
+  def propertyMap[F <: Element]: GremlinScalaPipeline[S, JMap[String, Object]] = super.map()
 
   def property[F](key: String) = super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 

@@ -9,10 +9,10 @@ class MapStepTest extends com.tinkerpop.gremlin.test.transform.MapStepTest {
   val g = TinkerGraphFactory.createTinkerGraph()
 
   def test_g_v1_map() {
-    super.test_g_v1_map(g.v(1).->.map.asInstanceOf[GremlinScalaPipeline[Vertex, java.util.Map[String, Object]]])
+    super.test_g_v1_map(g.v(1).->.propertyMap.asInstanceOf[GremlinScalaPipeline[Vertex, java.util.Map[String, Object]]])
   }
 
   def test_g_v1_outXknowsX_map() {
-    super.test_g_v1_outXknowsX_map(g.v(1).out("knows").map);
+    super.test_g_v1_outXknowsX_map(g.v(1).out("knows").propertyMap);
   }
 }
