@@ -15,6 +15,7 @@ import com.tinkerpop.pipes.filter.IdFilterPipe
 import com.tinkerpop.pipes.filter.LabelFilterPipe
 import com.tinkerpop.pipes.filter.PropertyFilterPipe
 import com.tinkerpop.pipes.filter.FilterFunctionPipe
+import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -42,8 +43,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   override def label: GremlinScalaPipeline[S, String] = super.label
 
-  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, JMap[String, Object]] = super.map(keys: _*)
-  def propertyMap[F <: Element]: GremlinScalaPipeline[S, JMap[String, Object]] = super.map()
+  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = add(new PropertyMapPipe(keys: _*))
+  def propertyMap[F <: Element]: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
   def property[F](key: String) = super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
