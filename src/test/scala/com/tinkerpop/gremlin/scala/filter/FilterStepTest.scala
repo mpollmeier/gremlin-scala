@@ -9,6 +9,7 @@ import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.blueprints.Edge
 
 @RunWith(classOf[JUnitRunner])
 class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -39,6 +40,11 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.v(1).out.filterPF { case v: Vertex ⇒ v.id == "2" }.toList.size should be(1)
     }
 
+    it("finds 'created' edges") {
+      edges.filter { e: Edge ⇒ e.getLabel == "created" }.toList.size should be(4)
+      edges.filterPF { case e: Edge ⇒ e.getLabel == "created" }.toList.size should be(4)
+    }
+
   }
 
   describe("filterNot") {
@@ -67,6 +73,12 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.v(1).out.filterNot { v: Vertex ⇒ v.id == "2" }.toList.size should be(2)
       graph.v(1).out.filterNotPF { case v: Vertex ⇒ v.id == "2" }.toList.size should be(2)
     }
+
+    it("finds edges other than 'created'") {
+      edges.filterNot { e: Edge ⇒ e.getLabel == "created" }.toList.size should be(2)
+      edges.filterNotPF { case e: Edge ⇒ e.getLabel == "created" }.toList.size should be(2)
+    }
+
   }
 
 }

@@ -20,4 +20,5 @@ class GremlinTest extends TestCase {
 trait TestGraph {
   val graph = TinkerGraphFactory.createTinkerGraph
   def vertices = graph.V
+  def edges = graph.E
 }
