@@ -30,6 +30,12 @@ class FilterStepTest extends FunSpec with ShouldMatchers {
     it("finds vertices with int property") {
       g.V.filter { v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(2)
     }
+
+    it("finds that v1.out has id=2") {
+      // tinkergraph uses strings for ids
+      g.v(1).out.filter { v: Vertex ⇒ v.id == "2" }.toList.size should be(1)
+    }
+
   }
 
   describe("filterNot") {
@@ -47,6 +53,11 @@ class FilterStepTest extends FunSpec with ShouldMatchers {
 
     it("finds vertices with int property") {
       g.V.filterNot { v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(4)
+    }
+
+    it("finds that v1.out has two vertices whose id is not 2") {
+      // tinkergraph uses strings for ids
+      g.v(1).out.filterNot { v: Vertex ⇒ v.id == "2" }.toList.size should be(2)
     }
   }
 
