@@ -89,8 +89,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   override def except(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.except(collection)
   override def except(namedSteps: String*): GremlinScalaPipeline[S, E] = super.except(namedSteps: _*)
 
-  def filter(filterFunction: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ filterFunction(e) }
-  def filterNot(filterFunction: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ !filterFunction(e) }
+  def filter(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ f(e) }
+  def filterPF(fn: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ fn(e) }
+  def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ !f(e) }
+  def filterNotPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ !f(e) }
 
   override def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.or(pipes: _*)
 
