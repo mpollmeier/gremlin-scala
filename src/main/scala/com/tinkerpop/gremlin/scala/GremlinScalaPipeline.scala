@@ -16,6 +16,7 @@ import com.tinkerpop.pipes.filter.LabelFilterPipe
 import com.tinkerpop.pipes.filter.PropertyFilterPipe
 import com.tinkerpop.pipes.filter.FilterFunctionPipe
 import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
+import scala.collection.JavaConversions._
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -303,6 +304,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   override def as(name: String): GremlinScalaPipeline[S, E] = super.as(name)
   override def start(starts: S): GremlinScalaPipeline[S, S] = super.start(starts)
+
+  def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
   private def manualStart[T](start: Any): GremlinScalaPipeline[T, T] = {
     val pipe = this.add(new StartPipe[S](start))

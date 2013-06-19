@@ -14,12 +14,12 @@ import org.scalatest.junit.JUnitRunner
 class PropertyMapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the properties of one vertex") {
-    graph.v(1).->.propertyMap.toList.iterator.next should be(
-      Map("name" -> "marko", "age" -> 29))
+    graph.v(1).->.propertyMap.toScalaList should be(List(
+      Map("name" -> "marko", "age" -> 29)))
   }
 
   it("maps the properties of everybody who knows marko") {
-    List.fromIterator(graph.v(1).out("knows").propertyMap.toList.iterator) should be(
+    graph.v(1).out("knows").propertyMap.toScalaList should be(
       List(
         Map("name" -> "vadas", "age" -> 27),
         Map("name" -> "josh", "age" -> 32))
@@ -27,8 +27,8 @@ class PropertyMapStepTest extends FunSpec with ShouldMatchers with TestGraph {
   }
 
   it("maps the properties for a given key for one vertex") {
-    graph.v(1).->.propertyMap("name", "doesnt exit").toList.iterator.next should be(
-      Map("name" -> "marko"))
+    graph.v(1).->.propertyMap("name", "doesnt exit").toScalaList should be(List(
+      Map("name" -> "marko")))
   }
 
 }
