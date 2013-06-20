@@ -17,6 +17,7 @@ import com.tinkerpop.pipes.filter.PropertyFilterPipe
 import com.tinkerpop.pipes.filter.FilterFunctionPipe
 import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import scala.collection.JavaConversions._
+import com.tinkerpop.pipes.transform.PropertyPipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -47,7 +48,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = add(new PropertyMapPipe(keys: _*))
   def propertyMap[F <: Element]: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
-  def property[F](key: String) = super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
+  def property[F](key: String) = add(new PropertyPipe(key, false)).asInstanceOf[GremlinScalaPipeline[S, F]]
+  //super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
   def step[F](f: JIterator[E] ⇒ F): GremlinScalaPipeline[S, F] =
@@ -288,7 +290,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
-  def transform[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = super.transform(new ScalaPipeFunction(function))
+  def map[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = super.transform(new ScalaPipeFunction(function))
   def apply[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
 
   def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] =
