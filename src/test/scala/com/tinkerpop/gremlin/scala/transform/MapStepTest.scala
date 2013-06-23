@@ -1,18 +1,34 @@
 package com.tinkerpop.gremlin.scala.transform
 
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.blueprints.Vertex
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.gremlin.scala.ScalaVertex._
 
-class MapStepTest extends com.tinkerpop.gremlin.test.transform.MapStepTest {
-  val g = TinkerGraphFactory.createTinkerGraph()
+@RunWith(classOf[JUnitRunner])
+class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-  def test_g_v1_map() {
-    super.test_g_v1_map(g.v(1).->.map.asInstanceOf[GremlinScalaPipeline[Vertex, java.util.Map[String, Object]]])
+  it("maps the label of an edge to it's length") {
+    edges.label.map { _.size }.toScalaList should be(List(7, 5, 7, 5, 7, 7))
   }
 
-  def test_g_v1_outXknowsX_map() {
-    super.test_g_v1_outXknowsX_map(g.v(1).out("knows").map);
+  it("maps the age property of all vertices") {
+    vertices.property("age").map { age: Int ⇒ age * 2 }.toScalaList should be(List(54, 58, 70, 64))
+  }
+
+  it("gets the name and the age as tuples") {
+    vertices.map { v: Vertex ⇒ (v.property("name"), v.property("age")) }.toScalaList should be(List(
+      (Some("lop"), None),
+      (Some("vadas"), Some(27)),
+      (Some("marko"), Some(29)),
+      (Some("peter"), Some(35)),
+      (Some("ripple"), None),
+      (Some("josh"), Some(32))))
   }
 }
