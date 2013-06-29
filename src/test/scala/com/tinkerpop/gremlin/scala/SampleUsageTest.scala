@@ -50,8 +50,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("finds who marko knows") {
       val marko = graph.v(1)
-      marko.out("knows")(_("name"))
-        .toList.toString should be("[vadas, josh]")
+      marko.out("knows").map { _("name") }.toScalaList should be(List("vadas", "josh"))
     }
 
     it("finds who marko knows if a given edge property `weight` is > 0.8") {
