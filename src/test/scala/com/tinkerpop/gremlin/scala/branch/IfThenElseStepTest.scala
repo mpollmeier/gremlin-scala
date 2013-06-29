@@ -5,18 +5,20 @@ import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.blueprints.Vertex
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.pipes.Pipe
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-/**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
+@RunWith(classOf[JUnitRunner])
+class IfThenElseStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-class IfThenElseStepTest extends com.tinkerpop.gremlin.test.branch.IfThenElseStepTest {
-
-  val g = TinkerGraphFactory.createTinkerGraph();
-
-  //TODO fixme
-  //  def test_g_v1_out_ifThenElseXlang_eq_java__it__outX_name() {
-  //    super.test_g_v1_out_ifThenElseXlang_eq_java__it__outX_name(g.v(1).out.ifThenElse({v: Vertex => val lang = v.getProperty("lang"); lang != null && lang.equals("java")}, {v: Vertex => v}, {v: Vertex => v.out}).property("name").asInstanceOf[Pipe[Vertex, String]]);
-  //  }
+  it("gets josh's age, otherwise the name") {
+    graph.v(1).out.ifThenElse(
+      { v: Vertex ⇒ v("name") == "josh" },
+      { v: Vertex ⇒ v("age") },
+      { v: Vertex ⇒ v("name") })
+      .toScalaList should be(List("vadas", 32, "lop"))
+  }
 
 }

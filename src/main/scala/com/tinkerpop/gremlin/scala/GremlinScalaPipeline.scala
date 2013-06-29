@@ -18,6 +18,9 @@ import com.tinkerpop.pipes.filter.FilterFunctionPipe
 import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import scala.collection.JavaConversions._
 import com.tinkerpop.pipes.transform.PropertyPipe
+import com.tinkerpop.pipes.util.structures.AsMap
+import com.tinkerpop.pipes.branch.IfThenElsePipe
+import com.tinkerpop.pipes.util.PipesFunction
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
@@ -66,8 +69,12 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   /** Used in combination with a copySplit, merging the parallel traversals in a round-robin fashion. */
   override def fairMerge: GremlinScalaPipeline[S, _] = super.fairMerge
 
-  def ifThenElse(ifFunction: E ⇒ JBoolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
-    super.ifThenElse(new ScalaPipeFunction(ifFunction), new ScalaPipeFunction(thenFunction), new ScalaPipeFunction(elseFunction))
+  def ifThenElse(ifFunction: E ⇒ Boolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
+    this.add(new IfThenElsePipe(
+      new ScalaPipeFunction(ifFunction),
+      new ScalaPipeFunction(thenFunction),
+      new ScalaPipeFunction(elseFunction)
+    )).asInstanceOf[GremlinScalaPipeline[S, _]]
 
   def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
     super.loop(numberedStep, new ScalaPipeFunction(whileFunction))
@@ -319,4 +326,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   implicit private def scalaPipeline[A, B](pipeline: GremlinPipeline[A, B]): GremlinScalaPipeline[A, B] =
     pipeline.asInstanceOf[GremlinScalaPipeline[A, B]]
+
+  implicit def boolean2BooleanFn(fn: E ⇒ Boolean)(e: E): JBoolean = fn(e)
 }
