@@ -17,9 +17,13 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
   describe("Usage with default Tinkergraph") {
     it("finds all vertices") {
       vertices.count should be(6)
-      vertices.propertyMap.toList.toString should be(
-        "[{name=lop, lang=java}, {age=27, name=vadas}, {age=29, name=marko}, " +
-          "{age=35, name=peter}, {name=ripple, lang=java}, {age=32, name=josh}]")
+      vertices.propertyMap.toScalaList should be(List(
+        Map("name" -> "lop", "lang" -> "java"),
+        Map("age" -> 27, "name" -> "vadas"),
+        Map("name" -> "marko", "age" -> 29),
+        Map("name" -> "peter", "age" -> 35),
+        Map("name" -> "ripple", "lang" -> "java"),
+        Map("name" -> "josh", "age" -> 32)))
     }
 
     it("finds all names of vertices") {
@@ -39,8 +43,9 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
           case Some(age) if age > 30 ⇒ true
           case _                     ⇒ false
         }
-      }.propertyMap().toList.toString should be(
-        "[{age=35, name=peter}, {age=32, name=josh}]")
+      }.propertyMap().toScalaList should be(List(
+        Map("name" -> "peter", "age" -> 35),
+        Map("name" -> "josh", "age" -> 32)))
     }
 
     it("finds who marko knows") {
@@ -56,7 +61,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
           case Some(weight) if weight > 0.8 ⇒ true
           case _                            ⇒ false
         }
-      }.inV.propertyMap().toList.toString should be("[{age=32, name=josh}]")
+      }.inV.propertyMap.toScalaList should be(List(Map("name" -> "josh", "age" -> 32)))
     }
 
     describe("Usage with empty Graph") {
