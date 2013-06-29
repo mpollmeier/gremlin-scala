@@ -27,8 +27,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds all names of vertices") {
-      val names = vertices.property("name").toList
-      names.toString should be("[lop, vadas, marko, peter, ripple, josh]")
+      vertices.property("name").toScalaList should be(List("lop", "vadas", "marko", "peter", "ripple", "josh"))
     }
 
     it("can get a specific vertex by id and get it's properties") {
