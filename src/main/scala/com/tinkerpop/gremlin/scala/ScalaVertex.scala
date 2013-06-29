@@ -41,8 +41,6 @@ class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
   def bothE(labels: String*): GremlinScalaPipeline[Vertex, Edge] =
     new GremlinScalaPipeline[Vertex, Edge].start(vertex).bothE(labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
 
-  def property(name: String): Any = Option(getProperty(name))
-
   def -> : GremlinScalaPipeline[Vertex, Vertex] =
     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]];
 }
