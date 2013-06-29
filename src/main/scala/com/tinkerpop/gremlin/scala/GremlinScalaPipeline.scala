@@ -58,10 +58,12 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   ////////////////////
   /// BRANCH PIPES ///
   ////////////////////
+  /** Copies incoming object to internal pipes. */
   override def copySplit(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, _] = super.copySplit(pipes: _*)
 
   override def exhaustMerge: GremlinScalaPipeline[S, _] = super.exhaustMerge
 
+  /** Used in combination with a copySplit, merging the parallel traversals in a round-robin fashion. */
   override def fairMerge: GremlinScalaPipeline[S, _] = super.fairMerge
 
   def ifThenElse(ifFunction: E ⇒ JBoolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
