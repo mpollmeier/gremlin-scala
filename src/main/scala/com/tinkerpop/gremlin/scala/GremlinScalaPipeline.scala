@@ -48,10 +48,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   override def label: GremlinScalaPipeline[S, String] = super.label
 
-  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = add(new PropertyMapPipe(keys: _*))
+  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPP(new PropertyMapPipe(keys: _*))
   def propertyMap[F <: Element]: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
-  def property[F](key: String) = add(new PropertyPipe(key, false)).asInstanceOf[GremlinScalaPipeline[S, F]]
+  def property[F](key: String) = addPP(new PropertyPipe(key, false))
   //super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
@@ -70,11 +70,11 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   override def fairMerge: GremlinScalaPipeline[S, _] = super.fairMerge
 
   def ifThenElse(ifFunction: E ⇒ Boolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
-    this.add(new IfThenElsePipe(
+    addPP(new IfThenElsePipe(
       new ScalaPipeFunction(ifFunction),
       new ScalaPipeFunction(thenFunction),
       new ScalaPipeFunction(elseFunction)
-    )).asInstanceOf[GremlinScalaPipeline[S, _]]
+    ))
 
   def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
     super.loop(numberedStep, new ScalaPipeFunction(whileFunction))
@@ -319,13 +319,23 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
   private def manualStart[T](start: Any): GremlinScalaPipeline[T, T] = {
-    val pipe = this.add(new StartPipe[S](start))
+    val pipe = addPP(new StartPipe[S](start))
     FluentUtility.setStarts(this, start)
     pipe.asInstanceOf[GremlinScalaPipeline[T, T]]
+  }
+
+  /**
+   * TODO: return a new pipe rather than changing mutable state and cast
+   * TODO: rename to add once this doesn't extend GremlinPipeline any more
+   */
+  def addPP[T](pipe: Pipe[_, T]): GremlinScalaPipeline[S, T] = {
+    addPipe(pipe)
+    this.asInstanceOf[GremlinScalaPipeline[S, T]]
   }
 
   implicit private def scalaPipeline[A, B](pipeline: GremlinPipeline[A, B]): GremlinScalaPipeline[A, B] =
     pipeline.asInstanceOf[GremlinScalaPipeline[A, B]]
 
   implicit def boolean2BooleanFn(fn: E ⇒ Boolean)(e: E): JBoolean = fn(e)
+
 }
