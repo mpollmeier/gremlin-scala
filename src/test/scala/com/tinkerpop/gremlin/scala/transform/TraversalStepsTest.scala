@@ -3,75 +3,75 @@ package com.tinkerpop.gremlin.scala.transform
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.gremlin.scala._
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-class TraversalStepsTest extends com.tinkerpop.gremlin.test.transform.TraversalStepsTest {
-  val g = TinkerGraphFactory.createTinkerGraph()
+@RunWith(classOf[JUnitRunner])
+class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
-  def test_g_V() {
-    super.test_g_V(g.V)
+  describe("vertice adjacency") {
+    it("gets all vertices") {
+      graph.V.toScalaList should have size (6)
+    }
+
+    it("gets the out vertices") {
+      graph.v(1).out.property("name").toScalaList should be(List("vadas", "josh", "lop"))
+    }
+
+    it("gets the in vertices") {
+      graph.v(2).in.property("name").toScalaList should be(List("marko"))
+    }
+
+    it("gets both in and out vertices") {
+      graph.v(4).both.property("name").toScalaList should be(List("marko", "ripple", "lop"))
+    }
   }
 
-  def test_g_v1_out() {
-    super.test_g_v1_out(g.v(1).out)
+  describe("edge adjacency") {
+    it("gets all edges") {
+      graph.E.toScalaList should have size (6)
+    }
+
+    it("follows out edges") {
+      graph.v(1).outE.label.toScalaList should be(List("knows", "knows", "created"))
+    }
+
+    it("follows in edges") {
+      graph.v(2).inE.label.toScalaList should be(List("knows"))
+    }
+
+    it("follows both edges") {
+      graph.v(4).bothE.label.toScalaList should be(List("knows", "created", "created"))
+    }
   }
 
-  def test_g_v2_in() {
-    super.test_g_v2_in(g.v(2).in)
+  describe("edge / vertex adjacency") {
+    it("follows out edges and in vertices") {
+      graph.v(1).outE.inV.property("name").toScalaList should be(List("vadas", "josh", "lop"))
+    }
+
+    it("follows in edges and out vertices") {
+      graph.v(2).inE.outV.property("name").toScalaList should be(List("marko"))
+    }
   }
 
-  def test_g_v4_both() {
-    super.test_g_v4_both(g.v(4).both)
+  describe("vertex edge label adjacency") {
+    it("follows out edges by label") {
+      graph.v(1).out("knows").property("name").toScalaList should be(List("vadas", "josh"))
+      graph.v(1).outE("knows").inV.property("name").toScalaList should be(List("vadas", "josh"))
+    }
+
+    it("follows out edges by labels") {
+      graph.v(1).out("knows", "created").property("name").toScalaList should be(List("vadas", "josh", "lop"))
+      graph.v(1).outE("knows", "created").inV.property("name").toScalaList should be(List("vadas", "josh", "lop"))
+    }
+
+    it("traverses multiple steps") {
+      graph.v(1).out.out.property("name").toScalaList should be(List("ripple", "lop"))
+      graph.v(1).out.out.out.property("name").toScalaList should be(Nil)
+    }
   }
 
-  def test_g_E() {
-    super.test_g_E(g.E)
-  }
-
-  def test_g_v1_outE() {
-    super.test_g_v1_outE(g.v(1).outE)
-  }
-
-  def test_g_v2_inE() {
-    super.test_g_v2_inE(g.v(2).inE)
-  }
-
-  def test_g_v4_bothE() {
-    super.test_g_v4_bothE(g.v(4).bothE)
-  }
-
-  def test_g_v1_outE_inV() {
-    super.test_g_v1_outE_inV(g.v(1).outE.inV)
-  }
-
-  def test_g_v2_inE_outV() {
-    super.test_g_v2_inE_outV(g.v(2).inE.outV)
-  }
-
-  def test_g_v1_outXknowsX() {
-    super.test_g_v1_outXknowsX(g.v(1).out("knows"))
-  }
-
-  def test_g_v1_outXknows_createdX() {
-    super.test_g_v1_outXknows_createdX(g.v(1).out("knows", "created"))
-  }
-
-  def test_g_v1_outEXknowsX_inV() {
-    super.test_g_v1_outEXknowsX_inV(g.v(1).outE("knows").inV)
-  }
-
-  def test_g_v1_outEXknows_createdX_inV() {
-    super.test_g_v1_outEXknows_createdX_inV(g.v(1).outE("knows", "created").inV)
-  }
-
-  def test_g_V_out_out() {
-    super.test_g_V_out_out(g.v(1).out.out)
-  }
-
-  def test_g_v1_out_out_out() {
-    super.test_g_v1_out_out_out(g.v(1).out.out.out)
-  }
-
-  def test_g_v1_out_propertyXnameX() {
-    super.test_g_v1_out_propertyXnameX(g.v(1).out.property("name"))
-  }
 }
