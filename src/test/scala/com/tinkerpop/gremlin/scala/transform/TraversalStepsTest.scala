@@ -18,14 +18,17 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("gets the out vertices") {
       graph.v(1).out.property("name").toScalaList should be(List("vadas", "josh", "lop"))
+      graph.v(1).out(1).property("name").toScalaList should be(List("vadas"))
     }
 
     it("gets the in vertices") {
-      graph.v(2).in.property("name").toScalaList should be(List("marko"))
+      graph.v(3).in.property("name").toScalaList should be(List("marko", "josh", "peter"))
+      graph.v(3).in(1).property("name").toScalaList should be(List("marko"))
     }
 
     it("gets both in and out vertices") {
       graph.v(4).both.property("name").toScalaList should be(List("marko", "ripple", "lop"))
+      graph.v(4).both(1).property("name").toScalaList should be(List("marko"))
     }
   }
 
@@ -36,14 +39,20 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("follows out edges") {
       graph.v(1).outE.label.toScalaList should be(List("knows", "knows", "created"))
+      graph.v(1).outE(1).label.toScalaList should be(List("knows"))
     }
 
     it("follows in edges") {
-      graph.v(2).inE.label.toScalaList should be(List("knows"))
+      graph.v(3).inE.label.toScalaList should be(List("created", "created", "created"))
+      graph.v(3).inE(1).label.toScalaList should be(List("created"))
     }
 
     it("follows both edges") {
       graph.v(4).bothE.label.toScalaList should be(List("knows", "created", "created"))
+      graph.v(4).bothE(1).label.toScalaList should be(List("knows"))
+
+      graph.v(4).bothE("created").label.toScalaList should be(List("created", "created"))
+      graph.v(4).bothE(1, "created").label.toScalaList should be(List("created"))
     }
   }
 
@@ -61,11 +70,22 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     it("follows out edges by label") {
       graph.v(1).out("knows").property("name").toScalaList should be(List("vadas", "josh"))
       graph.v(1).outE("knows").inV.property("name").toScalaList should be(List("vadas", "josh"))
+
+      graph.v(1).out(1, "knows").property("name").toScalaList should be(List("vadas"))
+      graph.v(1).outE(1, "knows").inV.property("name").toScalaList should be(List("vadas"))
     }
 
     it("follows out edges by labels") {
       graph.v(1).out("knows", "created").property("name").toScalaList should be(List("vadas", "josh", "lop"))
       graph.v(1).outE("knows", "created").inV.property("name").toScalaList should be(List("vadas", "josh", "lop"))
+    }
+
+    it("follows in edges by label") {
+      graph.v(3).in("created").property("name").toScalaList should be(List("marko", "josh", "peter"))
+      graph.v(3).in(1, "created").property("name").toScalaList should be(List("marko"))
+
+      graph.v(3).inE("created").outV.property("name").toScalaList should be(List("marko", "josh", "peter"))
+      graph.v(3).inE(1, "created").outV.property("name").toScalaList should be(List("marko"))
     }
 
     it("traverses multiple steps") {
