@@ -2,8 +2,7 @@
 
 gremlin-scala
 =============
-A thin wrapper for Gremlin so that it feels natural to use the Gremlin graph DSL in Scala. 
-Gremlin is a domain specific language for traversing a number of graph databases including
+A thin Scala wrapper for Gremlin, a graph DSL for traversing a number of graph databases including
 [Neo4j](http://neo4j.org/),
 [OrientDB](http://www.orientechnologies.com/),
 [DEX](http://www.sparsity-technologies.com/dex),
@@ -12,60 +11,87 @@ Gremlin is a domain specific language for traversing a number of graph databases
 [Rexster graph server](http://rexster.tinkerpop.com)
 and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
 
-For more information about Gremlin see the [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
-[Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods) will give you a quick deep dive. 
+For more information about Gremlin see the [Gremlin docs](http://gremlindocs.com/), [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
+[Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods).
+Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they all make sense to a Scala developer ;)
+
+A word about type safety, Options and nulls
+=============
+Gremlin-Scala should be as idiomatic Scala as possible, i.e. you can work with Options instead of checking for nulls etc. However, I want to stick close to Gremlin-Groovy, so that it still feels like a real Gremlin and we can use the existing documentation. Often you have multiple ways to achieve something similar. 
+Example 1: Gremlin defines a step *transform*, which in functional Scala land is called *map*. Gremlin-Scala simply defines both, so it's your choice which one to use. I would encourage to use *map*. 
+Example 2: to access the properties of elements (vertices or edges) you have the following options:
+```scala
+  element.someProp //returns Any
+  element[Int]("intProp") //returns an Int, throws ClassCastException for wrong type
+  element.property[Int]("intProp") //returns Some[Int] if property defined, otherwise None
+```
+Check out the sample usage below for more details.
+
 
 Sample usage
 =============
-
+This is an executable ScalaTest specification - see SampleUsageTest.scala for full setup:
 ```scala
-  // this is an executable ScalaTest specification - see SampleUsageTest.scala for full setup
-  describe("Usage with default Tinkergraph") {
-    val graph = TinkerGraphFactory.createTinkerGraph
-    def vertices = graph.V
-
-    it("finds all vertices") {
-      vertices.count should be(6)
-      vertices.propertyMap.toList.toString should be(
-        "[{name=lop, lang=java}, {age=27, name=vadas}, {age=29, name=marko}, " +
-          "{age=35, name=peter}, {name=ripple, lang=java}, {age=32, name=josh}]")
-    }
-
+  describe("Usage with Tinkergraph") {
     it("finds all names of vertices") {
-      val names = vertices.property("name").toList
-      names.toString should be("[lop, vadas, marko, peter, ripple, josh]")
+      vertices.name.toScalaList should be(List("lop", "vadas", "marko", "peter", "ripple", "josh"))
     }
 
-    it("can get a specific vertex by id and get it's properties") {
-      val marko = graph.v(1)
-      marko("name") should be("marko")
-      marko("age") should be(29)
+    it("has different ways to get the properties of a vertex") {
+      val vertex = graph.v(1)
+
+      //dynamic invocation for property is untyped and may return null, like the groovy dsl
+      vertex.name should be("marko")
+      vertex.nonExistentProperty should equal(null)
+
+      //apply method takes the type and throws ClassCastException for wrong type
+      vertex[Int]("age") should be(29) //note: age is actually a java.lang.Integer
+      vertex[String]("nonExistentProperty") should equal(null)
+      intercept[ClassCastException] {
+        vertex[String]("age") should be("some string") //wrong type
+      }
+
+      //property returns Option[A]
+      vertex.property("nonExistentProperty") should equal(None)
+      vertex.property[Int]("age") should be(Some(29))
+      vertex.property[String]("age") should be(Some(29)) //this is not typesafe, see scaladoc for why that's the case
     }
 
     it("finds everybody who is over 30 years old") {
       vertices.filter { v: Vertex ⇒
-        v.get[Int]("age") match {
+        v.property[Int]("age") match {
           case Some(age) if age > 30 ⇒ true
           case _                     ⇒ false
         }
-      }.propertyMap().toList.toString should be(
-        "[{age=35, name=peter}, {age=32, name=josh}]")
+      }.propertyMap().toScalaList should be(List(
+        Map("name" -> "peter", "age" -> 35),
+        Map("name" -> "josh", "age" -> 32)))
     }
 
     it("finds who marko knows") {
-      val marko = graph.v(1)
-      marko.out("knows")(_("name"))
-        .toList.toString should be("[vadas, josh]")
+      val marko: ScalaVertex = graph.v(1)
+      marko.out("knows").map { v: ScalaVertex ⇒ v.name }.toScalaList should be(List("vadas", "josh"))
     }
 
     it("finds who marko knows if a given edge property `weight` is > 0.8") {
       val marko = graph.v(1)
       marko.outE("knows").filter { e: Edge ⇒
-        e.get[Float]("weight") match {
+        e.property[Float]("weight") match {
           case Some(weight) if weight > 0.8 ⇒ true
           case _                            ⇒ false
         }
-      }.inV.propertyMap().toList.toString should be("[{age=32, name=josh}]")
+      }.inV.propertyMap.toScalaList should be(List(Map("name" -> "josh", "age" -> 32)))
+    }
+
+    it("finds all vertices") {
+      vertices.count should be(6)
+      vertices.propertyMap.toScalaList should be(List(
+        Map("name" -> "lop", "lang" -> "java"),
+        Map("age" -> 27, "name" -> "vadas"),
+        Map("name" -> "marko", "age" -> 29),
+        Map("name" -> "peter", "age" -> 35),
+        Map("name" -> "ripple", "lang" -> "java"),
+        Map("name" -> "josh", "age" -> 32)))
     }
 
     describe("Usage with empty Graph") {
@@ -75,7 +101,7 @@ Sample usage
         val vertex = graph.addV(id)
         vertex.setProperty("key", "value")
 
-        graph.v(id)("key") should be("value")
+        graph.v(id).key should be("value")
       }
 
       it("creates vertices without specific ids") {
@@ -96,6 +122,7 @@ Sample usage
         foundVertices.get(0) should be(v2)
       }
     }
+  }
 ```
 
 Adding Gremlin-Scala as a dependency to your project
@@ -142,7 +169,7 @@ gremlin> g.V.propertyMap
 ==> {name=josh, age=32}
 
 # show names of all vertices
-gremlin> g.V.property("name")
+gremlin> g.V.name
 ==>lop
 ==>vadas
 ==>marko
@@ -154,11 +181,11 @@ gremlin> g.V.property("name")
 gremlin> val marko = g.v(1)
 ==> v[1]
 
-gremlin> marko("age")
+gremlin> marko.age
 ==> 29
 
 # find marko's friends' names
-gremlin> marko.out("knows")(_("name"))
+gremlin> marko.out("knows")(_.name)
 ==> vadas
 ==> josh
 
@@ -182,7 +209,7 @@ mvn install   #install into your local maven repository so that you can use it (
 
 Contributors
 =============
-[Michael Pollmeier](http://www.michaelpollmeier.com] - project maintainer since Gremlin 2.2
+[Michael Pollmeier](http://www.michaelpollmeier.com) - project maintainer since Gremlin 2.2
 [Zach Cox](http://theza.ch) - started this project
 [Tinkerpop team](http://www.tinkerpop.com) - created a whole awesome stack around graph databases
 [Antonio](https://twitter.com/Vantonio) - helped with jsr223 script engine

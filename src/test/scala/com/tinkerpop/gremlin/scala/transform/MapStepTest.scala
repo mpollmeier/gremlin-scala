@@ -19,16 +19,17 @@ class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
   }
 
   it("maps the age property of all vertices") {
-    vertices.property("age").map { age: Int ⇒ age * 2 }.toScalaList should be(List(54, 58, 70, 64))
+    vertices.property("age").map { age: Integer ⇒ age * 2 }.toScalaList should be(List(54, 58, 70, 64))
   }
 
   it("gets the name and the age as tuples") {
-    vertices.map { v: Vertex ⇒ (v.property("name"), v.property("age")) }.toScalaList should be(List(
-      (Some("lop"), None),
-      (Some("vadas"), Some(27)),
-      (Some("marko"), Some(29)),
-      (Some("peter"), Some(35)),
-      (Some("ripple"), None),
-      (Some("josh"), Some(32))))
+    vertices.map { v: Vertex ⇒ (v("name"), v("age")) }.toScalaList should be(List(
+      ("lop", null),
+      ("vadas", 27),
+      ("marko", 29),
+      ("peter", 35),
+      ("ripple", null),
+      ("josh", 32)))
   }
+
 }

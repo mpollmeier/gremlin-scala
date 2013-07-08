@@ -21,9 +21,9 @@ import com.tinkerpop.pipes.transform.PropertyPipe
 import com.tinkerpop.pipes.util.structures.AsMap
 import com.tinkerpop.pipes.branch.IfThenElsePipe
 import com.tinkerpop.pipes.util.PipesFunction
+import scala.language.dynamics
 
-class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
-
+class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def out: GremlinScalaPipeline[S, Vertex] = super.out()
   def in: GremlinScalaPipeline[S, Vertex] = super.in()
   def path: GremlinScalaPipeline[S, JList[_]] = super.path()
@@ -51,7 +51,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
   def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPP(new PropertyMapPipe(keys: _*))
   def propertyMap[F <: Element]: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
-  def property[F](key: String) = addPP(new PropertyPipe(key, false))
+  def property[F](key: String): GremlinScalaPipeline[S, F] = addPP(new PropertyPipe(key, false))
   //super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
@@ -338,4 +338,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] {
 
   implicit def boolean2BooleanFn(fn: E ⇒ Boolean)(e: E): JBoolean = fn(e)
 
+  //TODO: move to separate trait
+  def selectDynamic[F](field: String): GremlinScalaPipeline[S, F] = property(field)
 }

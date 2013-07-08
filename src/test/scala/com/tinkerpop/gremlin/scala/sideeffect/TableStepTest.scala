@@ -24,6 +24,9 @@ class TableStepTest extends com.tinkerpop.gremlin.test.sideeffect.TableStepTest 
   }
 
   def test_g_v1_asXaX_out_propertyXnameX_asXbX_tableXname_lengthX_cap() {
-    super.test_g_v1_asXaX_out_propertyXnameX_asXbX_tableXname_lengthX_cap(g.v(1).->.as("a").out.property("name").as("b").table({ v: Vertex ⇒ v("name") }, { s: String ⇒ s.length() }).cap.asInstanceOf[Pipe[Vertex, Table]]);
+    super.test_g_v1_asXaX_out_propertyXnameX_asXbX_tableXname_lengthX_cap(g.v(1).->.as("a").out.property("name").as("b")
+      .table({ v: Vertex ⇒ v("name") },
+        { s: String ⇒ s.length() })
+      .cap.asInstanceOf[Pipe[Vertex, Table]]);
   }
 }

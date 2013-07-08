@@ -25,13 +25,13 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds vertices with string property") {
-      vertices.filter { v: Vertex ⇒ v.get[String]("lang").exists(_ == "java") }.toList.size should be(2)
-      vertices.filterPF { case v: Vertex ⇒ v.get[String]("lang").exists(_ == "java") }.toList.size should be(2)
+      vertices.filter { v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
+      vertices.filterPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
     }
 
     it("finds vertices with int property") {
-      vertices.filter { v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(2)
-      vertices.filterPF { case v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(2)
+      vertices.filter { v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
+      vertices.filterPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
     }
 
     it("finds that v1.out has id=2") {
@@ -59,13 +59,13 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds vertices with string property") {
-      vertices.filterNot { v: Vertex ⇒ v.get[String]("lang").exists(_ == "java") }.toList.size should be(4)
-      vertices.filterNotPF { case v: Vertex ⇒ v.get[String]("lang").exists(_ == "java") }.toList.size should be(4)
+      vertices.filterNot { v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
+      vertices.filterNotPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
     }
 
     it("finds vertices with int property") {
-      vertices.filterNot { v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(4)
-      vertices.filterNotPF { case v: Vertex ⇒ v.get[Int]("age").exists(_ > 30) }.toList.size should be(4)
+      vertices.filterNot { v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
+      vertices.filterNotPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
     }
 
     it("finds that v1.out has two vertices whose id is not 2") {

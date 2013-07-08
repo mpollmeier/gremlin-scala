@@ -13,9 +13,13 @@ class GroupByStepTest extends com.tinkerpop.gremlin.test.sideeffect.GroupByStepT
 
   val g = TinkerGraphFactory.createTinkerGraph();
 
-  def test_g_V_groupByXlang_nameX() {
-    val m = new java.util.HashMap[String, java.util.List[String]]();
-    super.test_g_V_groupByXlang_nameX(g.V.groupBy(m.asInstanceOf[java.util.HashMap[_, java.util.List[_]]], { v: Vertex ⇒ v("lang") }, { v: Vertex ⇒ v("name") }), m);
-  }
+  //  def test_g_V_groupByXlang_nameX() {
+  //    val m = new java.util.HashMap[String, java.util.List[String]]();
+  //    super.test_g_V_groupByXlang_nameX(
+  //      g.V.groupBy(m.asInstanceOf[java.util.HashMap[_, java.util.List[_]]],
+  //        { v: ScalaVertex ⇒ v.lang },
+  //        { v: ScalaVertex ⇒ v.name }),
+  //      m);
+  //  }
 }
 

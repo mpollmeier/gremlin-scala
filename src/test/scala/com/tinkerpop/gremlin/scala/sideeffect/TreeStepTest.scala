@@ -16,6 +16,6 @@ class TreeStepTest extends com.tinkerpop.gremlin.test.sideeffect.TreeStepTest {
   val g = TinkerGraphFactory.createTinkerGraph();
 
   def test_g_v1_out_out_treeXnameX_cap() {
-    super.test_g_v1_out_out_treeXnameX_cap(g.v(1).out.out.tree { v: Vertex ⇒ v("name") }.cap.asInstanceOf[Pipe[Vertex, Tree[_]]]);
+    super.test_g_v1_out_out_treeXnameX_cap(g.v(1).out.out.tree { v: Vertex ⇒ v("name") }.cap.asInstanceOf[Pipe[Vertex, Tree[_]]])
   }
 }
