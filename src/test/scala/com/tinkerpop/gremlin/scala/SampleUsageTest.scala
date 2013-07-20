@@ -10,7 +10,6 @@ import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
-import com.tinkerpop.blueprints.impls.tg.TinkerVertex
 
 @RunWith(classOf[JUnitRunner])
 class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
