@@ -27,13 +27,11 @@ class ScalaGraph(val graph: Graph) {
   def -> : GremlinScalaPipeline[Graph, Graph] =
     new GremlinScalaPipeline[Graph, Graph].start(graph).asInstanceOf[GremlinScalaPipeline[Graph, Graph]];
 
-  /** add vertex */
-  def addV() = graph.addVertex(null)
-  def addV(id: Any) = graph.addVertex(id)
+  /** add vertex; id defaults to null which will generate a random id*/
+  def addV(id: Any = null) = graph.addVertex(id)
 
-  /** add edge */
-  def addE(id: Any, out: ScalaVertex, in: ScalaVertex, label: String) = graph.addEdge(id, out, in, label)
-  def addE(out: ScalaVertex, in: ScalaVertex, label: String) = graph.addEdge(null, out, in, label)
+  /** add edge; id defaults to null which will generate a random id */
+  def addE(out: ScalaVertex, in: ScalaVertex, label: String, id: Any = null) = graph.addEdge(id, out, in, label)
 }
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Graph]] and [[com.tinkerpop.gremlin.scala.ScalaGraph]]. */
