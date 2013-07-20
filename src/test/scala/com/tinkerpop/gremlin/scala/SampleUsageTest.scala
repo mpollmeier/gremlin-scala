@@ -48,16 +48,6 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
         Map("name" -> "peter", "age" -> 35),
         Map("name" -> "josh", "age" -> 32)))
     }
-    //    it("finds everybody who is over 30 years old") {
-    //    	vertices.filter { v: Vertex ⇒
-    //    		v.property[Int]("age") match {
-    //    		case Some(age) if age > 30 ⇒ true
-    //    		case _                     ⇒ false
-    //    	}
-    //    	}.propertyMap().toScalaList should be(List(
-    //    			Map("name" -> "peter", "age" -> 35),
-    //    			Map("name" -> "josh", "age" -> 32)))
-    //    }
 
     it("finds who marko knows") {
       val marko = graph.v(1)
