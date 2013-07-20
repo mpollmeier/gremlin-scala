@@ -25,4 +25,6 @@ abstract class ScalaElement(val element: Element) extends Dynamic {
     }
   }
 
+  override def toString = element.toString
+
 }
