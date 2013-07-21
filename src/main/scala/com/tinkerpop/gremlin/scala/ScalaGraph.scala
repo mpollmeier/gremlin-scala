@@ -22,7 +22,7 @@ class ScalaGraph(val graph: Graph) {
   def e(id: Any): ScalaEdge = graph.getEdge(id)
 
   def -> : GremlinScalaPipeline[ScalaGraph, ScalaGraph] =
-    new GremlinScalaPipeline[ScalaGraph, ScalaGraph].start(new ScalaGraph(graph))
+    new GremlinScalaPipeline[ScalaGraph, ScalaGraph].start(ScalaGraph(graph))
 
   /** add vertex; id defaults to null which will generate a random id*/
   def addV(id: Any = null) = graph.addVertex(id)
@@ -33,6 +33,7 @@ class ScalaGraph(val graph: Graph) {
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Graph]] and [[com.tinkerpop.gremlin.scala.ScalaGraph]]. */
 object ScalaGraph {
+  def apply(graph: Graph) = wrap(graph)
   implicit def wrap(graph: Graph) = new ScalaGraph(graph)
   implicit def unwrap(wrapper: ScalaGraph) = wrapper.graph
 }

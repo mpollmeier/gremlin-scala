@@ -2,8 +2,7 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.blueprints._
-import com.tinkerpop.pipes.{ PipeFunction, Pipe }
-import com.tinkerpop.pipes.util.{ FluentUtility, StartPipe }
+import com.tinkerpop.pipes._
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import java.util.{ Map ⇒ JMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
 import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
@@ -11,18 +10,16 @@ import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
 import com.tinkerpop.pipes.transform.TransformPipe
 import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
-import com.tinkerpop.pipes.filter.IdFilterPipe
-import com.tinkerpop.pipes.filter.LabelFilterPipe
-import com.tinkerpop.pipes.filter.PropertyFilterPipe
-import com.tinkerpop.pipes.filter.FilterFunctionPipe
-import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import scala.collection.JavaConversions._
-import com.tinkerpop.pipes.transform.PropertyPipe
+import com.tinkerpop.pipes.filter._
+import com.tinkerpop.pipes.transform._
+import com.tinkerpop.pipes.branch._
+import com.tinkerpop.pipes.util._
+import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import com.tinkerpop.pipes.util.structures.AsMap
-import com.tinkerpop.pipes.branch.IfThenElsePipe
-import com.tinkerpop.pipes.util.PipesFunction
 import scala.language.dynamics
 import scala.collection.convert.wrapAsJava
+import com.tinkerpop.pipes.transform.InVertexPipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def out: GremlinScalaPipeline[S, Vertex] = super.out()
@@ -52,16 +49,17 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def inE(labels: String*): GremlinScalaPipeline[S, Edge] = super.inE(labels: _*)
   override def in(labels: String*): GremlinScalaPipeline[S, Vertex] = super.in(labels: _*)
   override def inV: GremlinScalaPipeline[S, Vertex] = super.inV
+  //def inV: GremlinScalaPipeline[S, ScalaVertex] = addPipe2(new InVertexPipe().asInstanceOf[Pipe[_, ScalaVertex]])
   override def outE(labels: String*): GremlinScalaPipeline[S, Edge] = super.outE(labels: _*)
   override def out(labels: String*): GremlinScalaPipeline[S, Vertex] = super.out(labels: _*)
   override def outV: GremlinScalaPipeline[S, Vertex] = super.outV
 
   override def label: GremlinScalaPipeline[S, String] = super.label
 
-  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPP(new PropertyMapPipe(keys: _*))
+  def propertyMap[F <: Element](keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPipe2(new PropertyMapPipe(keys: _*))
   def propertyMap[F <: Element]: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
-  def property[F](key: String): GremlinScalaPipeline[S, F] = addPP(new PropertyPipe(key, false))
+  def property[F](key: String): GremlinScalaPipeline[S, F] = addPipe2(new PropertyPipe(key, false))
   //super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
@@ -80,7 +78,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def fairMerge: GremlinScalaPipeline[S, _] = super.fairMerge
 
   def ifThenElse(ifFunction: E ⇒ Boolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
-    addPP(new IfThenElsePipe(
+    addPipe2(new IfThenElsePipe(
       new ScalaPipeFunction(ifFunction),
       new ScalaPipeFunction(thenFunction),
       new ScalaPipeFunction(elseFunction)
@@ -112,10 +110,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def except(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.except(collection)
   override def except(namedSteps: String*): GremlinScalaPipeline[S, E] = super.except(namedSteps: _*)
 
-  def filter(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ f(e) }
-  def filterPF(fn: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ fn(e) }
-  def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ !f(e) }
-  def filterNotPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = super.filter { e: E ⇒ !f(e) }
+  def filter(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E](f))
+  def filterPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E](f))
+  def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
+  def filterNotPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
 
   override def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.or(pipes: _*)
 
@@ -329,21 +327,21 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
   private def manualStart[T](start: JIterable[_]): GremlinScalaPipeline[T, T] = {
-    val pipe = addPP(new StartPipe[S](start))
+    val pipe = addPipe2(new StartPipe[S](start))
     FluentUtility.setStarts(this, start)
     pipe.asInstanceOf[GremlinScalaPipeline[T, T]]
   }
 
-  def addPP[T](pipe: Pipe[_, T]): GremlinScalaPipeline[S, T] = {
+  def addPipe2[T](pipe: Pipe[_, T]): GremlinScalaPipeline[S, T] = {
     addPipe(pipe)
     this.asInstanceOf[GremlinScalaPipeline[S, T]]
   }
 
+  //TODO: remove
   implicit private def scalaPipeline[A, B](pipeline: GremlinPipeline[A, B]): GremlinScalaPipeline[A, B] =
     pipeline.asInstanceOf[GremlinScalaPipeline[A, B]]
 
   implicit def boolean2BooleanFn(fn: E ⇒ Boolean)(e: E): JBoolean = fn(e)
-
-  //TODO: move to separate trait
   def selectDynamic[F](field: String): GremlinScalaPipeline[S, F] = property(field)
+
 }
