@@ -105,8 +105,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
     describe("Graph navigation") {
       it("follows outEdge and inVertex") {
-        println(graph.v(1).outE("created").inV.toScalaList) //TODO: do a .name
-
+        graph.v(1).outE("created").inV.name.toScalaList should be(List("lop"))
       }
     }
   }
