@@ -1,6 +1,6 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.blueprints.{ Graph, Vertex, Edge }
+import com.tinkerpop.blueprints.Graph
 
 class ScalaGraph(val graph: Graph) {
   /** iterate all vertices */
@@ -21,8 +21,8 @@ class ScalaGraph(val graph: Graph) {
   /**Returns the edge with the specified ID. */
   def e(id: Any): ScalaEdge = graph.getEdge(id)
 
-  def -> : GremlinScalaPipeline[Graph, Graph] =
-    new GremlinScalaPipeline[Graph, Graph].start(graph).asInstanceOf[GremlinScalaPipeline[Graph, Graph]];
+  def -> : GremlinScalaPipeline[ScalaGraph, ScalaGraph] =
+    new GremlinScalaPipeline[ScalaGraph, ScalaGraph].start(new ScalaGraph(graph))
 
   /** add vertex; id defaults to null which will generate a random id*/
   def addV(id: Any = null) = graph.addVertex(id)
