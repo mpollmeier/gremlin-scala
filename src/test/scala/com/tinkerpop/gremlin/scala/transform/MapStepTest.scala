@@ -23,7 +23,7 @@ class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
   }
 
   it("gets the name and the age as tuples") {
-    vertices.map { v: Vertex ⇒ (v("name"), v("age")) }.toScalaList should be(List(
+    vertices.map { v: ScalaVertex ⇒ (v("name"), v("age")) }.toScalaList should be(List(
       ("lop", null),
       ("vadas", 27),
       ("marko", 29),

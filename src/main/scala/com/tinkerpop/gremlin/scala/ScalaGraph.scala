@@ -2,15 +2,14 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints.{ Graph, Vertex, Edge }
 
-/**Adds convenience methods to [com.tinkerpop.blueprints.Graph] */
 class ScalaGraph(val graph: Graph) {
   /**Returns all vertices. */
-  def V: GremlinScalaPipeline[Vertex, Vertex] = //TODO: get rid of these casts
-    new GremlinScalaPipeline[Graph, Vertex].start(graph).V(graph).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  def V: GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
+    new GremlinScalaPipeline[ScalaGraph, ScalaVertex].V(graph)
 
   /**Returns all edges. */
-  def E: GremlinScalaPipeline[Edge, Edge] = //TODO: get rid of these casts
-    new GremlinScalaPipeline[Graph, Edge].start(graph).E(graph).asInstanceOf[GremlinScalaPipeline[Edge, Edge]]
+  def E: GremlinScalaPipeline[Edge, Edge] =
+    new GremlinScalaPipeline[Graph, Edge].start(graph).E(graph)
 
   /**Returns the vertices with the specified IDs. */
   def V(ids: Any*): Iterable[ScalaVertex] = ids.map(id ⇒ ScalaVertex(graph.getVertex(id)))

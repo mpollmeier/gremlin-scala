@@ -6,7 +6,7 @@ import com.tinkerpop.pipes.{ PipeFunction, Pipe }
 import com.tinkerpop.pipes.util.{ FluentUtility, StartPipe }
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import java.util.{ Map ⇒ JMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
-import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger }
+import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
 import com.tinkerpop.pipes.transform.TransformPipe
@@ -22,13 +22,19 @@ import com.tinkerpop.pipes.util.structures.AsMap
 import com.tinkerpop.pipes.branch.IfThenElsePipe
 import com.tinkerpop.pipes.util.PipesFunction
 import scala.language.dynamics
+import scala.collection.convert.wrapAsJava
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def out: GremlinScalaPipeline[S, Vertex] = super.out()
   def in: GremlinScalaPipeline[S, Vertex] = super.in()
   def path: GremlinScalaPipeline[S, JList[_]] = super.path()
 
-  def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] = manualStart(graph.getVertices)
+  def V(graph: Graph): GremlinScalaPipeline[ScalaVertex, ScalaVertex] = {
+    val scalaVertices = graph.getVertices.iterator.map { v ⇒ ScalaVertex(v) }
+    val jIterator: JIterable[ScalaVertex] =
+      wrapAsJava.asJavaIterable(scalaVertices.toIterable)
+    manualStart(jIterator)
+  }
   def E(graph: Graph): GremlinScalaPipeline[Edge, Edge] = manualStart(graph.getEdges)
 
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
@@ -318,16 +324,12 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
 
   def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
-  private def manualStart[T](start: Any): GremlinScalaPipeline[T, T] = {
+  private def manualStart[T](start: JIterable[_]): GremlinScalaPipeline[T, T] = {
     val pipe = addPP(new StartPipe[S](start))
     FluentUtility.setStarts(this, start)
     pipe.asInstanceOf[GremlinScalaPipeline[T, T]]
   }
 
-  /**
-   * TODO: return a new pipe rather than changing mutable state and cast
-   * TODO: rename to add once this doesn't extend GremlinPipeline any more
-   */
   def addPP[T](pipe: Pipe[_, T]): GremlinScalaPipeline[S, T] = {
     addPipe(pipe)
     this.asInstanceOf[GremlinScalaPipeline[S, T]]

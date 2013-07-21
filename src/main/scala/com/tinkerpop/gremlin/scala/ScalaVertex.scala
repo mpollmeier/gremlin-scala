@@ -98,7 +98,8 @@ class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
     new GremlinScalaPipeline[Vertex, Edge].start(vertex).bothE(branchFactor, labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
 
   def -> : GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]];
+    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+
 }
 
 /**Implicit conversions between [[com.tinkerpop.blueprints.Vertex]] and [[com.tinkerpop.gremlin.scala.ScalaVertex]]. */

@@ -15,22 +15,22 @@ import com.tinkerpop.blueprints.Edge
 class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
   describe("filter") {
     it("finds none") {
-      vertices.filter { v: Vertex ⇒ false }.toList.size should be(0)
+      vertices.filter { v: ScalaVertex ⇒ false }.toList.size should be(0)
       vertices.filterPF { case _ ⇒ false }.toList.size should be(0)
     }
 
     it("finds all") {
-      vertices.filter { v: Vertex ⇒ true }.toList.size should be(6)
+      vertices.filter { v: ScalaVertex ⇒ true }.toList.size should be(6)
       vertices.filterPF { case _ ⇒ true }.toList.size should be(6)
     }
 
     it("finds vertices with string property") {
-      vertices.filter { v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
+      vertices.filter { v: ScalaVertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
       vertices.filterPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
     }
 
     it("finds vertices with int property") {
-      vertices.filter { v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
+      vertices.filter { v: ScalaVertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
       vertices.filterPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
     }
 
@@ -49,22 +49,22 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("filterNot") {
     it("finds none") {
-      vertices.filterNot { v: Vertex ⇒ false }.toList.size should be(6)
+      vertices.filterNot { v ⇒ false }.toList.size should be(6)
       vertices.filterNotPF { case _ ⇒ false }.toList.size should be(6)
     }
 
     it("finds all") {
-      vertices.filterNot { v: Vertex ⇒ true }.toList.size should be(0)
+      vertices.filterNot { v ⇒ true }.toList.size should be(0)
       vertices.filterNotPF { case _ ⇒ true }.toList.size should be(0)
     }
 
     it("finds vertices with string property") {
-      vertices.filterNot { v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
+      vertices.filterNot { v ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
       vertices.filterNotPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
     }
 
     it("finds vertices with int property") {
-      vertices.filterNot { v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
+      vertices.filterNot { v ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
       vertices.filterNotPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
     }
 
