@@ -1,10 +1,13 @@
 package com.tinkerpop.gremlin.scala
 
 import java.util.{ Map ⇒ JMap }
-import com.tinkerpop.blueprints.{ Vertex, Edge }
+import com.tinkerpop.blueprints.{ Vertex, Edge, Element }
+import java.lang.{ Iterable ⇒ JIterable }
+import com.tinkerpop.blueprints.Direction
+import com.tinkerpop.blueprints.VertexQuery
 
 //TODO: use methods on scalapipeline directly to avoid casts
-class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
+class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   /** follow all outgoing edges to the vertices */
   def out(): GremlinScalaPipeline[Vertex, Vertex] =
     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out().asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
@@ -99,6 +102,13 @@ class ScalaVertex(val vertex: Vertex) extends ScalaElement(vertex) {
 
   def -> : GremlinScalaPipeline[Vertex, Vertex] =
     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+
+  /** need to extend Vertex so that we can use existing Gremlin Pipes... */
+  val element: Element = vertex
+  def addEdge(label: String, inVertex: Vertex): Edge = vertex.addEdge(label, inVertex)
+  def getEdges(direction: Direction, labels: String*): JIterable[Edge] = vertex.getEdges(direction, labels: _*)
+  def getVertices(direction: Direction, labels: String*): JIterable[Vertex] = vertex.getVertices(direction, labels: _*)
+  def query(): VertexQuery = vertex.query()
 
 }
 

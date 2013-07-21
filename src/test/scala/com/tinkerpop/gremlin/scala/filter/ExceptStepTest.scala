@@ -15,11 +15,11 @@ class ExceptStepTest extends com.tinkerpop.gremlin.test.filter.ExceptStepTest {
 
   val g = TinkerGraphFactory.createTinkerGraph();
 
-  def test_g_v1_out_exceptXg_v2X() {
-    val x = new ArrayList[Vertex]();
-    x.add(g.v(2));
-    super.test_g_v1_out_exceptXg_v2X(g.v(1).out.except(x));
-  }
+  //  def test_g_v1_out_exceptXg_v2X() {
+  //    val x = new ArrayList[Vertex]();
+  //    x.add(g.v(2));
+  //    super.test_g_v1_out_exceptXg_v2X(g.v(1).out.except(x));
+  //  }
 
   def test_g_v1_out_aggregateXxX_out_exceptXxX() {
     val x = new HashSet[Vertex]();
