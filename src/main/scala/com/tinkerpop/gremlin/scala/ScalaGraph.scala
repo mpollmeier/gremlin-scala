@@ -3,13 +3,11 @@ package com.tinkerpop.gremlin.scala
 import com.tinkerpop.blueprints.{ Graph, Vertex, Edge }
 
 class ScalaGraph(val graph: Graph) {
-  /**Returns all vertices. */
-  def V: GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
-    new GremlinScalaPipeline[ScalaGraph, ScalaVertex].V(graph)
+  /** iterate all vertices */
+  def V: GremlinScalaPipeline[ScalaVertex, ScalaVertex] = new GremlinScalaPipeline[ScalaGraph, ScalaVertex].V(graph)
 
-  /**Returns all edges. */
-  def E: GremlinScalaPipeline[Edge, Edge] =
-    new GremlinScalaPipeline[Graph, Edge].start(graph).E(graph)
+  /** iterate all edges */
+  def E: GremlinScalaPipeline[ScalaEdge, ScalaEdge] = new GremlinScalaPipeline[ScalaGraph, ScalaEdge].E(graph)
 
   /**Returns the vertices with the specified IDs. */
   def V(ids: Any*): Iterable[ScalaVertex] = ids.map(id ⇒ ScalaVertex(graph.getVertex(id)))

@@ -30,12 +30,16 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def path: GremlinScalaPipeline[S, JList[_]] = super.path()
 
   def V(graph: Graph): GremlinScalaPipeline[ScalaVertex, ScalaVertex] = {
-    val scalaVertices = graph.getVertices.iterator.map { v ⇒ ScalaVertex(v) }
-    val jIterator: JIterable[ScalaVertex] =
-      wrapAsJava.asJavaIterable(scalaVertices.toIterable)
+    val vertices = graph.getVertices.iterator.map { v ⇒ ScalaVertex(v) }
+    val jIterator: JIterable[ScalaVertex] = wrapAsJava.asJavaIterable(vertices.toIterable)
     manualStart(jIterator)
   }
-  def E(graph: Graph): GremlinScalaPipeline[Edge, Edge] = manualStart(graph.getEdges)
+
+  def E(graph: Graph): GremlinScalaPipeline[ScalaEdge, ScalaEdge] = {
+    val edges = graph.getEdges.iterator.map { e ⇒ ScalaEdge(e) }
+    val jIterator: JIterable[ScalaEdge] = wrapAsJava.asJavaIterable(edges.toIterable)
+    manualStart(jIterator)
+  }
 
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
