@@ -40,6 +40,8 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     it("follows out edges") {
       graph.v(1).outE.label.toScalaList should be(List("knows", "knows", "created"))
       graph.v(1).outE(1).label.toScalaList should be(List("knows"))
+
+      graph.v(1).outE("knows", "created").inV.name.toScalaList should be(List("vadas", "josh", "lop"))
     }
 
     it("follows in edges") {
