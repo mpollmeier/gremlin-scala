@@ -6,34 +6,46 @@ import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.pipes.Pipe
 import com.tinkerpop.blueprints.{ Graph, Vertex }
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-/**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
+@RunWith(classOf[JUnitRunner])
+class LoopStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-class LoopStepTest extends com.tinkerpop.gremlin.test.branch.LoopStepTest {
+  describe("looping for numbered step") {
+    it("loops while the whileFunction true") {
+      graph.v(1).out.loop(1, { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 })
+        .name.toScalaList should be(List("ripple", "lop"))
+    }
 
-  val g = TinkerGraphFactory.createTinkerGraph
+    it("optionally takes an emit function that decides if the current object gets emitted or not - that could get emitted multiple times") {
+      graph.v(1).out.loop(
+        numberedStep = 1,
+        whileFun = { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 },
+        emit = { lb: LoopBundle[Vertex] ⇒ ScalaVertex(lb.getObject).name == "lop"
+        })
+        .name.toScalaList should be(List("lop", "lop"))
+    }
 
-  //  def test_g_v1_out_loopX1_loops_lt_3X_propertyXnameX() {
-  //    super.test_g_v1_out_loopX1_loops_lt_3X_propertyXnameX(g.v(1).out.loop(1, { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 }).property("name").asInstanceOf[Pipe[Vertex, String]]);
-  //  }
-  //
-  //  def test_g_v1_asXhereX_out_loopXhere_loops_lt_3X_propertyXnameX() {
-  //    super.test_g_v1_asXhereX_out_loopXhere_loops_lt_3X_propertyXnameX(g.v(1).->.as("here").out.loop("here", { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 }).property("name").asInstanceOf[Pipe[Vertex, String]]);
-  //  }
-  //
-  //  def test_g_V_out_loopX1_loops_lt_3X_propertyXnameX() {
-  //    super.test_g_V_out_loopX1_loops_lt_3X_propertyXnameX(
-  //      g.V.out.loop(1, { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 })
-  //        .property("name")
-  //        .asInstanceOf[Pipe[Vertex, String]]);
-  //  }
-  //
-  //  def test_g_V_asXhereX_out_loopXhere_loops_lt_3X_propertyXnameX() {
-  //    super.test_g_V_asXhereX_out_loopXhere_loops_lt_3X_propertyXnameX(
-  //      g.V.as("here").out().loop("here", { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 })
-  //        .property("name").asInstanceOf[Pipe[Vertex, String]]);
-  //  }
+  }
+
+  describe("looping for named step") {
+
+    it("jumps back to named step and loops twice") {
+      graph.v(1).->.as("here").out.loop("here", { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 })
+        .name.toScalaList should be(List("ripple", "lop"))
+    }
+
+    it("optionally takes an emit function that decides if the current object gets emitted or not - that could get emitted multiple times") {
+      graph.v(1).->.as("here").out.loop(
+        namedStep = "here",
+        whileFun = { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 },
+        emit = { lb: LoopBundle[Vertex] ⇒ ScalaVertex(lb.getObject).name == "lop" })
+        .name.toScalaList should be(List("lop", "lop"))
+    }
+
+  }
 
 }

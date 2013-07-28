@@ -84,17 +84,60 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
       new ScalaPipeFunction(elseFunction)
     ))
 
-  def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
-    super.loop(numberedStep, new ScalaPipeFunction(whileFunction))
+  /**
+   * Add a LoopPipe to the end of the Pipeline.
+   * Looping is useful for repeating a section of a pipeline.
+   * The provided whileFunction determines when to drop out of the loop.
+   * The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
+   *
+   * @param numberedStep  the number of steps to loop back to
+   * @param whileFunction whether or not to continue looping on the current object
+   */
+  def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
+    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, numberedStep)), whileFunction))
 
-  def loop(namedStep: String, whileFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
-    super.loop(namedStep, new ScalaPipeFunction(whileFunction))
+  /**
+   * Add a LoopPipe to the end of the Pipeline.
+   * Looping is useful for repeating a section of a pipeline.
+   * The provided whileFunction determines when to drop out of the loop.
+   * The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
+   *
+   * @param namedStep     the name of the step to loop back to
+   * @param whileFunction whether or not to continue looping on the current object
+   */
+  def loop(namedStep: String, whileFunction: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
+    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep)), whileFunction))
 
-  def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ JBoolean, emitFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
-    super.loop(numberedStep, new ScalaPipeFunction(whileFunction), new ScalaPipeFunction(emitFunction))
+  /**
+   * Add a LoopPipe to the end of the Pipeline.
+   * Looping is useful for repeating a section of a pipeline.
+   * The provided whileFunction determines when to drop out of the loop.
+   * The provided emitFunction can be used to emit objects that are still going through a loop.
+   * The whileFunction and emitFunctions are provided a LoopBundle object which contains the object in loop along with other useful metadata.
+   *
+   * @param numberedStep  the number of steps to loop back to
+   * @param whileFun or not to continue looping on the current object
+   * @param emit  whether or not to emit the current object (irrespective of looping)
+   * @return the extended Pipeline
+   */
+  def loop(numberedStep: Int, whileFun: LoopBundle[E] ⇒ Boolean, emit: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
+    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, numberedStep)), whileFun, emit))
 
-  def loop(namedStep: String, whileFunction: LoopBundle[E] ⇒ JBoolean, emitFunction: LoopBundle[E] ⇒ JBoolean): GremlinScalaPipeline[S, E] =
-    super.loop(namedStep, new ScalaPipeFunction(whileFunction), new ScalaPipeFunction(emitFunction))
+  /**
+   * Add a LoopPipe to the end of the Pipeline.
+   * Looping is useful for repeating a section of a pipeline.
+   * The provided whileFunction determines when to drop out of the loop.
+   * The provided emitFunction can be used to emit objects that are still going through a loop.
+   * The whileFunction and emitFunctions are provided a LoopBundle object which contains the object in loop along with other useful metadata.
+   *
+   * @param namedStep     the number of steps to loop back to
+   * @param whileFun whether or not to continue looping on the current object
+   * @param emit whether or not to emit the current object (irrespective of looping)
+   */
+  def loop(namedStep: String,
+           whileFun: LoopBundle[E] ⇒ Boolean,
+           emit: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
+    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep)), whileFun, emit))
 
   ////////////////////
   /// FILTER PIPES ///
