@@ -16,7 +16,7 @@
         <gremlin.version>2.4.0-SNAPSHOT</gremlin.version>
         <blueprints.version>2.4.0-SNAPSHOT</blueprints.version>
         <pipes.version>2.4.0-SNAPSHOT</pipes.version>
-        <scala.version>2.10.1</scala.version>
+        <scala.version>2.10.2</scala.version>
     </properties>
     <developers>
         <developer>
@@ -79,6 +79,11 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>jline</artifactId>
             <version>${scala.version}</version>
         </dependency>
         <dependency>
