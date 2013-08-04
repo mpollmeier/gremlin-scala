@@ -120,7 +120,9 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    * @param emit  whether or not to emit the current object (irrespective of looping)
    * @return the extended Pipeline
    */
-  def loop(numberedStep: Int, whileFun: LoopBundle[E] ⇒ Boolean, emit: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
+  def loop(numberedStep: Int,
+           whileFun: LoopBundle[E] ⇒ Boolean,
+           emit: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
     addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, numberedStep)), whileFun, emit))
 
   /**
