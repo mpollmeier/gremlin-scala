@@ -41,10 +41,6 @@ class GremlinILoop extends ILoop {
   /**Overriden to print out the value evaluated from the specified line. */
   override def command(line: String): Result = {
     val result = super.command(line)
-
-    //TODO handle compiler error
-    //TODO handle exception
-    //TODO handle something like class on multilines
     if (result.keepRunning && result.lineToRecord.isDefined)
       printLastValue
 
@@ -61,12 +57,12 @@ class GremlinILoop extends ILoop {
   def toIterator(value: Any): Iterator[Any] = {
     import scala.collection.JavaConverters._
     value match {
-      case t: Traversable[Any]        ⇒ t.toIterator
-      case a: Array[_]                ⇒ a.toIterator
-      case i: java.lang.Iterable[Any] ⇒ i.asScala.toIterator
-      case i: java.util.Iterator[Any] ⇒ i.asScala
-      case m: java.util.Map[Any, Any] ⇒ m.asScala.toIterator
-      case _                          ⇒ Iterator.single(value)
+      case t: Traversable[Any]      ⇒ t.toIterator
+      case a: Array[_]              ⇒ a.toIterator
+      case i: java.lang.Iterable[_] ⇒ i.asScala.toIterator
+      case i: java.util.Iterator[_] ⇒ i.asScala
+      case m: java.util.Map[_, _]   ⇒ m.asScala.toIterator
+      case _                        ⇒ Iterator.single(value)
     }
   }
 
