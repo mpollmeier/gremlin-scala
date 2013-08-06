@@ -38,6 +38,26 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     manualStart(jIterator)
   }
 
+  /** Check if the element has a property with provided key */
+  def has[F <: Element, T](key: String): GremlinScalaPipeline[S, F] =
+    has(key, Tokens.T.neq, null)
+
+  def has[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+    has(key, Tokens.T.eq, value)
+
+  def has[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
+    super.has(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+
+  def has[F <: Element, T](key: String, predicate: Predicate, value: T): GremlinScalaPipeline[S, F] =
+    super.has(key, predicate, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+
+  /** Check if the element does not have a property with provided key. */
+  def hasNot[F <: Element, T](key: String): GremlinScalaPipeline[S, F] =
+    has(key, Tokens.T.eq, null)
+
+  def hasNot[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+    has(key, Tokens.T.neq, value)
+
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
   override def bothV: GremlinScalaPipeline[S, Vertex] = super.bothV
