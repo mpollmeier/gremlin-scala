@@ -110,40 +110,11 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    * The provided whileFunction determines when to drop out of the loop.
    * The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
    *
-   * @param numberedStep  the number of steps to loop back to
-   * @param whileFunction whether or not to continue looping on the current object
-   */
-  def loop(numberedStep: Int, whileFunction: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
-    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, numberedStep)), whileFunction))
-
-  /**
-   * Add a LoopPipe to the end of the Pipeline.
-   * Looping is useful for repeating a section of a pipeline.
-   * The provided whileFunction determines when to drop out of the loop.
-   * The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
-   *
    * @param namedStep     the name of the step to loop back to
    * @param whileFunction whether or not to continue looping on the current object
    */
   def loop(namedStep: String, whileFunction: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
     addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep)), whileFunction))
-
-  /**
-   * Add a LoopPipe to the end of the Pipeline.
-   * Looping is useful for repeating a section of a pipeline.
-   * The provided whileFunction determines when to drop out of the loop.
-   * The provided emitFunction can be used to emit objects that are still going through a loop.
-   * The whileFunction and emitFunctions are provided a LoopBundle object which contains the object in loop along with other useful metadata.
-   *
-   * @param numberedStep  the number of steps to loop back to
-   * @param whileFun or not to continue looping on the current object
-   * @param emit  whether or not to emit the current object (irrespective of looping)
-   * @return the extended Pipeline
-   */
-  def loop(numberedStep: Int,
-           whileFun: LoopBundle[E] ⇒ Boolean,
-           emit: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
-    addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, numberedStep)), whileFun, emit))
 
   /**
    * Add a LoopPipe to the end of the Pipeline.
@@ -166,7 +137,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   ////////////////////
   override def and(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.and(pipes: _*)
 
-  override def back(numberedStep: Int): GremlinScalaPipeline[S, _] = super.back(numberedStep)
   override def back(namedStep: String): GremlinScalaPipeline[S, _] = super.back(namedStep)
 
   override def dedup: GremlinScalaPipeline[S, E] = super.dedup()
@@ -203,7 +173,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def aggregate(aggregateFunction: E ⇒ _): GremlinScalaPipeline[S, E] =
     super.aggregate(new JArrayList[Object](), new ScalaPipeFunction(aggregateFunction))
 
-  override def optional(numberedStep: Int): GremlinScalaPipeline[S, _] = super.optional(numberedStep)
   override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
 
   override def groupBy(map: JMap[_, JList[_]], keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] =
@@ -348,9 +317,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def gather(function: JList[_] ⇒ JList[_]): GremlinScalaPipeline[S, _] = super.gather(new ScalaPipeFunction(function))
 
   override def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
-  override def memoize(numberedStep: Int): GremlinScalaPipeline[S, E] = super.memoize(numberedStep)
   override def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
-  override def memoize(numberedStep: Int, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(numberedStep, map)
 
   override def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
 
