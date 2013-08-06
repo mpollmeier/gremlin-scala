@@ -13,9 +13,9 @@
     <packaging>jar</packaging>
     <name>Gremlin-Scala: Gremlin for the Scala Language</name>
     <properties>
-        <gremlin.version>2.4.0-SNAPSHOT</gremlin.version>
-        <blueprints.version>2.4.0-SNAPSHOT</blueprints.version>
-        <pipes.version>2.4.0-SNAPSHOT</pipes.version>
+        <gremlin.version>2.4.0</gremlin.version>
+        <blueprints.version>2.4.0</blueprints.version>
+        <pipes.version>2.4.0</pipes.version>
         <scala.version>2.10.2</scala.version>
     </properties>
     <developers>
