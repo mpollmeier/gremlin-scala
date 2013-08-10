@@ -9,7 +9,7 @@ import com.tinkerpop.gremlin.scala.Imports
 
 class Interpreter(out: PrintWriter) extends IMain(new Settings, out) {
   beQuietDuring {
-    addImports(Imports.forRexster: _*)
+    addImports(Imports.asList: _*)
   }
 
   override lazy val classLoader = new AbstractFileClassLoader(virtualDirectory, getClass.getClassLoader)
