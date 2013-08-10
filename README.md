@@ -120,14 +120,14 @@ The test specifications are documenting how you can use Gremlin-Scala, this is a
 Adding Gremlin-Scala as a dependency to your project
 =============
 ```scala
-/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "VERSION"
+/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.0"
 ```
 ```xml
 <!-- Maven -->
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
   <artifactId>gremlin-scala</artifactId>
-  <version>VERSION</version>
+  <version>2.4.0</version>
 </dependency>
 ```
 
@@ -201,15 +201,15 @@ mvn install   #install into your local maven repository so that you can use it (
 
 A word about type safety, Options and nulls
 =============
-Gremlin-Scala should be as idiomatic Scala as possible, i.e. you can work with Options instead of checking for nulls etc. However, I want to stick close to Gremlin-Groovy, so that it still feels like a real Gremlin and we can use the existing documentation. Often you have multiple ways to achieve something similar. 
-Example 1: Gremlin defines a step *transform*, which in functional Scala land is called *map*. Gremlin-Scala simply defines both, so it's your choice which one to use. I would encourage to use *map*. 
+Gremlin-Scala should be as idiomatic Scala as possible, i.e. you can work with Scala's Option type instead of dealing with nulls etc. However, I want to stick close to Gremlin-Groovy, so that it still feels like a real Gremlin and we can use the existing documentation. Often you have multiple ways to achieve the same. 
+Example 1: Gremlin defines a step *transform*, which in functional Scala land is typically called *map*. Gremlin-Scala simply defines both, so it's your choice which one to use. I encourage you to use *map*. 
 Example 2: to access the properties of elements (vertices or edges) you have the following options:
 ```scala
-  element.someProp //returns Any
+  element.someProp //return type: Any, could be null
   element[Int]("intProp") //returns an Int, throws ClassCastException for wrong type
-  element.property[Int]("intProp") //returns Some[Int] if property defined, otherwise None
+  element.property[Int]("intProp") //returns Some[Int] if property defined, otherwise None. Idiomatic Scala
 ```
-Check out the sample usage below for more details.
+Check out the sample usage above for more details.
 
 
 Contributors
