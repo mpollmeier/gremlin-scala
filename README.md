@@ -14,7 +14,7 @@ and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
 For more information about Gremlin see the [Gremlin docs](http://gremlindocs.com/), [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
 [Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods). 
 If you have a question please check out the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
-Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they all make sense to a Scala developer ;)
+Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
 
 
 Sample usage
@@ -134,7 +134,7 @@ Adding Gremlin-Scala as a dependency to your project
 
 Gremlin-Console
 =============
-You can play with Gremlin in an interactive console in gremlin-standalone/bin/gremlin-scala.sh:
+You can play with Gremlin in an interactive console in gremlin-standalone/bin/gremlin-scala.sh: [Download](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.4.0-standalone.tgz)
 ```shell
          \,,,/
          (o o)
