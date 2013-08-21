@@ -121,14 +121,14 @@ The test specifications are documenting how you can use Gremlin-Scala, this is a
 Adding Gremlin-Scala as a dependency to your project
 =============
 ```scala
-/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.0"
+/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.1"
 ```
 ```xml
 <!-- Maven -->
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
   <artifactId>gremlin-scala</artifactId>
-  <version>2.4.0</version>
+  <version>2.4.1</version>
 </dependency>
 ```
 
