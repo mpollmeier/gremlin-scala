@@ -39,27 +39,27 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   }
 
   /** Check if the element has a property with provided key */
-  def has[F <: Element, T](key: String): GremlinScalaPipeline[S, F] =
+  def has[F <: Element](key: String): GremlinScalaPipeline[S, F] =
     has(key, Tokens.T.neq, null)
 
   /** Check if the element has a property with provided key/value */
-  def has[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+  def has[F <: Element](key: String, value: Any): GremlinScalaPipeline[S, F] =
     has(key, Tokens.T.eq, value)
 
   /** Check if the element does not have a property with provided key. */
-  def hasNot[F <: Element, T](key: String): GremlinScalaPipeline[S, F] =
+  def hasNot[F <: Element](key: String): GremlinScalaPipeline[S, F] =
     has(key, Tokens.T.eq, null)
 
   /** Check if the element does not have a property with provided key/value */
-  def hasNot[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
+  def hasNot[F <: Element](key: String, value: Any): GremlinScalaPipeline[S, F] =
     has(key, Tokens.T.neq, value)
 
   /** Check if the element has a property with provided key/value that matches the given comparison token */
-  def has[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
+  def has[F <: Element](key: String, comparison: Tokens.T, value: Any): GremlinScalaPipeline[S, F] =
     has(key, Tokens.mapPredicate(comparison), value).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   /** Check if the element has a property with provided key/value that matches the given predicate */
-  def has[F <: Element, T](key: String, predicate: Predicate, value: T): GremlinScalaPipeline[S, F] = {
+  def has[F <: Element, Any](key: String, predicate: Predicate, value: Any): GremlinScalaPipeline[S, F] = {
     val pipeline = key match {
       case Tokens.ID    ⇒ addPipe2(new IdFilterPipe(predicate, value))
       case Tokens.LABEL ⇒ addPipe2(new LabelFilterPipe(predicate, value))
