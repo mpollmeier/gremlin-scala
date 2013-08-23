@@ -13,23 +13,32 @@ import com.tinkerpop.gremlin.Tokens
 @RunWith(classOf[JUnitRunner])
 class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-  it("finds vertices with given property") {
+  it("finds by id") {
+    //attention with the type of the ID. TinkerGraph uses Strings, other implementations will use different types!
+    graph.V.has(Tokens.ID, "3").toScalaList.size should be(1)
+  }
+
+  it("finds by label") {
+    graph.E.has(Tokens.LABEL, "knows").toScalaList.size should be(2)
+  }
+
+  it("finds with given property") {
     graph.V.has("age").toScalaList.size should be(4)
   }
 
-  it("finds vertices with given property and value") {
+  it("finds with given property and value") {
     graph.V.has("name", "marko").toScalaList.size should be(1)
   }
 
-  it("finds vertices without a given property") {
+  it("finds without a given property") {
     graph.V.hasNot("age").toScalaList.size should be(2)
   }
 
-  it("finds vertices without a given property and value") {
+  it("finds without a given property and value") {
     graph.V.hasNot("name", "marko").toScalaList.size should be(5)
   }
 
-  describe("tokens") {
+  describe("using tokens") {
     import Tokens.T
 
     it("finds equal") {
@@ -40,5 +49,4 @@ class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.V.has("age", T.gt, 29).toScalaList.size should be(2)
     }
   }
-
 }

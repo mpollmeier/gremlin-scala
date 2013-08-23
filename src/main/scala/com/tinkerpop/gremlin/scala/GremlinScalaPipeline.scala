@@ -54,11 +54,19 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def hasNot[F <: Element, T](key: String, value: T): GremlinScalaPipeline[S, F] =
     has(key, Tokens.T.neq, value)
 
+  /** Check if the element has a property with provided key/value that matches the given comparison token */
   def has[F <: Element, T](key: String, comparison: Tokens.T, value: T): GremlinScalaPipeline[S, F] =
-    super.has(key, comparison, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+    has(key, Tokens.mapPredicate(comparison), value).asInstanceOf[GremlinScalaPipeline[S, F]]
 
-  def has[F <: Element, T](key: String, predicate: Predicate, value: T): GremlinScalaPipeline[S, F] =
-    super.has(key, predicate, value).asInstanceOf[GremlinScalaPipeline[S, F]]
+  /** Check if the element has a property with provided key/value that matches the given predicate */
+  def has[F <: Element, T](key: String, predicate: Predicate, value: T): GremlinScalaPipeline[S, F] = {
+    val pipeline = key match {
+      case Tokens.ID    ⇒ addPipe2(new IdFilterPipe(predicate, value))
+      case Tokens.LABEL ⇒ addPipe2(new LabelFilterPipe(predicate, value))
+      case _            ⇒ addPipe2(new PropertyFilterPipe(key, predicate, value))
+    }
+    pipeline.asInstanceOf[GremlinScalaPipeline[S, F]]
+  }
 
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
