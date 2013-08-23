@@ -9,6 +9,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import com.tinkerpop.gremlin.Tokens
+import com.tinkerpop.blueprints.Vertex
 
 @RunWith(classOf[JUnitRunner])
 class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -49,4 +50,5 @@ class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.V.has("age", T.gt, 29).toScalaList.size should be(2)
     }
   }
+
 }
