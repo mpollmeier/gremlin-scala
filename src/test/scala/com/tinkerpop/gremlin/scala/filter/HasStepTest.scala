@@ -1,15 +1,12 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.gremlin.test.ComplianceTest
-import com.tinkerpop.gremlin.scala._
-import com.tinkerpop.gremlin.Tokens.T
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.Tokens
-import com.tinkerpop.blueprints.Vertex
+import com.tinkerpop.gremlin.Tokens.T
+import com.tinkerpop.gremlin.scala.TestGraph
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {

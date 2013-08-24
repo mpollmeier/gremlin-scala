@@ -68,6 +68,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     pipeline.asInstanceOf[GremlinScalaPipeline[S, E]]
   }
 
+  /** checks if a given property is in an interval (startValue: inclusive, endValue: exclusive)  */
+  def interval[_](key: String, startValue: Comparable[_], endValue: Comparable[_]): GremlinScalaPipeline[S, ScalaElement] =
+    addPipe2(new IntervalFilterPipe[ScalaElement](key, startValue, endValue))
+
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
   override def bothV: GremlinScalaPipeline[S, Vertex] = super.bothV
