@@ -9,13 +9,10 @@
     </parent>
     <groupId>com.michaelpollmeier</groupId>
     <artifactId>gremlin-scala</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Gremlin-Scala: Gremlin for the Scala Language</name>
     <properties>
         <gremlin.version>2.5.0-SNAPSHOT</gremlin.version>
-        <blueprints.version>2.5.0-SNAPSHOT</blueprints.version>
-        <pipes.version>2.5.0-SNAPSHOT</pipes.version>
         <scala.version>2.10.2</scala.version>
     </properties>
     <developers>
@@ -64,7 +61,7 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>pipes</artifactId>
-            <version>${pipes.version}</version>
+            <version>${gremlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -89,43 +86,43 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-jung</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-graph-sail</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-orient-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-dex-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-sail-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-rexster-graph</artifactId>
-            <version>${blueprints.version}</version>
+            <version>${gremlin.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- TESTING -->
@@ -167,10 +164,9 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
