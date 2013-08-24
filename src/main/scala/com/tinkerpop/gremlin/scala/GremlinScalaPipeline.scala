@@ -59,7 +59,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     has(key, Tokens.mapPredicate(comparison), value)
 
   /** Check if the element has a property with provided key/value that matches the given predicate */
-  def has[F](key: String, predicate: Predicate, value: Any): GremlinScalaPipeline[S, E] = {
+  def has[_](key: String, predicate: Predicate, value: Any): GremlinScalaPipeline[S, E] = {
     val pipeline = key match {
       case Tokens.ID    ⇒ addPipe2(new IdFilterPipe(predicate, value))
       case Tokens.LABEL ⇒ addPipe2(new LabelFilterPipe(predicate, value))
@@ -90,7 +90,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def propertyMap: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
   def property[F](key: String): GremlinScalaPipeline[S, F] = addPipe2(new PropertyPipe(key, false))
-  //super.property(key).asInstanceOf[GremlinScalaPipeline[S, F]]
 
   override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
   def step[F](f: JIterator[E] ⇒ F): GremlinScalaPipeline[S, F] =
