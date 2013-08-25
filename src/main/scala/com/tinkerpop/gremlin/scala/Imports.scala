@@ -36,10 +36,7 @@ object Imports {
     "com.tinkerpop.blueprints.util.wrappers.event.listener._",
     "com.tinkerpop.blueprints.util.wrappers.id._",
     "com.tinkerpop.blueprints.util.wrappers.partition._",
-    "com.tinkerpop.blueprints.util.wrappers.readonly._",
-    "com.tinkerpop.blueprints.oupls.sail._",
-    "com.tinkerpop.blueprints.oupls.sail.pg._",
-    "com.tinkerpop.blueprints.oupls.jung._"
+    "com.tinkerpop.blueprints.util.wrappers.readonly._"
   )
 
 }
