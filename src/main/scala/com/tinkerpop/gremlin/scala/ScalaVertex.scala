@@ -100,8 +100,9 @@ class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   def bothE(branchFactor: Int, labels: String*): GremlinScalaPipeline[Vertex, Edge] =
     new GremlinScalaPipeline[Vertex, Edge].start(vertex).bothE(branchFactor, labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
 
-  def -> : GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  /**start a pipeline on this vertex */
+  def -> = startPipe
+  def startPipe: GremlinScalaPipeline[Vertex, Vertex] = new GremlinScalaPipeline[Vertex, Vertex].start(vertex)
 
   /** need to extend Vertex so that we can use existing Gremlin Pipes... */
   val element: Element = vertex
