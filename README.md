@@ -217,15 +217,6 @@ rexster[scala]> g.v(1).name
 ==>res1: Any = marko
 ```
 
-
-Building Gremlin-Scala manually
-=============
-```shell
-git clone https://github.com/mpollmeier/gremlin-scala.git
-mvn test      #run all tests
-mvn install   #installs into your local maven repository
-```
-
 Type safety, Options and nulls
 =============
 Gremlin-Scala should be as idiomatic Scala as possible, i.e. you can work with Scala's Option type instead of dealing with nulls etc. However, I want to stick close to Gremlin-Groovy, so that it still feels like a real Gremlin and we can use the existing documentation. Often you have multiple ways to achieve the same. 
@@ -237,6 +228,14 @@ Example 2: to access the properties of elements (vertices or edges) you have the
   element.property[Int]("intProp") //returns Some[Int] if property defined, otherwise None. Idiomatic Scala
 ```
 Check out the sample usage above for more details.
+
+Building Gremlin-Scala manually
+=============
+```shell
+git clone https://github.com/mpollmeier/gremlin-scala.git
+mvn test      #run all tests
+mvn install   #installs into your local maven repository
+```
 
 
 Contributors
