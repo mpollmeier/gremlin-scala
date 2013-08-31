@@ -192,7 +192,32 @@ For many more examples (in Gremlin-Groovy syntax) see the [Getting started page 
 This is a normal Scala REPL, so you run arbitrary Scala code here. 
 ```
 
-Building Gremlin-Scala
+Using Gremlin-Scala as a Rexster Console drop-in
+=============
+[Rexster](https://github.com/tinkerpop/rexster/) is a RESTful server for the Tinkerpop stack.  It comes with a [Console](https://github.com/tinkerpop/rexster/wiki/Rexster-Console) that let's you execute ad hoc Gremlin queries on the configured graphs inside a REPL.
+In order to use Gremlin-Scala in that Console, just follow these simple steps:
+1) download the [dropin.zip](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.5.0-SNAPSHOT-rexster-dropin.zip)
+2) unzip the four jars into rexster-standalone/ext
+3) Add this block to rexster-standalone/config/rexster.xml inside <script-engines>:
+```xml
+<script-engine>
+  <name>gremlin-scala</name>
+</script-engine>
+```
+4) start the console: bin/rexster-console.sh
+For more information see the [Rexster Console Wiki](https://github.com/tinkerpop/rexster/wiki/Rexster-Console).
+
+Sample usage:
+```scala
+rexster[groovy]> ?scala
+rexster[scala]> val g = rexster.getGraph("tinkergraph")
+==>g: com.tinkerpop.blueprints.Graph = tinkergraph[vertices:6 edges:6 directory:data/graph-example-1]
+rexster[scala]> g.v(1).name
+==>res1: Any = marko
+```
+
+
+Building Gremlin-Scala manually
 =============
 ```shell
 git clone https://github.com/mpollmeier/gremlin-scala.git
@@ -217,7 +242,7 @@ Contributors
 =============
 [Michael Pollmeier](http://www.michaelpollmeier.com) - project maintainer since Gremlin 2.2
 
-[Zach Cox](http://theza.ch) - started this project
+[Marko Rodriguez](http://markorodriguez.com/) and [Zach Cox](http://theza.ch) - started this project
 
 [Tinkerpop team](http://www.tinkerpop.com) - created a whole awesome stack around graph databases
 
