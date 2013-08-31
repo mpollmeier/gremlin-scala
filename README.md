@@ -196,8 +196,11 @@ Using Gremlin-Scala as a Rexster Console drop-in
 =============
 [Rexster](https://github.com/tinkerpop/rexster/) is a RESTful server for the Tinkerpop stack.  It comes with a [Console](https://github.com/tinkerpop/rexster/wiki/Rexster-Console) that let's you execute ad hoc Gremlin queries on the configured graphs inside a REPL.
 In order to use Gremlin-Scala in that Console, just follow these simple steps:
+
 1) download the [dropin.zip](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.5.0-SNAPSHOT-rexster-dropin.zip)
+
 2) unzip the four jars into rexster-standalone/ext
+
 3) Add this block to rexster-standalone/config/rexster.xml inside <script-engines>:
 ```xml
 <script-engine>
@@ -207,7 +210,7 @@ In order to use Gremlin-Scala in that Console, just follow these simple steps:
 4) start the console: bin/rexster-console.sh
 For more information see the [Rexster Console Wiki](https://github.com/tinkerpop/rexster/wiki/Rexster-Console).
 
-Sample usage:
+And this is how you switch the language to Gremlin-Scala and execute a simple query:
 ```scala
 rexster[groovy]> ?scala
 rexster[scala]> val g = rexster.getGraph("tinkergraph")
@@ -221,8 +224,8 @@ Building Gremlin-Scala manually
 =============
 ```shell
 git clone https://github.com/mpollmeier/gremlin-scala.git
-mvn test      #run all tests - should find all dependencies and run the tests fine
-mvn install   #install into your local maven repository so that you can use it (groupId=com.tinkerpop.gremlin, artifactId=gremlin-scala
+mvn test      #run all tests
+mvn install   #installs into your local maven repository
 ```
 
 A word about type safety, Options and nulls
