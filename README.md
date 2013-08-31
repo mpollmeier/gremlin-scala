@@ -1,6 +1,6 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
 
-gremlin-scala
+Gremlin-Scala
 =============
 A thin Scala wrapper for Gremlin, a graph DSL for traversing a number of graph databases including
 [Neo4j](http://neo4j.org/),
