@@ -118,7 +118,7 @@ The test specifications are documenting how you can use Gremlin-Scala, this is a
   }
 ```
 
-Adding Gremlin-Scala as a dependency to your project
+Adding Gremlin-Scala as a dependency
 =============
 ```scala
 /* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.1"
@@ -192,22 +192,20 @@ For many more examples (in Gremlin-Groovy syntax) see the [Getting started page 
 This is a normal Scala REPL, so you run arbitrary Scala code here. 
 ```
 
-Using Gremlin-Scala as a Rexster Console drop-in
+Using Gremlin-Scala in Rexster
 =============
 [Rexster](https://github.com/tinkerpop/rexster/) is a RESTful server for the Tinkerpop stack.  It comes with a [Console](https://github.com/tinkerpop/rexster/wiki/Rexster-Console) that let's you execute ad hoc Gremlin queries on the configured graphs inside a REPL.
 In order to use Gremlin-Scala in that Console, just follow these simple steps:
 
-1) download the [dropin.zip](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.5.0-SNAPSHOT-rexster-dropin.zip)
-
-2) unzip the four jars into rexster-standalone/ext
-
-3) Add this block to rexster-standalone/config/rexster.xml inside <script-engines>:
+* download the [dropin.zip](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.5.0-SNAPSHOT-rexster-dropin.zip)
+* unzip the four jars into rexster-standalone/ext
+* Add this block to rexster-standalone/config/rexster.xml inside <script-engines>:
 ```xml
 <script-engine>
   <name>gremlin-scala</name>
 </script-engine>
 ```
-4) start the console: bin/rexster-console.sh
+* start the console: bin/rexster-console.sh
 For more information see the [Rexster Console Wiki](https://github.com/tinkerpop/rexster/wiki/Rexster-Console).
 
 And this is how you switch the language to Gremlin-Scala and execute a simple query:
@@ -228,7 +226,7 @@ mvn test      #run all tests
 mvn install   #installs into your local maven repository
 ```
 
-A word about type safety, Options and nulls
+Type safety, Options and nulls
 =============
 Gremlin-Scala should be as idiomatic Scala as possible, i.e. you can work with Scala's Option type instead of dealing with nulls etc. However, I want to stick close to Gremlin-Groovy, so that it still feels like a real Gremlin and we can use the existing documentation. Often you have multiple ways to achieve the same. 
 Example 1: Gremlin defines a step *transform*, which in functional Scala land is typically called *map*. Gremlin-Scala simply defines both, so it's your choice which one to use. I encourage you to use *map*. 
