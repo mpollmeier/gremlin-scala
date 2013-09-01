@@ -94,10 +94,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
 
   def property[F](key: String): GremlinScalaPipeline[S, F] = addPipe2(new PropertyPipe(key, false))
 
-  override def step[F](pipe: Pipe[E, F]): GremlinScalaPipeline[S, F] = super.step(pipe)
-  def step[F](f: JIterator[E] ⇒ F): GremlinScalaPipeline[S, F] =
-    super.step(new ScalaPipeFunction(f)).asInstanceOf[GremlinScalaPipeline[S, F]]
-
   ////////////////////
   /// BRANCH PIPES ///
   ////////////////////
