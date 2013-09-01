@@ -87,7 +87,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def out(labels: String*): GremlinScalaPipeline[S, Vertex] = super.out(labels: _*)
   override def outV: GremlinScalaPipeline[S, Vertex] = super.outV
 
-  override def label: GremlinScalaPipeline[S, String] = super.label
+  override def label: GremlinScalaPipeline[S, String] = addPipe2(new LabelPipe)
 
   def propertyMap(keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPipe2(new PropertyMapPipe(keys: _*))
   def propertyMap: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
