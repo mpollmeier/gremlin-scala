@@ -74,6 +74,11 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
         Map("name" -> "josh", "age" -> 32)))
     }
 
+    it("shuffles the names around randomly") {
+      //will produce different output every time you run it
+      println(vertices.name.shuffle.toScalaList)
+    }
+
     describe("Usage with empty Graph") {
       it("creates a vertex with properties") {
         val graph = new TinkerGraph

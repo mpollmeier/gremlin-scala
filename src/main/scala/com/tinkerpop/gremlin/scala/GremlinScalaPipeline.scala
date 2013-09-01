@@ -342,10 +342,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    * Add a ShufflePipe to the end of the Pipeline.
    * All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
    * as a List.
-   *
-   * @return the extended Pipeline
    */
-  override def shuffle: GremlinScalaPipeline[S, JList[_]] = super.shuffle()
+  def shuffle[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new ShufflePipe)
 
   override def scatter: GremlinScalaPipeline[S, _] = super.scatter()
 
