@@ -367,8 +367,16 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /// UTILITY PIPES ///
   //////////////////////
 
-  override def as(name: String): GremlinScalaPipeline[S, E] = super.as(name)
-  override def start(starts: S): GremlinScalaPipeline[S, S] = super.start(starts)
+  override def as(name: String): GremlinScalaPipeline[S, E] = {
+    val pipeline = addPipe2(new AsPipe(name, FluentUtility.removePreviousPipes(this, 1).get(0)))
+    this.asMap.refresh()
+    pipeline.asInstanceOf[GremlinScalaPipeline[S, E]]
+  }
+  override def start(startObject: S): GremlinScalaPipeline[S, S] = {
+    addPipe2(new StartPipe[S](startObject))
+    FluentUtility.setStarts(this, startObject)
+    this.asInstanceOf[GremlinScalaPipeline[S, S]]
+  }
 
   def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
