@@ -1,15 +1,11 @@
 package com.tinkerpop.gremlin.scala.transform
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import scala.collection.JavaConversions._
-import com.tinkerpop.gremlin.test.ComplianceTest
-import com.tinkerpop.gremlin.scala._
-import com.tinkerpop.blueprints.Vertex
 import org.junit.runner.RunWith
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+import com.tinkerpop.gremlin.scala.ScalaVertex
+import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
-import com.tinkerpop.gremlin.scala.ScalaVertex._
 
 @RunWith(classOf[JUnitRunner])
 class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {

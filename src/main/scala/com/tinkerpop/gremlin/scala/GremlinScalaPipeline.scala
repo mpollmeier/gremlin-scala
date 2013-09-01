@@ -9,6 +9,7 @@ import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIte
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
 import com.tinkerpop.pipes.transform.TransformPipe
+import com.tinkerpop.pipes.transform.TransformPipe.Order
 import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
 import scala.collection.JavaConversions._
 import com.tinkerpop.pipes.filter._
@@ -353,12 +354,14 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def map[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = super.transform(new ScalaPipeFunction(function))
   def transform[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
 
-  def order(compareFunction: PipeFunction[TPair[E, E], Int]): GremlinScalaPipeline[S, E] =
-    super.order({ x: TPair[E, E] ⇒ new JInteger(compareFunction.compute(x)) })
+  override def order: GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe)
+  override def order(by: Order = Order.INCR): GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe(by))
 
-  override def order: GremlinScalaPipeline[S, E] = super.order()
-  override def order(by: Tokens.T) = super.order(by)
-  override def order(by: TransformPipe.Order): GremlinScalaPipeline[S, E] = super.order(by)
+  def order(compare: (E, E) ⇒ Int): GremlinScalaPipeline[S, E] = {
+    val compareFun: PipeFunction[TPair[E, E], Integer] =
+      new ScalaPipeFunction({ pair: TPair[E, E] ⇒ compare(pair.getA, pair.getB) })
+    addPipe2(new OrderPipe(compareFun))
+  }
 
   //////////////////////
   /// UTILITY PIPES ///
@@ -380,7 +383,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     this.asInstanceOf[GremlinScalaPipeline[S, T]]
   }
 
-  //TODO: remove
+  //TODO: remove once we don't extend GremlinPipeline any more
   implicit private def scalaPipeline[A, B](pipeline: GremlinPipeline[A, B]): GremlinScalaPipeline[A, B] =
     pipeline.asInstanceOf[GremlinScalaPipeline[A, B]]
 

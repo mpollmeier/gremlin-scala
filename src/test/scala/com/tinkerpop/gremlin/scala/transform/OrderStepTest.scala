@@ -1,28 +1,35 @@
 package com.tinkerpop.gremlin.scala.transform
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.gremlin.test.ComplianceTest
-import com.tinkerpop.gremlin.scala._
-import com.tinkerpop.blueprints.Vertex
-import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TPair }
-import java.lang.{ Integer ⇒ JInteger }
+import org.junit.runner.RunWith
+import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+import com.tinkerpop.gremlin.scala.ScalaVertex
+import com.tinkerpop.gremlin.scala.TestGraph
+import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.gremlin.Tokens
+import com.tinkerpop.pipes.transform.TransformPipe.Order
 
-class OrderStepTest extends com.tinkerpop.gremlin.test.transform.OrderStepTest {
-  val g = TinkerGraphFactory.createTinkerGraph()
+@RunWith(classOf[JUnitRunner])
+class OrderStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-  //  def test_g_V_name_order() {
-  //    super.test_g_V_name_order(g.V.property("name").order())
-  //  }
-  //
-  //  def test_g_V_name_orderXabX() {
-  //    super.test_g_V_name_orderXabX(g.V.property("name")
-  //      .order({ arg: TPair[String, String] ⇒ arg.getB.compareTo(arg.getA) }))
-  //  }
-  //
-  //  def test_g_V_orderXa_nameXb_nameX_name() {
-  //    super.test_g_V_orderXa_nameXb_nameX_name(g.V
-  //      .order({ arg: TPair[Vertex, Vertex] ⇒ arg.getB.get[String]("name").get.compareTo(arg.getA.get[String]("name").get) })
-  //      .property("name").asInstanceOf[GremlinScalaPipeline[Vertex, String]])
-  //  }
+  it("orders naturally") {
+    graph.V.property("name").order().toScalaList should be(List("josh", "lop", "marko", "peter", "ripple", "vadas"))
+  }
+
+  it("orders in decremental order") {
+    graph.V.property("name").order(Order.DECR).toScalaList should be(List("vadas", "ripple", "peter", "marko", "lop", "josh"))
+  }
+
+  it("orders names by given function") {
+    graph.V.property("name").order {
+      (left: String, right: String) ⇒ left.compareTo(right)
+    }.toScalaList should be(List("josh", "lop", "marko", "peter", "ripple", "vadas"))
+  }
+
+  it("orders ages by given function") {
+    graph.V.property("age").order {
+      (left: Int, right: Int) ⇒ left.compareTo(right)
+    }.toScalaList should be(List(27, 29, 32, 35))
+  }
 
 }
