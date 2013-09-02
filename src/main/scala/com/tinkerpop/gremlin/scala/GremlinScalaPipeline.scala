@@ -325,9 +325,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   ///////////////////////
   /// TRANSFORM PIPES ///
   ///////////////////////
-  override def gather: GremlinScalaPipeline[S, JList[_]] = super.gather()
-  def gather(function: JList[_] ⇒ JList[_]): GremlinScalaPipeline[S, _] = super.gather(new ScalaPipeFunction(function))
-
   override def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
   override def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
 
@@ -345,12 +342,30 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    */
   def shuffle[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new ShufflePipe)
 
-  override def scatter: GremlinScalaPipeline[S, _] = super.scatter()
+  /**
+   * All the objects previous to this step are aggregated in a greedy fashion and emitted as a List.
+   * Normally they would be traversed over lazily.
+   * Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
+   * @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
+   *
+   * Note: Gremlin-Groovy comes with an overloaded gather pipe that takes a function to
+   * transform the last step. You can achieve the same by just appending a map step.
+   */
+  def gather[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new GatherPipe[E]) map (_.toList)
+
+  /**
+   * This will unroll any iterator/iterable/map that is provided to it.
+   * Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
+   * @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
+   *
+   * Note: only for one level - it will not unroll an iterator within an iterator.
+   */
+  override def scatter: GremlinScalaPipeline[S, _] = addPipe2(new ScatterPipe)
 
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
-  def map[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = super.transform(new ScalaPipeFunction(function))
-  def transform[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
+  def map[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = super.transform(new ScalaPipeFunction(function))
+  def transform[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = transform(function)
 
   override def order: GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe)
   override def order(by: Order = Order.INCR): GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe(by))
