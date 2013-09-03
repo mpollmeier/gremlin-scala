@@ -350,7 +350,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
   def map[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = super.transform(new ScalaPipeFunction(function))
-  def transform[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = transform(function)
+  def transform[T](function: E ⇒ T): GremlinScalaPipeline[S, T] = map(function)
 
   override def order: GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe)
   override def order(by: Order = Order.INCR): GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe(by))
