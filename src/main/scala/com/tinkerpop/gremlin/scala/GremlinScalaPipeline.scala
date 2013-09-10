@@ -360,7 +360,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *
    * Note: only for one level - it will not unroll an iterator within an iterator.
    */
-  override def scatter: GremlinScalaPipeline[S, _] = addPipe2(new ScatterPipe)
+  override def scatter: GremlinScalaPipeline[S, _] = {
+    import com.tinkerpop.gremlin.scala.pipes.ScatterPipe
+    addPipe2(new ScatterPipe)
+  }
 
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
