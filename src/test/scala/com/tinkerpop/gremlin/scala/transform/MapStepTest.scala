@@ -12,6 +12,7 @@ class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the label of an edge to it's length") {
     edges.label.map { _.size }.toScalaList should be(List(7, 5, 7, 5, 7, 7))
+    edges.label.transform { _.size }.toScalaList should be(List(7, 5, 7, 5, 7, 7))
   }
 
   it("maps the age property of all vertices") {
