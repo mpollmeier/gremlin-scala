@@ -99,12 +99,14 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /// BRANCH PIPES ///
   ////////////////////
   /** Copies incoming object to internal pipes. */
-  override def copySplit(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, _] = super.copySplit(pipes: _*)
+  override def copySplit(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, _] = addPipe2(new CopySplitPipe(pipes))
 
-  override def exhaustMerge: GremlinScalaPipeline[S, _] = super.exhaustMerge
+  override def exhaustMerge: GremlinScalaPipeline[S, _] =
+    addPipe2(new ExhaustMergePipe(FluentUtility.getPreviousPipe(this).asInstanceOf[MetaPipe].getPipes))
 
   /** Used in combination with a copySplit, merging the parallel traversals in a round-robin fashion. */
-  override def fairMerge: GremlinScalaPipeline[S, _] = super.fairMerge
+  override def fairMerge: GremlinScalaPipeline[S, _] =
+    addPipe2(new FairMergePipe(FluentUtility.getPreviousPipe(this).asInstanceOf[MetaPipe].getPipes))
 
   def ifThenElse(ifFunction: E ⇒ Boolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
     addPipe2(new IfThenElsePipe(
@@ -113,28 +115,26 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
       new ScalaPipeFunction(elseFunction)
     ))
 
-  /**
-   * Add a LoopPipe to the end of the Pipeline.
-   * Looping is useful for repeating a section of a pipeline.
-   * The provided whileFunction determines when to drop out of the loop.
-   * The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
+  /** Add a LoopPipe to the end of the Pipeline.
+   *  Looping is useful for repeating a section of a pipeline.
+   *  The provided whileFunction determines when to drop out of the loop.
+   *  The whileFunction is provided a LoopBundle object which contains the object in loop along with other useful metadata.
    *
-   * @param namedStep     the name of the step to loop back to
-   * @param whileFunction whether or not to continue looping on the current object
+   *  @param namedStep     the name of the step to loop back to
+   *  @param whileFunction whether or not to continue looping on the current object
    */
   def loop(namedStep: String, whileFunction: LoopBundle[E] ⇒ Boolean): GremlinScalaPipeline[S, E] =
     addPipe2(new LoopPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep)), whileFunction))
 
-  /**
-   * Add a LoopPipe to the end of the Pipeline.
-   * Looping is useful for repeating a section of a pipeline.
-   * The provided whileFunction determines when to drop out of the loop.
-   * The provided emitFunction can be used to emit objects that are still going through a loop.
-   * The whileFunction and emitFunctions are provided a LoopBundle object which contains the object in loop along with other useful metadata.
+  /** Add a LoopPipe to the end of the Pipeline.
+   *  Looping is useful for repeating a section of a pipeline.
+   *  The provided whileFunction determines when to drop out of the loop.
+   *  The provided emitFunction can be used to emit objects that are still going through a loop.
+   *  The whileFunction and emitFunctions are provided a LoopBundle object which contains the object in loop along with other useful metadata.
    *
-   * @param namedStep     the number of steps to loop back to
-   * @param whileFun whether or not to continue looping on the current object
-   * @param emit whether or not to emit the current object (irrespective of looping)
+   *  @param namedStep     the number of steps to loop back to
+   *  @param whileFun whether or not to continue looping on the current object
+   *  @param emit whether or not to emit the current object (irrespective of looping)
    */
   def loop(namedStep: String,
            whileFun: LoopBundle[E] ⇒ Boolean,
@@ -228,96 +228,87 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
   override def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
 
-  /**
-   * Add a OrderMapPipe to the end of the Pipeline
-   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+  /** Add a OrderMapPipe to the end of the Pipeline
+   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
    *
-   * @param order if the values implement Comparable, then a increment or decrement sort is usable
-   * @return the extended Pipeline
+   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
+   *  @return the extended Pipeline
    */
   override def orderMap(by: Tokens.T): GremlinScalaPipeline[S, _] = super.orderMap(by)
 
-  /**
-   * Add a OrderMapPipe to the end of the Pipeline
-   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+  /** Add a OrderMapPipe to the end of the Pipeline
+   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
    *
-   * @param order if the values implement Comparable, then a increment or decrement sort is usable
-   * @return the extended Pipeline
+   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
+   *  @return the extended Pipeline
    */
   override def orderMap(by: TransformPipe.Order): GremlinScalaPipeline[S, _] = super.orderMap(by)
 
-  /**
-   * Add a OrderMapPipe to the end of the Pipeline
-   * Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+  /** Add a OrderMapPipe to the end of the Pipeline
+   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
    *
-   * @param compareFunction a function to compare to map entries
-   * @return the extended Pipeline
+   *  @param compareFunction a function to compare to map entries
+   *  @return the extended Pipeline
    */
   def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer): GremlinScalaPipeline[S, _] =
     super.orderMap(new ScalaPipeFunction(by))
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
    *
-   * @param label     the edge label
-   * @param namedStep the step name that has the other vertex to link to
-   * @return the extended Pipeline
+   *  @param label     the edge label
+   *  @param namedStep the step name that has the other vertex to link to
+   *  @return the extended Pipeline
    */
   override def linkOut(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
     super.linkOut(label, namedStep)
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
    *
-   * @param label     the edge label
-   * @param namedStep the step name that has the other vertex to link to
-   * @return the extended Pipeline
+   *  @param label     the edge label
+   *  @param namedStep the step name that has the other vertex to link to
+   *  @return the extended Pipeline
    */
   override def linkIn(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
     super.linkIn(label, namedStep)
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
    *
-   * @param label     the edge label
-   * @param namedStep the step name that has the other vertex to link to
-   * @return the extended Pipeline
+   *  @param label     the edge label
+   *  @param namedStep the step name that has the other vertex to link to
+   *  @return the extended Pipeline
    */
   override def linkBoth(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
     super.linkBoth(label, namedStep)
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
    *
-   * @param label the edge label
-   * @param other the other vertex
-   * @return the extended Pipeline
+   *  @param label the edge label
+   *  @param other the other vertex
+   *  @return the extended Pipeline
    */
   override def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
     super.linkOut(label, other)
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
    *
-   * @param label the edge label
-   * @param other the other vertex
-   * @return the extended Pipeline
+   *  @param label the edge label
+   *  @param other the other vertex
+   *  @return the extended Pipeline
    */
   override def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
     super.linkIn(label, other)
 
-  /**
-   * Add a LinkPipe to the end of the Pipeline.
-   * Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
+  /** Add a LinkPipe to the end of the Pipeline.
+   *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
    *
-   * @param label the edge label
-   * @param other the other vertex
-   * @return the extended Pipeline
+   *  @param label the edge label
+   *  @param other the other vertex
+   *  @return the extended Pipeline
    */
   override def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
     super.linkBoth(label, other)
@@ -335,30 +326,27 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def select(stepNames: JCollection[String], stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] =
     super.select(stepNames, stepFunctions: _*)
 
-  /**
-   * Add a ShufflePipe to the end of the Pipeline.
-   * All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
-   * as a List.
+  /** Add a ShufflePipe to the end of the Pipeline.
+   *  All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
+   *  as a List.
    */
   def shuffle[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new ShufflePipe)
 
-  /**
-   * All the objects previous to this step are aggregated in a greedy fashion and emitted as a List.
-   * Normally they would be traversed over lazily.
-   * Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
-   * @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
+  /** All the objects previous to this step are aggregated in a greedy fashion and emitted as a List.
+   *  Normally they would be traversed over lazily.
+   *  Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
+   *  @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
    *
-   * Note: Gremlin-Groovy comes with an overloaded gather pipe that takes a function to
-   * transform the last step. You can achieve the same by just appending a map step.
+   *  Note: Gremlin-Groovy comes with an overloaded gather pipe that takes a function to
+   *  transform the last step. You can achieve the same by just appending a map step.
    */
   def gather[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new GatherPipe[E]) map (_.toList)
 
-  /**
-   * This will unroll any iterator/iterable/map that is provided to it.
-   * Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
-   * @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
+  /** This will unroll any iterator/iterable/map that is provided to it.
+   *  Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
+   *  @see https://github.com/tinkerpop/gremlin/wiki/Depth-First-vs.-Breadth-First
    *
-   * Note: only for one level - it will not unroll an iterator within an iterator.
+   *  Note: only for one level - it will not unroll an iterator within an iterator.
    */
   override def scatter: GremlinScalaPipeline[S, _] = {
     import com.tinkerpop.gremlin.scala.pipes.ScatterPipe
