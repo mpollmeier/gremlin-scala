@@ -21,4 +21,6 @@ trait TestGraph {
   val graph: ScalaGraph = TinkerGraphFactory.createTinkerGraph
   def vertices = graph.V
   def edges = graph.E
+
+  def print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toScalaList)
 }

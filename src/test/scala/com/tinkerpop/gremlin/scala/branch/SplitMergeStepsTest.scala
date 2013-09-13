@@ -22,4 +22,13 @@ class SplitMergeStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     }
   }
 
+  describe("copySplit and exhaustMerge") {
+    it("copies incoming objects to internal pipes, then merges the parallel traversals in a greedy fashion") {
+      graph.v(1).out
+        .copySplit(->[Vertex].property("name"), ->[Vertex].property("age"))
+        .exhaustMerge
+        .toScalaList should be(List("vadas", "josh", "lop", 27, 32))
+    }
+  }
+
 }
