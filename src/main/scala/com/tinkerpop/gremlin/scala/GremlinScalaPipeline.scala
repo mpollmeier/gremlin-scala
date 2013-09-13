@@ -144,7 +144,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   ////////////////////
   /// FILTER PIPES ///
   ////////////////////
-  override def and(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.and(pipes: _*)
+  /** Takes a collection of pipes and emits incoming objects that are true for all of the pipes. */
+  override def and(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = addPipe2(new AndFilterPipe[E](pipes: _*))
 
   override def back(namedStep: String): GremlinScalaPipeline[S, Any] =
     addPipe2(new BackFilterPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep))))
