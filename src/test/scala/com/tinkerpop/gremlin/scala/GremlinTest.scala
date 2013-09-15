@@ -4,17 +4,35 @@ import junit.framework.TestCase
 import com.tinkerpop.gremlin.Tokens
 import junit.framework.Assert._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
 
-class GremlinTest extends TestCase {
-
-  def testVersion() {
-    assertEquals(Gremlin.version, Tokens.VERSION)
+@RunWith(classOf[JUnitRunner])
+class GremlinTest extends FunSpec with ShouldMatchers with TestGraph {
+  it("specifies the right version") {
+    Gremlin.version should be(Tokens.VERSION)
   }
 
-  def testLanguage() {
-    assertEquals(Gremlin.language, "gremlin-scala")
+  it("specifies the right language") {
+    Gremlin.language should be("gremlin-scala")
   }
 
+  describe("ScalaElement equality and hashCode are based on their id") {
+    it("equals") {
+      graph.v(1) == graph.v(1) should be(true)
+      graph.v(1) == graph.v(2) should be(false)
+    }
+
+    it("uses the right hashCodes") {
+      graph.v(1).hashCode should be(graph.v(1).hashCode)
+      graph.v(1).hashCode should not be (graph.v(2).hashCode)
+
+      Set(graph.v(1)) contains (graph.v(1)) should be(true)
+      Set(graph.v(1)) contains (graph.v(2)) should be(false)
+    }
+  }
 }
 
 trait TestGraph {

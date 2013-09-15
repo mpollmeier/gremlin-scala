@@ -29,5 +29,11 @@ trait ScalaElement extends Element with Dynamic {
   def remove(): Unit = element.remove()
   def removeProperty[T](key: String): T = element.removeProperty(key)
   def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
+
   override def toString = element.toString
+  override def hashCode: Int = id.hashCode
+  override def equals(other: Any): Boolean = other match {
+    case other: ScalaElement ⇒ this.id == other.id
+    case _                   ⇒ false
+  }
 }
