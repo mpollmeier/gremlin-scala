@@ -33,7 +33,7 @@ trait ScalaElement extends Element with Dynamic {
   override def toString = element.toString
   override def hashCode: Int = id.hashCode
   override def equals(other: Any): Boolean = other match {
-    case other: ScalaElement ⇒ this.id == other.id
-    case _                   ⇒ false
+    case other: Element ⇒ this.id == other.getId
+    case _              ⇒ false
   }
 }
