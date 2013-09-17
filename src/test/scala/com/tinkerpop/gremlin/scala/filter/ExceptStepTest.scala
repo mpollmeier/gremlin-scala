@@ -7,35 +7,64 @@ import java.util.{ ArrayList, HashSet }
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.pipes.Pipe
 
-/**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
+import org.junit.runner.RunWith
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FunSpec
+import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.gremlin.Tokens.T.lt
 
-class ExceptStepTest extends com.tinkerpop.gremlin.test.filter.ExceptStepTest {
+@RunWith(classOf[JUnitRunner])
+class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-  val g = TinkerGraphFactory.createTinkerGraph();
+  it("emits everything except what is in the supplied collection") {
+    import scala.collection.JavaConversions._
+    val excludeList = List(graph.v(1), graph.v(2), graph.v(3))
 
-  //  def test_g_v1_out_exceptXg_v2X() {
-  //    val x = new ArrayList[Vertex]();
-  //    x.add(g.v(2));
-  //    super.test_g_v1_out_exceptXg_v2X(g.v(1).out.except(x));
-  //  }
-
-  def test_g_v1_out_aggregateXxX_out_exceptXxX() {
-    val x = new HashSet[Vertex]();
-    super.test_g_v1_out_aggregateXxX_out_exceptXxX(g.v(1).out.aggregate(x).out.except(x));
+    graph.V.except(excludeList).toScalaList should be(List(graph.v(6), graph.v(5), graph.v(4)))
   }
 
-  def test_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_propertyXnameX() {
-    import scala.collection.JavaConversions._
-    val v1 = g.v(1).vertex
+  ignore("emits everything except what is in named step") {
+    //    not currently supported because ExceptFilterPipe uses ElementHelper.areEqual to compare two elements, which compares if the classes are equal.
+    //   *  I'll open a pull request to fix that in blueprints shortly...
 
-    super.test_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_propertyXnameX(
-      g.v(1)
-        .out("created")
-        .in("created")
-        .except(List(v1))
-        .property("name").asInstanceOf[Pipe[Vertex, String]])
+    // prerequisite tests
+    //g.V.has('age',T.lt,30).as('x').out('created').in('created').except('x')
+    //    print(graph.V.has("age", lt, 30))
+    //    print(graph.V.has("age", lt, 30).out("created").in("created"))
+    //    println("""graph.V.has("age", lt, 30).as("x").out("created").in("created").except("x")""")
+    //    print(graph.V.has("age", lt, 30).as("x").out("created").in("created").except("x"))
+
+    //    val v3 = graph.v(3)
+    //    graph.v(1).out.toScalaList.toSet.contains(v3) should be(true)
+    //    graph.v(1).out.out.toScalaList.toSet.contains(v3) should be(true)
+    //
+    //    print(graph.v(1).out)
+    //    print(graph.v(1).out.out)
+    //    println("""graph.v(1).out.as("1").out.except("1")""")
+    //    print(graph.v(1).out.as("1").out.except("1"))
+    //
+    //    val namedStep = "contains v[3]"
+    //    graph.v(1).out.as(namedStep).out.except(namedStep).toScalaList.toSet.contains(v3) should be(false)
+
+  }
+
+  ignore("emits everything except what is in named step - doesn't work") {
+    //    not currently supported because ExceptFilterPipe uses ElementHelper.areEqual to compare two elements, which compares if the classes are equal.
+    //   *  I'll open a pull request to fix that in blueprints shortly...
+
+    // prerequisite tests
+    val v3 = graph.v(3)
+    graph.v(1).out.toScalaList.toSet.contains(v3) should be(true)
+    graph.v(1).out.out.toScalaList.toSet.contains(v3) should be(true)
+
+    //    print(graph.v(1).out)
+    //    print(graph.v(1).out.out)
+    //    println("""graph.v(1).out.as("1").out.except("1")""")
+    //    print(graph.v(1).out.as("1").out.except("1"))
+
+    val namedStep = "contains v[3]"
+    graph.v(1).out.as(namedStep).out.except(namedStep).toScalaList.toSet.contains(v3) should be(false)
+
   }
 
 }
