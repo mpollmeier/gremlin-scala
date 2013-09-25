@@ -1,28 +1,22 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.gremlin.test.ComplianceTest
-import com.tinkerpop.blueprints.Vertex
-import java.util.{ HashSet, ArrayList }
-import com.tinkerpop.gremlin.scala._
+import org.junit.runner.RunWith
+import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+import com.tinkerpop.gremlin.scala.TestGraph
+import org.scalatest.junit.JUnitRunner
 
-/**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
- */
+@RunWith(classOf[JUnitRunner])
+class RetainStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
-class RetainStepTest extends com.tinkerpop.gremlin.test.filter.RetainStepTest {
+  it("retains everything except what is in the supplied collection") {
+    val retainList = List(graph.v(1), graph.v(2), graph.v(3))
+    graph.V.retain(retainList).toScalaList should be(List(graph.v(3), graph.v(2), graph.v(1)))
+  }
 
-  val g = TinkerGraphFactory.createTinkerGraph();
-
-  //  def test_g_v1_out_retainXg_v2X() {
-  //    val x = new ArrayList[Vertex]();
-  //    x.add(g.v(2));
-  //    super.test_g_v1_out_retainXg_v2X(g.v(1).out.retain(x));
-  //  }
-
-  def test_g_v1_out_aggregateXxX_out_retainXxX() {
-    val x = new HashSet[Vertex]();
-    super.test_g_v1_out_aggregateXxX_out_retainXxX(g.v(1).out.aggregate(x).out.retain(x));
+  ignore("retains everything except what is in named step") {
+    //    not currently supported because RetainFilterPipe uses ElementHelper.areEqual to compare two elements, which compares if the classes are equal.
+    //   *  I'll open a pull request to fix that in blueprints shortly...
   }
 
 }

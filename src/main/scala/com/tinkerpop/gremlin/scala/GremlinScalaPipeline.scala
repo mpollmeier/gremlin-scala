@@ -165,6 +165,16 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    */
   override def except(namedSteps: String*): GremlinScalaPipeline[S, E] = throw new NotImplementedError("not currently supported")
 
+  /** retains everything that is in the supplied collection. */
+  def retain(iterable: Iterable[E]): GremlinScalaPipeline[S, E] = addPipe2(new RetainFilterPipe[E](iterable))
+
+  /** retains everything that is in the results of a named step.
+   *
+   *  not currently supported because RetainFilterPipe uses ElementHelper.areEqual to compare two elements, which compares if the classes are equal.
+   *  I'll open a pull request to fix that in blueprints shortly...
+   */
+  override def retain(namedSteps: String*): GremlinScalaPipeline[S, E] = throw new NotImplementedError("not currently supported")
+
   def filter(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E](f))
   def filterPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E](f))
   def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
@@ -175,9 +185,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def random(bias: Double): GremlinScalaPipeline[S, E] = super.random(bias)
 
   override def range(low: Int, high: Int): GremlinScalaPipeline[S, E] = super.range(low, high)
-
-  override def retain(collection: JCollection[E]): GremlinScalaPipeline[S, E] = super.retain(collection)
-  override def retain(namedSteps: String*): GremlinScalaPipeline[S, E] = super.retain(namedSteps: _*)
 
   override def simplePath: GremlinScalaPipeline[S, E] = super.simplePath()
 
