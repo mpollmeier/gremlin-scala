@@ -1,25 +1,16 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.gremlin.test.ComplianceTest
-import com.tinkerpop.blueprints.Vertex
-import java.util.{ ArrayList, HashSet }
-import com.tinkerpop.gremlin.scala._
-import com.tinkerpop.pipes.Pipe
-
 import org.junit.runner.RunWith
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
+import org.scalatest.matchers.ShouldMatchers
+import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
-import com.tinkerpop.gremlin.Tokens.T.lt
 
 @RunWith(classOf[JUnitRunner])
 class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("emits everything except what is in the supplied collection") {
-    import scala.collection.JavaConversions._
     val excludeList = List(graph.v(1), graph.v(2), graph.v(3))
-
     graph.V.except(excludeList).toScalaList should be(List(graph.v(6), graph.v(5), graph.v(4)))
   }
 
