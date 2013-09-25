@@ -180,13 +180,15 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
   def filterNotPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe2(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
 
-  override def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = super.or(pipes: _*)
+  override def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = addPipe2(new OrFilterPipe[E](pipes: _*))
 
-  def random(bias: Double): GremlinScalaPipeline[S, E] = super.random(bias)
+  def random(bias: Double): GremlinScalaPipeline[S, E] = addPipe2(new RandomFilterPipe[E](bias))
 
-  override def range(low: Int, high: Int): GremlinScalaPipeline[S, E] = super.range(low, high)
+  /** only emit a given range of elements */
+  override def range(low: Int, high: Int): GremlinScalaPipeline[S, E] = addPipe2(new RangeFilterPipe[E](low, high))
 
-  override def simplePath: GremlinScalaPipeline[S, E] = super.simplePath()
+  /** simplifies the path by removing cycles */
+  override def simplePath: GremlinScalaPipeline[S, E] = addPipe2(new CyclicPathFilterPipe[E])
 
   /////////////////////////
   /// SIDE-EFFECT PIPES ///
