@@ -15,6 +15,7 @@ import com.tinkerpop.pipes.filter._
 import com.tinkerpop.pipes.transform._
 import com.tinkerpop.pipes.branch._
 import com.tinkerpop.pipes.util._
+import com.tinkerpop.pipes.sideeffect._
 import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import com.tinkerpop.pipes.util.structures.AsMap
 import scala.language.dynamics
@@ -22,7 +23,6 @@ import scala.collection.convert.wrapAsJava
 import com.tinkerpop.pipes.transform.InVertexPipe
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import com.tinkerpop.pipes.sideeffect.AggregatePipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def out: GremlinScalaPipeline[S, Vertex] = super.out()
@@ -195,11 +195,18 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /** Emits input, but adds input in collection, where provided closure processes input prior to insertion (greedy).
    *  In being "greedy", 'aggregate' will exhaust all the items that come to it from previous steps before emitting the next element.
    */
-  def aggregate(aggregate: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new AggregatePipe[E](aggregate))
+  def aggregate(buffer: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new AggregatePipe[E](buffer))
 
   /** Like aggregate, but applies `fun` to each element prior to adding it to the Buffer */
-  def aggregate[F](aggregate: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
-    addPipe2(new AggregatePipe[E](aggregate, new ScalaPipeFunction(fun)))
+  def aggregate[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
+    addPipe2(new AggregatePipe[E](buffer, new ScalaPipeFunction(fun)))
+
+  /** Emits input, but adds input to collection. This is a lazy step, i.e. it adds it to the buffer as the elements are being traversed.  */
+  def store(buffer: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new StorePipe[E](buffer))
+
+  /** Like store , but applies `fun` to each element prior to adding it to the Buffer */
+  def store[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
+    addPipe2(new StorePipe[E](buffer, new ScalaPipeFunction(fun)))
 
   override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
 
@@ -227,11 +234,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
 
   def sideEffect(sideEffectFunction: E ⇒ _): GremlinScalaPipeline[S, E] = super.sideEffect(new ScalaPipeFunction(sideEffectFunction))
-
-  override def store(storage: JCollection[E]): GremlinScalaPipeline[S, E] = super.store(storage)
-  override def store(): GremlinScalaPipeline[S, E] = super.store(new JArrayList[E]())
-  def store(storage: JCollection[_], storageFunction: E ⇒ _): GremlinScalaPipeline[S, E] = super.aggregate(storage, new ScalaPipeFunction(storageFunction))
-  def store(storageFunction: E ⇒ _): GremlinScalaPipeline[S, E] = super.store(new JArrayList[Object](), new ScalaPipeFunction(storageFunction))
 
   override def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
     super.table(table, stepNames, columnFunctions: _*)
