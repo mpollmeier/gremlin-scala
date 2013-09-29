@@ -1,10 +1,12 @@
 package com.tinkerpop.gremlin.scala.filter
 
 import org.junit.runner.RunWith
+import scala.collection.mutable
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.blueprints.Vertex
 
 @RunWith(classOf[JUnitRunner])
 class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -12,6 +14,17 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
   it("emits everything except what is in the supplied collection") {
     val excludeList = List(graph.v(1), graph.v(2), graph.v(3))
     graph.V.except(excludeList).toScalaList should be(List(graph.v(6), graph.v(5), graph.v(4)))
+  }
+
+  it("works nicely with aggregate") {
+    val buffer = mutable.Buffer.empty[Vertex]
+    val result = graph.v(1).out.aggregate(buffer).in.except(buffer).toScalaList.toSet
+
+    result.contains(graph.v(1)) should be(true)
+    result.contains(graph.v(6)) should be(true)
+    List(2, 3, 4) foreach { i ⇒
+      buffer.toSet.contains(graph.v(i)) should be(true)
+    }
   }
 
   ignore("emits everything except what is in named step") {

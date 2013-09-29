@@ -30,17 +30,6 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
       buffer should be(mutable.Buffer("vadas", "josh", "lop"))
     }
-
-    it("works nicely with except") {
-      val buffer = mutable.Buffer.empty[Vertex]
-      val result = graph.v(1).out.aggregate(buffer).in.except(buffer).toScalaList.toSet
-
-      result.contains(graph.v(1)) should be(true)
-      result.contains(graph.v(6)) should be(true)
-      List(2, 3, 4) foreach { i ⇒
-        buffer.toSet.contains(graph.v(i)) should be(true)
-      }
-    }
   }
 
   describe("store") {
