@@ -11,7 +11,6 @@ import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
 import com.tinkerpop.pipes.transform.TransformPipe
 import com.tinkerpop.pipes.transform.TransformPipe.Order
 import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
-import scala.collection.JavaConversions._
 import com.tinkerpop.pipes.filter._
 import com.tinkerpop.pipes.transform._
 import com.tinkerpop.pipes.branch._
@@ -21,6 +20,9 @@ import com.tinkerpop.pipes.util.structures.AsMap
 import scala.language.dynamics
 import scala.collection.convert.wrapAsJava
 import com.tinkerpop.pipes.transform.InVertexPipe
+import scala.collection.JavaConversions._
+import scala.collection.mutable
+import com.tinkerpop.pipes.sideeffect.AggregatePipe
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def out: GremlinScalaPipeline[S, Vertex] = super.out()
@@ -193,6 +195,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /////////////////////////
   /// SIDE-EFFECT PIPES ///
   /////////////////////////
+  /** Emits input, but adds input in collection, where provided closure processes input prior to insertion (greedy).
+   *  In being "greedy", 'aggregate' will exhaust all the items that come to it from previous steps before emitting the next element.
+   */
+  def aggregate(aggregate: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new AggregatePipe[E](aggregate))
   override def aggregate(aggregate: JCollection[E]): GremlinScalaPipeline[S, E] = super.aggregate(aggregate)
   override def aggregate(): GremlinScalaPipeline[S, E] = super.aggregate(new JArrayList[E]())
 
