@@ -192,21 +192,14 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /** simplifies the path by removing cycles */
   override def simplePath: GremlinScalaPipeline[S, E] = addPipe2(new CyclicPathFilterPipe[E])
 
-  /////////////////////////
-  /// SIDE-EFFECT PIPES ///
-  /////////////////////////
   /** Emits input, but adds input in collection, where provided closure processes input prior to insertion (greedy).
    *  In being "greedy", 'aggregate' will exhaust all the items that come to it from previous steps before emitting the next element.
    */
   def aggregate(aggregate: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new AggregatePipe[E](aggregate))
-  override def aggregate(aggregate: JCollection[E]): GremlinScalaPipeline[S, E] = super.aggregate(aggregate)
-  override def aggregate(): GremlinScalaPipeline[S, E] = super.aggregate(new JArrayList[E]())
 
-  def aggregate(aggregate: JCollection[_], aggregateFunction: E ⇒ _): GremlinScalaPipeline[S, E] =
-    super.aggregate(aggregate, new ScalaPipeFunction(aggregateFunction))
-
-  def aggregate(aggregateFunction: E ⇒ _): GremlinScalaPipeline[S, E] =
-    super.aggregate(new JArrayList[Object](), new ScalaPipeFunction(aggregateFunction))
+  /** Like aggregate, but applies `fun` to each element prior to adding it to the Buffer */
+  def aggregate[F](aggregate: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
+    addPipe2(new AggregatePipe[E](aggregate, new ScalaPipeFunction(fun)))
 
   override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
 
