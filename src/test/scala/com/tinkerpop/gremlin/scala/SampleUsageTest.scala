@@ -24,11 +24,11 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
       //dynamic invocation for property is untyped and may return null, like the groovy dsl
       vertex.name should be("marko")
-      vertex.nonExistentProperty should equal(null)
+      vertex.nonExistentProperty should equal(null: Any)
 
       //apply method returns Any type
       vertex("age") should be(29)
-      vertex("nonExistentProperty") should equal(null)
+      vertex("nonExistentProperty") should equal(null: Any)
 
       //property returns Some[A] if element present and of type A, otherwise None
       vertex.property[Integer]("age") should be(Some(29))
