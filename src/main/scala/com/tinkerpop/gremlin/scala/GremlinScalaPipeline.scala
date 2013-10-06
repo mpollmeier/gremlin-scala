@@ -192,13 +192,14 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   /** simplifies the path by removing cycles */
   override def simplePath: GremlinScalaPipeline[S, E] = addPipe2(new CyclicPathFilterPipe[E])
 
-  /** Emits input, but adds input in collection, where provided closure processes input prior to insertion (greedy).
-   *  In being "greedy", 'aggregate' will exhaust all the items that come to it from previous steps before emitting the next element.
+  /** Adds input into buffer greedily - it will exhaust all the items that come to it from previous steps before emitting the next element.
+   *  Note that this is a side effect step: the input will just flow through to the next step, but you can use `cap` to get the buffer into the pipeline.
+   *  @see example in SideEffectTest
    */
   def aggregate(buffer: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe2(new AggregatePipe[E](buffer))
 
   /** Like aggregate, but applies `fun` to each element prior to adding it to the Buffer */
-  def aggregate[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
+  def aggregate[F](buffer: mutable.Buffer[F])(fun: E ⇒ F): GremlinScalaPipeline[S, E] =
     addPipe2(new AggregatePipe[E](buffer, new ScalaPipeFunction(fun)))
 
   /** Emits input, but adds input to collection. This is a lazy step, i.e. it adds it to the buffer as the elements are being traversed.  */
@@ -371,6 +372,9 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     addPipe2(new ScatterPipe)
   }
 
+  /** emits the side-effect of the previous pipe (e.g. groupBy) - and not the values that flow through it.
+   *  This is useful for when the side effect of a Pipe is desired in a computational stream.
+   */
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
   def map[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = super.transform(new ScalaPipeFunction(function))

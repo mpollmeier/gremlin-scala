@@ -24,9 +24,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("applies a transformation to each element before filling the buffer") {
       val buffer = mutable.Buffer.empty[String]
-      def fun(v: Vertex) = v.getProperty[String]("name")
-
-      graph.v(1).out.aggregate[String](buffer, fun).iterate()
+      graph.v(1).out.aggregate(buffer)(getName).iterate()
 
       buffer should be(mutable.Buffer("vadas", "josh", "lop"))
     }
@@ -40,14 +38,14 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
         buffer.toSet.contains(graph.v(i)) should be(true)
       }
     }
+
+    it("applies a transformation to each element before filling the buffer") {
+      val buffer = mutable.Buffer.empty[String]
+      graph.v(1).out.store[String](buffer, getName).iterate()
+
+      buffer should be(mutable.Buffer("vadas", "josh", "lop"))
+    }
   }
 
-  it("applies a transformation to each element before filling the buffer") {
-    val buffer = mutable.Buffer.empty[String]
-    def fun(v: Vertex) = v.getProperty[String]("name")
-
-    graph.v(1).out.store[String](buffer, fun).iterate()
-
-    buffer should be(mutable.Buffer("vadas", "josh", "lop"))
-  }
+  def getName(v: Vertex) = v.getProperty[String]("name")
 }
