@@ -9,6 +9,7 @@ import com.tinkerpop.gremlin.Tokens.T._
 import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection }
 
 @RunWith(classOf[JUnitRunner])
 class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -46,6 +47,31 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       buffer should be(mutable.Buffer("vadas", "josh", "lop"))
     }
   }
+  describe("groupBy") {
+    it("groups tinkerpop team by age range") {
+      //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[ScalaVertex]]
+      val ageMap = new JHashMap[String, JCollection[Any]]
+      graph.V.groupBy(ageMap)(keyFunction = ageRange, valueFunction = getName).iterate()
+
+      val result = ageMap.toMap
+      result(underThirty).toList should be(List("vadas", "marko"))
+      result(overThirty).toList should be(List("peter", "josh"))
+      result(unknown).toList should be(List("lop", "ripple"))
+    }
+
+  }
 
   def getName(v: Vertex) = v.getProperty[String]("name")
+  def getAge(v: ScalaVertex) = v.getProperty[Integer]("age")
+
+  val underThirty = "under thirty"
+  val overThirty = "over thirty"
+  val unknown = "unknown"
+
+  def ageRange(v: ScalaVertex): String =
+    v.property[Integer]("age") match {
+      case Some(age) if (age < 30)  ⇒ underThirty
+      case Some(age) if (age >= 30) ⇒ overThirty
+      case _                        ⇒ unknown
+    }
 }

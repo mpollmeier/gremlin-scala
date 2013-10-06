@@ -4,7 +4,7 @@ import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.blueprints._
 import com.tinkerpop.pipes._
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
-import java.util.{ Map ⇒ JMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
+import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
 import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
@@ -211,23 +211,17 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
 
   override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
 
-  override def groupBy(map: JMap[_, JList[_]], keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] =
-    super.groupBy(map, keyFunction, valueFunction)
-
-  override def groupBy(keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] =
-    super.groupBy(keyFunction, valueFunction)
-
-  override def groupBy(keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[_, _], reduceFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] =
-    super.groupBy(keyFunction, valueFunction, reduceFunction)
-
-  override def groupBy(reduceMap: JMap[_, _], keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[_, _], reduceFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] =
-    super.groupBy(reduceMap, keyFunction, valueFunction, reduceFunction)
-
-  override def groupCount(map: JMap[_, Number], keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[TPair[_, Number], Number]): GremlinScalaPipeline[S, E] =
-    super.groupCount(map, keyFunction, valueFunction)
-
-  override def groupCount(keyFunction: PipeFunction[_, _], valueFunction: PipeFunction[TPair[_, Number], Number]): GremlinScalaPipeline[S, E] =
-    super.groupCount(keyFunction, valueFunction)
+  /** Groups input by given keyFunction reedily - it will exhaust all the items that come to it from previous steps before emitting the next element.
+   *  Note that this is a side effect step: the input will just flow through to the next step, but you can use `cap` to get the buffer into the pipeline.
+   *  @see example in SideEffectTest
+   */
+  def groupBy[K, V](map: JMap[K, JCollection[Any]] = new JHashMap)(keyFunction: E ⇒ K, valueFunction: E ⇒ V): GremlinScalaPipeline[S, E] =
+    addPipe2(
+      new GroupByPipe(
+        map,
+        new ScalaPipeFunction(keyFunction),
+        new ScalaPipeFunction(valueFunction).asInstanceOf[ScalaPipeFunction[E, Any]])
+    )
 
   override def groupCount(map: JMap[_, Number], keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(map, keyFunction)
   override def groupCount(keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(keyFunction)
