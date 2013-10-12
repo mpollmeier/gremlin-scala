@@ -25,8 +25,32 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
-  def out: GremlinScalaPipeline[S, Vertex] = super.out()
-  def in: GremlinScalaPipeline[S, Vertex] = super.in()
+  val doQueryOptimization = true
+
+  override def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
+  override def id: GremlinScalaPipeline[S, Object] = super.id
+  override def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
+
+  override def label: GremlinScalaPipeline[S, String] = addPipe2(new LabelPipe)
+
+  override def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
+  override def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new OutPipe(branchFactor, labels: _*))
+  override def outE(labels: String*): GremlinScalaPipeline[S, Edge] = super.outE(labels: _*)
+  override def outV: GremlinScalaPipeline[S, Vertex] = super.outV
+
+  override def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
+  override def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new InPipe(branchFactor, labels: _*))
+  override def inE(labels: String*): GremlinScalaPipeline[S, Edge] = super.inE(labels: _*)
+  override def inV: GremlinScalaPipeline[S, Vertex] = super.inV
+
   def path: GremlinScalaPipeline[S, JList[_]] = super.path()
 
   def V(graph: Graph): GremlinScalaPipeline[ScalaVertex, ScalaVertex] = {
@@ -78,19 +102,6 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
   override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
   override def bothV: GremlinScalaPipeline[S, Vertex] = super.bothV
-
-  override def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
-  override def id: GremlinScalaPipeline[S, Object] = super.id
-  override def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
-
-  override def in(labels: String*): GremlinScalaPipeline[S, Vertex] = super.in(labels: _*)
-  override def inE(labels: String*): GremlinScalaPipeline[S, Edge] = super.inE(labels: _*)
-  override def inV: GremlinScalaPipeline[S, Vertex] = super.inV
-  override def outE(labels: String*): GremlinScalaPipeline[S, Edge] = super.outE(labels: _*)
-  override def out(labels: String*): GremlinScalaPipeline[S, Vertex] = super.out(labels: _*)
-  override def outV: GremlinScalaPipeline[S, Vertex] = super.outV
-
-  override def label: GremlinScalaPipeline[S, String] = addPipe2(new LabelPipe)
 
   def propertyMap(keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPipe2(new PropertyMapPipe(keys: _*))
   def propertyMap: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
