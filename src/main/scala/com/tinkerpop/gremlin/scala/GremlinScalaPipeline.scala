@@ -229,7 +229,10 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   override def groupCount(map: JMap[_, Number]): GremlinScalaPipeline[S, E] = super.groupCount(map)
   override def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
 
-  def sideEffect(sideEffectFunction: E ⇒ _): GremlinScalaPipeline[S, E] = super.sideEffect(new ScalaPipeFunction(sideEffectFunction))
+  def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, F] = {
+    val sideEffectPipe = new ScalaPipeFunction(sideEffectFunction)
+    addPipe2(new SideEffectFunctionPipe(FluentUtility.prepareFunction(this.asMap, sideEffectPipe))).asInstanceOf[GremlinScalaPipeline[S, F]]
+  }
 
   override def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
     super.table(table, stepNames, columnFunctions: _*)
