@@ -368,8 +368,12 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
 
   /** emits the side-effect of the previous pipe (e.g. groupBy) - and not the values that flow through it.
    *  If you use it, this normally is the last step. @see examples in SideEffectTest
+   *  //TODO: reimplement, use proper types
    */
-  override def cap: GremlinScalaPipeline[S, _] = super.cap()
+  override def cap: GremlinScalaPipeline[S, _] = {
+    val sideEffectPipe = FluentUtility.removePreviousPipes(this, 1).get(0).asInstanceOf[SideEffectPipe[S, _]]
+    addPipe2(new SideEffectCapPipe(sideEffectPipe))
+  }
 
   def map[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = super.transform(new ScalaPipeFunction(function))
   def transform[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = map(function)
