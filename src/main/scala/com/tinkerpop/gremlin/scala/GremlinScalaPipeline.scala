@@ -27,9 +27,9 @@ import scala.collection.mutable
 class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   val doQueryOptimization = true
 
-  override def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
-  override def id: GremlinScalaPipeline[S, Object] = super.id
-  override def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
+  //  override def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
+  override def id: GremlinScalaPipeline[S, Object] = addPipe2(new IdPipe)
+  //  override def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
 
   override def label: GremlinScalaPipeline[S, String] = addPipe2(new LabelPipe)
 
@@ -39,8 +39,15 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
       addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
     else
       addPipe2(new OutPipe(branchFactor, labels: _*))
-  override def outE(labels: String*): GremlinScalaPipeline[S, Edge] = super.outE(labels: _*)
-  override def outV: GremlinScalaPipeline[S, Vertex] = super.outV
+
+  override def outE(labels: String*): GremlinScalaPipeline[S, Edge] = outE(branchFactor = Int.MaxValue, labels: _*)
+  override def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new OutEdgesPipe(branchFactor, labels: _*))
+
+  override def outV: GremlinScalaPipeline[S, Vertex] = addPipe2(new OutVertexPipe())
 
   override def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   override def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
@@ -48,10 +55,18 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
       addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
     else
       addPipe2(new InPipe(branchFactor, labels: _*))
-  override def inE(labels: String*): GremlinScalaPipeline[S, Edge] = super.inE(labels: _*)
-  override def inV: GremlinScalaPipeline[S, Vertex] = super.inV
 
-  def path: GremlinScalaPipeline[S, JList[_]] = super.path()
+  override def inE(labels: String*): GremlinScalaPipeline[S, Edge] = inE(branchFactor = Int.MaxValue, labels: _*)
+  override def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new InEdgesPipe(branchFactor, labels: _*))
+
+  override def inV: GremlinScalaPipeline[S, Vertex] = addPipe2(new InVertexPipe())
+
+  //  def path: GremlinScalaPipeline[S, JList[_]] = super.path()
+  //  override def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
 
   def V(graph: Graph): GremlinScalaPipeline[ScalaVertex, ScalaVertex] = {
     val vertices = graph.getVertices.iterator.map { v ⇒ ScalaVertex(v) }
@@ -99,9 +114,21 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def interval[_](key: String, startValue: Comparable[_], endValue: Comparable[_]): GremlinScalaPipeline[S, ScalaElement] =
     addPipe2(new IntervalFilterPipe[ScalaElement](key, startValue, endValue))
 
-  override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = super.both(labels: _*)
-  override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = super.bothE(labels: _*)
-  override def bothV: GremlinScalaPipeline[S, Vertex] = super.bothV
+  override def both(labels: String*): GremlinScalaPipeline[S, Vertex] = both(Int.MaxValue, labels: _*)
+  override def both(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new BothPipe(branchFactor, labels: _*))
+
+  override def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = bothE(Int.MaxValue, labels: _*)
+  override def bothE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
+    if (doQueryOptimization)
+      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    else
+      addPipe2(new BothEdgesPipe(branchFactor, labels: _*))
+
+  override def bothV: GremlinScalaPipeline[S, Vertex] = addPipe2(new BothVerticesPipe)
 
   def propertyMap(keys: String*): GremlinScalaPipeline[S, Map[String, Any]] = addPipe2(new PropertyMapPipe(keys: _*))
   def propertyMap: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
@@ -235,34 +262,26 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
         new ScalaPipeFunction(valueFunction).asInstanceOf[ScalaPipeFunction[E, Any]])
     )
 
-  override def groupCount(map: JMap[_, Number], keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(map, keyFunction)
-  override def groupCount(keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(keyFunction)
-  override def groupCount(map: JMap[_, Number]): GremlinScalaPipeline[S, E] = super.groupCount(map)
-  override def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
+  //  override def groupCount(map: JMap[_, Number], keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(map, keyFunction)
+  //  override def groupCount(keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(keyFunction)
+  //  override def groupCount(map: JMap[_, Number]): GremlinScalaPipeline[S, E] = super.groupCount(map)
+  //  override def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
 
   def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, F] = {
     val sideEffectPipe = new ScalaPipeFunction(sideEffectFunction)
     addPipe2(new SideEffectFunctionPipe(FluentUtility.prepareFunction(this.asMap, sideEffectPipe))).asInstanceOf[GremlinScalaPipeline[S, F]]
   }
 
-  override def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
-    super.table(table, stepNames, columnFunctions: _*)
-
-  override def table(table: Table, columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(table, columnFunctions: _*)
-  override def table(columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(columnFunctions: _*)
-  override def table(table: Table): GremlinScalaPipeline[S, E] = super.table(table)
-  override def table: GremlinScalaPipeline[S, E] = super.table()
-
-  override def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
-  override def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
-
-  /** Add a OrderMapPipe to the end of the Pipeline
-   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
-   *
-   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
-   *  @return the extended Pipeline
-   */
-  override def orderMap(by: Tokens.T): GremlinScalaPipeline[S, _] = super.orderMap(by)
+  //  override def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
+  //    super.table(table, stepNames, columnFunctions: _*)
+  //
+  //  override def table(table: Table, columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(table, columnFunctions: _*)
+  //  override def table(columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(columnFunctions: _*)
+  //  override def table(table: Table): GremlinScalaPipeline[S, E] = super.table(table)
+  //  override def table: GremlinScalaPipeline[S, E] = super.table()
+  //
+  //  override def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
+  //  override def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
 
   /** Add a OrderMapPipe to the end of the Pipeline
    *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
@@ -270,7 +289,15 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param order if the values implement Comparable, then a increment or decrement sort is usable
    *  @return the extended Pipeline
    */
-  override def orderMap(by: TransformPipe.Order): GremlinScalaPipeline[S, _] = super.orderMap(by)
+  //  override def orderMap(by: Tokens.T): GremlinScalaPipeline[S, _] = super.orderMap(by)
+
+  /** Add a OrderMapPipe to the end of the Pipeline
+   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
+   *
+   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
+   *  @return the extended Pipeline
+   */
+  //  override def orderMap(by: TransformPipe.Order): GremlinScalaPipeline[S, _] = super.orderMap(by)
 
   /** Add a OrderMapPipe to the end of the Pipeline
    *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
@@ -278,8 +305,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param compareFunction a function to compare to map entries
    *  @return the extended Pipeline
    */
-  def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer): GremlinScalaPipeline[S, _] =
-    super.orderMap(new ScalaPipeFunction(by))
+  //  def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer): GremlinScalaPipeline[S, _] =
+  //    super.orderMap(new ScalaPipeFunction(by))
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
@@ -288,8 +315,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param namedStep the step name that has the other vertex to link to
    *  @return the extended Pipeline
    */
-  override def linkOut(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
-    super.linkOut(label, namedStep)
+  //  override def linkOut(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] = {
+  //      super.linkOut(label, namedStep)
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
@@ -298,8 +325,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param namedStep the step name that has the other vertex to link to
    *  @return the extended Pipeline
    */
-  override def linkIn(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
-    super.linkIn(label, namedStep)
+  //  override def linkIn(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
+  //    super.linkIn(label, namedStep)
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
@@ -308,8 +335,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param namedStep the step name that has the other vertex to link to
    *  @return the extended Pipeline
    */
-  override def linkBoth(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
-    super.linkBoth(label, namedStep)
+  //  override def linkBoth(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
+  //    super.linkBoth(label, namedStep)
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
@@ -318,8 +345,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param other the other vertex
    *  @return the extended Pipeline
    */
-  override def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-    super.linkOut(label, other)
+  //  override def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+  //    super.linkOut(label, other)
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
@@ -328,8 +355,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param other the other vertex
    *  @return the extended Pipeline
    */
-  override def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-    super.linkIn(label, other)
+  //  override def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+  //    super.linkIn(label, other)
 
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
@@ -338,21 +365,19 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
    *  @param other the other vertex
    *  @return the extended Pipeline
    */
-  override def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-    super.linkBoth(label, other)
+  //  override def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
+  //    super.linkBoth(label, other)
 
   ///////////////////////
   /// TRANSFORM PIPES ///
   ///////////////////////
-  override def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
-  override def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
+  //  override def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
+  //  override def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
 
-  override def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
-
-  override def select: GremlinScalaPipeline[S, Row[_]] = super.select()
-  override def select(stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] = super.select(stepFunctions: _*)
-  override def select(stepNames: JCollection[String], stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] =
-    super.select(stepNames, stepFunctions: _*)
+  //  override def select: GremlinScalaPipeline[S, Row[_]] = super.select()
+  //  override def select(stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] = super.select(stepFunctions: _*)
+  //  override def select(stepNames: JCollection[String], stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] =
+  //    super.select(stepNames, stepFunctions: _*)
 
   /** Add a ShufflePipe to the end of the Pipeline.
    *  All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
@@ -390,8 +415,11 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
     addPipe2(new SideEffectCapPipe(sideEffectPipe))
   }
 
-  def map[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = super.transform(new ScalaPipeFunction(function))
   def transform[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = map(function)
+  def map[F](function: E ⇒ F): GremlinScalaPipeline[S, F] = {
+    val pipeFunction = new ScalaPipeFunction(function)
+    addPipe2(new TransformFunctionPipe(pipeFunction))
+  }
 
   override def order: GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe)
   override def order(by: Order = Order.INCR): GremlinScalaPipeline[S, E] = addPipe2(new OrderPipe(by))
