@@ -454,13 +454,9 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   }
 
   def addPipe2[T](pipe: Pipe[_, T]): GremlinScalaPipeline[S, T] = {
-    addPipe(pipe)
+    super.addPipe(pipe)
     this.asInstanceOf[GremlinScalaPipeline[S, T]]
   }
-
-  //TODO: remove once we don't extend GremlinPipeline any more
-  implicit private def scalaPipeline[A, B](pipeline: GremlinPipeline[A, B]): GremlinScalaPipeline[A, B] =
-    pipeline.asInstanceOf[GremlinScalaPipeline[A, B]]
 
   implicit def boolean2BooleanFn(fn: E ⇒ Boolean)(e: E): JBoolean = fn(e)
   def selectDynamic[F](field: String): GremlinScalaPipeline[S, F] = property(field)
