@@ -209,7 +209,8 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   def store[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
     addPipe2(new StorePipe[E](buffer, new ScalaPipeFunction(fun)))
 
-  override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
+  override def optional(namedStep: String): GremlinScalaPipeline[S, _] =
+    addPipe2(new OptionalPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep))))
 
   /** Groups input by given keyFunction greedily - it will exhaust all the items that come to it from previous steps before emitting the next element.
    *  Note that this is a side effect step: the input will just flow through to the next step, but you can use `cap` to get the buffer into the pipeline.
