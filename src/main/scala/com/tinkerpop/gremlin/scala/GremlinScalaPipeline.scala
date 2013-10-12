@@ -211,7 +211,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
 
   override def optional(namedStep: String): GremlinScalaPipeline[S, _] = super.optional(namedStep)
 
-  /** Groups input by given keyFunction reedily - it will exhaust all the items that come to it from previous steps before emitting the next element.
+  /** Groups input by given keyFunction greedily - it will exhaust all the items that come to it from previous steps before emitting the next element.
    *  Note that this is a side effect step: the input will just flow through to the next step, but you can use `cap` to get the buffer into the pipeline.
    *  @see example in SideEffectTest
    */
@@ -367,7 +367,7 @@ class GremlinScalaPipeline[S, E] extends GremlinPipeline[S, E] with Dynamic {
   }
 
   /** emits the side-effect of the previous pipe (e.g. groupBy) - and not the values that flow through it.
-   *  This is useful for when the side effect of a Pipe is desired in a computational stream.
+   *  If you use it, this normally is the last step. @see examples in SideEffectTest
    */
   override def cap: GremlinScalaPipeline[S, _] = super.cap()
 
