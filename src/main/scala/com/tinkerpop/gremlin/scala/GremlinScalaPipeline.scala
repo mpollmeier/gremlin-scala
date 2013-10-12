@@ -2,13 +2,12 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.blueprints._
-import com.tinkerpop.pipes._
-import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
 import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
 import com.tinkerpop.gremlin.Tokens
+import com.tinkerpop.pipes._
+import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 import com.tinkerpop.pipes.util.structures.{ Tree, Table, Row, Pair ⇒ TPair }
-import com.tinkerpop.pipes.transform.TransformPipe
 import com.tinkerpop.pipes.transform.TransformPipe.Order
 import com.tinkerpop.pipes.util.structures.{ Pair ⇒ TinkerPair }
 import com.tinkerpop.pipes.filter._
@@ -20,7 +19,6 @@ import com.tinkerpop.gremlin.scala.pipes.PropertyMapPipe
 import com.tinkerpop.pipes.util.structures.AsMap
 import scala.language.dynamics
 import scala.collection.convert.wrapAsJava
-import com.tinkerpop.pipes.transform.InVertexPipe
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
