@@ -29,15 +29,16 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def label: GremlinScalaPipeline[S, String] = addPipe2(new LabelPipe)
 
-  def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
-  def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
+  def out(labels: String*): GremlinScalaPipeline[S, ScalaVertex] = out(branchFactor = Int.MaxValue, labels: _*)
+  def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, ScalaVertex] =
     outE(branchFactor, labels: _*).inV
 
   def outE(labels: String*): GremlinScalaPipeline[S, ScalaEdge] = outE(branchFactor = Int.MaxValue, labels: _*)
   def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, ScalaEdge] =
     addPipe2(new VertexQueryPipe(classOf[ScalaEdge], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
-  def outV: GremlinScalaPipeline[S, Vertex] = addPipe2(new OutVertexPipe())
+  def outV: GremlinScalaPipeline[S, ScalaVertex] =
+    addPipe2(new OutVertexPipe).asInstanceOf[GremlinScalaPipeline[S, ScalaVertex]]
 
   def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
@@ -47,7 +48,8 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
     addPipe2(new VertexQueryPipe(classOf[Edge], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
-  def inV: GremlinScalaPipeline[S, Vertex] = addPipe2(new InVertexPipe())
+  def inV: GremlinScalaPipeline[S, ScalaVertex] =
+    addPipe2(new InVertexPipe).asInstanceOf[GremlinScalaPipeline[S, ScalaVertex]]
 
   //  def path: GremlinScalaPipeline[S, JList[_]] = super.path()
   //   def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
