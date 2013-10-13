@@ -59,27 +59,27 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     manualStart(graph.getEdges)
 
   /** Check if the element has a property with provided key */
-  def has[_](key: String): GremlinScalaPipeline[S, E] =
+  def has(key: String): GremlinScalaPipeline[S, E] =
     has(key, Tokens.T.neq, null)
 
   /** Check if the element has a property with provided key/value */
-  def has[_](key: String, value: Any): GremlinScalaPipeline[S, E] =
+  def has(key: String, value: Any): GremlinScalaPipeline[S, E] =
     has(key, Tokens.T.eq, value)
 
   /** Check if the element does not have a property with provided key. */
-  def hasNot[_](key: String): GremlinScalaPipeline[S, E] =
+  def hasNot(key: String): GremlinScalaPipeline[S, E] =
     has(key, Tokens.T.eq, null)
 
   /** Check if the element does not have a property with provided key/value */
-  def hasNot[_](key: String, value: Any): GremlinScalaPipeline[S, E] =
+  def hasNot(key: String, value: Any): GremlinScalaPipeline[S, E] =
     has(key, Tokens.T.neq, value)
 
   /** Check if the element has a property with provided key/value that matches the given comparison token */
-  def has[_](key: String, comparison: Tokens.T, value: Any): GremlinScalaPipeline[S, E] =
+  def has(key: String, comparison: Tokens.T, value: Any): GremlinScalaPipeline[S, E] =
     has(key, Tokens.mapPredicate(comparison), value)
 
   /** Check if the element has a property with provided key/value that matches the given predicate */
-  def has[_](key: String, predicate: Predicate, value: Any): GremlinScalaPipeline[S, E] = {
+  def has(key: String, predicate: Predicate, value: Any): GremlinScalaPipeline[S, E] = {
     val pipeline = key match {
       case Tokens.ID    ⇒ addPipe2(new IdFilterPipe(predicate, value))
       case Tokens.LABEL ⇒ addPipe2(new LabelFilterPipe(predicate, value))
@@ -89,7 +89,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   }
 
   /** checks if a given property is in an interval (startValue: inclusive, endValue: exclusive)  */
-  def interval[_](key: String, startValue: Comparable[_], endValue: Comparable[_]): GremlinScalaPipeline[S, Element] =
+  def interval(key: String, startValue: Comparable[_], endValue: Comparable[_]): GremlinScalaPipeline[S, Element] =
     addPipe2(new IntervalFilterPipe[Element](key, startValue, endValue))
 
   def both(labels: String*): GremlinScalaPipeline[S, Vertex] = both(Int.MaxValue, labels: _*)
@@ -355,7 +355,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
    *  All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
    *  as a List.
    */
-  def shuffle[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new ShufflePipe)
+  def shuffle: GremlinScalaPipeline[S, List[E]] = addPipe2(new ShufflePipe)
 
   /** All the objects previous to this step are aggregated in a greedy fashion and emitted as a List.
    *  Normally they would be traversed over lazily.
@@ -365,7 +365,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
    *  Note: Gremlin-Groovy comes with an overloaded gather pipe that takes a function to
    *  transform the last step. You can achieve the same by just appending a map step.
    */
-  def gather[_]: GremlinScalaPipeline[S, List[E]] = addPipe2(new GatherPipe[E]) map (_.toList)
+  def gather: GremlinScalaPipeline[S, List[E]] = addPipe2(new GatherPipe[E]) map (_.toList)
 
   /** This will unroll any iterator/iterable/map that is provided to it.
    *  Gather/Scatter is good for breadth-first traversals where the gather closure filters out unwanted elements at the current radius.
@@ -419,7 +419,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
-  private def manualStart[T](start: JIterable[_]): GremlinScalaPipeline[T, T] = {
+  private def manualStart[T](start: JIterable[T]): GremlinScalaPipeline[T, T] = {
     val pipe = addPipe2(new StartPipe[S](start))
     FluentUtility.setStarts(this, start)
     pipe.asInstanceOf[GremlinScalaPipeline[T, T]]
