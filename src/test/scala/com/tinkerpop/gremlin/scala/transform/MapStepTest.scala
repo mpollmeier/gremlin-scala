@@ -6,6 +6,7 @@ import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.scala.ScalaVertex
 import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.gremlin.scala._
 
 @RunWith(classOf[JUnitRunner])
 class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -20,7 +21,7 @@ class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
   }
 
   it("gets the name and the age as tuples") {
-    vertices.map { v: ScalaVertex ⇒ (v("name"), v("age")) }.toScalaList should be(List(
+    vertices.map { v ⇒ (v("name"), v("age")) }.toScalaList should be(List(
       ("lop", null),
       ("vadas", 27),
       ("marko", 29),

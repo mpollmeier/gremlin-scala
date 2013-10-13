@@ -20,15 +20,4 @@ class AndStepTest extends FunSpec with ShouldMatchers with TestGraph {
     graph.v(1).outE.and(pipe1, pipe2).id.toScalaList should be(List("7"))
   }
 
-  /** will only work with correct types once GremlinScalaPipeline is independent of GremlinPipeline
-   *  g.V.and(_().both("knows"), _().both("created"))
-   *  ==>v[1]
-   *  ==>v[4]
-   */
-  ignore("finds all vertices that are true for all of the pipes") {
-    val pipe1 = ->[ScalaVertex].has("weight", gt, 0.4f)
-    val pipe2 = ->[ScalaVertex].has("weight", lt, 0.8f)
-    print(graph.V.and(pipe1, pipe2))
-  }
-
 }

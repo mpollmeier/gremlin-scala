@@ -68,7 +68,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
   val overThirty = "over thirty"
   val unknown = "unknown"
 
-  def ageRange(v: ScalaVertex): String =
+  def ageRange(v: Vertex): String =
     v.property[Integer]("age") match {
       case Some(age) if (age < 30)  ⇒ underThirty
       case Some(age) if (age >= 30) ⇒ overThirty
