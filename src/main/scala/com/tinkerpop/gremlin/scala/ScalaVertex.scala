@@ -9,36 +9,36 @@ import com.tinkerpop.blueprints.VertexQuery
 //TODO: use methods on scalapipeline directly to avoid casts
 class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   /** follow all outgoing edges to the vertices */
-  def out(): GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out().asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  def out(): GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaVertex].start(vertex).out()
 
   /** follow outgoing edges to the vertices, limited by given branch factor */
-  def out(branchFactor: Int): GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out(branchFactor).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  def out(branchFactor: Int): GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaVertex].start(vertex).out(branchFactor)
 
   /** follow outgoing edges with given labels to the vertices */
-  def out(labels: String*): GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out(labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  def out(labels: String*): GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaVertex].start(vertex).out(labels: _*)
 
   /** follow outgoing edges with given labels to the vertices, limited by given branch factor */
-  def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out(branchFactor, labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+  def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[ScalaVertex, ScalaVertex] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaVertex].start(vertex).out(branchFactor, labels: _*)
 
   /** follow all outgoing edges */
-  def outE: GremlinScalaPipeline[Vertex, Edge] =
-    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE().asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
+  def outE: GremlinScalaPipeline[ScalaVertex, ScalaEdge] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaEdge].start(vertex).outE()
 
   /** follow all outgoing edges, limited by given branch factor */
-  def outE(branchFactor: Int): GremlinScalaPipeline[Vertex, Edge] =
-    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE(branchFactor).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
+  def outE(branchFactor: Int): GremlinScalaPipeline[ScalaVertex, ScalaEdge] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaEdge].start(vertex).outE(branchFactor)
 
   /** follow outgoing edges with given labels */
-  def outE(labels: String*): GremlinScalaPipeline[Vertex, Edge] =
-    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE(labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
+  def outE(labels: String*): GremlinScalaPipeline[ScalaVertex, ScalaEdge] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaEdge].start(vertex).outE(labels: _*)
 
   /** follow outgoing edges with given labels, limited by given branch factor  */
-  def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[Vertex, Edge] =
-    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE(branchFactor, labels: _*).asInstanceOf[GremlinScalaPipeline[Vertex, Edge]]
+  def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[ScalaVertex, ScalaEdge] =
+    new GremlinScalaPipeline[ScalaVertex, ScalaEdge].start(vertex).outE(branchFactor, labels: _*)
 
   /** follow all incoming edges to the vertices */
   def in: GremlinScalaPipeline[Vertex, Vertex] =
