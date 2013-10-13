@@ -23,8 +23,6 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
-  val doQueryOptimization = true
-
   //   def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
   def id: GremlinScalaPipeline[S, Object] = addPipe2(new IdPipe)
   //   def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
@@ -33,33 +31,21 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
   def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new OutPipe(branchFactor, labels: _*))
+    outE(branchFactor, labels: _*).inV
 
-  def outE(labels: String*): GremlinScalaPipeline[S, Edge] = outE(branchFactor = Int.MaxValue, labels: _*)
-  def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new OutEdgesPipe(branchFactor, labels: _*))
+  def outE(labels: String*): GremlinScalaPipeline[S, ScalaEdge] = outE(branchFactor = Int.MaxValue, labels: _*)
+  def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, ScalaEdge] =
+    addPipe2(new VertexQueryPipe(classOf[ScalaEdge], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def outV: GremlinScalaPipeline[S, Vertex] = addPipe2(new OutVertexPipe())
 
   def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new InPipe(branchFactor, labels: _*))
+    addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def inE(labels: String*): GremlinScalaPipeline[S, Edge] = inE(branchFactor = Int.MaxValue, labels: _*)
   def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new InEdgesPipe(branchFactor, labels: _*))
+    addPipe2(new VertexQueryPipe(classOf[Edge], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def inV: GremlinScalaPipeline[S, Vertex] = addPipe2(new InVertexPipe())
 
@@ -114,17 +100,11 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def both(labels: String*): GremlinScalaPipeline[S, Vertex] = both(Int.MaxValue, labels: _*)
   def both(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new BothPipe(branchFactor, labels: _*))
+    addPipe2(new VertexQueryPipe(classOf[Vertex], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def bothE(labels: String*): GremlinScalaPipeline[S, Edge] = bothE(Int.MaxValue, labels: _*)
   def bothE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    if (doQueryOptimization)
-      addPipe2(new VertexQueryPipe(classOf[Edge], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
-    else
-      addPipe2(new BothEdgesPipe(branchFactor, labels: _*))
+    addPipe2(new VertexQueryPipe(classOf[Edge], Direction.BOTH, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def bothV: GremlinScalaPipeline[S, Vertex] = addPipe2(new BothVerticesPipe)
 
