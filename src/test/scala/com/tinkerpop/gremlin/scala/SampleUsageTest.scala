@@ -38,7 +38,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds everybody who is over 30 years old") {
-      vertices.filter { v: ScalaVertex ⇒
+      vertices.filter { v ⇒
         v.property[Integer]("age") match {
           case Some(age) if age > 30 ⇒ true
           case _                     ⇒ false
@@ -55,7 +55,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("finds who marko knows if a given edge property `weight` is > 0.8") {
       val marko = graph.v(1)
-      marko.outE("knows").filter { e: Edge ⇒
+      marko.outE("knows").filter { e ⇒
         e.property[java.lang.Float]("weight") match {
           case Some(weight) if weight > 0.8 ⇒ true
           case _                            ⇒ false
