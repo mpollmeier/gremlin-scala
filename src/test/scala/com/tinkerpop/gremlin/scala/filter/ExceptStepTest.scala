@@ -7,6 +7,7 @@ import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.blueprints.Vertex
+import com.tinkerpop.gremlin.scala._
 
 @RunWith(classOf[JUnitRunner])
 class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -18,7 +19,7 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("works nicely with aggregate") {
     val buffer = mutable.Buffer.empty[Vertex]
-    val result = graph.v(1).out().aggregate(buffer).in().except(buffer).toScalaList.toSet
+    val result = graph.v(1).out.aggregate(buffer).in().except(buffer).toScalaList.toSet
 
     result.contains(graph.v(1)) should be(true)
     result.contains(graph.v(6)) should be(true)

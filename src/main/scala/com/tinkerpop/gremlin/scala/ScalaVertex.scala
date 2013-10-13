@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.VertexQuery
 //TODO: use methods on scalapipeline directly to avoid casts
 class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   /** follow all outgoing edges to the vertices */
-  def out(): GremlinScalaPipeline[Vertex, Vertex] =
+  def out: GremlinScalaPipeline[Vertex, Vertex] =
     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out()
 
   /** follow outgoing edges to the vertices, limited by given branch factor */

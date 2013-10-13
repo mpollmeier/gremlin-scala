@@ -9,12 +9,13 @@ import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
+import com.tinkerpop.gremlin.scala._
 
 @RunWith(classOf[JUnitRunner])
 class BackStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("goes back to named step") {
-    val startVertex = graph.v(1)
+    val startVertex: ScalaVertex = graph.v(1)
     graph.v(1).startPipe.as("here").out().back("here").name.toScalaList should be(List(startVertex.name))
   }
 

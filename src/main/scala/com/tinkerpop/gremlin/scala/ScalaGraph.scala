@@ -10,13 +10,13 @@ class ScalaGraph(val graph: Graph) {
   def E: GremlinScalaPipeline[Edge, Edge] = new GremlinScalaPipeline[ScalaGraph, Edge].E(graph)
 
   /**Returns the vertices with the specified IDs. */
-  def V(ids: Any*): Iterable[ScalaVertex] = ids.map(id ⇒ ScalaVertex(graph.getVertex(id)))
+  def V(ids: Any*): Iterable[Vertex] = ids.map(graph.getVertex)
 
   /**Returns the edges with the specified IDs. */
-  def E(ids: Any*): Iterable[ScalaEdge] = ids.map(id ⇒ ScalaEdge(graph.getEdge(id)))
+  def E(ids: Any*): Iterable[Edge] = ids.map(graph.getEdge)
 
   /**Returns the vertex with the specified ID. */
-  def v(id: Any): ScalaVertex = graph.getVertex(id)
+  def v(id: Any): Vertex = graph.getVertex(id)
 
   /**Returns the edge with the specified ID. */
   def e(id: Any): ScalaEdge = graph.getEdge(id)

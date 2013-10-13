@@ -20,7 +20,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("has different ways to get the properties of a vertex") {
-      val vertex = graph.v(1)
+      val vertex: ScalaVertex = graph.v(1)
 
       //dynamic invocation for property is untyped and may return null, like the groovy dsl
       vertex.name should be("marko")
@@ -86,7 +86,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
         val vertex = graph.addV(id)
         vertex.setProperty("key", "value")
 
-        graph.v(id).key should be("value")
+        graph.v(id).property[String]("key") should be(Some("value"))
       }
 
       it("creates vertices without specific ids") {
