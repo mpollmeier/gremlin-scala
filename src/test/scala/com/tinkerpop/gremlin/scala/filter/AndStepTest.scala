@@ -17,7 +17,7 @@ class AndStepTest extends FunSpec with ShouldMatchers with TestGraph {
   it("finds edges that are true for all of the pipes") {
     val pipe1 = ->[Edge].has("weight", gt, 0.4f)
     val pipe2 = ->[Edge].has("weight", lt, 0.8f)
-    graph.v(1).outE.and(pipe1, pipe2).id.toScalaList should be(List("7"))
+    graph.v(1).outE.and(pipe1, pipe2).id.toList should be(List("7"))
   }
 
 }

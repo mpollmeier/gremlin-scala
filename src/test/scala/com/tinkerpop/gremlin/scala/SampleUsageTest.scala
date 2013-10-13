@@ -16,7 +16,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("Usage with Tinkergraph") {
     it("finds all names of vertices") {
-      vertices.name.toScalaList should be(List("lop", "vadas", "marko", "peter", "ripple", "josh"))
+      vertices.name.toList should be(List("lop", "vadas", "marko", "peter", "ripple", "josh"))
     }
 
     it("has different ways to get the properties of a vertex") {
@@ -43,14 +43,14 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
           case Some(age) if age > 30 ⇒ true
           case _                     ⇒ false
         }
-      }.propertyMap.toScalaList should be(List(
+      }.propertyMap.toList should be(List(
         Map("name" -> "peter", "age" -> 35),
         Map("name" -> "josh", "age" -> 32)))
     }
 
     it("finds who marko knows") {
       val marko = graph.v(1)
-      marko.out("knows").map { _("name") }.toScalaList should be(List("vadas", "josh"))
+      marko.out("knows").map { _("name") }.toList should be(List("vadas", "josh"))
     }
 
     it("finds who marko knows if a given edge property `weight` is > 0.8") {
@@ -60,12 +60,12 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
           case Some(weight) if weight > 0.8 ⇒ true
           case _                            ⇒ false
         }
-      }.inV.propertyMap.toScalaList should be(List(Map("name" -> "josh", "age" -> 32)))
+      }.inV.propertyMap.toList should be(List(Map("name" -> "josh", "age" -> 32)))
     }
 
     it("finds all vertices") {
       vertices.count should be(6)
-      vertices.propertyMap.toScalaList should be(List(
+      vertices.propertyMap.toList should be(List(
         Map("name" -> "lop", "lang" -> "java"),
         Map("age" -> 27, "name" -> "vadas"),
         Map("name" -> "marko", "age" -> 29),
@@ -76,7 +76,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("shuffles the names around randomly") {
       //will produce different output every time you run it
-      println(vertices.name.shuffle.toScalaList)
+      println(vertices.name.shuffle.toList)
     }
 
     describe("Usage with empty Graph") {
@@ -110,7 +110,7 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
     describe("Graph navigation") {
       it("follows outEdge and inVertex") {
-        graph.v(1).outE("created").inV.name.toScalaList should be(List("lop"))
+        graph.v(1).outE("created").inV.name.toList should be(List("lop"))
       }
     }
   }

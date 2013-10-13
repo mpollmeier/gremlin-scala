@@ -12,7 +12,7 @@ import org.scalatest.junit.JUnitRunner
 class IntervalStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("finds everybody between 20 and 30 years old") {
-    graph.V.interval("age", 20, 30).toScalaList.size should be(2)
+    graph.V.interval("age", 20, 30).toList.size should be(2)
   }
 
 }

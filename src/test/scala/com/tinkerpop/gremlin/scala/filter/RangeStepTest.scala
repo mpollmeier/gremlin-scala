@@ -11,6 +11,6 @@ import com.tinkerpop.gremlin.scala._
 class RangeStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("emits only a given range of elements") {
-    graph.v(1).out.range(0, 1).toScalaList.size should be(2)
+    graph.v(1).out.range(0, 1).toList.size should be(2)
   }
 }

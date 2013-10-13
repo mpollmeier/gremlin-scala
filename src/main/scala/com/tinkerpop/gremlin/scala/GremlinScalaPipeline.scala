@@ -411,18 +411,19 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     asMap.refresh()
     pipeline.asInstanceOf[GremlinScalaPipeline[S, E]]
   }
+
   def start(startObject: S): GremlinScalaPipeline[S, S] = {
     addPipe(new StartPipe[S](startObject))
     FluentUtility.setStarts(this, startObject)
     this.asInstanceOf[GremlinScalaPipeline[S, S]]
   }
 
+  def toList[_](): Seq[E] = iterableAsScalaIterable(this).toSeq
+
   def addPipe[T](pipe: Pipe[_ <: Any, T]): GremlinScalaPipeline[S, T] = {
     super.addPipe(pipe)
     this.asInstanceOf[GremlinScalaPipeline[S, T]]
   }
-
-  def toScalaList(): List[E] = iterableAsScalaIterable(this).toList
 
   private def manualStart[T](start: JIterable[T]): GremlinScalaPipeline[T, T] = {
     val pipe = addPipe(new StartPipe[S](start))

@@ -18,14 +18,14 @@ class BranchStepsTest extends FunSpec with ShouldMatchers with TestGraph {
         { v: Vertex ⇒ v("name") == "josh" },
         { v: Vertex ⇒ v("age") },
         { v: Vertex ⇒ v("name") })
-        .toScalaList should be(List("vadas", 32, "lop"))
+        .toList should be(List("vadas", 32, "lop"))
     }
   }
 
   describe("looping") {
     it("jumps back to named step and loops twice") {
       graph.v(1).startPipe.as("here").out().loop("here", { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 })
-        .name.toScalaList should be(List("ripple", "lop"))
+        .name.toList should be(List("ripple", "lop"))
     }
 
     it("optionally takes an emit function that decides if the current object gets emitted or not - that could get emitted multiple times") {
@@ -33,7 +33,7 @@ class BranchStepsTest extends FunSpec with ShouldMatchers with TestGraph {
         namedStep = "here",
         whileFun = { lb: LoopBundle[Vertex] ⇒ lb.loops < 3 },
         emit = { lb: LoopBundle[Vertex] ⇒ ScalaVertex(lb.getObject).name == "lop" })
-        .name.toScalaList should be(List("lop", "lop"))
+        .name.toList should be(List("lop", "lop"))
     }
   }
 
@@ -42,7 +42,7 @@ class BranchStepsTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.v(1).out
         .copySplit(->[Vertex].property("name"), ->[Vertex].property("age"))
         .fairMerge
-        .toScalaList should be(List("vadas", 27, "josh", 32, "lop"))
+        .toList should be(List("vadas", 27, "josh", 32, "lop"))
     }
   }
 
@@ -51,13 +51,13 @@ class BranchStepsTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.v(1).out
         .copySplit(->[Vertex].property("name"), ->[Vertex].property("age"))
         .exhaustMerge
-        .toScalaList should be(List("vadas", "josh", "lop", 27, 32))
+        .toList should be(List("vadas", "josh", "lop", 27, 32))
     }
   }
 
   describe("simplePath") {
     it("simplifies the path by removing cycles") {
-      graph.v(1).out().in().simplePath.toScalaList.size should be(2)
+      graph.v(1).out().in().simplePath.toList.size should be(2)
     }
   }
 
