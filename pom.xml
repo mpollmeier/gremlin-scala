@@ -13,7 +13,7 @@
     <name>Gremlin-Scala: Gremlin for the Scala Language</name>
     <properties>
         <gremlin.version>2.5.0-SNAPSHOT</gremlin.version>
-        <scala.version>2.10.2</scala.version>
+        <scala.version>2.10.3</scala.version>
     </properties>
     <developers>
         <developer>
