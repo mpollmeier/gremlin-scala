@@ -19,7 +19,7 @@ class ScalaGraph(val graph: Graph) {
   def v(id: Any): Vertex = graph.getVertex(id)
 
   /**Returns the edge with the specified ID. */
-  def e(id: Any): ScalaEdge = graph.getEdge(id)
+  def e(id: Any): Edge = graph.getEdge(id)
 
   def -> : GremlinScalaPipeline[ScalaGraph, ScalaGraph] =
     new GremlinScalaPipeline[ScalaGraph, ScalaGraph].start(ScalaGraph(graph))

@@ -3,7 +3,6 @@ package com.tinkerpop.gremlin.scala.transform
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.gremlin.scala._
-import com.tinkerpop.gremlin.scala.ScalaVertex._
 import com.tinkerpop.blueprints.Vertex
 import java.util.Arrays
 

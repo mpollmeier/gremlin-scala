@@ -6,7 +6,6 @@ import java.lang.{ Iterable ⇒ JIterable }
 import com.tinkerpop.blueprints.Direction
 import com.tinkerpop.blueprints.VertexQuery
 
-//TODO: use methods on scalapipeline directly to avoid casts
 class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   /** follow all outgoing edges to the vertices */
   def out: GremlinScalaPipeline[Vertex, Vertex] =

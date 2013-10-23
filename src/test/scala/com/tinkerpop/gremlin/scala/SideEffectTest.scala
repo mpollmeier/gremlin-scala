@@ -49,7 +49,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
   }
   describe("groupBy") {
     it("groups tinkerpop team by age range") {
-      //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[ScalaVertex]]
+      //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[Vertex]]
       val ageMap = new JHashMap[String, JCollection[Any]]
       graph.V.groupBy(ageMap)(keyFunction = ageRange, valueFunction = getName).iterate()
 
@@ -62,7 +62,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
   }
 
   def getName(v: Vertex) = v.getProperty[String]("name")
-  def getAge(v: ScalaVertex) = v.getProperty[Integer]("age")
+  def getAge(v: Vertex) = v.getProperty[Integer]("age")
 
   val underThirty = "under thirty"
   val overThirty = "over thirty"

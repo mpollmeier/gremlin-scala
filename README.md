@@ -45,8 +45,8 @@ The test specifications are documenting how you can use Gremlin-Scala, this is a
     }
 
     it("finds everybody who is over 30 years old") {
-      vertices.filter { v: ScalaVertex ⇒
-        v.property[Integer]("age") match {
+      vertices.filter { 
+        _.property[Integer]("age") match {
           case Some(age) if age > 30 ⇒ true
           case _                     ⇒ false
         }

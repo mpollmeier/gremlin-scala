@@ -3,7 +3,6 @@ package com.tinkerpop.gremlin.scala.transform
 import org.junit.runner.RunWith
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.gremlin.scala.ScalaVertex
 import com.tinkerpop.gremlin.scala.TestGraph
 import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.gremlin.scala._

@@ -1,7 +1,6 @@
 package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import com.tinkerpop.gremlin.scala.ScalaVertex._
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.junit.runner.RunWith
