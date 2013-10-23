@@ -41,8 +41,8 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds 'created' edges") {
-      edges.filter { _.getLabel == "created" }.toList.size should be(4)
-      edges.filterPF { case e: Edge ⇒ e.getLabel == "created" }.toList.size should be(4)
+      edges.filter { _.label == "created" }.toList.size should be(4)
+      edges.filterPF { case e: Edge ⇒ e.label == "created" }.toList.size should be(4)
     }
 
   }
@@ -75,8 +75,8 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("finds edges other than 'created'") {
-      edges.filterNot { e: Edge ⇒ e.getLabel == "created" }.toList.size should be(2)
-      edges.filterNotPF { case e: Edge ⇒ e.getLabel == "created" }.toList.size should be(2)
+      edges.filterNot { _.label == "created" }.toList.size should be(2)
+      edges.filterNotPF { case e: Edge ⇒ e.label == "created" }.toList.size should be(2)
     }
 
   }

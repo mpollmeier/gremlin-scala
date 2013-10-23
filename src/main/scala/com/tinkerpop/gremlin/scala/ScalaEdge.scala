@@ -13,6 +13,7 @@ class ScalaEdge(val edge: Edge) extends Edge with ScalaElement {
 
   val element = edge
   /** need to extend Edge so that we can use existing Gremlin Pipes... */
+  def label = getLabel
   def getLabel: String = edge.getLabel
   def getVertex(direction: Direction): Vertex = edge.getVertex(direction)
 
