@@ -43,34 +43,28 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("filterNot") {
     it("finds none") {
-      vertices.filterNot { v ⇒ false }.toList.size should be(6)
-      vertices.filterNotPF { case _ ⇒ false }.toList.size should be(6)
+      vertices.filterNot { _ ⇒ false }.toList.size should be(6)
     }
 
     it("finds all") {
-      vertices.filterNot { v ⇒ true }.toList.size should be(0)
-      vertices.filterNotPF { case _ ⇒ true }.toList.size should be(0)
+      vertices.filterNot { _ ⇒ true }.toList.size should be(0)
     }
 
     it("finds vertices with string property") {
-      vertices.filterNot { v ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
-      vertices.filterNotPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
+      vertices.filterNot { _.property[String]("lang").exists(_ == "java") }.toList.size should be(4)
     }
 
     it("finds vertices with int property") {
-      vertices.filterNot { v ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
-      vertices.filterNotPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
+      vertices.filterNot { _.property[Integer]("age").exists(_ > 30) }.toList.size should be(4)
     }
 
     it("finds that v1.out has two vertices whose id is not 2") {
       // tinkergraph uses strings for ids
-      graph.v(1).out.filterNot { v: Vertex ⇒ v.id == "2" }.toList.size should be(2)
-      graph.v(1).out.filterNotPF { case v: Vertex ⇒ v.id == "2" }.toList.size should be(2)
+      graph.v(1).out.filterNot { _.id == "2" }.toList.size should be(2)
     }
 
     it("finds edges other than 'created'") {
       edges.filterNot { _.label == "created" }.toList.size should be(2)
-      edges.filterNotPF { case e: Edge ⇒ e.label == "created" }.toList.size should be(2)
     }
 
   }
