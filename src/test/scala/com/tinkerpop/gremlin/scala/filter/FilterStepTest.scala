@@ -16,33 +16,27 @@ class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
   describe("filter") {
     it("finds none") {
       vertices.filter { _ ⇒ false }.toList.size should be(0)
-      vertices.filterPF { case _ ⇒ false }.toList.size should be(0)
     }
 
     it("finds all") {
       vertices.filter { _ ⇒ true }.toList.size should be(6)
-      vertices.filterPF { case _ ⇒ true }.toList.size should be(6)
     }
 
     it("finds vertices with string property") {
       vertices.filter { _.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
-      vertices.filterPF { case v: Vertex ⇒ v.property[String]("lang").exists(_ == "java") }.toList.size should be(2)
     }
 
     it("finds vertices with int property") {
       vertices.filter { _.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
-      vertices.filterPF { case v: Vertex ⇒ v.property[Integer]("age").exists(_ > 30) }.toList.size should be(2)
     }
 
     it("finds that v1.out has id=2") {
       // tinkergraph uses strings for ids
       graph.v(1).out.filter { _.id == "2" }.toList.size should be(1)
-      graph.v(1).out.filterPF { case v: Vertex ⇒ v.id == "2" }.toList.size should be(1)
     }
 
     it("finds 'created' edges") {
       edges.filter { _.label == "created" }.toList.size should be(4)
-      edges.filterPF { case e: Edge ⇒ e.label == "created" }.toList.size should be(4)
     }
 
   }

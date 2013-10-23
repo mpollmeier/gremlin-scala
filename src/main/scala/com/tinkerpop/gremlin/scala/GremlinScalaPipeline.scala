@@ -188,9 +188,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   def retain(namedSteps: String*): GremlinScalaPipeline[S, E] = throw new NotImplementedError("not currently supported")
 
   def filter(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe(new FilterFunctionPipe[E](f))
-  def filterPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe(new FilterFunctionPipe[E](f))
   def filterNot(f: E ⇒ Boolean): GremlinScalaPipeline[S, E] = addPipe(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
-  def filterNotPF(f: PartialFunction[E, Boolean]): GremlinScalaPipeline[S, E] = addPipe(new FilterFunctionPipe[E]({ e: E ⇒ !f(e) }))
 
   def or(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, E] = addPipe(new OrFilterPipe[E](pipes: _*))
 
