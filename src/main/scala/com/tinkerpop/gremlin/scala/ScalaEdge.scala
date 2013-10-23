@@ -8,7 +8,8 @@ class ScalaEdge(val edge: Edge) extends Edge with ScalaElement {
   def outV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).outV
   def bothV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).bothV
 
-  def -> : GremlinScalaPipeline[ScalaEdge, ScalaEdge] = new GremlinScalaPipeline[ScalaEdge, ScalaEdge].start(ScalaEdge(edge))
+  def -> = startPipe
+  def startPipe: GremlinScalaPipeline[Edge, Edge] = new GremlinScalaPipeline[Edge, Edge].start(edge)
 
   val element = edge
   /** need to extend Edge so that we can use existing Gremlin Pipes... */
