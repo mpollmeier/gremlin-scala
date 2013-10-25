@@ -5,12 +5,9 @@ import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.blueprints.Vertex
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.pipes.Pipe
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class BackStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("goes back to named step") {

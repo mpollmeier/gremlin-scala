@@ -4,14 +4,11 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.scala.ScalaVertex._
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
 
-@RunWith(classOf[JUnitRunner])
 class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("Usage with Tinkergraph") {

@@ -1,15 +1,10 @@
 package com.tinkerpop.gremlin.scala
 
-import junit.framework.TestCase
 import com.tinkerpop.gremlin.Tokens
-import junit.framework.Assert._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class GremlinTest extends FunSpec with ShouldMatchers with TestGraph {
   it("specifies the right version") {
     Gremlin.version should be(Tokens.VERSION)

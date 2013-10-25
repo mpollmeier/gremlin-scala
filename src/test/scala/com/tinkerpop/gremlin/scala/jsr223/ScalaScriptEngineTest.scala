@@ -4,8 +4,6 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.scala.ScalaVertex._
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import scala.collection.JavaConversions._
@@ -14,7 +12,6 @@ import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 import com.tinkerpop.gremlin.scala.Imports
 
-@RunWith(classOf[JUnitRunner])
 class ScalaScriptEngineTest extends FunSpec with ShouldMatchers {
 
   describe("ScriptEngine") {

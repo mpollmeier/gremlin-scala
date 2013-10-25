@@ -2,14 +2,11 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints._
 import com.tinkerpop.gremlin.scala._
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import com.tinkerpop.gremlin.Tokens.T._
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
 
-@RunWith(classOf[JUnitRunner])
 class BranchStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("ifThenElse") {

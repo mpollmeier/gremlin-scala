@@ -5,12 +5,9 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.gremlin.scala._
 import com.tinkerpop.blueprints.Vertex
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class PropertyMapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the properties of one vertex") {
