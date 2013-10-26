@@ -1,13 +1,9 @@
 package com.tinkerpop.gremlin.scala.transform
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.gremlin.scala.TestGraph
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.gremlin.scala._
 
-@RunWith(classOf[JUnitRunner])
 class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the label of an edge to it's length") {

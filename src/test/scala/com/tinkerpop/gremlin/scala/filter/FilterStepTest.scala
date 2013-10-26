@@ -5,13 +5,10 @@ import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.blueprints.Vertex
 import java.lang.{ Integer ⇒ JInteger }
 import com.tinkerpop.gremlin.scala._
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.blueprints.Edge
 
-@RunWith(classOf[JUnitRunner])
 class FilterStepTest extends FunSpec with ShouldMatchers with TestGraph {
   describe("filter") {
     it("finds none") {

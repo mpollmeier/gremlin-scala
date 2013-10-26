@@ -233,8 +233,8 @@ Building Gremlin-Scala manually
 =============
 ```shell
 git clone https://github.com/mpollmeier/gremlin-scala.git
-mvn test      #run all tests
-mvn install   #installs into your local maven repository
+sbt test      #run all tests (optional)
+sbt publish-local   #so you can use it in your project
 ```
 
 

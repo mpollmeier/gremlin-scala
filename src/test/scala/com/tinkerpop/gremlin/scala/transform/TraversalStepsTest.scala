@@ -3,12 +3,9 @@ package com.tinkerpop.gremlin.scala.transform
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import com.tinkerpop.gremlin.test.ComplianceTest
 import com.tinkerpop.gremlin.scala._
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("vertice adjacency") {

@@ -2,16 +2,13 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints._
 import com.tinkerpop.gremlin.scala._
-import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import com.tinkerpop.gremlin.Tokens.T._
-import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection }
 
-@RunWith(classOf[JUnitRunner])
 class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("aggregate") {
