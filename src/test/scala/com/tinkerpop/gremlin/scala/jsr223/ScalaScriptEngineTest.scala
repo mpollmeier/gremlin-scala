@@ -12,6 +12,14 @@ import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 import com.tinkerpop.gremlin.scala.Imports
 
+/*
+ * Script engine definition doesn't play nicely together with sbt - fix later or use maven to test
+ * 
+ * Failed to initialize compiler: object scala.annotation.Annotation in compiler mirror not found.
+ * Note that as of 2.8 scala does not assume use of the java classpath.
+ * For the old behavior pass -usejavacp to scala, or if using a Settings
+ * object programatically, settings.usejavacp.value = true.
+ */
 class ScalaScriptEngineTest extends FunSpec with ShouldMatchers {
 
   describe("ScriptEngine") {
