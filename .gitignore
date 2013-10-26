@@ -2,6 +2,7 @@
 *.log
 classes
 .cache
+tags
 
 # sbt specific
 dist/*

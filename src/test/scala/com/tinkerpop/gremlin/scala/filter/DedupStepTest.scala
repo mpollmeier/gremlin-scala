@@ -7,10 +7,7 @@ import com.tinkerpop.pipes.Pipe
 import com.tinkerpop.blueprints.{ Graph, Vertex }
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class DedupStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("dedups vertices") {

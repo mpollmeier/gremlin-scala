@@ -1,14 +1,11 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.gremlin.Tokens.T
 import com.tinkerpop.gremlin.scala.TestGraph
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class HasStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("finds by id") {

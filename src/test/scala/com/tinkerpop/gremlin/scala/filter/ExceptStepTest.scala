@@ -1,14 +1,11 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import org.junit.runner.RunWith
 import scala.collection.mutable
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.scala.TestGraph
-import org.scalatest.junit.JUnitRunner
 import com.tinkerpop.blueprints.Vertex
 
-@RunWith(classOf[JUnitRunner])
 class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("emits everything except what is in the supplied collection") {

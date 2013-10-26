@@ -1,12 +1,9 @@
 package com.tinkerpop.gremlin.scala.filter
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.scala.TestGraph
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class RetainStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("retains everything except what is in the supplied collection") {

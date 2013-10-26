@@ -1,13 +1,11 @@
 package com.tinkerpop.gremlin.scala.transform
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import com.tinkerpop.gremlin.scala.ScalaVertex
 import com.tinkerpop.gremlin.scala.TestGraph
 
-import org.scalatest.junit.JUnitRunner
 
 import scala.collection.JavaConversions._;
 
@@ -15,7 +13,6 @@ import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.transform.TransformPipe.Order
 import com.tinkerpop.blueprints.Vertex
 
-@RunWith(classOf[JUnitRunner])
 class ScatterStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("uses scatter to unroll elements that have been gathered before") {
