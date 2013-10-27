@@ -229,6 +229,12 @@ Example 2: to access the properties of elements (vertices or edges) you have the
 ```
 Check out the sample usage above for more details.
 
+
+Further reading
+=============
+[Shortest path algorithm with Gremlin-Scala 2.4.1 (Stefan Bleibinhaus)](http://bleibinha.us/blog/2013/10/scala-and-graph-databases-with-gremlin-scala)
+
+
 Building Gremlin-Scala manually
 =============
 ```shell
