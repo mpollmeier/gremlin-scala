@@ -10,7 +10,7 @@ class TransformStepsSpec extends FunSpec with ShouldMatchers with TestGraph {
   describe("path") {
 
     it("returns a list with all objects in the path") {
-      graph.v(1).startPipe.out().path.toList should be(
+      graph.v(1).startPipe.out.path.toList should be(
         Seq(
           Seq(v1, v2),
           Seq(v1, v4),

@@ -12,7 +12,7 @@ class BackStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("goes back to named step") {
     val startVertex: ScalaVertex = graph.v(1)
-    graph.v(1).startPipe.as("here").out().back("here").name.toList should be(List(startVertex.name))
+    graph.v(1).startPipe.as("here").out.back("here").name.toList should be(List(startVertex.name))
   }
 
 }

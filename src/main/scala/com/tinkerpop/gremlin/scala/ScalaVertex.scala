@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.VertexQuery
 class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   /** follow all outgoing edges to the vertices */
   def out: GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out()
+    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out
 
   /** follow outgoing edges to the vertices, limited by given branch factor */
   def out(branchFactor: Int): GremlinScalaPipeline[Vertex, Vertex] =
@@ -25,7 +25,7 @@ class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
 
   /** follow all outgoing edges */
   def outE: GremlinScalaPipeline[Vertex, Edge] =
-    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE()
+    new GremlinScalaPipeline[Vertex, Edge].start(vertex).outE
 
   /** follow all outgoing edges, limited by given branch factor */
   def outE(branchFactor: Int): GremlinScalaPipeline[Vertex, Edge] =
@@ -41,7 +41,7 @@ class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
 
   /** follow all incoming edges to the vertices */
   def in: GremlinScalaPipeline[Vertex, Vertex] =
-    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).in().asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
+    new GremlinScalaPipeline[Vertex, Vertex].start(vertex).in.asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
 
   /** follow all incoming edges to the vertices, limited by given branch factor */
   def in(branchFactor: Int): GremlinScalaPipeline[Vertex, Vertex] =

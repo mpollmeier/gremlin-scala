@@ -16,7 +16,7 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("works nicely with aggregate") {
     val buffer = mutable.Buffer.empty[Vertex]
-    val result = graph.v(1).out.aggregate(buffer).in().except(buffer).toList.toSet
+    val result = graph.v(1).out.aggregate(buffer).in.except(buffer).toList.toSet
 
     result.contains(graph.v(1)) should be(true)
     result.contains(graph.v(6)) should be(true)
@@ -57,7 +57,7 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
     // prerequisite tests
     val v3 = graph.v(3)
     graph.v(1).out.toList.toSet.contains(v3) should be(true)
-    graph.v(1).out.out().toList.toSet.contains(v3) should be(true)
+    graph.v(1).out.out.toList.toSet.contains(v3) should be(true)
 
     //    print(graph.v(1).out)
     //    print(graph.v(1).out.out)
@@ -65,7 +65,7 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
     //    print(graph.v(1).out.as("1").out.except("1"))
 
     val namedStep = "contains v[3]"
-    graph.v(1).out().as(namedStep).out().except(namedStep).toList.toSet.contains(v3) should be(false)
+    graph.v(1).out.as(namedStep).out().except(namedStep).toList.toSet.contains(v3) should be(false)
 
   }
 

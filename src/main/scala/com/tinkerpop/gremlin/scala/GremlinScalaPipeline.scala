@@ -29,20 +29,24 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def label: GremlinScalaPipeline[S, String] = addPipe(new LabelPipe)
 
+  def out: GremlinScalaPipeline[S, Vertex] = out()
   def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
   def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
     addVertexPipe(branchFactor, Direction.OUT, labels: _*)
 
+  def outE: GremlinScalaPipeline[S, Edge] = outE()
   def outE(labels: String*): GremlinScalaPipeline[S, Edge] = outE(branchFactor = Int.MaxValue, labels: _*)
   def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
     addVertexPipe(branchFactor, Direction.OUT, labels: _*)
 
   def outV: GremlinScalaPipeline[S, Vertex] = addPipe(new OutVertexPipe)
 
+  def in: GremlinScalaPipeline[S, Vertex] = in()
   def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
     addVertexPipe(branchFactor, Direction.IN, labels: _*)
 
+  def inE: GremlinScalaPipeline[S, Edge] = inE()
   def inE(labels: String*): GremlinScalaPipeline[S, Edge] = inE(branchFactor = Int.MaxValue, labels: _*)
   def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
     addVertexPipe(branchFactor, Direction.IN, labels: _*)

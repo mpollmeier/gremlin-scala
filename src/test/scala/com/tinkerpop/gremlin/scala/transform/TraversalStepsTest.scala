@@ -88,8 +88,8 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("traverses multiple steps") {
-      graph.v(1).out().out().property("name").toList should be(List("ripple", "lop"))
-      graph.v(1).out().out().out().property("name").toList should be(Nil)
+      graph.v(1).out.out().property("name").toList should be(List("ripple", "lop"))
+      graph.v(1).out.out().out().property("name").toList should be(Nil)
     }
   }
 
