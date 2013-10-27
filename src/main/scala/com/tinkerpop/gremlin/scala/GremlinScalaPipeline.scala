@@ -54,10 +54,13 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(new VertexQueryPipe(clazz, direction, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
   }
 
-  def path: GremlinScalaPipeline[S, Seq[_]] =
-    addPipe(new PathPipe[Any]).map(_.toSeq)
-
-  //   def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
+  /** Gets the objects on each step on the path through the pipeline as lists. Example:
+   *  graph.v(1).out.path
+   *  ==>[v[1], v[2]]
+   *  ==>[v[1], v[4]]
+   *  ==>[v[1], v[3]]
+   */
+  def path: GremlinScalaPipeline[S, Seq[_]] = addPipe(new PathPipe[Any]).map(_.toSeq)
 
   def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] =
     manualStart(graph.getVertices)
@@ -215,14 +218,14 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   /** Like aggregate, but applies `fun` to each element prior to adding it to the Buffer */
   def aggregate[F](buffer: mutable.Buffer[F])(fun: E ⇒ F): GremlinScalaPipeline[S, E] =
-    addPipe(new AggregatePipe[E](buffer, new ScalaPipeFunction(fun)))
+    addPipe(new AggregatePipe[E](buffer, fun))
 
   /** Emits input, but adds input to collection. This is a lazy step, i.e. it adds it to the buffer as the elements are being traversed.  */
   def store(buffer: mutable.Buffer[E]): GremlinScalaPipeline[S, E] = addPipe(new StorePipe[E](buffer))
 
   /** Like store , but applies `fun` to each element prior to adding it to the Buffer */
   def store[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
-    addPipe(new StorePipe[E](buffer, new ScalaPipeFunction(fun)))
+    addPipe(new StorePipe[E](buffer, fun))
 
   def optional(namedStep: String): GremlinScalaPipeline[S, _] =
     addPipe(new OptionalPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep))))
@@ -235,7 +238,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(
       new GroupByPipe(
         map,
-        new ScalaPipeFunction(keyFunction),
+        keyFunction,
         new ScalaPipeFunction(valueFunction).asInstanceOf[ScalaPipeFunction[E, Any]])
     )
 
@@ -245,8 +248,7 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   //   def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
 
   def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, F] = {
-    val sideEffectPipe = new ScalaPipeFunction(sideEffectFunction)
-    addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectPipe))).asInstanceOf[GremlinScalaPipeline[S, F]]
+    addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, F]]
   }
 
   //   def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
