@@ -49,7 +49,8 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def inV: GremlinScalaPipeline[S, Vertex] = addPipe(new InVertexPipe)
 
-  //  def path: GremlinScalaPipeline[S, JList[_]] = super.path()
+  def path: GremlinScalaPipeline[S, JList[_]] =
+    addPipe(new PathPipe[Any])
   //   def path(pathFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, JList[_]] = super.path(pathFunctions: _*)
 
   def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] =
