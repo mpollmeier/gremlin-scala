@@ -6,26 +6,14 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 
 class TransformStepsSpec extends FunSpec with ShouldMatchers with TestGraph {
-
   describe("path") {
     it("returns a list with all objects in the path") {
       val paths = graph.v(1).->.out().path.toList
       paths.size should be(3)
-      //[v[1], v[2]]
-      //[v[1], v[4]]
-      //[v[1], v[3]]
-      //      println(paths(0))
-      //      println(paths(1))
-      //      println(paths(2))
 
-      paths(0).get(0) should be(graph.v(1))
-      paths(0).get(1) should be(graph.v(2))
-
-      paths(1).get(0) should be(graph.v(1))
-      paths(1).get(1) should be(graph.v(4))
-
-      paths(2).get(0) should be(graph.v(1))
-      paths(2).get(1) should be(graph.v(3))
+      paths(0) should be(Seq(v1, v2))
+      paths(1) should be(Seq(v1, v4))
+      paths(2) should be(Seq(v1, v3))
     }
 
     //  def test_g_v1_propertyXnameX_path() {
