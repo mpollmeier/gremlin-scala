@@ -20,6 +20,7 @@ import scala.language.dynamics
 import scala.collection.convert.wrapAsJava
 import scala.collection.JavaConversions._
 import scala.collection.mutable
+import scala.reflect.{ classTag, ClassTag }
 
 class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   //   def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
@@ -30,26 +31,28 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
   def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    addVertexPipe(classOf[Vertex], branchFactor, Direction.OUT, labels: _*)
+    addVertexPipe(branchFactor, Direction.OUT, labels: _*)
 
   def outE(labels: String*): GremlinScalaPipeline[S, Edge] = outE(branchFactor = Int.MaxValue, labels: _*)
   def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    addVertexPipe(classOf[Edge], branchFactor, Direction.OUT, labels: _*)
+    addVertexPipe(branchFactor, Direction.OUT, labels: _*)
 
   def outV: GremlinScalaPipeline[S, Vertex] = addPipe(new OutVertexPipe)
 
   def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    addVertexPipe(classOf[Vertex], branchFactor, Direction.IN, labels: _*)
+    addVertexPipe(branchFactor, Direction.IN, labels: _*)
 
   def inE(labels: String*): GremlinScalaPipeline[S, Edge] = inE(branchFactor = Int.MaxValue, labels: _*)
   def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    addVertexPipe(classOf[Edge], branchFactor, Direction.IN, labels: _*)
+    addVertexPipe(branchFactor, Direction.IN, labels: _*)
 
   def inV: GremlinScalaPipeline[S, Vertex] = addPipe(new InVertexPipe)
 
-  def addVertexPipe[A <: Element](clazz: Class[A], branchFactor: Int, direction: Direction, labels: String*): GremlinScalaPipeline[S, A] =
+  def addVertexPipe[A <: Element: ClassTag](branchFactor: Int, direction: Direction, labels: String*): GremlinScalaPipeline[S, A] = {
+    val clazz = classTag[A].runtimeClass.asInstanceOf[Class[A]]
     addPipe(new VertexQueryPipe(clazz, direction, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+  }
 
   def path: GremlinScalaPipeline[S, JList[_]] =
     addPipe(new PathPipe[Any])
