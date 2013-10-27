@@ -1,6 +1,5 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.gremlin.java.GremlinPipeline
 import com.tinkerpop.blueprints._
 import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
 import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
@@ -31,23 +30,26 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
 
   def out(labels: String*): GremlinScalaPipeline[S, Vertex] = out(branchFactor = Int.MaxValue, labels: _*)
   def out(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    outE(branchFactor, labels: _*).inV
+    addVertexPipe(classOf[Vertex], branchFactor, Direction.OUT, labels: _*)
 
   def outE(labels: String*): GremlinScalaPipeline[S, Edge] = outE(branchFactor = Int.MaxValue, labels: _*)
   def outE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    addPipe(new VertexQueryPipe(classOf[Edge], Direction.OUT, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    addVertexPipe(classOf[Edge], branchFactor, Direction.OUT, labels: _*)
 
   def outV: GremlinScalaPipeline[S, Vertex] = addPipe(new OutVertexPipe)
 
   def in(labels: String*): GremlinScalaPipeline[S, Vertex] = in(branchFactor = Int.MaxValue, labels: _*)
   def in(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Vertex] =
-    addPipe(new VertexQueryPipe(classOf[Vertex], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    addVertexPipe(classOf[Vertex], branchFactor, Direction.IN, labels: _*)
 
   def inE(labels: String*): GremlinScalaPipeline[S, Edge] = inE(branchFactor = Int.MaxValue, labels: _*)
   def inE(branchFactor: Int, labels: String*): GremlinScalaPipeline[S, Edge] =
-    addPipe(new VertexQueryPipe(classOf[Edge], Direction.IN, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
+    addVertexPipe(classOf[Edge], branchFactor, Direction.IN, labels: _*)
 
   def inV: GremlinScalaPipeline[S, Vertex] = addPipe(new InVertexPipe)
+
+  def addVertexPipe[A <: Element](clazz: Class[A], branchFactor: Int, direction: Direction, labels: String*): GremlinScalaPipeline[S, A] =
+    addPipe(new VertexQueryPipe(clazz, direction, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
 
   def path: GremlinScalaPipeline[S, JList[_]] =
     addPipe(new PathPipe[Any])
