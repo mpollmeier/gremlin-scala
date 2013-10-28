@@ -263,14 +263,6 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, F]]
   }
 
-  //   def table(table: Table, stepNames: JCollection[String], columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] =
-  //    super.table(table, stepNames, columnFunctions: _*)
-  //
-  //   def table(table: Table, columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(table, columnFunctions: _*)
-  //   def table(columnFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.table(columnFunctions: _*)
-  //   def table(table: Table): GremlinScalaPipeline[S, E] = super.table(table)
-  //   def table: GremlinScalaPipeline[S, E] = super.table()
-  //
   //   def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
   //   def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
 
