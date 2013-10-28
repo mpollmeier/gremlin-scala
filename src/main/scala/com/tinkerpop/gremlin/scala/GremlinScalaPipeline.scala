@@ -58,14 +58,6 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(new VertexQueryPipe(clazz, direction, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
   }
 
-  /** Gets the objects on each step on the path through the pipeline as lists. Example:
-   *  graph.v(1).out.path
-   *  ==>[v[1], v[2]]
-   *  ==>[v[1], v[4]]
-   *  ==>[v[1], v[3]]
-   */
-  def path: GremlinScalaPipeline[S, Seq[_]] = addPipe(new PathPipe[Any]).map(_.toSeq)
-
   def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] =
     manualStart(graph.getVertices)
 
@@ -120,6 +112,22 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   def propertyMap: GremlinScalaPipeline[S, Map[String, Any]] = propertyMap()
 
   def property[F](key: String): GremlinScalaPipeline[S, F] = addPipe(new PropertyPipe(key, false))
+
+  /** Gets the objects on each step on the path through the pipeline as lists. Example:
+   *  graph.v(1).out.path
+   *  ==>[v[1], v[2]]
+   *  ==>[v[1], v[4]]
+   *  ==>[v[1], v[3]]
+   */
+  def path: GremlinScalaPipeline[S, Seq[_]] = addPipe(new PathPipe[Any]).map(_.toSeq)
+
+  /** Gets the objects on each named step on the path through the pipeline as rows. */
+  def select: GremlinScalaPipeline[S, Row[_]] =
+    addPipe(new SelectPipe(null, FluentUtility.getAsPipes(this)))
+
+  /** Gets the objects for given named steps on the path through the pipeline as rows. */
+  def select(steps: String*): GremlinScalaPipeline[S, Row[_]] =
+    addPipe(new SelectPipe(steps, FluentUtility.getAsPipes(this)))
 
   ////////////////////
   /// BRANCH PIPES ///
@@ -356,11 +364,6 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   ///////////////////////
   //   def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
   //   def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
-
-  //   def select: GremlinScalaPipeline[S, Row[_]] = super.select()
-  //   def select(stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] = super.select(stepFunctions: _*)
-  //   def select(stepNames: JCollection[String], stepFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, Row[_]] =
-  //    super.select(stepNames, stepFunctions: _*)
 
   /** Add a ShufflePipe to the end of the Pipeline.
    *  All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted

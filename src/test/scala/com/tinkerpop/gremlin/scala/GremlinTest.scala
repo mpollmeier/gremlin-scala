@@ -39,6 +39,8 @@ trait TestGraph {
   val v2 = graph.v(2)
   val v3 = graph.v(3)
   val v4 = graph.v(4)
+  val v5 = graph.v(5)
+  val v6 = graph.v(6)
 
   def print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toList)
 }
