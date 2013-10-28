@@ -264,31 +264,6 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   /** Emit input, but stores the tree formed by the traversal as a map. */
   def tree: GremlinScalaPipeline[S, E] = addPipe(new TreePipe)
 
-  /** Add a OrderMapPipe to the end of the Pipeline
-   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
-   *
-   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
-   *  @return the extended Pipeline
-   */
-  //   def orderMap(by: Tokens.T): GremlinScalaPipeline[S, _] = super.orderMap(by)
-
-  /** Add a OrderMapPipe to the end of the Pipeline
-   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
-   *
-   *  @param order if the values implement Comparable, then a increment or decrement sort is usable
-   *  @return the extended Pipeline
-   */
-  //   def orderMap(by: TransformPipe.Order): GremlinScalaPipeline[S, _] = super.orderMap(by)
-
-  /** Add a OrderMapPipe to the end of the Pipeline
-   *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
-   *
-   *  @param compareFunction a function to compare to map entries
-   *  @return the extended Pipeline
-   */
-  //  def orderMap(by: TinkerPair[JMap.Entry[_, _], JMap.Entry[_, _]] ⇒ Integer): GremlinScalaPipeline[S, _] =
-  //    super.orderMap(new ScalaPipeFunction(by))
-
   /** Add a LinkPipe to the end of the Pipeline.
    *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
    *
