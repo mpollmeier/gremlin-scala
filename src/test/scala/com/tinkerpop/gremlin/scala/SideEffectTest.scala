@@ -46,6 +46,20 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
     }
   }
 
+  describe("optional") {
+    //TODO: fix - standard pipe doesn't seem to work...?
+    ignore("adds the output of a named step to the current step") {
+      val namedStep = "named step"
+      val overThirty = (v: Vertex) ⇒ v.getProperty[Int]("age") > 30
+
+      graph.V.filter(overThirty).toList should be(List(v6, v4))
+
+      graph.V.filter(overThirty).as(namedStep).out.optional(namedStep).toList should be(
+        List(v6, v4, v3, v5, v3)
+      )
+    }
+  }
+
   describe("groupBy") {
     it("groups tinkerpop team by age range") {
       //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[Vertex]]

@@ -239,6 +239,9 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   def store[F](buffer: mutable.Buffer[F], fun: E ⇒ F): GremlinScalaPipeline[S, E] =
     addPipe(new StorePipe[E](buffer, fun))
 
+  /** Behaves similar to `back` except that it does not filter. It will go down a particular path and back up to where it left off.
+   *  As such, its useful for yielding a side-effect down a particular branch.
+   */
   def optional(namedStep: String): GremlinScalaPipeline[S, _] =
     addPipe(new OptionalPipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep))))
 
