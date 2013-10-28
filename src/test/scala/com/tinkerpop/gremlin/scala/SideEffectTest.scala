@@ -8,6 +8,7 @@ import com.tinkerpop.gremlin.Tokens.T._
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection }
+import com.tinkerpop.pipes.util.structures.Tree
 
 class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
@@ -44,6 +45,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       buffer should be(mutable.Buffer("vadas", "josh", "lop"))
     }
   }
+
   describe("groupBy") {
     it("groups tinkerpop team by age range") {
       //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[Vertex]]
@@ -55,7 +57,15 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       result(overThirty).toList should be(List("peter", "josh"))
       result(unknown).toList should be(List("lop", "ripple"))
     }
+  }
 
+  describe("tree") {
+    it("stores the tree formed by the traversal as a map") {
+      val tree = graph.v(1).out.out.tree.cap.toList.head.asInstanceOf[Tree[Vertex]]
+      tree.keys should be(Set(v1))
+      tree.toString should be("{v[1]={v[4]={v[3]={}, v[5]={}}}}")
+      //TODO: reimplement with proper types and proper test
+    }
   }
 
   def getName(v: Vertex) = v.getProperty[String]("name")

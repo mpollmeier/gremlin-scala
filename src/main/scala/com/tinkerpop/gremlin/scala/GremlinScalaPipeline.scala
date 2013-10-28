@@ -263,8 +263,8 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, F]]
   }
 
-  //   def tree(tree: Tree[_], branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(tree, branchFunctions: _*)
-  //   def tree(branchFunctions: PipeFunction[_, _]*): GremlinScalaPipeline[S, E] = super.tree(branchFunctions: _*)
+  /** Emit input, but stores the tree formed by the traversal as a map. */
+  def tree: GremlinScalaPipeline[S, E] = addPipe(new TreePipe)
 
   /** Add a OrderMapPipe to the end of the Pipeline
    *  Given a Map as an input, the map is first ordered and then the keys are emitted in the order.
