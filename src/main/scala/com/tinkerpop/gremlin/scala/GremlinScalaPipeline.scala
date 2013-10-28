@@ -330,8 +330,14 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   ///////////////////////
   /// TRANSFORM PIPES ///
   ///////////////////////
-  //   def memoize(namedStep: String): GremlinScalaPipeline[S, E] = super.memoize(namedStep)
-  //   def memoize(namedStep: String, map: JMap[_, _]): GremlinScalaPipeline[S, E] = super.memoize(namedStep, map)
+
+  /** Remembers a particular mapping from input to output. Long or expensive expressions with no side effects can use this step
+   *  to remember a mapping, which helps reduce load when previously processed objects are passed into it.
+   *  For situations where memoization may consume large amounts of RAM, consider using an embedded key-value store like JDBM or
+   *  some other persistent Map implementation.
+   */
+  def memoize(namedStep: String): GremlinScalaPipeline[S, E] =
+    addPipe(new MemoizePipe(new Pipeline(FluentUtility.removePreviousPipes(this, namedStep))))
 
   /** Add a ShufflePipe to the end of the Pipeline.
    *  All the objects previous to this step are aggregated in a greedy fashion, their order randomized and emitted
