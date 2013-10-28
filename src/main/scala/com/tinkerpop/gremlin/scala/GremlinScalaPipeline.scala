@@ -254,10 +254,8 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
         new ScalaPipeFunction(valueFunction).asInstanceOf[ScalaPipeFunction[E, Any]])
     )
 
-  //   def groupCount(map: JMap[_, Number], keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(map, keyFunction)
-  //   def groupCount(keyFunction: PipeFunction[_, _]): GremlinScalaPipeline[S, E] = super.groupCount(keyFunction)
-  //   def groupCount(map: JMap[_, Number]): GremlinScalaPipeline[S, E] = super.groupCount(map)
-  //   def groupCount: GremlinScalaPipeline[S, E] = super.groupCount()
+  /** counts each traversed object and stores it in a map */
+  def groupCount: GremlinScalaPipeline[S, E] = addPipe(new GroupCountPipe)
 
   def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, F] = {
     addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, F]]

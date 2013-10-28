@@ -68,6 +68,17 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
     }
   }
 
+  describe("groupCount") {
+    it("counts each traversed object and stores it in a map") {
+      val counts: mutable.Map[Vertex, Int] = graph.V.out("created").groupCount.cap.toList.head.asInstanceOf[java.util.HashMap[Vertex, Int]]
+      counts should be(
+        mutable.Map(
+          (v3, 3),
+          (v5, 1))
+      )
+    }
+  }
+
   def getName(v: Vertex) = v.getProperty[String]("name")
   def getAge(v: Vertex) = v.getProperty[Integer]("age")
 
