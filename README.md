@@ -2,7 +2,8 @@
 
 Gremlin-Scala
 =============
-A thin Scala wrapper for Gremlin, a graph DSL for traversing a number of graph databases including
+A thin wrapper for Gremlin to make it easily usable for Scala Developers. 
+Gremlin is a graph DSL for traversing a number of graph databases including
 [Neo4j](http://neo4j.org/),
 [OrientDB](http://www.orientechnologies.com/),
 [DEX](http://www.sparsity-technologies.com/dex),
@@ -10,6 +11,8 @@ A thin Scala wrapper for Gremlin, a graph DSL for traversing a number of graph d
 [Titan](http://thinkaurelius.github.com/titan/),
 [Rexster graph server](http://rexster.tinkerpop.com),
 and [Sesame 2.0 compliant RDF stores](http://www.openrdf.org).
+
+[![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=master)](http://travis-ci.org/mpollmeier/gremlin-scala)
 
 For more information about Gremlin see the [Gremlin docs](http://gremlindocs.com/), [Gremlin wiki](https://github.com/tinkerpop/gremlin/wiki).
 [Gremlin-Steps](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Steps) and [Methods](https://github.com/tinkerpop/gremlin/wiki/Gremlin-Methods). 
