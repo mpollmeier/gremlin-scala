@@ -1,8 +1,8 @@
 package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints._
-import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, List ⇒ JList, Iterator ⇒ JIterator, Collection ⇒ JCollection, ArrayList ⇒ JArrayList }
-import java.lang.{ Boolean ⇒ JBoolean, Integer ⇒ JInteger, Iterable ⇒ JIterable }
+import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection }
+import java.lang.{ Boolean ⇒ JBoolean, Iterable ⇒ JIterable }
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes._
 import com.tinkerpop.pipes.branch.LoopPipe.LoopBundle
