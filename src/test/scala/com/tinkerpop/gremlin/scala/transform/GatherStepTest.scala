@@ -2,10 +2,10 @@ package com.tinkerpop.gremlin.scala.transform
 
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.gremlin.scala.ScalaVertex
 import com.tinkerpop.gremlin.scala.TestGraph
 import com.tinkerpop.gremlin.Tokens
 import com.tinkerpop.pipes.transform.TransformPipe.Order
+import com.tinkerpop.gremlin.scala._
 
 class GatherStepTest extends FunSpec with ShouldMatchers with TestGraph {
 

@@ -4,14 +4,16 @@ import com.tinkerpop.blueprints.{ Vertex, Edge, Direction }
 
 /**Adds convenience methods to [[com.tinkerpop.blueprints.Edge]]. */
 class ScalaEdge(val edge: Edge) extends Edge with ScalaElement {
-  def inV: GremlinScalaPipeline[ScalaEdge, Vertex] = new GremlinScalaPipeline[ScalaEdge, Vertex].start(ScalaEdge(edge)).inV
+  def inV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).inV
   def outV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).outV
   def bothV: GremlinScalaPipeline[Edge, Vertex] = new GremlinScalaPipeline[Edge, Vertex].start(edge).bothV
 
-  def -> : GremlinScalaPipeline[ScalaEdge, ScalaEdge] = new GremlinScalaPipeline[ScalaEdge, ScalaEdge].start(ScalaEdge(edge))
+  def -> = startPipe
+  def startPipe: GremlinScalaPipeline[Edge, Edge] = new GremlinScalaPipeline[Edge, Edge].start(edge)
 
   val element = edge
   /** need to extend Edge so that we can use existing Gremlin Pipes... */
+  def label = getLabel
   def getLabel: String = edge.getLabel
   def getVertex(direction: Direction): Vertex = edge.getVertex(direction)
 

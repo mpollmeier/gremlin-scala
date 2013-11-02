@@ -35,5 +35,12 @@ trait TestGraph {
   def vertices = graph.V
   def edges = graph.E
 
-  def print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toScalaList)
+  val v1 = graph.v(1)
+  val v2 = graph.v(2)
+  val v3 = graph.v(3)
+  val v4 = graph.v(4)
+  val v5 = graph.v(5)
+  val v6 = graph.v(6)
+
+  def print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toList)
 }
