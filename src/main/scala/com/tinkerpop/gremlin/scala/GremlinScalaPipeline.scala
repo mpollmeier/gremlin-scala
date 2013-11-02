@@ -359,8 +359,17 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     this.asInstanceOf[GremlinScalaPipeline[S, S]]
   }
 
-  def toStream(): Stream[E] = iterableAsScalaIterable(this).toStream
+  /** run through pipeline and get results as List */
   def toList[_](): List[E] = iterableAsScalaIterable(this).toList
+
+  /** run through pipeline and get results as Set */
+  def toSet[_](): Set[E] = iterableAsScalaIterable(this).toSet
+
+  /** run through pipeline and get results as Stream */
+  def toStream(): Stream[E] = iterableAsScalaIterable(this).toStream
+
+  /** Completely drain the pipeline of its objects - useful when a sideEffect of the pipeline is desired */
+  override def iterate() = PipeHelper.iterate(this)
 
   def addPipe[T](pipe: Pipe[_ <: Any, T]): GremlinScalaPipeline[S, T] = {
     super.addPipe(pipe)
