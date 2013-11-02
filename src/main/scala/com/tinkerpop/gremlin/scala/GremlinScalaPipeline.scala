@@ -409,7 +409,8 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     this.asInstanceOf[GremlinScalaPipeline[S, S]]
   }
 
-  def toList[_](): Seq[E] = iterableAsScalaIterable(this).toSeq
+  def toStream(): Stream[E] = iterableAsScalaIterable(this).toStream
+  def toList[_](): List[E] = iterableAsScalaIterable(this).toList
 
   def addPipe[T](pipe: Pipe[_ <: Any, T]): GremlinScalaPipeline[S, T] = {
     super.addPipe(pipe)
