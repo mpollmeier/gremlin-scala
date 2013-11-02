@@ -260,9 +260,9 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   /** counts each traversed object and stores it in a map */
   def groupCount: GremlinScalaPipeline[S, E] = addPipe(new GroupCountPipe)
 
-  def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, F] = {
-    addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, F]]
-  }
+  /** Emits input, but calls a side effect closure on each input. */
+  def sideEffect[F](sideEffectFunction: E ⇒ F): GremlinScalaPipeline[S, E] =
+    addPipe(new SideEffectFunctionPipe(FluentUtility.prepareFunction(asMap, sideEffectFunction))).asInstanceOf[GremlinScalaPipeline[S, E]]
 
   /** Emit input, but stores the tree formed by the traversal as a map. */
   def tree: GremlinScalaPipeline[S, E] = addPipe(new TreePipe)

@@ -12,6 +12,19 @@ import com.tinkerpop.pipes.util.structures.Tree
 
 class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
+  describe("sideEffect") {
+    it("executes a side effect") {
+      var youngest = Int.MaxValue
+
+      graph.V.has("age").sideEffect { vertex ⇒
+        val age = vertex.getProperty[Integer]("age")
+        if (age < youngest) youngest = age
+      }.toList
+
+      youngest should be(27)
+    }
+  }
+
   describe("aggregate") {
     it("fills a buffer greedily") {
       val buffer = mutable.Buffer.empty[Vertex]
