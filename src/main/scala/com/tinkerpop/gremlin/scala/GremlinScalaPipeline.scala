@@ -23,9 +23,7 @@ import scala.collection.mutable
 import scala.reflect.{ classTag, ClassTag }
 
 class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
-  //   def idEdge(graph: Graph): GremlinScalaPipeline[S, Edge] = super.idEdge(graph)
   def id: GremlinScalaPipeline[S, Object] = addPipe(new IdPipe)
-  //   def idVertex(graph: Graph): GremlinScalaPipeline[S, Vertex] = super.idVertex(graph)
 
   def label: GremlinScalaPipeline[S, String] = addPipe(new LabelPipe)
 
