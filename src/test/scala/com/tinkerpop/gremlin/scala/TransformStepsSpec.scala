@@ -6,6 +6,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
 import com.tinkerpop.pipes.util.structures.Row
 import scala.collection.JavaConversions._
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 
 class TransformStepsSpec extends FunSpec with ShouldMatchers with TestGraph {
 
@@ -42,6 +43,37 @@ class TransformStepsSpec extends FunSpec with ShouldMatchers with TestGraph {
         )
       )
     }
+  }
+
+  describe("linkBoth [In/Out]") {
+
+    trait Scenario {
+      val graph: ScalaGraph = TinkerGraphFactory.createTinkerGraph
+      val marko = graph.v(1)
+    }
+
+    it("links vertices in BOTH directions") {
+      new Scenario {
+        graph.V.except(List(marko)).linkBoth("connected",marko).toList
+        marko.out("connected").count should be(5)
+        marko.in("connected").count should be(5)
+      }
+    }
+
+    it("links vertices in OUT direction") {
+      new Scenario {
+        graph.V.except(List(marko)).linkOut("connected",marko).toList
+        marko.in("connected").count should be(5)
+      }
+    }
+
+    it("links vertices in IN direction") {
+      new Scenario {
+        graph.V.except(List(marko)).linkIn("connected",marko).toList
+        marko.out("connected").count should be(5)
+      }
+    }
+
   }
 
 }

@@ -267,69 +267,21 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   /** Emit input, but stores the tree formed by the traversal as a map. */
   def tree: GremlinScalaPipeline[S, E] = addPipe(new TreePipe)
 
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
-   *
-   *  @param label     the edge label
-   *  @param namedStep the step name that has the other vertex to link to
-   *  @return the extended Pipeline
-   */
-  //   def linkOut(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] = {
-  //      super.linkOut(label, namedStep)
-
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
-   *
-   *  @param label     the edge label
-   *  @param namedStep the step name that has the other vertex to link to
-   *  @return the extended Pipeline
-   */
-  //   def linkIn(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
-  //    super.linkIn(label, namedStep)
-
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
-   *
-   *  @param label     the edge label
-   *  @param namedStep the step name that has the other vertex to link to
-   *  @return the extended Pipeline
-   */
-  //   def linkBoth(label: String, namedStep: String): GremlinScalaPipeline[S, Vertex] =
-  //    super.linkBoth(label, namedStep)
-
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an outgoing edge to incoming vertex.
-   *
-   *  @param label the edge label
-   *  @param other the other vertex
-   *  @return the extended Pipeline
-   */
-  //   def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-  //    super.linkOut(label, other)
-
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an incoming edge to incoming vertex.
-   *
-   *  @param label the edge label
-   *  @param other the other vertex
-   *  @return the extended Pipeline
-   */
-  //   def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-  //    super.linkIn(label, other)
-
-  /** Add a LinkPipe to the end of the Pipeline.
-   *  Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex.
-   *
-   *  @param label the edge label
-   *  @param other the other vertex
-   *  @return the extended Pipeline
-   */
-  //   def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] =
-  //    super.linkBoth(label, other)
-
   ///////////////////////
   /// TRANSFORM PIPES ///
   ///////////////////////
+
+  /** Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex. */
+  def linkBoth(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] = 
+    addPipe(new LinkPipe(Direction.BOTH, label, other))
+
+  /** Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex. */
+  def linkOut(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] = 
+    addPipe(new LinkPipe(Direction.OUT, label, other))
+
+  /** Emit the incoming vertex, but have other vertex provide an incoming and outgoing edge to incoming vertex. */
+  def linkIn(label: String, other: Vertex): GremlinScalaPipeline[S, Vertex] = 
+    addPipe(new LinkPipe(Direction.IN, label, other))
 
   /** Remembers a particular mapping from input to output. Long or expensive expressions with no side effects can use this step
    *  to remember a mapping, which helps reduce load when previously processed objects are passed into it.
