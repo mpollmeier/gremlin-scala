@@ -11,21 +11,21 @@ import org.scalatest.FunSpec
 class PropertyMapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the properties of one vertex") {
-    graph.v(1).->.propertyMap.toList should be(List(
-      Map("name" -> "marko", "age" -> 29)))
+    graph.v(1).startPipe.propertyMap.toList should be(List(
+      Map("name" → "marko", "age" → 29)))
   }
 
   it("maps the properties of everybody who knows marko") {
     graph.v(1).out("knows").propertyMap.toList should be(
       List(
-        Map("name" -> "vadas", "age" -> 27),
-        Map("name" -> "josh", "age" -> 32))
+        Map("name" → "vadas", "age" → 27),
+        Map("name" → "josh", "age" → 32))
     )
   }
 
   it("maps the properties for a given key for one vertex") {
-    graph.v(1).->.propertyMap("name", "doesnt exit").toList should be(List(
-      Map("name" -> "marko")))
+    graph.v(1).startPipe.propertyMap("name", "doesnt exit").toList should be(List(
+      Map("name" → "marko")))
   }
 
 }

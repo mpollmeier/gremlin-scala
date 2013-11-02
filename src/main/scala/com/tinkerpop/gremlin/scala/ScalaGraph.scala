@@ -21,7 +21,7 @@ class ScalaGraph(val graph: Graph) {
   /**Returns the edge with the specified ID. */
   def e(id: Any): Edge = graph.getEdge(id)
 
-  def -> : GremlinScalaPipeline[ScalaGraph, ScalaGraph] =
+  def startPipe : GremlinScalaPipeline[ScalaGraph, ScalaGraph] =
     new GremlinScalaPipeline[ScalaGraph, ScalaGraph].start(ScalaGraph(graph))
 
   /** add vertex; id defaults to null which will generate a random id*/
