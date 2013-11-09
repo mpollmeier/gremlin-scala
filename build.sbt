@@ -4,7 +4,7 @@ version := "2.5.0-SNAPSHOT"
 
 organization := "com.tinkerpop.gremlin"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.2"
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0-SNAPSHOT"
@@ -19,6 +19,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.tinkerpop.blueprints" % "blueprints-orient-graph" % gremlinVersion % "provided",
     "com.tinkerpop.blueprints" % "blueprints-dex-graph" % gremlinVersion % "provided",
     "com.tinkerpop.blueprints" % "blueprints-rexster-graph" % gremlinVersion % "provided",
+    "com.chuusai" % "shapeless" % "2.0.0-M1" cross CrossVersion.full,
     // REPL dependencies
     "org.scala-lang" % "scala-library" % scalaVersion,
     "org.scala-lang" % "scala-compiler" % scalaVersion,
