@@ -15,57 +15,44 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
       import syntax.std.traversable._
       import ops.traversable.FromTraversable
 
-      type Vertex = Int
-      type Edge = Double
+      case class Pipe[S,E](testObjects: List[E]) {
+        val testIter = testObjects.iterator
+        def next = testIter.next
+        def hasNext = testIter.hasNext
+      }
 
-      //case class Pipe[S,E](testObjects: List[E]) {
-        //val testIter = testObjects.iterator
-        //def next = testIter.next
-        //def hasNext = testIter.hasNext
-      //}
-
-      case class Pipeline[A <: HList : FromTraversable] {
-        //def out[S,E](testObjects: List[E]) = 
-          //Pipeline(Pipe(testObjects) :: pipes)
-        //def out[E] = Pipeline[E :: A]
-
+      case class Pipeline[A <: HList : FromTraversable](pipes: HList) {
+        def out[E](testObjects: List[E])(implicit ft: FromTraversable[E::A]): Pipeline[E::A] =
+          Pipeline[E::A](Pipe(testObjects) :: pipes)
+        
         def path = List(1, "one").toHList[A].getOrElse(HNil)
 
+        //def toList: List[A#H] = ???
       }
-      //val start = Pipeline(HNil)
-      val testObjects1 = List[Vertex](1,2)
-      val testObjects2 = List[Edge](1.0,2.0)
-      //val pipeline = start.out(testObjects1).out(testObjects2)
-      println(Pipeline[HNil].path)
-      println(Pipeline[Int::String::HNil].path)
-      //println(List(1,2).toHList[A].get)
 
-      //case class Pipeline[A <: HList](pipes: List[Pipe[_,_]]) {
-        ////example for pipes: Pipe[V,E] :: Pipe[E,V] :: HNil
-        //def out[T](testObjects: List[T]) = 
-          //Pipeline[Vertex :: A](Pipe(testObjects) :: pipes)
+      val start = Pipeline[HNil](HNil)
+      val testObjects1 = List[String]("edge1", "edge2")
+      val testObjects2 = List[Int](1,2)
+      val pipeline = start.out(testObjects1).out(testObjects2)
+      println(pipeline)
+      println(pipeline.path)
 
-        //def path = pipes
-        //// should be List[A] for all the steps...
+      //val a = 1 :: "one" :: HNil
+      //type A = Int :: String :: HNil
+      //def blub: A#H = ???
 
-      //}
-      //val start = new Pipeline[HNil](Nil)
+      /** TODOs:
+      toList
+      get `path` signature right
+        returns List[A]
+      zip pipes to get real path instead of dummy list
+      refer type of pipes to A?
+      reverse types and pipes on each step? flatten hlist type?
+        https://groups.google.com/forum/#!searchin/shapeless-dev/append/shapeless-dev/gOXAbvGqEv8/hgqZmqmiLDAJ
+      use peano types to stop compiler if types don't fit together?
+      use sink and producer? iteratees? scalaz?
+      */
 
-
-      // TODOs:
-      //get actual types of pipes (S and E) → on out(...)
-      //use peano types to stop compiler if types don't fit together?
-      //use sink and producer? iteratees? scalaz?
-
-      //case class Pipeline(pipes: HList) {
-        ////example for pipes: Pipe[V,E] :: Pipe[E,V] :: HNil
-        //def out[S,E](testObjects: List[E]) = 
-          //Pipeline(Pipe(testObjects) :: pipes)
-
-        //def path = pipes
-        //// combine all pipes.. return something that uses all the right types
-        //// should be List[A] for all the steps...
-      //}
     }
   }
 
