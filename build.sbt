@@ -6,6 +6,10 @@ organization := "com.tinkerpop.gremlin"
 
 scalaVersion := "2.10.2"
 
+//scalacOptions ++= Seq(
+//  "-Xlog-implicits"
+//)
+
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0-SNAPSHOT"
   Seq(

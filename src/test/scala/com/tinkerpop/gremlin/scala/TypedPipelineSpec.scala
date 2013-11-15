@@ -14,21 +14,20 @@ import ops.hlist._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
 
-  def getHead[A <: HList :IsHCons](pipes: A) = pipes.head
-
   describe("Pipeline[A<:HList]") {
     it("works", org.scalatest.Tag("foo")) {
 
-      case class Pipeline[A <: HList](pipes : A)(implicit val ev: IsHCons[A]) {
+      //case class Pipeline[A <: HList](pipes : A)(implicit val ev: IsHCons[A]) {
+      case class Pipeline[H, T <: HList](pipes : H :: T) {
         // A: Vertex :: Edge :: Vertex :: HNil
         // Pipe[Graph,Vertex] :: Pipe[Vertex,Edge] :: Pipe[Edge,Vertex]
         def out[E](testObjects: List[E]) = Pipeline(Pipe(testObjects) :: pipes)
 
         //def path: HList[A] = List(1, "one").toHList[A].get//OrElse(HNil)
 
-        def toList = {
-          pipes.head//.testObjects
-        }
+        def toList = pipes.head
+
+        //def getHead1[B <: HList :IsHCons](pipes: B) = pipes.head
       }
 
       case class Pipe[E](testObjects: List[E]) {
@@ -38,27 +37,16 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
         def hasNext = testIter.hasNext
       }
 
-      object EmptyPipe extends Pipe(Nil)
-      val start = Pipeline[Pipe[Nothing] :: HNil](EmptyPipe :: HNil)
+      val emptyPipe = Pipe(Nil)
+      val start = Pipeline(emptyPipe :: HNil)
       val testObjects1 = List[String]("edge1", "edge2")
       val testObjects2 = List[Int](1,2)
-      val pipeline = start.out(testObjects1)//.out(testObjects2)
-      val headPipe: Pipe[String] = getHead(pipeline.pipes)
-      val headPipe2: Pipe[String] = pipeline.toList //why not???
+      val pipeline = start.out(testObjects1)
+      //val headPipe: Pipe[String] = getHead(pipeline.pipes)
+      val headPipe2: Pipe[String] = pipeline.toList 
 
-      //val p = new Pipe(testObjects1)
-      //type t = p.T
-      //val a: Int = pipeline.toList(0)
-      //println(pipeline.path)
-      //pipeline.toList should be (testObjects2)
-
-      //val a = 1 :: "one" :: HNil
-      //type A = Int :: String :: HNil
-      //def blub: A#H = ???
 
       /** TODOs:
-      get rid of E in Pipeline type arguments → ensure always NonEmptyHList → :IsHCons
-        problem: in toList, how do we get the type of A.HEAD? implicitly[IsHCons[A]] doesn't help us..
       `path`
         returns List[A]
       reverse types: use stuff 
@@ -70,13 +58,6 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
       use sink and producer? iteratees? scalaz?
       */
 
-    val l = 1 :: "one" :: HNil
-    def fun[A <: HList :IsHCons](a: A) = {
-      a.head
-    }
-    val b: Int= fun(l)
-    //val c: String= fun(l)
-    //println(b)
   }
 }
 
