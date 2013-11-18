@@ -7,7 +7,7 @@ import org.scalatest.FunSpec
 import com.tinkerpop.gremlin.Tokens.T._
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection }
+import java.util.{ Map ⇒ JMap, HashMap ⇒ JHashMap, Collection ⇒ JCollection, List ⇒ JList }
 import com.tinkerpop.pipes.util.structures.Tree
 
 class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
@@ -76,7 +76,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
   describe("groupBy") {
     it("groups tinkerpop team by age range") {
       //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[Vertex]]
-      val ageMap = new JHashMap[String, JCollection[Any]]
+      val ageMap = new JHashMap[String, JList[Any]]
       graph.V.groupBy(ageMap)(keyFunction = ageRange, valueFunction = getName).iterate()
 
       val result = ageMap.toMap
