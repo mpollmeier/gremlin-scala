@@ -9,6 +9,7 @@
     </parent>
     <groupId>com.michaelpollmeier</groupId>
     <artifactId>gremlin-scala</artifactId>
+    <version>2.4.2</version>
     <packaging>jar</packaging>
     <name>Gremlin-Scala: Gremlin for the Scala Language</name>
     <properties>
