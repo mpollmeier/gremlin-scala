@@ -16,9 +16,9 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
 
   it("fifth try: pipes as hlist") {
     case class Vertex(id: Int, outE: Iterator[Edge])
-    case class Edge(id: Int, inV: Vertex)
+    case class Edge(id: Int, label: String, inV: Vertex)
 
-    trait Pipe[I,O] {
+    trait Pipe[-I,O] {
       //def starts: Iterator[I]
       def iter: Iterator[O]
     }
@@ -29,6 +29,12 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
     case class OutEPipe(starts: Iterator[Vertex]) extends Pipe[Vertex, Edge] {
       val iter = starts flatMap { _.outE }
     }
+    //case class LabelPipe(starts: Iterator[Edge]) extends Pipe[Edge, String] {
+      //val iter = starts map { _.label }
+    //}
+    //case class IdPipe(starts: Iterator[Element]) extends Pipe[Edge, String] {
+      //val iter = starts map { _.label }
+    //}
 
     /*     |e1-|
      * v1->|   |->v2
@@ -39,7 +45,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
       case 2 ⇒ Vertex(id, outE = Nil.iterator)
     }
     def e(id: Int): Edge = id match {
-      case 1|2 ⇒ Edge(id, inV = v(2))
+      case 1|2 ⇒ Edge(id, label = s"label:$id", inV = v(2))
     }
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline!
@@ -48,17 +54,20 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
     }
     def startPipeline[H,T](pipe: Pipe[H,T]) = Pipeline(pipe :: HNil)
 
+    //H1: the old end type of the pipeline
+    //H2: the new end type of the pipeline
+    def addPipe[H2, H1, T <: HList](
+      pipeline: Pipeline[H1,T],
+      pipeConstr: Iterator[H1] ⇒ Pipe[H1, H2]): Pipeline[H2, Pipe[_, H1] :: T] = {
+        val next = pipeConstr(pipeline.pipes.head.iter)
+        Pipeline(next :: pipeline.pipes)
+    }
+
     implicit class EdgeSteps[H <: Edge, T <: HList](pipeline: Pipeline[H, T]) {
-      def inV: Pipeline[Vertex, Pipe[_, H]::T] = {
-        val nextPipe = InVPipe(pipeline.pipes.head.iter)
-        Pipeline(nextPipe :: pipeline.pipes)
-      }
+      def inV: Pipeline[Vertex, Pipe[_, H] :: T] = addPipe(pipeline, InVPipe)
     }
     implicit class VertexSteps[H <: Vertex, T <: HList](pipeline: Pipeline[H, T]) {
-      def outE: Pipeline[Edge, Pipe[_, H]::T] = {
-        val nextPipe = OutEPipe(pipeline.pipes.head.iter)
-        Pipeline(nextPipe :: pipeline.pipes)
-      }
+      def outE: Pipeline[Edge, Pipe[_, H] :: T] = addPipe(pipeline, OutEPipe)
     }
 
     val edgeStartPipe = new Pipe[Nothing, Edge] {
