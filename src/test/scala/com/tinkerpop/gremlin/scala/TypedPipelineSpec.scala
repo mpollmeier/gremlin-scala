@@ -14,105 +14,216 @@ import ops.hlist._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
 
-  describe("Pipeline[A<:HList]") {
-    it("works", org.scalatest.Tag("foo")) {
+  it("fifth try: pipes as hlist") {
+    case class Vertex(id: Int, outE: Iterator[Edge])
+    case class Edge(id: Int, inV: Vertex)
 
-      //case class Pipeline[A <: HList](pipes : A)(implicit val ev: IsHCons[A]) {
-      case class Pipeline[H, T <: HList](pipes : H :: T) {
-        // A: Vertex :: Edge :: Vertex :: HNil
-        // Pipe[Graph,Vertex] :: Pipe[Vertex,Edge] :: Pipe[Edge,Vertex]
-        def out[E](testObjects: List[E]) = Pipeline(Pipe(testObjects) :: pipes)
+    trait Pipe[I,O] {
+      //def starts: Iterator[I]
+      def iter: Iterator[O]
+    }
 
-        //def path: HList[A] = List(1, "one").toHList[A].get//OrElse(HNil)
+    case class InVPipe(starts: Iterator[Edge]) extends Pipe[Edge, Vertex] {
+      val iter = starts map { _.inV }
+    }
+    case class OutEPipe(starts: Iterator[Vertex]) extends Pipe[Vertex, Edge] {
+      val iter = starts flatMap { _.outE }
+    }
 
-        def toList = pipes.head
+    /*     |e1-|
+     * v1->|   |->v2
+     *     |e2-|
+     */
+    def v(id: Int): Vertex = id match {
+      case 1 ⇒ Vertex(id, outE = List(e(1), e(2)).iterator)
+      case 2 ⇒ Vertex(id, outE = Nil.iterator)
+    }
+    def e(id: Int): Edge = id match {
+      case 1|2 ⇒ Edge(id, inV = v(2))
+    }
 
-        //def getHead1[B <: HList :IsHCons](pipes: B) = pipes.head
+    // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline!
+    case class Pipeline[H, T <: HList](pipes: Pipe[_, H] :: T) {
+      //def toList: List[H] = pipes.head.iter.toList
+    }
+    def startPipeline[H,T](pipe: Pipe[H,T]) = Pipeline(pipe :: HNil)
+
+    implicit class EdgeSteps[H <: Edge, T <: HList](pipeline: Pipeline[H, T]) {
+      def inV: Pipeline[Vertex, Pipe[_, H]::T] = {
+        val nextPipe = InVPipe(pipeline.pipes.head.iter)
+        Pipeline(nextPipe :: pipeline.pipes)
       }
-
-      case class Pipe[E](testObjects: List[E]) {
-        type T = E
-        val testIter = testObjects.iterator
-        def next = testIter.next
-        def hasNext = testIter.hasNext
+    }
+    implicit class VertexSteps[H <: Vertex, T <: HList](pipeline: Pipeline[H, T]) {
+      def outE: Pipeline[Edge, Pipe[_, H]::T] = {
+        val nextPipe = OutEPipe(pipeline.pipes.head.iter)
+        Pipeline(nextPipe :: pipeline.pipes)
       }
+    }
 
-      val emptyPipe = Pipe(Nil)
-      val start = Pipeline(emptyPipe :: HNil)
-      val testObjects1 = List[String]("edge1", "edge2")
-      val testObjects2 = List[Int](1,2)
-      val pipeline = start.out(testObjects1)
-      //val headPipe: Pipe[String] = getHead(pipeline.pipes)
-      val headPipe2: Pipe[String] = pipeline.toList 
+    val edgeStartPipe = new Pipe[Nothing, Edge] {
+      val iter = List(e(1)).iterator
+    }
+    val vertexStartPipe = new Pipe[Nothing, Vertex] {
+      val iter = List(v(1)).iterator
+    }
+    startPipeline(edgeStartPipe).inV          //works
+    startPipeline(vertexStartPipe).outE       //works
+    startPipeline(vertexStartPipe).outE.inV   //works
+    //startPipeline(vertexStartPipe).inV       //does not compile ;)
+    //startPipeline(edgeStartPipe).inV.inV     //does not compile ;)
+    //startPipeline(vertexStartPipe).outE.outE //does not compile ;) 
+  }
+
+  ignore("forth try: Pipeline as HList") {
+    //case class Pipeline[H, T <: HList](pipes :Pipe[_, H]::T) {
+      //def path: H::T = {
+        //val iter1 = pipes(0).testObjects. :: HNil
+        //combine iterators to streams:
+        //???
+      //}
+
+      // testObjects is only passed in to simplify things for now
+      //def out[E](testObjects: List[E]) = Pipeline(Pipe(testObjects) :: pipes)
+      //def path: HList[A] = List(1, "one").toHList[A].get//OrElse(HNil)
+      //def toList = pipes.head
+      //def getHead1[B <: HList :IsHCons](pipes: B) = pipes.head
+      //T3 semantics: Pipline extends Pipe
+    //}
+
+    //val emptyPipe = Pipe(Nil)
+    //val start = Pipeline(emptyPipe :: HNil)
+    //val strings = List[String]("one", "two")
+    //val stringPipe = Pipe(strings)
+    //val ints = List[Int](1,2)
+    //val intPipe = Pipe(ints)
+    //val pipeline = Pipeline(stringPipe :: HNil)
+    //val pipeline = Pipeline(strings :: ints :: HNil)
+    //val pipeline = start.out(strings)
+    //val path: String :: HNil  = pipeline.path
+    // val path1 = path.head
+    // val path2 = path.tail.head
+    // assert(path1 == strings(0) :: HNil)
+    // assert(path2 == strings(1) :: HNil)
+    // assert(path1 == strings(0) :: ints(0) :: HNil)
+    // assert(path2 == strings(1) :: ints(1) :: HNil)
+
+    //val headPipe: Pipe[String] = getHead(pipeline.pipes)
+    //val headPipe2: Pipe[String] = pipeline.toList
 
 
-      /** TODOs:
-      `path`
-        returns List[A]
-      reverse types: use stuff 
-      zip pipes to get real path instead of dummy list
-      refer type of pipes to A?
-      reverse types and pipes on each step? flatten hlist type?
-        https://groups.google.com/forum/#!searchin/shapeless-dev/append/shapeless-dev/gOXAbvGqEv8/hgqZmqmiLDAJ
-      use peano types to stop compiler if types don't fit together?
+    /** TODOs:
+    path with one pipe: replace ??? with impl
+    path with two pipes
+      Pipe[Graph,Vertex] :: Pipe[Vertex,Edge] :: Pipe[Edge,Vertex]
+    Pipe needs to hold two types: I/O
+    out: make work again
+    out: append to hlist, not prepend
+    out: use peano types to stop compiler if types of pipes don't fit together
+    let path produce the content lazily, not eagerly
       use sink and producer? iteratees? scalaz?
-      */
+    zip pipes to get real path instead of dummy list
+    reverse types and pipes on each step? flatten hlist type?
+      https://groups.google.com/forum/#!searchin/shapeless-dev/append/shapeless-dev/gOXAbvGqEv8/hgqZmqmiLDAJ
+    pipe: extend some tinkerpop type?
+    have three types of pipelines? VertexPipeline (that contains outE etc.), EdgePipeline (that contains inV etc.) and Pipeline that contains common stuff like filter?
+      shouldn't be necessary if the compiler detects that inV.inV doesn't work
+    */
 
   }
-}
 
-  describe("second try") {
-    it("works") {
-      type Vertex = Int
-      type Edge = Float
-      type Graph = String
+  ignore("third try: nested Pipes") {
+    //problem: cannot nest types other than vertex/edge easily as InVPipe and OutEPipe are explicitly bound to these types
+    //easy: Filter, label, ...
+    //hard: path, back, ...
 
-      trait Pipe[S,+E] {}
+    case class Vertex(id: Int, outE: Iterator[Edge])
+    case class Edge(id: Int, inV: Vertex)
 
-      trait Pipeline[+T] {
-        type head <: Pipe[_,T]
-        type tail <: Pipeline[T]
+    trait Pipe[I,O] {
+      //def starts: Iterator[I]
+      def iter: Iterator[O]
+      def next: O = {
+        println(s"pipe.next: $iter.next")
+        iter.next
       }
-
-      trait NilPipeline extends Pipeline[Any] {
-        override def toString = "NilPipeline"
+      def hasNext = {
+        println(s"pipe.hasNext: $iter.hasNext")
+        iter.hasNext
       }
-      object NilPipeline extends NilPipeline
-
-      trait StartPipe[E] extends Pipe[Graph, E] {
-        override def toString = "StartPipe"
-      }
-      trait VertexPipe[S] extends Pipe[S, Vertex] {
-        override def toString = "VertexPipe"
-      }
-      trait EdgePipe[S] extends Pipe[S, Edge] {
-        override def toString = "EdgePipe"
-      }
-
-      case class ::[S, E](head: Pipe[S,E], tail: Pipeline[E]) extends Pipeline[S] {
-        override def toString = s"$head :: $tail"
-      }
-
-      val startPipe = new StartPipe[Vertex]{} //Pipe[Graph, Vertex]
-      val edgePipe = new EdgePipe[Vertex]{} //Pipe[Vertex, Edge]
-      val p1 = ::(startPipe, NilPipeline)
-      val p2 = ::(edgePipe, p1)
-      println(p1)
-      println(p2)
-
-      // TODOs:
-      //ensure cannot combine wrong pipes
-      //dummy version of Pipe and Pipeline methods
     }
+
+    case class InVPipe(prev: Pipe[_, Edge]) extends Pipe[Edge, Vertex] {
+      val iter = prev.iter map { _.inV }
+    }
+    case class OutEPipe(prev: Pipe[_, Vertex]) extends Pipe[Vertex, Edge] {
+      val iter = prev.iter flatMap { _.outE }
+    }
+
+    def v(id: Int): Vertex = id match {
+      case 1 ⇒ Vertex(id, outE = List(e(1), e(2)).iterator)
+      case 2 ⇒ Vertex(id, outE = Nil.iterator)
+    }
+    def e(id: Int): Edge = id match {
+      case 1|2 ⇒ Edge(id, inV = v(2))
+    }
+
+    val startPipe = new Pipe[Nothing, Vertex] {
+      val iter = List(v(1)).iterator
+    }
+    val outE = OutEPipe(startPipe)
+    val inV = InVPipe(outE)
+
+    //startPipe.iter foreach println
+    //outE.iter foreach println
+    //inV.iter foreach println
+  }
+
+  ignore("second try") {
+    type Vertex = Int
+    type Edge = Float
+    type Graph = String
+
+    trait Pipe[S,+E] {}
+
+    trait Pipeline[+T] {
+      type head <: Pipe[_,T]
+      type tail <: Pipeline[T]
+    }
+
+    trait NilPipeline extends Pipeline[Any] {
+      override def toString = "NilPipeline"
+    }
+    object NilPipeline extends NilPipeline
+
+    trait StartPipe[E] extends Pipe[Graph, E] {
+      override def toString = "StartPipe"
+    }
+    trait VertexPipe[S] extends Pipe[S, Vertex] {
+      override def toString = "VertexPipe"
+    }
+    trait EdgePipe[S] extends Pipe[S, Edge] {
+      override def toString = "EdgePipe"
+    }
+
+    case class ::[S, E](head: Pipe[S,E], tail: Pipeline[E]) extends Pipeline[S] {
+      override def toString = s"$head :: $tail"
+    }
+
+    val startPipe = new StartPipe[Vertex]{} //Pipe[Graph, Vertex]
+    val edgePipe = new EdgePipe[Vertex]{} //Pipe[Vertex, Edge]
+    val p1 = ::(startPipe, NilPipeline)
+    val p2 = ::(edgePipe, p1)
+    println(p1)
+    println(p2)
+
+    // TODOs:
+    //ensure cannot combine wrong pipes
+    //dummy version of Pipe and Pipeline methods
 }
 
 
-  describe("first try") {
-    it("is strongly typed") {
-      val p = new VertexPipe
-      println(p)
-     }
-
+  ignore("first try") {
     sealed trait Pipe {
       type Head // <: Pipeline //idea: have Pipeline[Vertex]?
       type Tail <: Pipe
@@ -156,6 +267,9 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
 
       //override def toString = head + " :: " + tail
     }
+
+    val p = new VertexPipe
+    println(p)
   }
 
 }
