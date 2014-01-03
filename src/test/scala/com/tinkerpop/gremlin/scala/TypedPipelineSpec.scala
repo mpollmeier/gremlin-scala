@@ -36,7 +36,14 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline!
     case class Pipeline[H, T <: HList](pipes: Pipe[_, H] :: T) {
       type CurrentPipes = Pipe[_, H] :: T
-      //def toList: List[H] = pipes.head.iter.toList
+      def toList: List[H] = pipes.head.iter.toList
+    }
+    implicit class EdgeSteps[H <: Edge, T <: HList](pipeline: Pipeline[H, T]) extends Pipeline[H, T](pipeline.pipes) {
+      def inV: Pipeline[Vertex, CurrentPipes] = addPipe(pipes, InVPipe)
+      def label: Pipeline[String, CurrentPipes] = addPipe(pipes, LabelPipe)
+    }
+    implicit class VertexSteps[H <: Vertex, T <: HList](pipeline: Pipeline[H, T]) extends Pipeline[H, T](pipeline.pipes) {
+      def outE: Pipeline[Edge, Pipe[_, H] :: T] = addPipe(pipes, OutEPipe)
     }
 
     def startPipeline[H,T](pipe: Pipe[H,T]) = Pipeline(pipe :: HNil)
@@ -47,14 +54,6 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
       pipeConstr: Iterator[H1] ⇒ Pipe[H1, H2]): Pipeline[H2, Pipe[_, H1] :: T] = {
         val next = pipeConstr(pipes.head.iter)
         Pipeline(next :: pipes)
-    }
-
-    implicit class EdgeSteps[H <: Edge, T <: HList](pipeline: Pipeline[H, T]) extends Pipeline[H, T](pipeline.pipes) {
-      def inV: Pipeline[Vertex, CurrentPipes] = addPipe(pipes, InVPipe)
-      def label: Pipeline[String, CurrentPipes] = addPipe(pipes, LabelPipe)
-    }
-    implicit class VertexSteps[H <: Vertex, T <: HList](pipeline: Pipeline[H, T]) extends Pipeline[H, T](pipeline.pipes) {
-      def outE: Pipeline[Edge, Pipe[_, H] :: T] = addPipe(pipes, OutEPipe)
     }
 
 
@@ -76,18 +75,23 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
     val vertexStartPipe = new Pipe[Nothing, Vertex] {
       val iter = List(v(1)).iterator
     }
+    val edgePipeline = startPipeline(edgeStartPipe)
+    val vertexPipeline = startPipeline(vertexStartPipe)
 
-    //these compile
-    startPipeline(edgeStartPipe).inV          
-    startPipeline(vertexStartPipe).outE       
-    startPipeline(vertexStartPipe).outE.inV   
-    startPipeline(vertexStartPipe).outE.label 
+    // these compile
+    edgePipeline.inV          
+    vertexPipeline.outE       
+    vertexPipeline.outE.inV
+    vertexPipeline.outE.label 
 
-    // does not compile - and shouldn't ;)
-    //startPipeline(vertexStartPipe).inV      
-    //startPipeline(edgeStartPipe).inV.inV    
-    //startPipeline(vertexStartPipe).outE.outE
-    //startPipeline(vertexStartPipe).label
+    println(vertexPipeline.toList)
+    println(vertexPipeline.outE.toList)
+
+    // these don't compile - and they shouldn't ;)
+    //vertexPipeline.inV
+    //edgePipeline.inV.inV    
+    //vertexPipeline.outE.outE
+    //vertexPipeline.label
   }
 
   ignore("forth try: Pipeline as HList") {
