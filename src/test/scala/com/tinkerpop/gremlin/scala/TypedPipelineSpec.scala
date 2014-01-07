@@ -69,23 +69,25 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
     def e(id: Int): Edge = id match {
       case 1|2 ⇒ Edge(id, label = s"label:$id", inV = v(2))
     }
-    val edgeStartPipe = new Pipe[Nothing, Edge] {
+    def edgeStartPipe = new Pipe[Nothing, Edge] {
       val iter = List(e(1)).iterator
     }
-    val vertexStartPipe = new Pipe[Nothing, Vertex] {
+    def vertexStartPipe = new Pipe[Nothing, Vertex] {
       val iter = List(v(1)).iterator
     }
-    val edgePipeline = startPipeline(edgeStartPipe)
-    val vertexPipeline = startPipeline(vertexStartPipe)
+    def edgePipeline = startPipeline(edgeStartPipe)
+    def vertexPipeline = startPipeline(vertexStartPipe)
 
     // these compile
-    edgePipeline.inV          
+    edgePipeline.inV
     vertexPipeline.outE       
     vertexPipeline.outE.inV
     vertexPipeline.outE.label 
 
-    println(vertexPipeline.toList)
-    println(vertexPipeline.outE.toList)
+    //println(vertexPipeline.toList)
+    //println(vertexPipeline.outE.toList)
+    //println(vertexPipeline.outE.inV.toList)
+    //println(vertexPipeline.outE.inV.outE.toList)
 
     // these don't compile - and they shouldn't ;)
     //vertexPipeline.inV
