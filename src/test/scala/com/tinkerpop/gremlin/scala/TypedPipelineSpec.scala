@@ -18,10 +18,17 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
-    case class GremlinScala[H, T <: HList](gremlin: GremlinPipeline[_, H]) {
+    // wrapped GremlinPipeline is prefixed with _ to ensure we always use the method `gremlin` which copies `_gremlin`
+    case class GremlinScala[H, T <: HList](_gremlin: GremlinPipeline[_, H]) {
       def toList(): List[H] = gremlin.toList.toList
       def as(name: String) = GremlinScala[H, T](gremlin.as(name))
       def back[S](to: String) = GremlinScala[S, H :: T](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
+
+      def gremlin = {
+        val target = new GremlinPipeline[Unit, H]
+        _gremlin.getPipes foreach target.addPipe
+        target
+      }
     }
 
     implicit class GremlinEdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
@@ -38,7 +45,6 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
     //implicit class GremlinNonEmptyPipeline[H, T <: HList: IsHCons](gremlinScala: GremlinScala[H, _])
       //extends GremlinScala[H, T](gremlinScala.gremlin) {
-
       //type Tail = IsHCons[T]
       //def backOne = GremlinScala[Tail#H, Tail#T](gremlin.back(1))
     //}
@@ -49,9 +55,8 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
     val vertexGremlin = GremlinScala(vertexPipeline) //GremlinScala[Vertex, HNil](vertexPipeline)
 
-    edgeGremlin.inV
-    edgeGremlin.inV.outE
-
+    vertexGremlin.outE  //once properly immutable, this can be uncommented
+    vertexGremlin.outE.inV.toList foreach println
     vertexGremlin.outE
     vertexGremlin.outE.inV
     vertexGremlin.as("x").outE.back[Vertex]("x")
