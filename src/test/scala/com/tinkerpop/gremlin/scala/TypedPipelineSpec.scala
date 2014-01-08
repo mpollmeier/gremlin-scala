@@ -17,32 +17,53 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import com.tinkerpop.gremlin.java.GremlinPipeline
     import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 
-    // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline!
+    // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
     case class GremlinScala[H, T <: HList](gremlin: GremlinPipeline[_, H]) {
       def toList(): List[H] = gremlin.toList.toList
+      def as(name: String) = GremlinScala[H, T](gremlin.as(name))
+      def back[S](to: String) = GremlinScala[S, H :: T](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
     }
 
-    implicit class EdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
+    implicit class GremlinEdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
       extends GremlinScala[H, T](gremlinScala.gremlin) {
+
       def inV = GremlinScala[Vertex, H :: T](gremlin.inV)
     }
-    implicit class VertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
+
+    implicit class GremlinVertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
       extends GremlinScala[H, T](gremlinScala.gremlin) {
+
       def outE = GremlinScala[Edge, H :: T](gremlin.outE())
     }
 
+    //implicit class GremlinNonEmptyPipeline[H, T <: HList: IsHCons](gremlinScala: GremlinScala[H, _])
+      //extends GremlinScala[H, T](gremlinScala.gremlin) {
+
+      //type Tail = IsHCons[T]
+      //def backOne = GremlinScala[Tail#H, Tail#T](gremlin.back(1))
+    //}
+
     val graph = TinkerGraphFactory.createTinkerGraph
-
-    val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
-    val vertexGremlin = GremlinScala(vertexPipeline) //GremlinScala[Vertex, HNil](vertexPipeline)
-    vertexGremlin.outE
-    //vertexGremlin.inV //does not compile!
-
     val edgePipeline = new GremlinPipeline[Unit, Edge](graph.e(1))
     val edgeGremlin = GremlinScala(edgePipeline) //GremlinScala[Edge, HNil](edgePipeline)
+    val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
+    val vertexGremlin = GremlinScala(vertexPipeline) //GremlinScala[Vertex, HNil](vertexPipeline)
+
     edgeGremlin.inV
+    edgeGremlin.inV.outE
+
+    vertexGremlin.outE
+    vertexGremlin.outE.inV
+    vertexGremlin.as("x").outE.back[Vertex]("x")
+    //vertexGremlin.as("x").outE.back[Vertex]("x").toList foreach println
+
+    // these do not compile (and they shouldn't!)
+    //vertexGremlin.inV //does not compile!
+    //vertexGremlin.outE.inV.inV //does not compile!
+    //vertexGremlin.outE.back[Edge]("x").outE //does not compile
     //edgeGremlin.outE //does not compile!
-  }      
+    //edgeGremlin.inV.outE.outE //does not compile!
+  }
 
   it("fifth try: pipes as hlist") {
     trait Element { def id: Int }
