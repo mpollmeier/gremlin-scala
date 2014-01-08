@@ -1,10 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.blueprints._
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import scala.collection.JavaConversions._
 
 import shapeless._
@@ -12,7 +9,40 @@ import syntax.std.traversable._
 import ops.traversable.FromTraversable
 import ops.hlist._
 
-class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
+class TypedPipelineSpec extends FunSpec with ShouldMatchers {
+
+  it("is a simple wrapper around Pipeline that holds the types") {
+    import com.tinkerpop.blueprints.Edge
+    import com.tinkerpop.blueprints.Vertex
+    import com.tinkerpop.gremlin.java.GremlinPipeline
+    import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+
+    // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline!
+    case class GremlinScala[H, T <: HList](gremlin: GremlinPipeline[_, H]) {
+      def toList(): List[H] = gremlin.toList.toList
+    }
+
+    implicit class EdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
+      extends GremlinScala[H, T](gremlinScala.gremlin) {
+      def inV = GremlinScala[Vertex, H :: T](gremlin.inV)
+    }
+    implicit class VertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
+      extends GremlinScala[H, T](gremlinScala.gremlin) {
+      def outE = GremlinScala[Edge, H :: T](gremlin.outE())
+    }
+
+    val graph = TinkerGraphFactory.createTinkerGraph
+
+    val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
+    val vertexGremlin = GremlinScala(vertexPipeline) //GremlinScala[Vertex, HNil](vertexPipeline)
+    vertexGremlin.outE
+    //vertexGremlin.inV //does not compile!
+
+    val edgePipeline = new GremlinPipeline[Unit, Edge](graph.e(1))
+    val edgeGremlin = GremlinScala(edgePipeline) //GremlinScala[Edge, HNil](edgePipeline)
+    edgeGremlin.inV
+    //edgeGremlin.outE //does not compile!
+  }      
 
   it("fifth try: pipes as hlist") {
     trait Element { def id: Int }
@@ -245,6 +275,8 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers with TestGraph {
 
 
   ignore("first try") {
+    import com.tinkerpop.blueprints.Vertex
+
     sealed trait Pipe {
       type Head // <: Pipeline //idea: have Pipeline[Vertex]?
       type Tail <: Pipe
