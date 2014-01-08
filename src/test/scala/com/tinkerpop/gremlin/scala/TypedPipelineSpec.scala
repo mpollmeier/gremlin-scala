@@ -14,33 +14,55 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
   it("is a simple wrapper around Pipeline that holds the types") {
     import com.tinkerpop.blueprints.Edge
     import com.tinkerpop.blueprints.Vertex
+    import com.tinkerpop.pipes.Pipe
+    import com.tinkerpop.pipes.AbstractPipe
+    import com.tinkerpop.pipes.transform.TransformPipe
     import com.tinkerpop.gremlin.java.GremlinPipeline
     import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+    import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
+    import syntax.std.traversable._
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
     // wrapped GremlinPipeline is prefixed with _ to ensure we always use the method `gremlin` which copies `_gremlin`
-    case class GremlinScala[H, T <: HList](_gremlin: GremlinPipeline[_, H]) {
+    case class GremlinScala[H, T <: HList: FromTraversable]
+      (_gremlin: GremlinPipeline[_, H])
+      (implicit ft: FromTraversable[H::T]) {
+      type CurrentTypes = H :: T
+
       def toList(): List[H] = gremlin.toList.toList
       def as(name: String) = GremlinScala[H, T](gremlin.as(name))
-      def back[S](to: String) = GremlinScala[S, H :: T](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
+      def back[S](to: String)(implicit ft2: FromTraversable[S::CurrentTypes]) = 
+        GremlinScala[S, CurrentTypes](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
+
+      //def pathBoring = GremlinScala[JList[_], CurrentTypes](gremlin.path())
+
+      def path: GremlinScala[CurrentTypes, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypes])
 
       def gremlin = {
         val target = new GremlinPipeline[Unit, H]
         _gremlin.getPipes foreach target.addPipe
         target
       }
+      def addPipe[E]
+        (pipe: Pipe[H, E])
+        (implicit ft2: FromTraversable[E::CurrentTypes]) = 
+        GremlinScala[E, CurrentTypes](gremlin.add(pipe))
     }
 
-    implicit class GremlinEdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
+    implicit class GremlinEdgeSteps[H <: Edge, T <: HList: FromTraversable]
+      (gremlinScala: GremlinScala[H, _])
+      (implicit ft: FromTraversable[H::T])
       extends GremlinScala[H, T](gremlinScala.gremlin) {
 
-      def inV = GremlinScala[Vertex, H :: T](gremlin.inV)
+      def inV = GremlinScala[Vertex, CurrentTypes](gremlin.inV)
     }
 
-    implicit class GremlinVertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
+    implicit class GremlinVertexSteps[H <: Vertex, T <: HList: FromTraversable]
+      (gremlinScala: GremlinScala[H, _])
+      (implicit ft: FromTraversable[H::T])
       extends GremlinScala[H, T](gremlinScala.gremlin) {
 
-      def outE = GremlinScala[Edge, H :: T](gremlin.outE())
+      def outE = GremlinScala[Edge, CurrentTypes](gremlin.outE())
     }
 
     //implicit class GremlinNonEmptyPipeline[H, T <: HList: IsHCons](gremlinScala: GremlinScala[H, _])
@@ -49,17 +71,35 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
       //def backOne = GremlinScala[Tail#H, Tail#T](gremlin.back(1))
     //}
 
+    class PathPipe[S, E <: HList : FromTraversable] extends AbstractPipe[S, E] with TransformPipe[S, E] {
+      override def setStarts(starts: JIterator[S]): Unit = {
+        super.setStarts(starts)
+        this.enablePath(true)
+      }
+
+      override def processNextStart(): E = starts match {
+        case starts: Pipe[_,_] ⇒ 
+          starts.next()
+          val path: JList[_] = starts.getCurrentPath
+          path.toHList[E].get
+      }
+    }
+
+
     val graph = TinkerGraphFactory.createTinkerGraph
     val edgePipeline = new GremlinPipeline[Unit, Edge](graph.e(1))
-    val edgeGremlin = GremlinScala(edgePipeline) //GremlinScala[Edge, HNil](edgePipeline)
+    val edgeGremlin = GremlinScala[Edge, HNil](edgePipeline)
     val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
-    val vertexGremlin = GremlinScala(vertexPipeline) //GremlinScala[Vertex, HNil](vertexPipeline)
+    val vertexGremlin = GremlinScala[Vertex, HNil](vertexPipeline)
 
-    vertexGremlin.outE  //once properly immutable, this can be uncommented
-    vertexGremlin.outE.inV.toList foreach println
-    vertexGremlin.outE
-    vertexGremlin.outE.inV
-    vertexGremlin.as("x").outE.back[Vertex]("x")
+    //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
+    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    //vertexGremlin.outE.inV.pathBoring.toList foreach println
+    //attention: the HList is reversed in it's types...
+    //vertexGremlin.outE.inV.path.toList foreach { l: Vertex :: Edge :: Vertex :: HNil ⇒ println(l) }
+    //vertexGremlin.outE
+    //vertexGremlin.outE.inV
+    //vertexGremlin.as("x").outE.back[Vertex]("x")
     //vertexGremlin.as("x").outE.back[Vertex]("x").toList foreach println
 
     // these do not compile (and they shouldn't!)
