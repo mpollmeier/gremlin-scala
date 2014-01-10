@@ -5,7 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.collection.JavaConversions._
 
 import shapeless._
-import syntax.std.traversable._
+//import syntax.std.traversable._
 import ops.hlist._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers {
@@ -19,31 +19,21 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import com.tinkerpop.gremlin.java.GremlinPipeline
     import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
     import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
+    import shapeless.test.illTyped
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
     // wrapped GremlinPipeline is prefixed with _ to ensure we always use the method `gremlin` which copies `_gremlin`
     case class GremlinScala[H, T <: HList](_gremlin: GremlinPipeline[_, H]) {
       type CurrentTypes = H :: T
-      type CurrentTypesReversed = Reverse[CurrentTypes]#Out
-
-      //type C1 = CurrentTypesReversed#Out
-      //type C1 = Reverse[CurrentTypes]
-      //type C2 = IsHCons[C1]
-      //type C3 = C2#H
-      //type Tail = IsHCons[T]
+      //type CurrentTypesReversed = Reverse[CurrentTypes]#Out
 
       def toList(): List[H] = gremlin.toList.toList
       def as(name: String) = GremlinScala[H, T](gremlin.as(name))
       def back[S](to: String) = GremlinScala[S, CurrentTypes](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
 
-      //def pathBoring = GremlinScala[JList[_], CurrentTypes](gremlin.path())
-
       def path: GremlinScala[CurrentTypes, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypes])
-      //def path = addPipe(new PathPipe[H, Reverse[H::T]#Out])
       //def path: GremlinScala[CurrentTypesReversed, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypesReversed])
-      //def path: GremlinScala[Reverse[CurrentTypes]#Out, CurrentTypes] = addPipe(new PathPipe[H, Reverse[CurrentTypes]#Out])
-      //def path = addPipe(new PathPipe[H, Reverse[CurrentTypes]#Out])
-
+      //def pathBoring = GremlinScala[JList[_], CurrentTypes](gremlin.path())
 
       def gremlin = {
         val target = new GremlinPipeline[Unit, H]
@@ -98,25 +88,24 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
     val vertexGremlin = GremlinScala[Vertex, HNil](vertexPipeline)
 
-    //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
-    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
-    //vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
-    //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: _ ⇒ println(l) }
-    //vertexGremlin.outE.path.toList foreach { l: _ :: _ :: _ ⇒ println(l) }
-    //vertexGremlin.outE.inV.pathBoring.toList foreach println
-    //attention: the HList is reversed in it's types...
-    //vertexGremlin.outE.inV.path.toList foreach { l: Vertex :: Edge :: Vertex :: HNil ⇒ println(l) }
-    //vertexGremlin.outE
-    //vertexGremlin.outE.inV
+
+    vertexGremlin.outE
+    vertexGremlin.outE.inV
     //vertexGremlin.as("x").outE.back[Vertex]("x")
     //vertexGremlin.as("x").outE.back[Vertex]("x").toList foreach println
 
+    //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
+    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    //attention: the HList is reversed in it's types... I'm working on that...
+    vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
+    //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: _ ⇒ println(l) }
+
     // these do not compile (and they shouldn't!)
-    //vertexGremlin.inV //does not compile!
-    //vertexGremlin.outE.inV.inV //does not compile!
-    //vertexGremlin.outE.back[Edge]("x").outE //does not compile
-    //edgeGremlin.outE //does not compile!
-    //edgeGremlin.inV.outE.outE //does not compile!
+    illTyped {""" vertexGremlin.inV """}
+    illTyped {""" vertexGremlin.outE.inV.inV """}
+    illTyped {""" vertexGremlin.outE.back[Edge]("x").outE """}
+    illTyped {""" edgeGremlin.outE """}
+    illTyped {""" edgeGremlin.inV.outE.outE """}
   }
 
   it("fifth try: pipes as hlist") {
