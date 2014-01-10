@@ -88,10 +88,11 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     val vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
     val vertexGremlin = GremlinScala[Vertex, HNil](vertexPipeline)
 
-
     vertexGremlin.outE
     vertexGremlin.outE.inV
-    //vertexGremlin.as("x").outE.back[Vertex]("x")
+    
+    //TODO: fix runtime errors
+    vertexGremlin.as("x").outE.back[Vertex]("x")
     //vertexGremlin.as("x").outE.back[Vertex]("x").toList foreach println
 
     //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
