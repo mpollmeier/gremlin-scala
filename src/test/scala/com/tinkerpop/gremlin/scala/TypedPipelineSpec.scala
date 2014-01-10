@@ -75,13 +75,11 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
     print(vertexGremlin.outE)
     print(vertexGremlin.outE.inV)
-    
     print(vertexGremlin.as("x").outE.back[Vertex]("x"))
 
-    //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
-    //vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
-    //attention: the HList is reversed in it's types... I'm working on that...
-    //vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
+    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
+    //attention: the HList is reversed in it's types... I'm working on that... and then the next line should work
     //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: _ ⇒ println(l) }
 
     // these do not compile (and they shouldn't!)
