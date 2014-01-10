@@ -19,12 +19,18 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import com.tinkerpop.gremlin.java.GremlinPipeline
     import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
     import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
-    import syntax.std.traversable._
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
     // wrapped GremlinPipeline is prefixed with _ to ensure we always use the method `gremlin` which copies `_gremlin`
     case class GremlinScala[H, T <: HList](_gremlin: GremlinPipeline[_, H]) {
       type CurrentTypes = H :: T
+      type CurrentTypesReversed = Reverse[CurrentTypes]#Out
+
+      //type C1 = CurrentTypesReversed#Out
+      //type C1 = Reverse[CurrentTypes]
+      //type C2 = IsHCons[C1]
+      //type C3 = C2#H
+      //type Tail = IsHCons[T]
 
       def toList(): List[H] = gremlin.toList.toList
       def as(name: String) = GremlinScala[H, T](gremlin.as(name))
@@ -33,6 +39,11 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
       //def pathBoring = GremlinScala[JList[_], CurrentTypes](gremlin.path())
 
       def path: GremlinScala[CurrentTypes, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypes])
+      //def path = addPipe(new PathPipe[H, Reverse[H::T]#Out])
+      //def path: GremlinScala[CurrentTypesReversed, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypesReversed])
+      //def path: GremlinScala[Reverse[CurrentTypes]#Out, CurrentTypes] = addPipe(new PathPipe[H, Reverse[CurrentTypes]#Out])
+      //def path = addPipe(new PathPipe[H, Reverse[CurrentTypes]#Out])
+
 
       def gremlin = {
         val target = new GremlinPipeline[Unit, H]
@@ -76,7 +87,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
       def toHList[T <: HList](path: List[_]): T = 
         if(path.length == 0)
           HNil.asInstanceOf[T]
-        else 
+        else
           (path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
     }
 
@@ -89,6 +100,9 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
     //vertexGremlin.outE  //once properly immutable, this can be uncommented → make that a test!
     vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    //vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
+    //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: _ ⇒ println(l) }
+    //vertexGremlin.outE.path.toList foreach { l: _ :: _ :: _ ⇒ println(l) }
     //vertexGremlin.outE.inV.pathBoring.toList foreach println
     //attention: the HList is reversed in it's types...
     //vertexGremlin.outE.inV.path.toList foreach { l: Vertex :: Edge :: Vertex :: HNil ⇒ println(l) }
