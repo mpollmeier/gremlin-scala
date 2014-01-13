@@ -10,7 +10,88 @@ import ops.hlist._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
-  it("keeps the types in right order so we don't have to reverse them") {
+  it("using a simple wrapper that maintains the right order of the types by appending") {
+    import com.tinkerpop.blueprints.Edge
+    import com.tinkerpop.blueprints.Vertex
+    import com.tinkerpop.pipes.Pipe
+    import com.tinkerpop.pipes.AbstractPipe
+    import com.tinkerpop.pipes.transform.TransformPipe
+    import com.tinkerpop.gremlin.java.GremlinPipeline
+    import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory
+    import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
+    import shapeless.test.illTyped
+
+    case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
+      def toList(): List[End] = gremlin.toList.toList
+      def as(name: String) = GremlinScala[End, Types](gremlin.as(name))
+      def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) = 
+        GremlinScala[E, p.Out](gremlin.back(to).asInstanceOf[GremlinPipeline[_,E]])
+
+      def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
+        addPipe(new PathPipe[End, Types])
+
+      def addPipe[E](pipe: Pipe[End, E])(implicit p:Prepend[Types, E::HNil]) = 
+        GremlinScala[E, p.Out](gremlin.add(pipe))
+    }
+
+    implicit class GremlinEdgeSteps[End <: Edge, Types <: HList](gremlinScala: GremlinScala[End,Types])
+      extends GremlinScala[End, Types](gremlinScala.gremlin) {
+
+      def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.inV)
+    }
+
+    implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
+      extends GremlinScala[End, Types](gremlinScala.gremlin) {
+
+      def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](gremlin.outE())
+    }
+
+    class PathPipe[S, E <: HList] extends AbstractPipe[S, E] with TransformPipe[S, E] {
+      override def setStarts(starts: JIterator[S]): Unit = {
+        super.setStarts(starts)
+        this.enablePath(true)
+      }
+
+      override def processNextStart(): E = starts match {
+        case starts: Pipe[_,_] ⇒ 
+          starts.next()
+          val path: JList[_] = starts.getCurrentPath
+          toHList[E](path.toList)
+      }
+
+      def toHList[T <: HList](path: List[_]): T = 
+        if(path.length == 0)
+          HNil.asInstanceOf[T]
+        else
+          (path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
+    }
+
+    val graph = TinkerGraphFactory.createTinkerGraph
+    def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
+    def vertexGremlin = GremlinScala[Vertex, Vertex :: HNil](vertexPipeline)
+
+    print(vertexGremlin.outE)
+    print(vertexGremlin.outE.inV)
+    print(vertexGremlin.as("x").outE.back[Vertex]("x"))
+
+    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: HNil ⇒ println(l) }
+
+    // verify that these do not compile
+    illTyped {""" vertexGremlin.inV """}
+    illTyped {""" vertexGremlin.outE.inV.inV """}
+    illTyped {""" vertexGremlin.outE.back[Edge]("x").outE """}
+    illTyped {""" edgeGremlin.outE """}
+    illTyped {""" edgeGremlin.inV.outE.outE """}
+
+    def print(gremlin: GremlinScala[_,_]): Unit = {
+      println("----------results---------")
+      gremlin.toList foreach println
+    }
+  }
+
+
+  ignore("keeps the types in right order so we don't have to reverse them") {
     class Pipeline[End, Types <: HList] {
 
       def toList: List[End] = ???
@@ -31,7 +112,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     p.stringStep.intStep.path.toList.foreach { _: String :: String :: Int :: HNil ⇒ }
   }
 
-  it("demonstrates the problem for shapeless-dev") {
+  ignore("demonstrates the problem for shapeless-dev") {
     // type Head is the first entry of the HList L - one could aswell get that vis IsHCons[L], but this is simpler for now
     class Pipeline[Head, L <: HList](implicit val R:Reverse[L]) {
 
@@ -70,7 +151,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     //p.allPreviousStepsAsListInReverseOrder.iterate foreach {_: p.LRev ⇒ }
   }
 
-  it("is a simple wrapper around Pipeline that holds the types") {
+  ignore("is a simple wrapper around Pipeline that holds the types") {
     import com.tinkerpop.blueprints.Edge
     import com.tinkerpop.blueprints.Vertex
     import com.tinkerpop.pipes.Pipe
@@ -165,7 +246,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     }
   }
 
-  it("fifth try: pipes as hlist") {
+  ignore("fifth try: pipes as hlist") {
     trait Element { def id: Int }
     case class Vertex(id: Int, outE: Iterator[Edge]) extends Element
     case class Edge(id: Int, label: String, inV: Vertex) extends Element
