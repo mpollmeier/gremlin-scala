@@ -5,10 +5,70 @@ import org.scalatest.matchers.ShouldMatchers
 import scala.collection.JavaConversions._
 
 import shapeless._
-//import syntax.std.traversable._
 import ops.hlist._
+//import syntax.std.traversable._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers {
+
+  it("keeps the types in right order so we don't have to reverse them") {
+    class Pipeline[End, Types <: HList] {
+
+      def toList: List[End] = ???
+
+      def intStep(implicit p:Prepend[Types, Int :: HNil]): Pipeline[Int, p.Out] = ???
+      def stringStep(implicit p:Prepend[Types, String :: HNil]): Pipeline[String, p.Out] 
+        = addStep[String]
+
+      def path(implicit p:Prepend[Types, Types :: HNil]): Pipeline[Types, p.Out] = ???
+
+      def addStep[E](implicit p:Prepend[Types, E :: HNil]): Pipeline[E, p.Out] = ???
+    }
+
+    val p = new Pipeline[String, String :: HNil]
+    val p1: Pipeline[Int, String :: Int :: HNil] = p.intStep
+    p1.path.toList.foreach {_: String :: Int :: HNil ⇒ }
+
+    p.stringStep.intStep.path.toList.foreach { _: String :: String :: Int :: HNil ⇒ }
+  }
+
+  it("demonstrates the problem for shapeless-dev") {
+    // type Head is the first entry of the HList L - one could aswell get that vis IsHCons[L], but this is simpler for now
+    class Pipeline[Head, L <: HList](implicit val R:Reverse[L]) {
+
+      def reifyR[L <: HList](implicit R:Reverse[L]): Reverse[L]{type Out = R.Out} = R
+      type L1 = L
+
+      //type LRev = R.Out
+      type LRev
+      //val head = implicitly[IsHCons[L]]
+      //type Head = head.H
+      val rev = reifyR[L]
+      //type LRev = rev.Out
+
+
+      // get a list of all Head elements
+      def iterate: List[Head] = ???
+
+      // the Head type is the reverse of L
+      def allPreviousStepsAsListInReverseOrder: Pipeline[LRev, LRev :: L]{type LRev = rev.Out} = ???
+
+      def allPreviousStepsAsList: Pipeline[L, L :: L] = ???
+    }
+
+    val p = new Pipeline[String, String :: Int :: HNil]
+    def reifyR[L <: HList](implicit R:Reverse[L]): Reverse[L]{type Out = R.Out} = R
+    val rev = reifyR[p.L1]
+    //val rev = reifyR[String :: Int :: HNil]
+    type LR2 = rev.Out
+    type LR = Int :: String :: HNil
+    implicitly[LR2 =:= LR]
+    //implicitly[p.LRev =:= LR] //does not compile
+
+    p.iterate foreach {_: String ⇒ }
+    p.allPreviousStepsAsList.iterate foreach {_: String :: Int :: HNil ⇒ }
+    //p.allPreviousStepsAsListInReverseOrder.iterate foreach {_: Int :: String :: HNil ⇒ }
+    //p.allPreviousStepsAsListInReverseOrder.iterate foreach {_: p.LRev ⇒ }
+  }
 
   it("is a simple wrapper around Pipeline that holds the types") {
     import com.tinkerpop.blueprints.Edge
@@ -22,32 +82,41 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import shapeless.test.illTyped
 
     // H is the out type of the _last_ pipe, i.e. the result type of the whole pipeline
-    case class GremlinScala[H, T <: HList](gremlin: GremlinPipeline[_, H]) {
+    case class GremlinScala[H, T <: HList]
+      (gremlin: GremlinPipeline[_, H])
+      (implicit val R:Reverse[H::T]) {
       type CurrentTypes = H :: T
+      //val reifyR: Reverse[H::T]{type Out = R.Out} = R
       //type CurrentTypesReversed = Reverse[CurrentTypes]#Out
+      //def reifyR[L <: HList](implicit R:Reverse[L]): Reverse[L]{type Out = R.Out} = R
+      //def reifyR: Reverse[CurrentTypes]{type Out = R.Out} = R
+      //val rev = reifyR
+      //type CurrentTypesReversed = rev.Out
+      //type CurrentTypesReversed = reifyR.Out
+      type CurrentTypesReversed = R.Out
 
       def toList(): List[H] = gremlin.toList.toList
-      def as(name: String) = GremlinScala[H, T](gremlin.as(name))
-      def back[S](to: String) = GremlinScala[S, CurrentTypes](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
+      //def as(name: String) = GremlinScala[H, T](gremlin.as(name))
+      //def back[S](to: String) = GremlinScala[S, CurrentTypes](gremlin.back(to).asInstanceOf[GremlinPipeline[_,S]])
 
-      def path: GremlinScala[CurrentTypes, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypes])
-      //def path: GremlinScala[CurrentTypesReversed, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypesReversed])
+      //def path: GremlinScala[CurrentTypes, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypes])
+      def path(implicit R3: Reverse[CurrentTypesReversed::CurrentTypes]): GremlinScala[CurrentTypesReversed, CurrentTypes] = addPipe(new PathPipe[H, CurrentTypesReversed])
       //def pathBoring = GremlinScala[JList[_], CurrentTypes](gremlin.path())
 
-      def addPipe[E](pipe: Pipe[H, E]) = GremlinScala[E, CurrentTypes](gremlin.add(pipe))
+      def addPipe[E](pipe: Pipe[H, E])(implicit R2:Reverse[E::CurrentTypes]) = GremlinScala[E, CurrentTypes](gremlin.add(pipe))
     }
 
-    implicit class GremlinEdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
-      extends GremlinScala[H, T](gremlinScala.gremlin) {
+    //implicit class GremlinEdgeSteps[H <: Edge, T <: HList](gremlinScala: GremlinScala[H, _])
+      //extends GremlinScala[H, T](gremlinScala.gremlin) {
 
-      def inV = GremlinScala[Vertex, CurrentTypes](gremlin.inV)
-    }
+      //def inV = GremlinScala[Vertex, CurrentTypes](gremlin.inV)
+    //}
 
-    implicit class GremlinVertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
-      extends GremlinScala[H, T](gremlinScala.gremlin) {
+    //implicit class GremlinVertexSteps[H <: Vertex, T <: HList](gremlinScala: GremlinScala[H, _])
+      //extends GremlinScala[H, T](gremlinScala.gremlin) {
 
-      def outE = GremlinScala[Edge, CurrentTypes](gremlin.outE())
-    }
+      //def outE = GremlinScala[Edge, CurrentTypes](gremlin.outE())
+    //}
 
     class PathPipe[S, E <: HList] extends AbstractPipe[S, E] with TransformPipe[S, E] {
       override def setStarts(starts: JIterator[S]): Unit = {
@@ -73,21 +142,21 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
     def vertexGremlin = GremlinScala[Vertex, HNil](vertexPipeline)
 
-    print(vertexGremlin.outE)
-    print(vertexGremlin.outE.inV)
-    print(vertexGremlin.as("x").outE.back[Vertex]("x"))
+    //print(vertexGremlin.outE)
+    //print(vertexGremlin.outE.inV)
+    //print(vertexGremlin.as("x").outE.back[Vertex]("x"))
 
-    vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
-    vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
+    //vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    //vertexGremlin.outE.path.toList foreach { l: Edge :: Vertex :: _ ⇒ println(l) }
     //attention: the HList is reversed in it's types... I'm working on that... and then the next line should work
     //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: _ ⇒ println(l) }
 
     // these do not compile (and they shouldn't!)
-    illTyped {""" vertexGremlin.inV """}
-    illTyped {""" vertexGremlin.outE.inV.inV """}
-    illTyped {""" vertexGremlin.outE.back[Edge]("x").outE """}
-    illTyped {""" edgeGremlin.outE """}
-    illTyped {""" edgeGremlin.inV.outE.outE """}
+    //illTyped {""" vertexGremlin.inV """}
+    //illTyped {""" vertexGremlin.outE.inV.inV """}
+    //illTyped {""" vertexGremlin.outE.back[Edge]("x").outE """}
+    //illTyped {""" edgeGremlin.outE """}
+    //illTyped {""" edgeGremlin.inV.outE.outE """}
 
     def print(gremlin: GremlinScala[_,_]): Unit = {
       println("----------results---------")
