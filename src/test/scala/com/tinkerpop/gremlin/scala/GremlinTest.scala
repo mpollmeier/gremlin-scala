@@ -32,8 +32,8 @@ class GremlinTest extends FunSpec with ShouldMatchers with TestGraph {
 
 trait TestGraph {
   val graph: ScalaGraph = TinkerGraphFactory.createTinkerGraph
-  def vertices = graph.V
-  def edges = graph.E
+  //def vertices = graph.V
+  //def edges = graph.E
 
   val v1 = graph.v(1)
   val v2 = graph.v(2)
@@ -42,5 +42,5 @@ trait TestGraph {
   val v5 = graph.v(5)
   val v6 = graph.v(6)
 
-  def print(pipeline: GremlinScalaPipeline[_, _]) = println(pipeline.toList)
+  def print(pipeline: GremlinScala[_,_]) = println(pipeline.toList)
 }

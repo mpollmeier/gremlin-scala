@@ -6,7 +6,6 @@ import scala.collection.JavaConversions._
 
 import shapeless._
 import ops.hlist._
-//import syntax.std.traversable._
 
 class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
@@ -67,7 +66,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     }
 
     val graph = TinkerGraphFactory.createTinkerGraph
-    def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
+    def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.getVertex(1))
     def vertexGremlin = GremlinScala[Vertex, Vertex :: HNil](vertexPipeline)
 
     print(vertexGremlin.outE)
@@ -220,7 +219,7 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     }
 
     val graph = TinkerGraphFactory.createTinkerGraph
-    def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.v(1))
+    def vertexPipeline = new GremlinPipeline[Unit, Vertex](graph.getVertex(1))
     def vertexGremlin = GremlinScala[Vertex, HNil](vertexPipeline)
 
     //print(vertexGremlin.outE)

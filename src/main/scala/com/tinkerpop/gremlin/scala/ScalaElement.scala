@@ -37,3 +37,10 @@ trait ScalaElement extends Element with Dynamic {
     case _              ⇒ false
   }
 }
+
+/**Implicit conversions between Element and ScalaElement */
+//object ScalaElement {
+  //def apply(vertex: Vertex) = wrap(vertex)
+  //implicit def wrap(vertex: Vertex) = new ScalaVertex(vertex)
+  //implicit def unwrap(wrapper: ScalaVertex) = wrapper.vertex
+//}
