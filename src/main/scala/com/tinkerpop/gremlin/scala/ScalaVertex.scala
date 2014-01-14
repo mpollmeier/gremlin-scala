@@ -14,10 +14,10 @@ class ScalaVertex(val vertex: Vertex) extends Vertex with ScalaElement {
   def out: GremlinScala[Vertex, Vertex :: Vertex :: HNil] = 
     GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(vertex)).out
  
-//   /** follow outgoing edges to the vertices, limited by given branch factor */
-//   def out(branchFactor: Int): GremlinScalaPipeline[Vertex, Vertex] =
-//     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out(branchFactor)
-// 
+   /** follow outgoing edges to the vertices, limited by given branch factor */
+  def out(branchFactor: Int): GremlinScala[Vertex, Vertex :: Vertex :: HNil] = 
+    GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(vertex)).out(branchFactor)
+ 
 //   /** follow outgoing edges with given labels to the vertices */
 //   def out(labels: String*): GremlinScalaPipeline[Vertex, Vertex] =
 //     new GremlinScalaPipeline[Vertex, Vertex].start(vertex).out(labels: _*)

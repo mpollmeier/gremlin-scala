@@ -35,7 +35,7 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("follows the out vertices") {
       graph.v(1).out.property[String]("name").toList should be(List("vadas", "josh", "lop"))
-      //graph.v(1).out(1).property("name").toList should be(List("vadas"))
+      graph.v(1).out(1).property[String]("name").toList should be(List("vadas"))
     }
 
     //it("gets the in vertices") {
