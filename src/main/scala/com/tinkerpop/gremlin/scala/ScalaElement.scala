@@ -2,17 +2,16 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.blueprints.Element
 import java.util.{ Set ⇒ JSet }
-import scala.language.dynamics
 import scala.reflect.ClassTag
 
-trait ScalaElement extends Element with Dynamic {
+trait ScalaElement extends Element {
   def element: Element
 
-  def apply(key: String): Any = getProperty(key)
-  def selectDynamic(key: String): Any = getProperty(key)
+  /** returns null if property not set*/
+  def property[A](name: String): A = element.getProperty(name)
 
   /** returns Some[A] if element present and of type A, otherwise None */
-  def property[A: ClassTag](name: String): Option[A] = {
+  def propertyOption[A: ClassTag](name: String): Option[A] = {
     val value: A = element.getProperty(name)
     value match {
       case value: A ⇒ Option(value)
@@ -38,9 +37,3 @@ trait ScalaElement extends Element with Dynamic {
   }
 }
 
-/**Implicit conversions between Element and ScalaElement */
-//object ScalaElement {
-  //def apply(vertex: Vertex) = wrap(vertex)
-  //implicit def wrap(vertex: Vertex) = new ScalaVertex(vertex)
-  //implicit def unwrap(wrapper: ScalaVertex) = wrapper.vertex
-//}

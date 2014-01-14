@@ -11,13 +11,19 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("properties") {
     it("gets a property") {
-      graph.v(1).getProperty[String]("name") should be("marko")
-      //graph.v(1).property[String]("name") should be("marko")
+      graph.v(1).property[String]("name") should be("marko")
+      graph.v(1).property[String]("doesnt exist") should be(null)
+    }
+
+    it("gets a property null-safe") {
+      graph.v(1).property[String]("name") should be("marko")
+      graph.v(1).propertyOption[Int]("name") should be(None)
+      graph.v(1).propertyOption[String]("doesnt exist") should be(None)
     }
 
     it("sets a property") {
       graph.v(1).setProperty("name", "updated")
-      graph.v(1).getProperty[String]("name") should be("updated")
+      graph.v(1).property[String]("name") should be("updated")
     }
   }
 
@@ -27,10 +33,12 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.V.path.toList foreach {_: Vertex :: HNil ⇒ /* compiles */ }
     }
 
-    //it("gets the out vertices") {
-      //graph.v(1).out.property("name").toList should be(List("vadas", "josh", "lop"))
+    it("follows the out vertices") {
+      graph.v(1).out.toList foreach println
+      //graph.v(1).out//.getProperty[String]("name").toList should be(List("vadas", "josh", "lop"))
+      //graph.v(1).out.getProperty[String]("name").toList should be(List("vadas", "josh", "lop"))
       //graph.v(1).out(1).property("name").toList should be(List("vadas"))
-    //}
+    }
 
     //it("gets the in vertices") {
       //graph.v(3).in.property("name").toList should be(List("marko", "josh", "peter"))

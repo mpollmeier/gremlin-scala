@@ -40,19 +40,24 @@ case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
 }
 
 object ElementSpecific {
+  implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
+    extends GremlinScala[End, Types](gremlinScala.gremlin) {
+
+    def out(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.out())
+    def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](gremlin.outE())
+  }
+
   implicit class GremlinEdgeSteps[End <: Edge, Types <: HList](gremlinScala: GremlinScala[End,Types])
     extends GremlinScala[End, Types](gremlinScala.gremlin) {
 
     def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.inV)
   }
 
-  implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
-    extends GremlinScala[End, Types](gremlinScala.gremlin) {
-
-    def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](gremlin.outE())
-  }
+  implicit def vertexToGremlinScala(v: Vertex) = GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(v))
 }
 import ElementSpecific._
+
+
 
 
 //class GremlinScala[S, E] extends Pipeline[S, E] {
