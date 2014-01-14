@@ -29,8 +29,12 @@ import ops.hlist._
 case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
   def toList(): List[End] = gremlin.toList.toList
   def as(name: String) = GremlinScala[End, Types](gremlin.as(name))
+
   def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) = 
     GremlinScala[E, p.Out](gremlin.back(to).asInstanceOf[GremlinPipeline[_,E]])
+
+  def property[E](name: String)(implicit p:Prepend[Types, E::HNil]) = 
+    GremlinScala[E, p.Out](gremlin.property(name).asInstanceOf[GremlinPipeline[_,E]])
 
   def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
     addPipe(new PathPipe[End, Types])
