@@ -38,3 +38,37 @@ resolvers ++= Seq(
   "Aduna Software" at "http://repo.aduna-software.org/maven2/releases/", //for org.openrdf.sesame
   "Restlet Framework" at "http://maven.restlet.org"
 )
+
+publishTo <<= version { (v: String) =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { x => false }
+
+pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:mpollmeier/gremlin-scala.git</url>
+    <connection>scm:git:git@github.com:mpollmeier/gremlin-scala.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>mpollmeier</id>
+      <name>Michael Pollmeier</name>
+      <url>http://mpollmeier.github.com</url>
+    </developer>
+  </developers>
+
+credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
