@@ -67,7 +67,7 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
     <developer>
       <id>mpollmeier</id>
       <name>Michael Pollmeier</name>
-      <url>http://mpollmeier.github.com</url>
+      <url>http://www.michaelpollmeier.com</url>
     </developer>
   </developers>
 

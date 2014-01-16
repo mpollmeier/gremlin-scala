@@ -3,8 +3,12 @@ after_script:
 - if [[ $TRAVIS_TEST_RESULT == 0 && "$TRAVIS_BRANCH" == "master" ]]; then sbt "publish";
   fi
 scala:
-  - 2.10.3
+- 2.10.3
 jdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
+- oraclejdk7
+- openjdk7
+- openjdk6
+env:
+  global:
+  - secure: YudhwA6SZnl+XplXA3ADyHFasR8BwLcxB8KFAJjwdLogdzbP3cf1NczwvvhZqhltDJP1gRSYpbaiIIv7sZW78pzHz859RUoonXTXCuhlzNqR7mf2S5SIcTCjlMzYdDoVPteOIW3AWJoT6u+W02FGFbDvUzxf+SHEVcMSyZTS+mk=
+  - secure: UD9WEuxLu/MHlwD2OFrh8xeA6XyU2XnynsuJC78P4AgsVkd47uQm6yWIwqVrogRX4S4UWyG/E+i931KPO8AlRp87/37t3Y5g95eLOKclcvXWLeHWHd9C8ulMhoO1Lr+Me6y9bgPWy7QaChrQNuvl6hUzFdeUq/nGMKrE5T4Fwok=
