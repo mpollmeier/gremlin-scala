@@ -21,3 +21,4 @@ project/plugins/project/
 .project
 .settings
 *.swp
+.lib-src
