@@ -19,6 +19,19 @@ For more information about Gremlin see the [Gremlin docs](http://gremlindocs.com
 If you have a question please check out the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
 Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
 
+Install
+=======
+Add Sonatype snapshots to your project/plugins.sbt :
+
+```
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+```
+
+Import the last snapshot in your build.sbt :
+
+```
+"com.tinkerpop.gremlin" % "gremlin-scala_2.10" % "2.5.0-SNAPSHOT"
+```
 
 Sample usage
 =============
