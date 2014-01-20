@@ -2,7 +2,7 @@ name := "gremlin-scala"
 
 version := "2.5.0-SNAPSHOT"
 
-organization := "com.tinkerpop.gremlin"
+organization := "com.michaelpollmeier"
 
 scalaVersion := "2.10.3"
 
