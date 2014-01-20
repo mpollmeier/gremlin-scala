@@ -1,6 +1,6 @@
 name := "gremlin-scala"
 
-version := "2.5.0-SNAPSHOT"
+version := "2.4.0t-SNAPSHOT"
 
 organization := "com.michaelpollmeier"
 
