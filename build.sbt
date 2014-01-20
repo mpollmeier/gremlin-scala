@@ -2,7 +2,7 @@ name := "gremlin-scala"
 
 version := "2.5.0-SNAPSHOT"
 
-organization := "com.tinkerpop.gremlin"
+organization := "com.michaelpollmeier"
 
 scalaVersion := "2.10.3"
 
@@ -14,8 +14,8 @@ scalaVersion := "2.10.3"
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0-SNAPSHOT"
   Seq(
-    "com.tinkerpop.gremlin" % "gremlin-java" % gremlinVersion withSources,
-    "com.tinkerpop" % "pipes" % gremlinVersion withSources,
+    "com.tinkerpop.gremlin" % "gremlin-java" % gremlinVersion,
+    "com.tinkerpop" % "pipes" % gremlinVersion,
     "com.tinkerpop.blueprints" % "blueprints-graph-jung" % gremlinVersion % "provided",
     "com.tinkerpop.blueprints" % "blueprints-graph-sail" % gremlinVersion % "provided",
     "com.tinkerpop.blueprints" % "blueprints-sail-graph" % gremlinVersion % "provided",
@@ -44,3 +44,37 @@ resolvers ++= Seq(
   "Aduna Software" at "http://repo.aduna-software.org/maven2/releases/", //for org.openrdf.sesame
   "Restlet Framework" at "http://maven.restlet.org"
 )
+
+publishTo <<= version { (v: String) =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishMavenStyle := true
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { x => false }
+
+pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>git@github.com:mpollmeier/gremlin-scala.git</url>
+    <connection>scm:git:git@github.com:mpollmeier/gremlin-scala.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>mpollmeier</id>
+      <name>Michael Pollmeier</name>
+      <url>http://www.michaelpollmeier.com</url>
+    </developer>
+  </developers>
+
+credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))

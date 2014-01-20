@@ -124,7 +124,9 @@ The test specifications are documenting how you can use Gremlin-Scala, this is a
 Adding Gremlin-Scala as a dependency
 =============
 ```scala
-/* sbt */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.1"
+/* sbt */
+/* release  */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.1"
+/* snapshot */ "com.michaelpollmeier" %% "gremlin-scala" % "2.5.0-SNAPSHOT"
 ```
 ```xml
 <!-- Maven -->
