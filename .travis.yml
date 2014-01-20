@@ -10,5 +10,5 @@ jdk:
 - openjdk6
 env:
   global:
-  - secure: YudhwA6SZnl+XplXA3ADyHFasR8BwLcxB8KFAJjwdLogdzbP3cf1NczwvvhZqhltDJP1gRSYpbaiIIv7sZW78pzHz859RUoonXTXCuhlzNqR7mf2S5SIcTCjlMzYdDoVPteOIW3AWJoT6u+W02FGFbDvUzxf+SHEVcMSyZTS+mk=
-  - secure: UD9WEuxLu/MHlwD2OFrh8xeA6XyU2XnynsuJC78P4AgsVkd47uQm6yWIwqVrogRX4S4UWyG/E+i931KPO8AlRp87/37t3Y5g95eLOKclcvXWLeHWHd9C8ulMhoO1Lr+Me6y9bgPWy7QaChrQNuvl6hUzFdeUq/nGMKrE5T4Fwok=
+  - SONATYPE_USER=mpollmeier
+  - secure: ckc8wVBi9QhJErs1MxTukyCVRx76vEaoLEnIjfIUPTMg7qX6NAXTNsPbY6FmI3c2+sL2ljKFyQt5PwIXACQVetkOkmdNYoBDE8njhvIQ21ITupsTSkxDd+bMiUft1r2jhmZYQwXnGIHeX0Pml44eVTci3r8WFt0XZpdCUzE9mxw=
