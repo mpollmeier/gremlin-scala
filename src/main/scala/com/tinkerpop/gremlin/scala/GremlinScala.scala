@@ -26,6 +26,9 @@ import scala.collection.JavaConversions._
 import shapeless._
 import ops.hlist._
 
+/**
+  * Types holds the types of each step in the gremlin pipeline. End is simply the last type of that HList
+  * */
 case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
   def toList(): List[End] = gremlin.toList.toList
   def as(name: String) = GremlinScala[End, Types](gremlin.as(name))
