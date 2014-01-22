@@ -37,6 +37,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
 
 resolvers ++= Seq(
   "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + "/.m2/repository",
+  "Local Ivy2 Repository" at Path.userHome.asFile.toURI.toURL + "/.ivy2/cache",
   "Maven Central" at "http://repo1.maven.org/maven2/",
   "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/",
   "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
