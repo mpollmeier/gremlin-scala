@@ -139,7 +139,7 @@ Adding Gremlin-Scala as a dependency
 
 Gremlin-Console
 =============
-You can play with Gremlin in an interactive console in gremlin-standalone/bin/gremlin-scala.sh: [Download](http://www.michaelpollmeier.com/fileshare/gremlin-scala-2.4.0-standalone.tgz)
+You can play with Gremlin in an interactive console in gremlin-standalone/bin/gremlin-scala.sh: [Download](http://box.michaelpollmeier.com/fileshare/gremlin-scala-2.4.2-standalone.tgz)
 ```shell
          \,,,/
          (o o)
