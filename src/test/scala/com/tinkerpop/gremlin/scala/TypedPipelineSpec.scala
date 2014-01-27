@@ -16,14 +16,16 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
     import shapeless.test.illTyped
 
+    //TODO: implement pathpipe?
     //TODO: provide overridden constructor that takes Gremlin instead of Pipeline that creates a dummy step
     //Alternative: GremlinScala.of(graph)
 
-    case class GremlinScala[End, Types <: HList](pipeline: Pipeline[_, End]) {
+    case class GremlinScala[Types <: HList, End](pipeline: Pipeline[_, End]) {
       def toList(): List[End] = pipeline.toList.toList
-      def as(name: String) = GremlinScala[End, Types](pipeline.as(name))
-      //def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) = 
-        //GremlinScala[E, p.Out](pipeline.back(to).asInstanceOf[GremlinPipeline[_,E]])
+      def as(name: String) = GremlinScala[Types, End](pipeline.as(name))
+
+      def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) =
+        GremlinScala[p.Out, E](pipeline.back(to).asInstanceOf[Pipeline[_,E]])
 
       //def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
         //addPipe(new PathPipe[End, Types])
@@ -32,16 +34,16 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
         //GremlinScala[E, p.Out](pipeline.add(pipe))
     }
 
-    implicit class GremlinEdgeSteps[End <: Edge, Types <: HList](gremlinScala: GremlinScala[End,Types])
-      extends GremlinScala[End, Types](gremlinScala.pipeline) {
+    implicit class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
+      extends GremlinScala[Types, End](gremlinScala.pipeline) {
 
-      def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](pipeline.inV)
+      def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](pipeline.inV)
     }
 
-    implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
-      extends GremlinScala[End, Types](gremlinScala.pipeline) {
+    implicit class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
+      extends GremlinScala[Types, End](gremlinScala.pipeline) {
 
-      def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](pipeline.outE())
+      def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](pipeline.outE())
     }
 
     //class PathPipe[S, E <: HList] extends AbstractPipe[S, E] with TransformPipe[S, E] {
@@ -66,28 +68,24 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
     val graph = TinkerFactory.createClassic()
     def gremlin: Gremlin[_, Vertex] = Gremlin.of(graph).asInstanceOf[Gremlin[_, Vertex]]
-    /*def gremlin = new GremlinPipeline[Unit, Vertex](graph.getVertex(1))*/
-    def gs = GremlinScala[Vertex, Vertex :: HNil](gremlin.v(1:Integer))
-    println(gs.outE.toList)
+    def gs = GremlinScala[Vertex :: HNil, Vertex](gremlin.v(1:Integer))
 
-    //print(vertexGremlin.outE)
-    //print(vertexGremlin.outE.inV)
-    //print(vertexGremlin.as("x").outE.back[Vertex]("x"))
+    print(gs.outE)
+    print(gs.outE.inV)
+    print(gs.as("x").outE.back[Vertex]("x"))
 
-    //vertexGremlin.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
-    //vertexGremlin.outE.path.toList foreach { l: Vertex :: Edge :: HNil ⇒ println(l) }
+    //gs.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
+    //gs.outE.path.toList foreach { l: Vertex :: Edge :: HNil ⇒ println(l) }
 
     //// verify that these do not compile
-    //illTyped {""" vertexGremlin.inV """}
-    //illTyped {""" vertexGremlin.outE.inV.inV """}
-    //illTyped {""" vertexGremlin.outE.back[Edge]("x").outE """}
-    //illTyped {""" edgeGremlin.outE """}
-    //illTyped {""" edgeGremlin.inV.outE.outE """}
+    illTyped {""" gs.inV """}
+    illTyped {""" gs.outE.inV.inV """}
+    illTyped {""" gs.outE.back[Edge]("x").outE """}
 
-    //def print(gremlin: GremlinScala[_,_]): Unit = {
-      //println("----------results---------")
-      //gremlin.toList foreach println
-    //}
+    def print(gremlin: GremlinScala[_,_]): Unit = {
+      println("----------results---------")
+      gremlin.toList foreach println
+    }
   }
 
  
