@@ -16,7 +16,8 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
   Seq(
     "com.tinkerpop.gremlin" % "gremlin-java" % gremlinVersion,
-    "com.tinkerpop.blueprints" % "blueprints-tinkergraph" % gremlinVersion,
+    "com.tinkerpop" % "tinkergraph" % gremlinVersion,
+    /*"com.tinkerpop.blueprints" % "blueprints-tinkergraph" % gremlinVersion,*/
     /*"com.tinkerpop.blueprints" % "blueprints-core" % gremlinVersion,*/
     /*"com.tinkerpop.blueprints" % "blueprints-io" % gremlinVersion,*/
     /*"com.tinkerpop.blueprints" % "blueprints-generator" % gremlinVersion,*/

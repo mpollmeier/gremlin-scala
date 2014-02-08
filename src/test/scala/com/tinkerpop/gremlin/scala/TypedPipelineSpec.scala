@@ -10,13 +10,24 @@ import ops.hlist._
 class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
   it("uses T3") {
+    //import com.tinkerpop.gremlin.structure._
     import com.tinkerpop.gremlin._
+    //import com.tinkerpop.gremlin.pipes.map.PathPipe
     import com.tinkerpop.blueprints._
-    import com.tinkerpop.blueprints.tinkergraph.TinkerFactory
-    import java.util.{List ⇒ JList, Iterator ⇒ JIterator}
+    import com.tinkerpop.tinkergraph.TinkerFactory
+    import java.util.function.{Function => JFunction}
+    import java.util.{List => JList, Iterator => JIterator}
     import shapeless.test.illTyped
 
-    //TODO: implement pathpipe?
+    implicit def toJavaFunction[A,B](f: Function1[A,B]) = new JFunction[A,B] {
+      override def apply(a: A): B = f(a)
+    }
+
+    //path concept: don't use standard path, but hlist
+    //problem: uses simplepath which doesnt support path - what's different?
+    //TODO: get path step so that it uses the pathoptimizer... so that it doesnt complain any more?
+      //Gremlin: PathOptimizer
+    // alternative: do what gremlin does manually
     //TODO: provide overridden constructor that takes Gremlin instead of Pipeline that creates a dummy step
     //Alternative: GremlinScala.of(graph)
 
@@ -27,12 +38,88 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
       def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) =
         GremlinScala[p.Out, E](pipeline.back(to).asInstanceOf[Pipeline[_,E]])
 
-      //def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
-        //addPipe(new PathPipe[End, Types])
+      //def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[p.Out, Types] =
+        //GremlinScala[p.Out, Types](pipeline.addPipe(new PathPipe(pipeline, null).asInstanceOf[Pipeline[End, Types]]))
+        //GremlinScala[p.Out, Types](pipeline.path().asInstanceOf[Pipeline[End, Types]])
+        //addPipe(new com.tinkerpop.gremlin.pipes.map.PathPipe[End](pipeline))
+      //def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[p.Out, Types] =
+        //addPipe(new MyPathPipe3[End, Types](pipeline))
+        //doesnt work
 
-      //def addPipe[E](pipe: Pipe[End, E])(implicit p:Prepend[Types, E::HNil]) = 
-        //GremlinScala[E, p.Out](pipeline.add(pipe))
+        //doesnt work
+      //def path2 = GremlinScala[Types, End](
+        //pipeline.addPipe(new MyPathPipe3[End, Types](pipeline)))
+
+      ////works - where's the difference?
+      //def path3 = pipeline.path()
+
+      ////works - difference must be PathPipe and my PathPipe - copy it
+      //def path4:Pipeline[Vertex, Vertex] = pipeline.addPipe(
+        //new PathPipe[End](pipeline))
+
+      ////doesnt work - holder is simpleholder for some reason... whats different?
+      //def path5:Pipeline[Vertex, Vertex] = pipeline.addPipe(
+        //new MyPathPipe[End](pipeline))
+
+      ////works
+      //def path6:Pipeline[Vertex, Vertex] = pipeline.addPipe(
+        //new MyPathPipe2[End](pipeline))
+
+      ////works
+      //def path7:Pipeline[Vertex, Vertex] = pipeline.addPipe(
+        //new MyPathPipe4[End](pipeline))
+
+      //def path8:Pipeline[Vertex, Vertex] = pipeline.addPipe(
+        //new MyPathPipe8[End, Types](pipeline))
+
+      def addPipe[E](pipe: Pipe[End, E])(implicit p:Prepend[Types, E::HNil]) =
+        GremlinScala[p.Out, E](pipeline.addPipe(pipe))
     }
+
+    //class MyPathPipe2[S](pipeline: Pipeline[_,S]) extends PathPipe[S](pipeline)
+    //class MyPathPipe4[S](pipeline: Pipeline[_,S]) extends PathPipe[S](pipeline) {
+      //this.setFunction { h: Holder[_] =>
+        //println(s"holder: $h, ${h.getPath()}")
+        ////HNil.asInstanceOf[E] }
+        //h.getPath
+      //}
+    //}
+    //class MyPathPipe8[S, E <: HList](pipeline: Pipeline[_,S]) extends PathPipe[S](pipeline) {
+      //this.setFunction { h: Holder[_] =>
+        //println(s"holder: $h, ${h.getPath()}")
+        ////HNil.asInstanceOf[E] }
+        //h.getPath
+        ////HNil.asInstanceOf[E] }
+      //}
+
+      //override def processNextStart(): E = starts match {
+        //case starts: Pipe[_,_] ⇒ 
+          //starts.next()
+          //val path: JList[_] = starts.getCurrentPath
+          //toHList[E](path.toList)
+      //}
+
+      //def toHList[T <: HList](path: List[_]): T = 
+        //if(path.length == 0)
+          //HNil.asInstanceOf[T]
+        //else
+          //(path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
+    //}
+    //class MyPathPipe[S](pipeline: Pipeline[_,S]) extends MapPipe[S, Path](pipeline) {
+      //this.setFunction { h:Any =>
+      ////this.setFunction { h: Holder[_] =>
+        ////println(s"holder: $h, ${h.getPath()}")
+        //////HNil.asInstanceOf[E] }
+        ////h.getPath
+        //val path = new Path()
+        //println(h)
+        //h match {
+          //case h: Holder[_] ⇒  println(s"bla ${h.getPath}")
+        //}
+        ////val a = h.getPath
+        //path
+      //}
+    //}
 
     implicit class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.pipeline) {
@@ -45,6 +132,27 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
 
       def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](pipeline.outE())
     }
+
+    //class MyPathPipe3[S, E <: HList](pipeline: Pipeline[_,S]) extends MapPipe[S, E](pipeline) {
+      ////this.setFunction {h: Holder[_] => h.getPath.asInstanceOf[E] }
+      //this.setFunction { h: Holder[_] => 
+        ////println(pipeline.getClass)
+        //println(s"holder: $h, ${h.getPath()}")
+        //HNil.asInstanceOf[E] }
+
+      //override def processNextStart(): E = starts match {
+        //case starts: Pipe[_,_] ⇒ 
+          //starts.next()
+          //val path: JList[_] = starts.getCurrentPath
+          //toHList[E](path.toList)
+      //}
+
+      //def toHList[T <: HList](path: List[_]): T = 
+        //if(path.length == 0)
+          //HNil.asInstanceOf[T]
+        //else
+          //(path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
+    //}
 
     //class PathPipe[S, E <: HList] extends AbstractPipe[S, E] with TransformPipe[S, E] {
       //override def setStarts(starts: JIterator[S]): Unit = {
@@ -66,14 +174,22 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
           //(path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
     //}
 
-    val graph = TinkerFactory.createClassic()
-    def gremlin: Gremlin[_, Vertex] = Gremlin.of(graph).asInstanceOf[Gremlin[_, Vertex]]
+    val graph: Graph = TinkerFactory.createClassic()
+    def gremlin: GremlinJ[_, Vertex] = GremlinJ.of(graph).asInstanceOf[GremlinJ[_, Vertex]]
     def gs = GremlinScala[Vertex :: HNil, Vertex](gremlin.v(1:Integer))
 
-    print(gs.outE)
-    print(gs.outE.inV)
-    print(gs.as("x").outE.back[Vertex]("x"))
+    //print(gs.outE)
+    //print(gs.outE.inV)
+    //print(gs.as("x").outE.back[Vertex]("x"))
 
+    println("XXXXXXXX")
+    //println(Gremlin.of(graph).v(1:Integer).value("name").path().toList)
+    //println(gremlin.v(1:Integer).value("name").path().toList)
+    //println(gs.pipeline.value("name").path().toList)
+    //println(gs.outE.inV.pipeline.path().toList)
+    //println(gs.outE.inV.path8.toList)
+    println("XXXXXXXX")
+    //gs.path.toList foreach println
     //gs.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
     //gs.outE.path.toList foreach { l: Vertex :: Edge :: HNil ⇒ println(l) }
 
