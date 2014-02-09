@@ -62,9 +62,15 @@ object ElementSpecific {
     def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.inV)
   }
 
-  implicit def vertexToGremlinScala(v: Vertex) = GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(v))
+  implicit class GremlinGraphSteps[End <: Graph, Types <: HList](gremlinScala: GremlinScala[End,Types])
+    extends GremlinScala[End, Types](gremlinScala.gremlin) {
+
+    def v(ids: AnyRef*)(implicit p:Prepend[Types, Vertex::HNil]) =
+      GremlinScala[Vertex, p.Out](gremlin.v(ids: _*))
+  }
+  //implicit def vertexToGremlinScala(v: Vertex) = GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(v))
 }
-import ElementSpecific._
+//import ElementSpecific._
 
 
 

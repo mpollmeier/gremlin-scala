@@ -182,13 +182,13 @@ class TypedPipelineSpec extends FunSpec with ShouldMatchers {
     //print(gs.outE.inV)
     //print(gs.as("x").outE.back[Vertex]("x"))
 
-    println("XXXXXXXX")
+    //println("XXXXXXXX")
     //println(Gremlin.of(graph).v(1:Integer).value("name").path().toList)
     //println(gremlin.v(1:Integer).value("name").path().toList)
     //println(gs.pipeline.value("name").path().toList)
     //println(gs.outE.inV.pipeline.path().toList)
     //println(gs.outE.inV.path8.toList)
-    println("XXXXXXXX")
+    //println("XXXXXXXX")
     //gs.path.toList foreach println
     //gs.path.toList foreach { l: Vertex :: HNil ⇒ println(l) }
     //gs.outE.path.toList foreach { l: Vertex :: Edge :: HNil ⇒ println(l) }
