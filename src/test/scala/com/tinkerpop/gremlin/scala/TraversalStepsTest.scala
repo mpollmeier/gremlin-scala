@@ -12,13 +12,13 @@ class TraversalStepsTest extends GremlinSpec {
   describe("vertex steps") {
     it("gets all vertices") {
       gs.V.toList should have size (6)
+      //TODO: path step
       //graph.V.path.toList foreach {_: Vertex :: HNil ⇒ [> compiles <] }
     }
 
     it("follows the out vertices") {
-      gs.v("1").out
-      //graph.v(1).out.property[String]("name").toList should be(List("vadas", "josh", "lop"))
-      //graph.v(1).out(1).property[String]("name").toList should be(List("vadas"))
+      v(1).out.property[String]("name").toSet.unroll should be(Set("vadas", "josh", "lop"))
+      v(1).out(1).property[String]("name").toSet.unroll should be(Set("lop"))
     }
 
     //it("gets the in vertices") {
@@ -100,21 +100,14 @@ class TraversalStepsTest extends GremlinSpec {
 
   describe("properties") {
     it("gets a property") {
-      //TODO provide own pipeline that converts from Property to Option?
-      gs.v("1").property[String]("name").head.get should be("marko")
-      gs.v("1").property[String]("doesnt exit").head.isPresent should be(false)
+      v(1).property[String]("name").head.get should be("marko")
+      v(1).property[String]("doesnt exit").head.isPresent should be(false)
     }
 
-    //it("gets a property null-safe") {
-      //graph.v(1).property[String]("name") should be("marko")
-      //graph.v(1).propertyOption[Int]("name") should be(None)
-      //graph.v(1).propertyOption[String]("doesnt exist") should be(None)
-    //}
-
-    //it("sets a property") {
-      //graph.v(1).setProperty("name", "updated")
-      //graph.v(1).property[String]("name") should be("updated")
-    //}
+    it("sets a property") {
+      v(1).head.setProperty("name", "updated")
+      v(1).property[String]("name").head.get should be("updated")
+    }
   }
 
 }

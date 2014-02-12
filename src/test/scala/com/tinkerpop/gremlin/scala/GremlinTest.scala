@@ -9,11 +9,18 @@ import shapeless._
 trait TestGraph {
   val graph = TinkerFactory.createClassic()
   def gs: GremlinScala[Graph :: HNil, Graph] = GremlinScala.of(graph)
+  def v(i: Int) = gs.v(i:Integer)
 
   def print(gs: GremlinScala[_,_]) = println(gs.toList)
 }
 
-trait GremlinSpec extends FunSpec with ShouldMatchers with TestGraph
+trait GremlinSpec extends FunSpec with ShouldMatchers with TestGraph {
+  implicit class Properties[A](set: Traversable[Property[A]]) {
+    def unroll(): Traversable[A] = set map (_.get)
+  }
+}
+
+
 
 //TODO
   //describe("ScalaElement equality and hashCode are based on their id") {

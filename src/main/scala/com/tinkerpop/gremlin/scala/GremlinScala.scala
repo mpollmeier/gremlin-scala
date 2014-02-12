@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints._
 
 case class GremlinScala[Types <: HList, End](pipeline: Pipeline[_, End]) {
   def toList(): List[End] = pipeline.toList.toList
+  def toSet(): Set[End] = pipeline.toList.toSet
   def head(): End = toList.head
 
   //TODO: provide own PropertyPipe that converts from blueprints property to Option?
@@ -32,11 +33,15 @@ object GremlinScala {
   implicit class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
     extends GremlinScala[Types, End](gremlinScala.pipeline) {
 
-    def outE(implicit p:Prepend[Types, Edge::HNil]) = 
-      GremlinScala[p.Out, Edge](pipeline.outE())
+    //def outE()(implicit p:Prepend[Types, Edge::HNil]) = 
+      //GremlinScala[p.Out, Edge](pipeline.outE())
+    //def outE(branchFactor: Int)(implicit p:Prepend[Types, Edge::HNil]) = 
+      //GremlinScala[p.Out, Edge](pipeline.outE(branchFactor))
 
-    def out(implicit p:Prepend[Types, Vertex::HNil]) = 
+    def out()(implicit p:Prepend[Types, Vertex::HNil]) =
       GremlinScala[p.Out, Vertex](pipeline.out())
+    def out(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
+      GremlinScala[p.Out, Vertex](pipeline.out(branchFactor))
   }
 
   implicit class GremlinGraphSteps[Types <: HList, End <: Graph](gremlinScala: GremlinScala[Types, End])
