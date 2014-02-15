@@ -32,7 +32,7 @@ class TraversalStepsTest extends GremlinSpec {
       v(3).in.in(1).property[String]("name").toSet.unroll should be(Set("marko"))
     }
 
-    it("gets both in and out vertices") {
+    it("follows both in and out vertices") {
       v(4).both.property[String]("name").toSet.unroll should be(Set("marko", "ripple", "lop"))
       v(4).both(1).property[String]("name").toSet.unroll should be(Set("lop"))
 
@@ -40,31 +40,35 @@ class TraversalStepsTest extends GremlinSpec {
       v(4).both.both(1).property[String]("name").toSet.unroll should be(Set("josh", "lop"))
     }
 
-    //it("follows out edges") {
-      //TODO: continue here: label pipe?
-      //v(1).outE.label.toSet.unroll should be(Set("knows", "knows", "created"))
-      //graph.v(1).outE(1).label.toList should be(List("knows"))
+    it("follows out edges") {
+      v(1).outE.toSet map (_.getLabel) should be(Set("knows", "created"))
+      v(1).outE(1).toSet map (_.getLabel) should be(Set("created"))
 
-      //graph.v(1).outE("knows", "created").inV.name.toList should be(List("vadas", "josh", "lop"))
-    //}
+      v(1).out.outE.toSet map (_.getLabel) should be(Set("created"))
+      v(1).out.outE(1).toSet map (_.getLabel) should be(Set("created"))
+    }
 
-    //it("follows in edges") {
-      //graph.v(3).inE.label.toList should be(List("created", "created", "created"))
-      //graph.v(3).inE(1).label.toList should be(List("created"))
-    //}
+    it("follows in edges") {
+      v(3).inE.toSet map (_.getLabel) should be(Set("created"))
+      v(3).inE(1).toSet map (_.getLabel) should be(Set("created"))
 
-    //it("follows both edges") {
-      //graph.v(4).bothE.label.toList should be(List("knows", "created", "created"))
-      //graph.v(4).bothE(1).label.toList should be(List("knows"))
+      v(3).in.inE.toSet map (_.getLabel) should be(Set("knows"))
+      v(3).in.inE(1).toSet map (_.getLabel) should be(Set("knows"))
+    }
 
-      //graph.v(4).bothE("created").label.toList should be(List("created", "created"))
-      //graph.v(4).bothE(1, "created").label.toList should be(List("created"))
-    //}
+    it("follows both edges") {
+      v(4).bothE.toSet map (_.getLabel) should be(Set("created", "knows"))
+      v(4).bothE(1).toSet map (_.getLabel) should be(Set("created"))
 
-    //it("does not allow edge steps") {
-      //illTyped {"""v(1).inV"""}
-    //}
+      v(4).in.bothE.toSet map (_.getLabel) should be(Set("knows", "created"))
+      v(4).in.bothE(1).toSet map (_.getLabel) should be(Set("created"))
+    }
 
+    it("does not allow edge steps") {
+      illTyped {"""v(1).inV"""}
+    }
+
+    //TODO: all steps by label (out("knows")
   }
 
   //describe("edge steps") {
@@ -126,6 +130,10 @@ class TraversalStepsTest extends GremlinSpec {
     //it("sets a property") {
       //v(1).head.setProperty("name", "updated")
       //v(1).property[String]("name").head.get should be("updated")
+    //}
+
+    //it("does not allow vertex steps") {
+      //illTyped {"""v(1)."""}
     //}
   //}
 
