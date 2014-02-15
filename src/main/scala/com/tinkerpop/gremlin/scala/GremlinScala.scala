@@ -7,13 +7,13 @@ import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.gremlin.process._
 
-case class GremlinScala[Types <: HList, End](pipeline: Traversal[_, End]) {
-  def toList(): List[End] = pipeline.toList.toList
-  def toSet(): Set[End] = pipeline.toList.toSet
+case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
+  def toList(): List[End] = traversal.toList.toList
+  def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
 
   def property[A](key: String)(implicit p:Prepend[Types, Property[A]::HNil]) =
-    GremlinScala[p.Out, Property[A]](pipeline.property[A](key))
+    GremlinScala[p.Out, Property[A]](traversal.property[A](key))
 }
 
 case class ScalaGraph(graph: Graph) {
@@ -39,34 +39,34 @@ object GremlinScala {
   def of(graph: Graph): ScalaGraph = ScalaGraph(graph)
 
   implicit class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
-    extends GremlinScala[Types, End](gremlinScala.pipeline) {
+    extends GremlinScala[Types, End](gremlinScala.traversal) {
 
     def out()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.out())
+      GremlinScala[p.Out, Vertex](traversal.out())
     def out(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.out(branchFactor))
+      GremlinScala[p.Out, Vertex](traversal.out(branchFactor))
 
     //def outE()(implicit p:Prepend[Types, Edge::HNil]) =
-      //GremlinScala[p.Out, Edge](pipeline.outE())
+      //GremlinScala[p.Out, Edge](traversal.outE())
     //def outE(branchFactor: Int)(implicit p:Prepend[Types, Edge::HNil]) = 
-      //GremlinScala[p.Out, Edge](pipeline.outE(branchFactor))
+      //GremlinScala[p.Out, Edge](traversal.outE(branchFactor))
 
     def in()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.in())
+      GremlinScala[p.Out, Vertex](traversal.in())
     def in(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.in(branchFactor))
+      GremlinScala[p.Out, Vertex](traversal.in(branchFactor))
 
     def both()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.both())
+      GremlinScala[p.Out, Vertex](traversal.both())
     def both(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](pipeline.both(branchFactor))
+      GremlinScala[p.Out, Vertex](traversal.both(branchFactor))
   }
 
   implicit class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
-    extends GremlinScala[Types, End](gremlinScala.pipeline) {
+    extends GremlinScala[Types, End](gremlinScala.traversal) {
 
     //def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
-      //GremlinScala[p.Out, Vertex](pipeline.inV)
+      //GremlinScala[p.Out, Vertex](traversal.inV)
   }
 
 }
