@@ -29,47 +29,47 @@ import ops.hlist._
 /**
   * Types holds the types of each step in the gremlin pipeline. End is simply the last type of that HList
   * */
-case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
-  def toList(): List[End] = gremlin.toList.toList
-  def as(name: String) = GremlinScala[End, Types](gremlin.as(name))
+//case class GremlinScala[End, Types <: HList](gremlin: GremlinPipeline[_, End]) {
+  //def toList(): List[End] = gremlin.toList.toList
+  //def as(name: String) = GremlinScala[End, Types](gremlin.as(name))
 
-  def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) = 
-    GremlinScala[E, p.Out](gremlin.back(to).asInstanceOf[GremlinPipeline[_,E]])
+  //def back[E](to: String)(implicit p:Prepend[Types, E::HNil]) = 
+    //GremlinScala[E, p.Out](gremlin.back(to).asInstanceOf[GremlinPipeline[_,E]])
 
-  def property[E](name: String)(implicit p:Prepend[Types, E::HNil]) = 
-    GremlinScala[E, p.Out](gremlin.property(name).asInstanceOf[GremlinPipeline[_,E]])
+  //def property[E](name: String)(implicit p:Prepend[Types, E::HNil]) = 
+    //GremlinScala[E, p.Out](gremlin.property(name).asInstanceOf[GremlinPipeline[_,E]])
 
-  def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
-    addPipe(new PathPipe[End, Types])
+  //def path(implicit p:Prepend[Types, Types::HNil]): GremlinScala[Types, p.Out] =
+    //addPipe(new PathPipe[End, Types])
 
-  def addPipe[E](pipe: Pipe[End, E])(implicit p:Prepend[Types, E::HNil]) = 
-    GremlinScala[E, p.Out](gremlin.add(pipe))
-}
+  //def addPipe[E](pipe: Pipe[End, E])(implicit p:Prepend[Types, E::HNil]) = 
+    //GremlinScala[E, p.Out](gremlin.add(pipe))
+//}
 
-object ElementSpecific {
-  implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
-    extends GremlinScala[End, Types](gremlinScala.gremlin) {
+//object ElementSpecific {
+  //implicit class GremlinVertexSteps[End <: Vertex, Types <: HList](gremlinScala: GremlinScala[End,Types])
+    //extends GremlinScala[End, Types](gremlinScala.gremlin) {
 
-    def out()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.out())
-    def out(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) = 
-      GremlinScala[Vertex, p.Out](gremlin.out(branchFactor))
-    def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](gremlin.outE())
-  }
+    //def out()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.out())
+    //def out(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) = 
+      //GremlinScala[Vertex, p.Out](gremlin.out(branchFactor))
+    //def outE(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[Edge, p.Out](gremlin.outE())
+  //}
 
-  implicit class GremlinEdgeSteps[End <: Edge, Types <: HList](gremlinScala: GremlinScala[End,Types])
-    extends GremlinScala[End, Types](gremlinScala.gremlin) {
+  //implicit class GremlinEdgeSteps[End <: Edge, Types <: HList](gremlinScala: GremlinScala[End,Types])
+    //extends GremlinScala[End, Types](gremlinScala.gremlin) {
 
-    def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.inV)
-  }
+    //def inV(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[Vertex, p.Out](gremlin.inV)
+  //}
 
-  implicit class GremlinGraphSteps[End <: Graph, Types <: HList](gremlinScala: GremlinScala[End,Types])
-    extends GremlinScala[End, Types](gremlinScala.gremlin) {
+  //implicit class GremlinGraphSteps[End <: Graph, Types <: HList](gremlinScala: GremlinScala[End,Types])
+    //extends GremlinScala[End, Types](gremlinScala.gremlin) {
 
-    def v(ids: AnyRef*)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[Vertex, p.Out](gremlin.v(ids: _*))
-  }
-  //implicit def vertexToGremlinScala(v: Vertex) = GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(v))
-}
+    //def v(ids: AnyRef*)(implicit p:Prepend[Types, Vertex::HNil]) =
+      //GremlinScala[Vertex, p.Out](gremlin.v(ids: _*))
+  //}
+  ////implicit def vertexToGremlinScala(v: Vertex) = GremlinScala[Vertex, Vertex :: HNil](new GremlinPipeline(v))
+//}
 //import ElementSpecific._
 
 

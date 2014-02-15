@@ -1,6 +1,6 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.blueprints._
+import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.tinkergraph.TinkerFactory
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
@@ -8,7 +8,7 @@ import shapeless._
 
 trait TestGraph {
   val graph = TinkerFactory.createClassic()
-  def gs: GremlinScala[Graph :: HNil, Graph] = GremlinScala.of(graph)
+  def gs: ScalaGraph = GremlinScala.of(graph)
   def v(i: Int) = gs.v(i:Integer)
 
   def print(gs: GremlinScala[_,_]) = println(gs.toList)

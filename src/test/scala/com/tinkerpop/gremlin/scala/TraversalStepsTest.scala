@@ -3,8 +3,9 @@ package com.tinkerpop.gremlin.scala
 import com.tinkerpop.gremlin.scala._
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import com.tinkerpop.blueprints._
+import com.tinkerpop.gremlin.structure._
 import shapeless._
+import shapeless.test.illTyped
 import GremlinScala._
 
 class TraversalStepsTest extends GremlinSpec {
@@ -12,35 +13,36 @@ class TraversalStepsTest extends GremlinSpec {
   describe("vertex steps") {
     it("gets all vertices") {
       gs.V.toList should have size (6)
-      //TODO: path step
       //graph.V.path.toList foreach {_: Vertex :: HNil ⇒ [> compiles <] }
     }
 
     it("follows the out vertices") {
       v(1).out.property[String]("name").toSet.unroll should be(Set("vadas", "josh", "lop"))
       v(1).out(1).property[String]("name").toSet.unroll should be(Set("lop"))
+
+      v(1).out.out.property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
+      v(1).out.out(1).property[String]("name").toSet.unroll should be(Set("lop"))
     }
 
-    //it("gets the in vertices") {
-      //graph.v(3).in.property("name").toList should be(List("marko", "josh", "peter"))
-      //graph.v(3).in(1).property("name").toList should be(List("marko"))
-    //}
+    it("follows the in vertices") {
+      v(3).in.property[String]("name").toSet.unroll should be(Set("marko", "josh", "peter"))
+      v(3).in(1).property[String]("name").toSet.unroll should be(Set("josh"))
 
-    //it("gets both in and out vertices") {
-      //graph.v(4).both.property("name").toList should be(List("marko", "ripple", "lop"))
-      //graph.v(4).both(1).property("name").toList should be(List("marko"))
-    //}
+      v(3).in.in.property[String]("name").toSet.unroll should be(Set("marko"))
+      v(3).in.in(1).property[String]("name").toSet.unroll should be(Set("marko"))
+    }
 
-    //TODO: illTyped
-  }
+    it("gets both in and out vertices") {
+      v(4).both.property[String]("name").toSet.unroll should be(Set("marko", "ripple", "lop"))
+      v(4).both(1).property[String]("name").toSet.unroll should be(Set("lop"))
 
-  //describe("edge adjacency") {
-    //it("gets all edges") {
-      //graph.E.toList should have size (6)
-    //}
+      v(4).both.both.property[String]("name").toSet.unroll should be(Set("marko", "lop", "peter", "josh", "vadas"))
+      v(4).both.both(1).property[String]("name").toSet.unroll should be(Set("josh", "lop"))
+    }
 
     //it("follows out edges") {
-      //graph.v(1).outE.label.toList should be(List("knows", "knows", "created"))
+      //TODO: continue here: label pipe?
+      //v(1).outE.label.toSet.unroll should be(Set("knows", "knows", "created"))
       //graph.v(1).outE(1).label.toList should be(List("knows"))
 
       //graph.v(1).outE("knows", "created").inV.name.toList should be(List("vadas", "josh", "lop"))
@@ -57,6 +59,23 @@ class TraversalStepsTest extends GremlinSpec {
 
       //graph.v(4).bothE("created").label.toList should be(List("created", "created"))
       //graph.v(4).bothE(1, "created").label.toList should be(List("created"))
+    //}
+
+    //it("does not allow edge steps") {
+      //illTyped {"""v(1).inV"""}
+    //}
+
+  }
+
+  //describe("edge steps") {
+    //it("gets all edges") {
+      //graph.E.toList should have size (6)
+    //}
+
+
+    //it("does not allow vertex steps") {
+      //illTyped {"""v(1).inV"""}
+      //TODO: all vertex steps: out, outE, in, inE, both
     //}
   //}
 
@@ -98,16 +117,16 @@ class TraversalStepsTest extends GremlinSpec {
     //}
   //}
 
-  describe("properties") {
-    it("gets a property") {
-      v(1).property[String]("name").head.get should be("marko")
-      v(1).property[String]("doesnt exit").head.isPresent should be(false)
-    }
+  //describe("properties") {
+    //it("gets a property") {
+      //v(1).property[String]("name").head.get should be("marko")
+      //v(1).property[String]("doesnt exit").head.isPresent should be(false)
+    //}
 
-    it("sets a property") {
-      v(1).head.setProperty("name", "updated")
-      v(1).property[String]("name").head.get should be("updated")
-    }
-  }
+    //it("sets a property") {
+      //v(1).head.setProperty("name", "updated")
+      //v(1).property[String]("name").head.get should be("updated")
+    //}
+  //}
 
 }
