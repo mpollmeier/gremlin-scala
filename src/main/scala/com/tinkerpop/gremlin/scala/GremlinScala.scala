@@ -26,22 +26,28 @@ case class ScalaGraph(graph: Graph) {
 
 case class ScalaVertex(vertex: Vertex) {
   def out() = GremlinScala[Vertex :: HNil, Vertex](vertex.out())
-  def out(branchFactor: Int) = GremlinScala[Vertex :: HNil, Vertex](vertex.out(branchFactor))
+  def out(labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.out(labels: _*))
+  def out(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.out(branchFactor, labels: _*))
 
   def outE() = GremlinScala[Edge :: HNil, Edge](vertex.outE())
-  def outE(branchFactor: Int) = GremlinScala[Edge :: HNil, Edge](vertex.outE(branchFactor))
+  def outE(labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.outE(labels: _*))
+  def outE(branchFactor: Int, labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.outE(branchFactor, labels: _*))
 
   def in() = GremlinScala[Vertex :: HNil, Vertex](vertex.in())
-  def in(branchFactor: Int) = GremlinScala[Vertex :: HNil, Vertex](vertex.in(branchFactor))
+  def in(labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.in(labels: _*))
+  def in(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.in(branchFactor, labels: _*))
 
   def inE() = GremlinScala[Edge :: HNil, Edge](vertex.inE())
-  def inE(branchFactor: Int) = GremlinScala[Edge :: HNil, Edge](vertex.inE(branchFactor))
+  def inE(labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.inE(labels: _*))
+  def inE(branchFactor: Int, labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.inE(branchFactor, labels: _*))
 
   def both() = GremlinScala[Vertex :: HNil, Vertex](vertex.both())
-  def both(branchFactor: Int) = GremlinScala[Vertex :: HNil, Vertex](vertex.both(branchFactor))
+  def both(labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.both(labels: _*))
+  def both(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.both(branchFactor, labels: _*))
 
   def bothE() = GremlinScala[Edge :: HNil, Edge](vertex.bothE())
-  def bothE(branchFactor: Int) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(branchFactor))
+  def bothE(labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(labels: _*))
+  def bothE(branchFactor: Int, labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(branchFactor, labels: _*))
 }
 
 object GremlinScala {
@@ -50,35 +56,29 @@ object GremlinScala {
   implicit class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
     extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def out()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.out())
-    def out(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.out(branchFactor))
+    def out()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.out())
+    def out(labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.out(labels: _*))
+    def out(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.out(branchFactor, labels: _*))
 
-    def outE()(implicit p:Prepend[Types, Edge::HNil]) =
-      GremlinScala[p.Out, Edge](traversal.outE())
-    def outE(branchFactor: Int)(implicit p:Prepend[Types, Edge::HNil]) = 
-      GremlinScala[p.Out, Edge](traversal.outE(branchFactor))
+    def outE()(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.outE())
+    def outE(labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.outE(labels: _*))
+    def outE(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.outE(branchFactor, labels: _*))
 
-    def in()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.in())
-    def in(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.in(branchFactor))
+    def in()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.in())
+    def in(labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.in(labels: _*))
+    def in(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.in(branchFactor, labels: _*))
 
-    def inE()(implicit p:Prepend[Types, Edge::HNil]) =
-      GremlinScala[p.Out, Edge](traversal.inE())
-    def inE(branchFactor: Int)(implicit p:Prepend[Types, Edge::HNil]) =
-      GremlinScala[p.Out, Edge](traversal.inE(branchFactor))
+    def inE()(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.inE())
+    def inE(labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.inE(labels: _*))
+    def inE(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.inE(branchFactor, labels: _*))
 
-    def both()(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.both())
-    def both(branchFactor: Int)(implicit p:Prepend[Types, Vertex::HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.both(branchFactor))
+    def both()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.both())
+    def both(labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.both(labels: _*))
+    def both(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.both(branchFactor, labels: _*))
 
-    def bothE()(implicit p:Prepend[Types, Edge::HNil]) =
-      GremlinScala[p.Out, Edge](traversal.bothE())
-    def bothE(branchFactor: Int)(implicit p:Prepend[Types, Edge::HNil]) =
-      GremlinScala[p.Out, Edge](traversal.bothE(branchFactor))
+    def bothE()(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.bothE())
+    def bothE(labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.bothE(labels: _*))
+    def bothE(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.bothE(branchFactor, labels: _*))
   }
 
   implicit class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
