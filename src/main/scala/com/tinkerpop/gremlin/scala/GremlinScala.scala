@@ -19,12 +19,26 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
 case class ScalaGraph(graph: Graph) {
   /** get vertex by id */
   def v(id: AnyRef) = ScalaVertex(graph.v(id))
+  /** get edge by id */
+  def e(id: AnyRef) = ScalaEdge(graph.e(id))
 
   /** get all vertices */
   def V() = GremlinScala[Vertex :: HNil, Vertex](graph.V.asInstanceOf[Traversal[_, Vertex]])
+  /** get all edges */
+  def E() = GremlinScala[Edge :: HNil, Edge](graph.E.asInstanceOf[Traversal[_, Edge]])
 }
 
-case class ScalaVertex(vertex: Vertex) {
+trait ScalaElement {
+  def element: Element
+  def property[A](key: String): Property[A] = element.getProperty[A](key)
+  def propertyKeys(): Set[String] = element.getPropertyKeys.toSet
+  def properties: Map[String, Any] = element.getProperties.toMap mapValues (_.get)
+  def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
+}
+
+case class ScalaVertex(vertex: Vertex) extends ScalaElement {
+  override def element = vertex
+
   def out() = GremlinScala[Vertex :: HNil, Vertex](vertex.out())
   def out(labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.out(labels: _*))
   def out(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: HNil, Vertex](vertex.out(branchFactor, labels: _*))
@@ -48,6 +62,14 @@ case class ScalaVertex(vertex: Vertex) {
   def bothE() = GremlinScala[Edge :: HNil, Edge](vertex.bothE())
   def bothE(labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(labels: _*))
   def bothE(branchFactor: Int, labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(branchFactor, labels: _*))
+}
+
+case class ScalaEdge(edge: Edge) extends ScalaElement {
+  override def element = edge
+
+  //TODO: wait until this is consistent in T3 between Vertex and Edge
+  //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
+  //def inV() = GremlinScala[Vertex :: HNil, Vertex](edge.inV())
 }
 
 object GremlinScala {

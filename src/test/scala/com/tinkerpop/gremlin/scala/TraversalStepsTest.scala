@@ -10,6 +10,28 @@ import GremlinScala._
 
 class TraversalStepsTest extends GremlinSpec {
 
+  describe("properties") {
+    it("gets properties") {
+      v(1).propertyKeys should be (Set("name", "age"))
+      v(1).property[String]("name").get should be("marko")
+      v(1).property[String]("doesnt exit").isPresent should be(false)
+      v(1).properties should be (Map("name" -> "marko", "age" -> 29))
+
+      e(7).propertyKeys should be (Set("weight"))
+      e(7).property[Float]("weight").get should be (0.5)
+      e(7).property[Float]("doesnt exit").isPresent should be(false)
+      e(7).properties should be (Map("weight" -> 0.5))
+    }
+
+    it("sets a property") {
+      v(1).setProperty("vertexProperty", "updated")
+      v(1).property[String]("vertexProperty").get should be("updated")
+
+      e(7).setProperty("edgeProperty", "updated")
+      e(7).property[String]("edgeProperty").get should be("updated")
+    }
+  }
+
   describe("vertex steps") {
     it("gets all vertices") {
       gs.V.toList should have size (6)
@@ -78,73 +100,31 @@ class TraversalStepsTest extends GremlinSpec {
 
     it("does not allow edge steps") {
       illTyped {"""v(1).inV"""}
+      illTyped {"""v(1).out.inV"""}
     }
   }
 
-  //describe("edge steps") {
-    //it("gets all edges") {
-      //graph.E.toList should have size (6)
-    //}
+  describe("edge steps") {
+    it("gets all edges") {
+      gs.E.toList should have size (6)
+    }
+    
+    it("follows in vertex") {
+      //TODO: wait until this is consistent in T3 between Vertex and Edge
+      //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
+      //e(7).inV//.out.property[String]("name").toSet.unroll should be(Set("vadas", "josh", "lop"))
+      //v(1).out("knows").property[String]("name").toSet.unroll should be(Set("vadas", "josh"))
+      //v(1).out(1, "knows").property[String]("name").toSet.unroll should be(Set("vadas"))
 
+      //v(1).out.out.property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
+      //v(1).out.out("created").property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
+      //v(1).out.out(1, "created").property[String]("name").toSet.unroll should be(Set("lop"))
+    }
 
     //it("does not allow vertex steps") {
       //illTyped {"""v(1).inV"""}
       //TODO: all vertex steps: out, outE, in, inE, both
     //}
-  //}
-
-  //describe("edge / vertex adjacency") {
-    //it("follows out edges and in vertices") {
-      //graph.v(1).outE.inV.property("name").toList should be(List("vadas", "josh", "lop"))
-    //}
-
-    //it("follows in edges and out vertices") {
-      //graph.v(2).inE.outV.property("name").toList should be(List("marko"))
-    //}
-  //}
-
-  //describe("vertex edge label adjacency") {
-    //it("follows out edges by label") {
-      //graph.v(1).out("knows").property("name").toList should be(List("vadas", "josh"))
-      //graph.v(1).outE("knows").inV.property("name").toList should be(List("vadas", "josh"))
-
-      //graph.v(1).out(1, "knows").property("name").toList should be(List("vadas"))
-      //graph.v(1).outE(1, "knows").inV.property("name").toList should be(List("vadas"))
-    //}
-
-    //it("follows out edges by labels") {
-      //graph.v(1).out("knows", "created").property("name").toList should be(List("vadas", "josh", "lop"))
-      //graph.v(1).outE("knows", "created").inV.property("name").toList should be(List("vadas", "josh", "lop"))
-    //}
-
-    //it("follows in edges by label") {
-      //graph.v(3).in("created").property("name").toList should be(List("marko", "josh", "peter"))
-      //graph.v(3).in(1, "created").property("name").toList should be(List("marko"))
-
-      //graph.v(3).inE("created").outV.property("name").toList should be(List("marko", "josh", "peter"))
-      //graph.v(3).inE(1, "created").outV.property("name").toList should be(List("marko"))
-    //}
-
-    //it("traverses multiple steps") {
-      //graph.v(1).out.out().property("name").toList should be(List("ripple", "lop"))
-      //graph.v(1).out.out().out().property("name").toList should be(Nil)
-    //}
-  //}
-
-  //describe("properties") {
-    //it("gets a property") {
-      //v(1).property[String]("name").head.get should be("marko")
-      //v(1).property[String]("doesnt exit").head.isPresent should be(false)
-    //}
-
-    //it("sets a property") {
-      //v(1).head.setProperty("name", "updated")
-      //v(1).property[String]("name").head.get should be("updated")
-    //}
-
-    //it("does not allow vertex steps") {
-      //illTyped {"""v(1)."""}
-    //}
-  //}
+  }
 
 }
