@@ -9,8 +9,8 @@ import shapeless._
 trait TestGraph {
   val graph = TinkerFactory.createClassic()
   def gs: ScalaGraph = GremlinScala.of(graph)
-  def v(i: Int) = gs.v(i:Integer)
-  def e(i: Int) = gs.e(i:Integer)
+  def v(i: Int) = gs.v(i:Integer).get
+  def e(i: Int) = gs.e(i:Integer).get
 
   def print(gs: GremlinScala[_,_]) = println(gs.toList)
 }

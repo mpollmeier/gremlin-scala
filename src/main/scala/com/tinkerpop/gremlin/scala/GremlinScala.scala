@@ -18,9 +18,16 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
 
 case class ScalaGraph(graph: Graph) {
   /** get vertex by id */
-  def v(id: AnyRef) = ScalaVertex(graph.v(id))
+  def v(id: AnyRef): Option[ScalaVertex] = graph.v(id) match {
+    case v: Vertex ⇒ Some(ScalaVertex(v))
+    case _ ⇒  None
+  }
+
   /** get edge by id */
-  def e(id: AnyRef) = ScalaEdge(graph.e(id))
+  def e(id: AnyRef): Option[ScalaEdge] = graph.e(id) match {
+    case e: Edge ⇒  Some(ScalaEdge(e))
+    case _ ⇒  None
+  }
 
   /** get all vertices */
   def V() = GremlinScala[Vertex :: HNil, Vertex](graph.V.asInstanceOf[Traversal[_, Vertex]])
