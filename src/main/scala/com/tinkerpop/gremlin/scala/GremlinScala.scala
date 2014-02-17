@@ -12,6 +12,9 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
 
+  def map[A](fun: Holder[End] => A)(implicit p:Prepend[Types, A::HNil]) =
+    GremlinScala[p.Out, A](traversal.map[A](fun))
+
   def property[A](key: String)(implicit p:Prepend[Types, Property[A]::HNil]) =
     GremlinScala[p.Out, Property[A]](traversal.property[A](key))
 }
@@ -116,5 +119,4 @@ object GremlinScala {
     //def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
       //GremlinScala[p.Out, Vertex](traversal.inV)
   }
-
 }
