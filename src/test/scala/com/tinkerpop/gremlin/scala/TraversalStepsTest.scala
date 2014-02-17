@@ -2,7 +2,6 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.gremlin.scala._
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.FunSpec
 import com.tinkerpop.gremlin.structure._
 import shapeless._
 import shapeless.test.illTyped
