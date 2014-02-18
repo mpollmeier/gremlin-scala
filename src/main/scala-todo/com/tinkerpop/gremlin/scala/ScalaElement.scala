@@ -4,11 +4,7 @@ import com.tinkerpop.blueprints.Element
 import java.util.{ Set ⇒ JSet }
 import scala.reflect.ClassTag
 
-trait ScalaElement extends Element {
-  def element: Element
-
   /** returns null if property not set*/
-  def property[A](name: String): A = element.getProperty(name)
 
   /** returns Some[A] if element present and of type A, otherwise None */
   def propertyOption[A: ClassTag](name: String): Option[A] = {
@@ -19,7 +15,6 @@ trait ScalaElement extends Element {
     }
   }
 
-  def id: Any = getId
 
   /** need to extend Element so that we can use existing Gremlin Pipes... */
   def getId(): Object = element.getId

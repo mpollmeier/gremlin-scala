@@ -1,8 +1,8 @@
 package com.tinkerpop.gremlin.scala
 
-import org.scalatest.matchers.ShouldMatchers
+import GremlinScala._
 
-class PathStepTest extends GremlinSpec {
+class FilterStepTest extends GremlinSpec {
 
   //it("works") {
     //import scala.collection.JavaConversions._

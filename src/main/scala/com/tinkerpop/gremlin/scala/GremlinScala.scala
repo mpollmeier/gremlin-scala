@@ -11,6 +11,7 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
+  def headOption(): Option[End] = Option(head)
 
   def map[A](fun: Holder[End] => A)(implicit p:Prepend[Types, A::HNil]) =
     GremlinScala[p.Out, A](traversal.map[A](fun))
@@ -20,9 +21,17 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
 }
 
 case class ScalaGraph(graph: Graph) {
+  def addVertex(): ScalaVertex = ScalaVertex(graph.addVertex())
+  def addVertex(id: AnyRef): ScalaVertex = addVertex(id, Map.empty)
+  def addVertex(id: AnyRef, properties: Map[String, Any]): ScalaVertex = {
+     val v = ScalaVertex(graph.addVertex(Element.ID, id))
+     v.setProperties(properties)
+     v
+  }
+
   /** get vertex by id */
   def v(id: AnyRef): Option[ScalaVertex] = graph.v(id) match {
-    case v: Vertex ⇒ Some(ScalaVertex(v))
+    case v: Vertex ⇒  Some(ScalaVertex(v))
     case _ ⇒  None
   }
 
@@ -40,10 +49,17 @@ case class ScalaGraph(graph: Graph) {
 
 trait ScalaElement {
   def element: Element
+
+  def id: AnyRef = element.getId
+
   def property[A](key: String): Property[A] = element.getProperty[A](key)
   def propertyKeys(): Set[String] = element.getPropertyKeys.toSet
   def properties: Map[String, Any] = element.getProperties.toMap mapValues (_.get)
   def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
+  def setProperties(properties: Map[String, Any]): Unit = 
+    properties foreach { case (k,v) => setProperty(k,v) }
+
+  def remove(): Unit = element.remove()
 }
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement {
@@ -72,10 +88,18 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement {
   def bothE() = GremlinScala[Edge :: HNil, Edge](vertex.bothE())
   def bothE(labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(labels: _*))
   def bothE(branchFactor: Int, labels: String*) = GremlinScala[Edge :: HNil, Edge](vertex.bothE(branchFactor, labels: _*))
+
+  def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any] = Map.empty): ScalaEdge = {
+    val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
+    e.setProperties(properties)
+    e
+  }
 }
 
 case class ScalaEdge(edge: Edge) extends ScalaElement {
   override def element = edge
+
+  def label(): String = edge.getLabel
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist

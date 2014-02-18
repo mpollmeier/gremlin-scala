@@ -1,35 +1,10 @@
 package com.tinkerpop.gremlin.scala
 
-import com.tinkerpop.gremlin.scala._
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.gremlin.structure._
-import shapeless._
 import shapeless.test.illTyped
 import GremlinScala._
 
 class TraversalStepsTest extends GremlinSpec {
-
-  describe("properties") {
-    it("gets properties") {
-      v(1).propertyKeys should be (Set("name", "age"))
-      v(1).property[String]("name").get should be("marko")
-      v(1).property[String]("doesnt exit").isPresent should be(false)
-      v(1).properties should be (Map("name" -> "marko", "age" -> 29))
-
-      e(7).propertyKeys should be (Set("weight"))
-      e(7).property[Float]("weight").get should be (0.5)
-      e(7).property[Float]("doesnt exit").isPresent should be(false)
-      e(7).properties should be (Map("weight" -> 0.5))
-    }
-
-    it("sets a property") {
-      v(1).setProperty("vertexProperty", "updated")
-      v(1).property[String]("vertexProperty").get should be("updated")
-
-      e(7).setProperty("edgeProperty", "updated")
-      e(7).property[String]("edgeProperty").get should be("updated")
-    }
-  }
 
   describe("vertex steps") {
     it("gets all vertices") {
