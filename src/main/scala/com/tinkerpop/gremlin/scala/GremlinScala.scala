@@ -109,7 +109,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement {
 object GremlinScala {
   def of(graph: Graph): ScalaGraph = ScalaGraph(graph)
 
-  implicit class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
+  class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
     extends GremlinScala[Types, End](gremlinScala.traversal) {
 
     def out()(implicit p:Prepend[Types, Vertex::HNil]) = GremlinScala[p.Out, Vertex](traversal.out())
@@ -137,7 +137,7 @@ object GremlinScala {
     def bothE(branchFactor: Int, labels: String*)(implicit p:Prepend[Types, Edge::HNil]) = GremlinScala[p.Out, Edge](traversal.bothE(branchFactor, labels: _*))
   }
 
-  implicit class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
+  class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
     extends GremlinScala[Types, End](gremlinScala.traversal) {
 
     //def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
