@@ -2,7 +2,7 @@ package com.tinkerpop.gremlin.scala
 
 import org.scalatest.matchers.ShouldMatchers
 
-class PathSpec extends GremlinSpec {
+class PathSpec extends TestBase {
 
   //it("works") {
     //import scala.collection.JavaConversions._

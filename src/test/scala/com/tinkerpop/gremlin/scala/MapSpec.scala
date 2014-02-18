@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 import org.scalatest.matchers.ShouldMatchers
 
-class MapSpec extends GremlinSpec {
+class MapSpec extends TestBase {
 
   it("maps") {
     v(1).out.map { holder => s"mapped ${holder.get}" }

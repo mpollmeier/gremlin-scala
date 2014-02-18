@@ -3,7 +3,7 @@ package com.tinkerpop.gremlin.scala
 import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.tinkergraph.TinkerGraph
 
-class ElementSpec extends GremlinSpec {
+class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {

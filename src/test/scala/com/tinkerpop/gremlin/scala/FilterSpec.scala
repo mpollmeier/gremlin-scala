@@ -2,7 +2,7 @@ package com.tinkerpop.gremlin.scala
 
 import GremlinScala._
 
-class FilterSpec extends GremlinSpec {
+class FilterSpec extends TestBase {
 
   //it("works") {
     //import scala.collection.JavaConversions._
