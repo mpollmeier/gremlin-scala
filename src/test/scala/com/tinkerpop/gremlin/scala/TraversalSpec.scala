@@ -4,7 +4,7 @@ import org.scalatest.matchers.ShouldMatchers
 import shapeless.test.illTyped
 import GremlinScala._
 
-class TraversalStepsTest extends GremlinSpec {
+class TraversalSpec extends GremlinSpec {
 
   describe("vertex steps") {
     it("gets all vertices") {
