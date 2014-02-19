@@ -58,6 +58,10 @@ trait ScalaElement {
   def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
   def setProperties(properties: Map[String, Any]): Unit = 
     properties foreach { case (k,v) => setProperty(k,v) }
+  def removeProperty(key: String): Unit = {
+    val p = property(key)
+    if(p.isPresent) p.remove
+  }
 
   /** note: in scala exceptions are typically discouraged in situations like this...
    *  `value` is only provided so that we are on par with Gremlin Groovy */

@@ -25,6 +25,18 @@ class ElementSpec extends TestBase {
       e(7).setProperty("edgeProperty", "updated")
       e(7).property[String]("edgeProperty").get should be("updated")
     }
+
+    it("removes a property") {
+      v(1).setProperty("vertexProperty", "updated")
+      v(1).removeProperty("vertexProperty")
+      v(1).removeProperty("doesnt exist")
+      v(1).property[String]("vertexProperty").isPresent should be(false)
+
+      e(7).setProperty("edgeProperty", "updated")
+      e(7).removeProperty("edgeProperty")
+      e(7).removeProperty("doesnt exist")
+      e(7).property[String]("edgeProperty").isPresent should be(false)
+    }
   }
 
   describe("values") {
