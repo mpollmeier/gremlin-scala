@@ -18,6 +18,11 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
 
   def property[A](key: String)(implicit p:Prepend[Types, Property[A]::HNil]) =
     GremlinScala[p.Out, Property[A]](traversal.property[A](key))
+
+  def value[A](key: String)(implicit p:Prepend[Types, A::HNil]) =
+    GremlinScala[p.Out, A](traversal.value[A](key))
+  def value[A](key: String, default: A)(implicit p:Prepend[Types, A::HNil]) =
+    GremlinScala[p.Out, A](traversal.value[A](key, default))
 }
 
 case class ScalaGraph(graph: Graph) {

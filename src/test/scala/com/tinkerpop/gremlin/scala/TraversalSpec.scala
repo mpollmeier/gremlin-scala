@@ -109,11 +109,15 @@ class TraversalSpec extends TestBase {
       }
     }
 
-    //describe("value") {
-      //it("gets values") {
-        //gs.V.property[String]("name").toSet should be(Set("marko"))
-      //}
-    //}
+    describe("value") {
+      it("gets values") {
+        gs.V.value[Int]("age").toSet should be(Set(27, 29, 32, 35))
+      }
+
+      it("gets values, defaults if not set") {
+        gs.V.value[Int]("age", 99).toSet should be(Set(27, 29, 32, 35, 99))
+      }
+    }
   }
 
 }
