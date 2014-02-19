@@ -45,6 +45,11 @@ class ElementSpec extends TestBase {
       e(7).value[Float]("weight") should be (0.5)
     }
 
+    it("falls back to default value if value doesnt exist") {
+      v(1).value("doesnt exist", "blub") should be("blub")
+      e(7).value("doesnt exist", 0.8) should be (0.8)
+    }
+
     it("throws an exception if a value doesnt exist") {
       //note: in scala exceptions are typically discouraged in situations like this...
       //value is only provided so that we are on par with Gremlin Groovy
