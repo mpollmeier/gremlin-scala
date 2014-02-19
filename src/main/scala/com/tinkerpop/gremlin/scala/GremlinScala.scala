@@ -33,6 +33,8 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
     }
     GremlinScala[Types, End](traversal.order(comparator))
   }
+
+  def shuffle() = GremlinScala[Types, End](traversal.shuffle())
 }
 
 case class ScalaGraph(graph: Graph) {
