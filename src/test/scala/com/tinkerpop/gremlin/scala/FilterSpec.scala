@@ -1,26 +1,15 @@
 package com.tinkerpop.gremlin.scala
 
-import GremlinScala._
+import org.scalatest.matchers.ShouldMatchers
 
 class FilterSpec extends TestBase {
 
-  //it("works") {
-    //import scala.collection.JavaConversions._
-    //import com.tinkerpop.gremlin.process._
-    //import com.tinkerpop.gremlin.process.steps.util.optimizers.HolderOptimizer
-
-    //doesnt work: simpleholder
-    //v(1).out.traversal.path().toList.toList foreach println
-
-    //still doesnt work - how can i get the holderoptimizer to be part of the graph?
-    //val t0:Traversal[_,_] = graph.v(1).out()
-    //val t1: Traversal[_,_] = t0.path()
-    //println(HolderOptimizer.trackPaths(t0))
-    //println(HolderOptimizer.trackPaths(t1))
-    //HolderOptimizer.doPathTracking(t1)
-    //new HolderOptimizer().optimize(t1)
-    //println(HolderOptimizer.trackPaths(t1))
-    //t1.toList.toList foreach println
-  //}
-
+  describe("filter") {
+    it("filters") {
+      //TODO: always convert to ScalaVertex?
+      gs.V
+        .filter { v: Vertex => ScalaVertex(v).value("age", default = 0) > 30 }
+        .value[String]("name").toSet should be(Set("josh", "peter"))
+    }
+  }
 }

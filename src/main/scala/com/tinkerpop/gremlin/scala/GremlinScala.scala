@@ -6,6 +6,8 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.gremlin.process._
+import java.util.Comparator
+import java.util.function.Predicate
 
 case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def toList(): List[End] = traversal.toList.toList
@@ -25,16 +27,18 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
     GremlinScala[p.Out, A](traversal.value[A](key, default))
 
   def order() = GremlinScala[Types, End](traversal.order())
-  def order(lessThan: (End, End) => Boolean) = {
-    val comparator = new java.util.Comparator[Holder[End]]() {
+  def order(lessThan: (End, End) => Boolean) =
+    GremlinScala[Types, End](traversal.order(new Comparator[Holder[End]]() {
       override def compare(a: Holder[End], b: Holder[End]) = 
         if(lessThan(a.get,b.get)) -1
         else 0
-    }
-    GremlinScala[Types, End](traversal.order(comparator))
-  }
+    }))
 
   def shuffle() = GremlinScala[Types, End](traversal.shuffle())
+
+  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new Predicate[Holder[End]] {
+      override def test(h: Holder[End]): Boolean = p(h.get)
+  }))
 }
 
 case class ScalaGraph(graph: Graph) {

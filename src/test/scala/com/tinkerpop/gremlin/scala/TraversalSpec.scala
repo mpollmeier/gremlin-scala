@@ -2,7 +2,6 @@ package com.tinkerpop.gremlin.scala
 
 import org.scalatest.matchers.ShouldMatchers
 import shapeless.test.illTyped
-import GremlinScala._
 
 class TraversalSpec extends TestBase {
 
