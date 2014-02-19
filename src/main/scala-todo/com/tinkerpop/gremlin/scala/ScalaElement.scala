@@ -17,12 +17,7 @@ import scala.reflect.ClassTag
 
 
   /** need to extend Element so that we can use existing Gremlin Pipes... */
-  def getId(): Object = element.getId
-  def getProperty[T](key: String): T = element.getProperty(key)
-  def getPropertyKeys: java.util.Set[String] = element.getPropertyKeys
-  def remove(): Unit = element.remove()
   def removeProperty[T](key: String): T = element.removeProperty(key)
-  def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
 
   override def toString = element.toString
   override def hashCode: Int = id.hashCode

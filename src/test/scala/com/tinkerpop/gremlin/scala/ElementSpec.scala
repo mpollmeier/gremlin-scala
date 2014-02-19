@@ -27,6 +27,24 @@ class ElementSpec extends TestBase {
     }
   }
 
+  describe("values") {
+    it("gets a value") {
+      v(1).value[String]("name") should be("marko")
+      e(7).value[Float]("weight") should be (0.5)
+    }
+
+    it("throws an exception if a value doesnt exist") {
+      //note: in scala exceptions are typically discouraged in situations like this...
+      //value is only provided so that we are on par with Gremlin Groovy
+      intercept[IllegalStateException] {
+        v(1).value[String]("doesnt exit")
+      }
+      intercept[IllegalStateException] {
+        e(7).value[Float]("doesnt exit")
+      }
+    }
+  }
+
   describe("id, equality and hashCode") {
     it("has an id") {
       v(1).id should be("1")

@@ -59,6 +59,10 @@ trait ScalaElement {
   def setProperties(properties: Map[String, Any]): Unit = 
     properties foreach { case (k,v) => setProperty(k,v) }
 
+  /** note: in scala exceptions are typically discouraged in situations like this...
+   *  `value` is only provided so that we are on par with Gremlin Groovy */
+  def value[A](key: String): A = element.getValue[A](key)
+
   def remove(): Unit = element.remove()
 }
 
