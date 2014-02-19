@@ -23,6 +23,16 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
     GremlinScala[p.Out, A](traversal.value[A](key))
   def value[A](key: String, default: A)(implicit p:Prepend[Types, A::HNil]) =
     GremlinScala[p.Out, A](traversal.value[A](key, default))
+
+  def order() = GremlinScala[Types, End](traversal.order())
+  def order(lessThan: (End, End) => Boolean) = {
+    val comparator = new java.util.Comparator[Holder[End]]() {
+      override def compare(a: Holder[End], b: Holder[End]) = 
+        if(lessThan(a.get,b.get)) -1
+        else 0
+    }
+    GremlinScala[Types, End](traversal.order(comparator))
+  }
 }
 
 case class ScalaGraph(graph: Graph) {

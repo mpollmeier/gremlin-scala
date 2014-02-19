@@ -118,6 +118,17 @@ class TraversalSpec extends TestBase {
         gs.V.value[Int]("age", 99).toSet should be(Set(27, 29, 32, 35, 99))
       }
     }
+
+    describe("order") {
+      it("sorts by natural order") {
+        gs.V.value[Int]("age").order.toList should be(List(27, 29, 32, 35))
+      }
+
+      it("sorts by provided comparator") {
+        gs.V.value[Int]("age").order(_ < _).toList should be(List(27, 29, 32, 35))
+        gs.V.value[Int]("age").order(_ > _).toList should be(List(35, 32, 29, 27))
+      }
+    }
   }
 
 }

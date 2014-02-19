@@ -40,4 +40,6 @@ class PathSpec extends TestBase {
     //t1.toList.toList foreach println
   }
 
+  //TODO: also test with steps that don't add to the path, e.g. order
+
 }
