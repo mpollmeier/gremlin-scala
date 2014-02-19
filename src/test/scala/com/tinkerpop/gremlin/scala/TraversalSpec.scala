@@ -101,9 +101,19 @@ class TraversalSpec extends TestBase {
     //}
   }
 
-  //describe("common steps") {
-    //it("") {
+  describe("common steps") {
+    describe("property") {
+      it("gets properties") {
+        gs.V.property[String]("name").toSet map (_.get) should be(
+          Set("marko", "ripple", "vadas", "josh", "lop", "peter"))
+      }
+    }
+
+    //describe("value") {
+      //it("gets values") {
+        //gs.V.property[String]("name").toSet should be(Set("marko"))
+      //}
     //}
-  //}
+  }
 
 }

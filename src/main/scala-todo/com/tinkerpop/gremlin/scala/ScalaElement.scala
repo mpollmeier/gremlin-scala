@@ -16,9 +16,6 @@ import scala.reflect.ClassTag
   }
 
 
-  /** need to extend Element so that we can use existing Gremlin Pipes... */
-  def removeProperty[T](key: String): T = element.removeProperty(key)
-
   override def toString = element.toString
   override def hashCode: Int = id.hashCode
   override def equals(other: Any): Boolean = other match {
