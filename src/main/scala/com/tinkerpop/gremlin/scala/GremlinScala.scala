@@ -39,6 +39,8 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new Predicate[Holder[End]] {
       override def test(h: Holder[End]): Boolean = p(h.get)
   }))
+
+  def dedup() = GremlinScala[Types, End](traversal.dedup())
 }
 
 case class ScalaGraph(graph: Graph) {
