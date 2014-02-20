@@ -37,7 +37,7 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def shuffle() = GremlinScala[Types, End](traversal.shuffle())
 
   def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new Predicate[Holder[End]] {
-      override def test(h: Holder[End]): Boolean = p(h.get)
+    override def test(h: Holder[End]): Boolean = p(h.get)
   }))
 
   def dedup() = GremlinScala[Types, End](traversal.dedup())

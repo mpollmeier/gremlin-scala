@@ -5,7 +5,6 @@ version := "3.0.0-SNAPSHOT"
 organization := "com.tinkerpop.gremlin"
 
 scalaVersion := "2.10.3"
-/*scalaVersion := "2.11.0-M4"*/
 
 scalacOptions ++= Seq(
  // "-Xlog-implicits"
@@ -14,9 +13,13 @@ scalacOptions ++= Seq(
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
+  val junitVersion = "4.11"
   Seq(
     "com.tinkerpop.gremlin" % "gremlin-core" % gremlinVersion,
     "com.tinkerpop" % "tinkergraph" % gremlinVersion,
+    "com.tinkerpop.gremlin" % "gremlin-test" % gremlinVersion % "test",
+    "junit" % "junit" % junitVersion % "test",
+    "com.novocode" % "junit-interface" % "0.9" % "test->default",
     /*"com.tinkerpop.blueprints" % "blueprints-tinkergraph" % gremlinVersion,*/
     /*"com.tinkerpop.blueprints" % "blueprints-core" % gremlinVersion,*/
     /*"com.tinkerpop.blueprints" % "blueprints-io" % gremlinVersion,*/
