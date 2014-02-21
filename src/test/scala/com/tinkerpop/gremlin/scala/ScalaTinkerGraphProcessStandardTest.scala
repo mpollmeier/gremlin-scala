@@ -16,16 +16,19 @@ import com.tinkerpop.gremlin.process._
 class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends AbstractGremlinSuite(clazz, builder, Array(
     classOf[Tests.ScalaDedupTest]))
 
+trait StandardTest {
+  implicit def toTraversal[S,E](gs: GremlinScala[_,E]): Traversal[S,E] = gs.traversal.asInstanceOf[Traversal[S,E]]
+}
+
 // actual tests are inside an object so that they are not executed twice
 object Tests {
-  class ScalaDedupTest extends DedupTest {
-      //TODO: provide implicit conversion to traversal incl. cast?
+  class ScalaDedupTest extends DedupTest with StandardTest {
     override def get_g_V_both_dedup_name(): Traversal[Vertex, String] = 
-      ScalaGraph(g).V.both.dedup.value[String]("name").traversal.asInstanceOf[Traversal[Vertex, String]]
+      ScalaGraph(g).V.both.dedup.value[String]("name")
 
       //TODO properly implement dedup
     override def get_g_V_both_dedupXlangX_name(): Traversal[Vertex, String] = 
-      ScalaGraph(g).V.both.dedup.value[String]("name").traversal.asInstanceOf[Traversal[Vertex, String]]
+      ScalaGraph(g).V.both.dedup.value[String]("name")
   }
 }
 
