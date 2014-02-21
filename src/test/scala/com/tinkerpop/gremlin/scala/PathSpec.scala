@@ -17,6 +17,6 @@ class PathSpec extends TestBase {
   }
 
   //TODO: also test with steps that don't add to the path:
-  //  order, shuffle, has, filter, dedup, except, as
+  //  order, shuffle, has, filter, dedup, except, as, aggregate
   //TODO: back, jump etc.
 }
