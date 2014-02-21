@@ -44,6 +44,7 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   }))
 
   def dedup() = GremlinScala[Types, End](traversal.dedup())
+  def dedup[A](uniqueFun: End => A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
 }
 
 case class ScalaGraph(graph: Graph) {

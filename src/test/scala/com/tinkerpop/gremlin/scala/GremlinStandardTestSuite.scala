@@ -26,9 +26,10 @@ object Tests {
     override def get_g_V_both_dedup_name(): Traversal[Vertex, String] = 
       ScalaGraph(g).V.both.dedup.value[String]("name")
 
-      //TODO properly implement dedup
     override def get_g_V_both_dedupXlangX_name(): Traversal[Vertex, String] = 
-      ScalaGraph(g).V.both.dedup.value[String]("name")
+      ScalaGraph(g).V.both
+        .dedup(v => ScalaVertex(v).property[String]("lang").orElse(null))
+        .value[String]("name")
   }
 }
 
