@@ -34,9 +34,17 @@ class FilterSpec extends TestBase {
         .toSet should be(Set("lop", "josh"))
     }
 
-    it("emits everything unless it's in a given aggregate variable") {
-      v(1).out.aggregate("x").out.exceptVar("x")
+    it("emits everything unless the vertex is in a given aggregate variable") {
+      v(1).out.aggregate("x")
+        .out.exceptVar("x")
         .value[String]("name").toSet should be (Set("ripple"))
+    }
+
+    it("emits everything unless a property is in a given aggregate variable") {
+      v(1).out
+        .aggregate("x", v => ScalaVertex(v).value[String]("name"))
+        .out.value[String]("name").exceptVar("x")
+        .toSet should be (Set("ripple"))
     }
   }
 }
