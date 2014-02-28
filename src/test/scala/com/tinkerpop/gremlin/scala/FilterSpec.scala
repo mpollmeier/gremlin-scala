@@ -5,9 +5,8 @@ import org.scalatest.matchers.ShouldMatchers
 class FilterSpec extends TestBase {
 
   it("filters") {
-    //TODO: always convert to ScalaVertex/Edge where possible?
     gs.V
-      .filter { v: Vertex => ScalaVertex(v).value("age", default = 0) > 30 }
+      .filter { _.getValueWithDefault("age", default = 0) > 30 }
       .value[String]("name").toSet should be(Set("josh", "peter"))
   }
 
@@ -18,7 +17,7 @@ class FilterSpec extends TestBase {
 
     it("dedups by a given uniqueness function") {
       v(1).out.in
-        .dedup(v => ScalaVertex(v).property[String]("lang").orElse(null))
+        .dedup(_.getProperty[String]("lang").orElse(null))
         .value[String]("name").toList should be(List("josh"))
     }
   }
@@ -42,7 +41,7 @@ class FilterSpec extends TestBase {
 
     it("emits everything unless a property is in a given aggregate variable") {
       v(1).out
-        .aggregate("x", v => ScalaVertex(v).value[String]("name"))
+        .aggregate("x", _.getValue[String]("name"))
         .out.value[String]("name").exceptVar("x")
         .toSet should be (Set("ripple"))
     }

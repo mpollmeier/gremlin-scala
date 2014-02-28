@@ -7,57 +7,57 @@ class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
-      v(1).propertyKeys should be (Set("name", "age"))
-      v(1).property[String]("name").get should be("marko")
-      v(1).property[String]("doesnt exit").isPresent should be(false)
+      v(1).getPropertyKeys should be (Set("name", "age"))
+      v(1).getProperty[String]("name").get should be("marko")
+      v(1).getProperty[String]("doesnt exit").isPresent should be(false)
       v(1).properties should be (Map("name" -> "marko", "age" -> 29))
 
-      e(7).propertyKeys should be (Set("weight"))
-      e(7).property[Float]("weight").get should be (0.5)
-      e(7).property[Float]("doesnt exit").isPresent should be(false)
+      e(7).getPropertyKeys should be (Set("weight"))
+      e(7).getProperty[Float]("weight").get should be (0.5)
+      e(7).getProperty[Float]("doesnt exit").isPresent should be(false)
       e(7).properties should be (Map("weight" -> 0.5))
     }
 
     it("sets a property") {
       v(1).setProperty("vertexProperty", "updated")
-      v(1).property[String]("vertexProperty").get should be("updated")
+      v(1).getProperty[String]("vertexProperty").get should be("updated")
 
       e(7).setProperty("edgeProperty", "updated")
-      e(7).property[String]("edgeProperty").get should be("updated")
+      e(7).getProperty[String]("edgeProperty").get should be("updated")
     }
 
     it("removes a property") {
       v(1).setProperty("vertexProperty", "updated")
       v(1).removeProperty("vertexProperty")
       v(1).removeProperty("doesnt exist")
-      v(1).property[String]("vertexProperty").isPresent should be(false)
+      v(1).getProperty[String]("vertexProperty").isPresent should be(false)
 
       e(7).setProperty("edgeProperty", "updated")
       e(7).removeProperty("edgeProperty")
       e(7).removeProperty("doesnt exist")
-      e(7).property[String]("edgeProperty").isPresent should be(false)
+      e(7).getProperty[String]("edgeProperty").isPresent should be(false)
     }
   }
 
   describe("values") {
     it("gets a value") {
-      v(1).value[String]("name") should be("marko")
-      e(7).value[Float]("weight") should be (0.5)
+      v(1).getValue[String]("name") should be("marko")
+      e(7).getValue[Float]("weight") should be (0.5)
     }
 
     it("falls back to default value if value doesnt exist") {
-      v(1).value("doesnt exist", "blub") should be("blub")
-      e(7).value("doesnt exist", 0.8) should be (0.8)
+      v(1).getValueWithDefault("doesnt exist", "blub") should be("blub")
+      e(7).getValueWithDefault("doesnt exist", 0.8) should be (0.8)
     }
 
     it("throws an exception if a value doesnt exist") {
       //note: in scala exceptions are typically discouraged in situations like this...
       //value is only provided so that we are on par with Gremlin Groovy
       intercept[IllegalStateException] {
-        v(1).value[String]("doesnt exit")
+        v(1).getValue[String]("doesnt exit")
       }
       intercept[IllegalStateException] {
-        e(7).value[Float]("doesnt exit")
+        e(7).getValue[Float]("doesnt exit")
       }
     }
   }
@@ -91,7 +91,7 @@ class ElementSpec extends TestBase {
       v2.setProperty("testkey", "testValue")
 
       gs.v(v1.id) should be(Some(v1))
-      gs.v(v2.id).get.property[String]("testkey").get should be("testValue")
+      gs.v(v2.id).get.getProperty[String]("testkey").get should be("testValue")
       gs.V.toList.size should be(2)
     }
 
@@ -103,7 +103,7 @@ class ElementSpec extends TestBase {
       val v2 = gs.addVertex(id2, Map("testkey" -> "testValue"))
 
       gs.v(id1) should be(Some(v1))
-      gs.v(id2).get.property[String]("testkey").get should be("testValue")
+      gs.v(id2).get.getProperty[String]("testkey").get should be("testValue")
       gs.V.toList.size should be(2)
     }
 

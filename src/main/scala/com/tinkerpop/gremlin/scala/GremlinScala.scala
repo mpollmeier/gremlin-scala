@@ -87,22 +87,22 @@ trait ScalaElement {
 
   def id: AnyRef = element.getId
 
-  def property[A](key: String): Property[A] = element.getProperty[A](key)
-  def propertyKeys(): Set[String] = element.getPropertyKeys.toSet
+  def getProperty[A](key: String): Property[A] = element.getProperty[A](key)
+  def getPropertyKeys(): Set[String] = element.getPropertyKeys.toSet
   def properties: Map[String, Any] = element.getProperties.toMap mapValues (_.get)
   def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
   def setProperties(properties: Map[String, Any]): Unit = 
     properties foreach { case (k,v) => setProperty(k,v) }
   def removeProperty(key: String): Unit = {
-    val p = property(key)
+    val p = getProperty(key)
     if(p.isPresent) p.remove
   }
 
   /** note: this may throw an IllegalStateException!
     * in scala exceptions are typically discouraged in situations like this...
     * `value` is only provided so that we are on par with Gremlin Groovy */
-  def value[A](key: String): A = element.getValue[A](key)
-  def value[A](key: String, default: A): A = property[A](key).orElse(default)
+  def getValue[A](key: String): A = element.getValue[A](key)
+  def getValueWithDefault[A](key: String, default: A): A = getProperty[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 }
