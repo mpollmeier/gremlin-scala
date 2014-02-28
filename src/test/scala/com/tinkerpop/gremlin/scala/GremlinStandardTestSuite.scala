@@ -48,13 +48,20 @@ object Tests {
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX =
       ScalaGraph(g).v("1").get.out("created").in("created").except(g.v("1")).value[String]("name")
   }
+
+  class ScalaSimplePathTest extends SimplePathTest with StandardTest {
+    override def get_g_v1_outXcreatedX_inXcreatedX_simplePath =
+      ScalaGraph(g).v("1").get.out("created").in("created").simplePath
+  
+  }
 }
 
 import Tests._
 class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends AbstractGremlinSuite(clazz, builder, Array(
   classOf[ScalaDedupTest],
   classOf[ScalaFilterTest],
-  classOf[ScalaExceptTest]
+  classOf[ScalaExceptTest],
+  classOf[ScalaSimplePathTest]
   ))
 
 trait StandardTest {
