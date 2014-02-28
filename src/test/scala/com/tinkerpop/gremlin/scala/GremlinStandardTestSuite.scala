@@ -13,15 +13,8 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process.steps.filter.DedupTest
 import com.tinkerpop.gremlin.process._
 
-class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends AbstractGremlinSuite(clazz, builder, Array(
-    classOf[Tests.ScalaDedupTest]))
-
-trait StandardTest {
-  implicit def toTraversal[S,E](gs: GremlinScala[_,E]): Traversal[S,E] = gs.traversal.asInstanceOf[Traversal[S,E]]
-}
-
-// actual tests are inside an object so that they are not executed twice
 object Tests {
+  // actual tests are inside an object so that they are not executed twice
   class ScalaDedupTest extends DedupTest with StandardTest {
     override def get_g_V_both_dedup_name(): Traversal[Vertex, String] = 
       ScalaGraph(g).V.both.dedup.value[String]("name")
@@ -31,6 +24,13 @@ object Tests {
         .dedup(_.getProperty[String]("lang").orElse(null))
         .value[String]("name")
   }
+}
+
+class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends AbstractGremlinSuite(clazz, builder, Array(
+    classOf[Tests.ScalaDedupTest]))
+
+trait StandardTest {
+  implicit def toTraversal[S,E](gs: GremlinScala[_,E]): Traversal[S,E] = gs.traversal.asInstanceOf[Traversal[S,E]]
 }
 
 @RunWith(classOf[ScalaProcessStandardSuite]) 
