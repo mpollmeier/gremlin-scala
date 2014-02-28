@@ -39,12 +39,22 @@ object Tests {
       name.startsWith("m") || name.startsWith("p")
     }
   }
+
+  class ScalaExceptTest extends ExceptTest with StandardTest {
+    override def get_g_v1_out_exceptXg_v2X = ScalaGraph(g).v("1").get.out.except(g.v("2"))
+  
+    override def get_g_v1_out_aggregateXxX_out_exceptXxX = ScalaGraph(g).v("1").get.out.aggregate("x").out.exceptVar("x")
+
+    override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX =
+      ScalaGraph(g).v("1").get.out("created").in("created").except(g.v("1")).value[String]("name")
+  }
 }
 
 import Tests._
 class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends AbstractGremlinSuite(clazz, builder, Array(
   classOf[ScalaDedupTest],
-  classOf[ScalaFilterTest]
+  classOf[ScalaFilterTest],
+  classOf[ScalaExceptTest]
   ))
 
 trait StandardTest {
