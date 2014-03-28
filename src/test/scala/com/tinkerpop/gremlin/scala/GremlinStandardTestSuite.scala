@@ -52,7 +52,27 @@ object Tests {
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath =
       ScalaGraph(g).v("1").get.out("created").in("created").simplePath
-  
+  }
+
+  class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
+    override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath =
+      ScalaGraph(g).v("1").get.out("created").in("created").cyclicPath
+  }
+
+  class ScalaHasTest extends HasTest with StandardTest {
+    override def get_g_V_hasXname_markoX = ???// ScalaGraph(g).V.has("name", "marko")
+
+    override def get_g_V_hasXname_blahX = ???//ScalaGraph(g).V.has("name", "blah")
+
+    override def get_g_V_hasXblahX = ???//ScalaGraph(g).V.has("blah")
+
+    override def get_g_v1_out_hasXid_2X = ???//ScalaGraph(g).v("1").get.has("id", "2")
+
+    override def get_g_V_hasXage_gt_30X = ???//ScalaGraph(g).V.has("age", T.gt, 30)
+
+    override def get_g_E_hasXlabelXknowsX = ???//ScalaGraph(g).E.has("label", "knows")
+
+    override def get_g_E_hasXlabelXknows_createdX = ???//ScalaGraph(g).E.has("label", T.in, List("knows", "created"))
   }
 }
 
@@ -61,7 +81,9 @@ class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) extends
   classOf[ScalaDedupTest],
   classOf[ScalaFilterTest],
   classOf[ScalaExceptTest],
-  classOf[ScalaSimplePathTest]
+  classOf[ScalaSimplePathTest],
+  classOf[ScalaCyclicPathTest],
+  classOf[ScalaHasTest]
   ))
 
 trait StandardTest {

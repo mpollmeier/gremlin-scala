@@ -40,6 +40,7 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def shuffle() = GremlinScala[Types, End](traversal.shuffle())
 
   def simplePath() = GremlinScala[Types, End](traversal.simplePath())
+  def cyclicPath() = GremlinScala[Types, End](traversal.cyclicPath())
 
   def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new Predicate[Holder[End]] {
     override def test(h: Holder[End]): Boolean = p(h.get)
