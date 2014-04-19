@@ -15,9 +15,9 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
   Seq(
-    "com.tinkerpop.gremlin" % "gremlin-core" % gremlinVersion,
-    "com.tinkerpop" % "tinkergraph" % gremlinVersion,
-    "com.tinkerpop.gremlin" % "gremlin-test" % gremlinVersion % "test",
+    "com.tinkerpop.tinkerpop3" % "gremlin-core" % gremlinVersion,
+    "com.tinkerpop.tinkerpop3" % "tinkergraph-gremlin" % gremlinVersion,
+    "com.tinkerpop.tinkerpop3" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
     "com.novocode" % "junit-interface" % "0.9" % "test->default",
     /*"com.tinkerpop.blueprints" % "blueprints-tinkergraph" % gremlinVersion,*/

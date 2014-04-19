@@ -26,6 +26,7 @@ import scala.collection.JavaConversions._
 import shapeless._
 import ops.hlist._
 
+
 /**
   * Types holds the types of each step in the gremlin pipeline. End is simply the last type of that HList
   * */

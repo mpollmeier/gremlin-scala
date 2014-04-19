@@ -6,10 +6,11 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.gremlin.process._
+import com.tinkerpop.gremlin.process.graph.GraphTraversal
+import com.tinkerpop.gremlin.util.function.SPredicate
 import java.util.Comparator
-import java.util.function.Predicate
 
-case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
+case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) {
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
@@ -42,7 +43,7 @@ case class GremlinScala[Types <: HList, End](traversal: Traversal[_, End]) {
   def simplePath() = GremlinScala[Types, End](traversal.simplePath())
   def cyclicPath() = GremlinScala[Types, End](traversal.cyclicPath())
 
-  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new Predicate[Holder[End]] {
+  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Holder[End]] {
     override def test(h: Holder[End]): Boolean = p(h.get)
   }))
 
@@ -80,9 +81,9 @@ case class ScalaGraph(graph: Graph) {
   }
 
   /** get all vertices */
-  def V() = GremlinScala[Vertex :: HNil, Vertex](graph.V.asInstanceOf[Traversal[_, Vertex]])
+  def V() = GremlinScala[Vertex :: HNil, Vertex](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
   /** get all edges */
-  def E() = GremlinScala[Edge :: HNil, Edge](graph.E.asInstanceOf[Traversal[_, Edge]])
+  def E() = GremlinScala[Edge :: HNil, Edge](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
 }
 
 trait ScalaElement {
@@ -150,7 +151,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement {
   def label(): String = edge.getLabel
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
-  //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
+  //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist
   //def inV() = GremlinScala[Edge :: Vertex :: HNil, Vertex](edge.inV())
 }
 

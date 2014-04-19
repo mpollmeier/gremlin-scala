@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.tinkergraph.TinkerGraph
+import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 class ElementSpec extends TestBase {
 
@@ -64,8 +64,8 @@ class ElementSpec extends TestBase {
 
   describe("id, equality and hashCode") {
     it("has an id") {
-      v(1).id should be("1")
-      e(7).id should be("7")
+      v(1).id should be(1)
+      e(7).id should be(7)
     }
 
     it("equals") {

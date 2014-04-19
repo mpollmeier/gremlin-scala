@@ -3,6 +3,7 @@ package com.tinkerpop.gremlin
 import shapeless._
 import ops.hlist._
 import java.util.function.{Function => JFunction}
+import com.tinkerpop.gremlin.util.function.SFunction
 import com.tinkerpop.gremlin.scala.GremlinScala._
 
 package object scala {
@@ -10,6 +11,9 @@ package object scala {
   type Edge = structure.Edge
   type Graph = structure.Graph
   implicit def toJavaFunction[A,B](f: Function1[A,B]) = new JFunction[A,B] {
+    override def apply(a: A): B = f(a)
+  }
+  implicit def toSFunction[A,B](f: Function1[A,B]) = new SFunction[A,B] {
     override def apply(a: A): B = f(a)
   }
 
