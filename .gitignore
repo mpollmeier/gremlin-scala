@@ -22,3 +22,9 @@ project/plugins/project/
 .settings
 *.swp
 .lib-src
+
+# Intellij IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws

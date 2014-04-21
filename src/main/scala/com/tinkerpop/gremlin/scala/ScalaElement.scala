@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Element
 import java.util.{ Set ⇒ JSet }
 import scala.language.dynamics
 import scala.reflect.ClassTag
+import scala.annotation.implicitNotFound
 
 trait ScalaElement extends Element with Dynamic {
   def element: Element
@@ -12,6 +13,7 @@ trait ScalaElement extends Element with Dynamic {
   def selectDynamic(key: String): Any = getProperty(key)
 
   /** returns Some[A] if element present and of type A, otherwise None */
+  @implicitNotFound( msg = "No ClassTag available for ${T}" )
   def property[A: ClassTag](name: String): Option[A] = {
     val value: A = element.getProperty(name)
     value match {
