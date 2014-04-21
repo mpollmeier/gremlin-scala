@@ -1,13 +1,13 @@
 name := "gremlin-scala"
 
-version := "2.5.0-SNAPSHOT"
+version := "2.5.0"
 
 organization := "com.michaelpollmeier"
 
 scalaVersion := "2.10.3"
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "2.5.0-SNAPSHOT"
+  val gremlinVersion = "2.5.0"
   Seq(
     "com.tinkerpop.gremlin" % "gremlin-java" % gremlinVersion,
     "com.tinkerpop" % "pipes" % gremlinVersion,
@@ -16,8 +16,8 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.tinkerpop.blueprints" % "blueprints-sail-graph" % gremlinVersion % "provided",
     "com.tinkerpop.blueprints" % "blueprints-neo4j-graph" % gremlinVersion % "provided",
     // "com.tinkerpop.blueprints" % "blueprints-neo4jbatch-graph" % gremlinVersion % "provided", //doesn't exist in snapshot repositories as of now... try again later
-    "com.tinkerpop.blueprints" % "blueprints-orient-graph" % gremlinVersion % "provided",
-    "com.tinkerpop.blueprints" % "blueprints-dex-graph" % gremlinVersion % "provided",
+    /*"com.tinkerpop.blueprints" % "blueprints-orient-graph" % gremlinVersion % "provided",*/
+    /*"com.tinkerpop.blueprints" % "blueprints-dex-graph" % gremlinVersion % "provided",*/
     "com.tinkerpop.blueprints" % "blueprints-rexster-graph" % gremlinVersion % "provided",
     // REPL dependencies
     "org.scala-lang" % "scala-library" % scalaVersion,

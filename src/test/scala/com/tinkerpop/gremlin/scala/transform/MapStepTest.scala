@@ -7,16 +7,16 @@ import com.tinkerpop.gremlin.scala._
 class MapStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("maps the label of an edge to it's length") {
-    edges.label.map { _.size }.toList should be(List(7, 5, 7, 5, 7, 7))
-    edges.label.transform { _.size }.toList should be(List(7, 5, 7, 5, 7, 7))
+    edges.label.map { _.size }.toSet should be(Set(7, 5, 7, 5, 7, 7))
+    edges.label.transform { _.size }.toSet should be(Set(7, 5, 7, 5, 7, 7))
   }
 
   it("maps the age property of all vertices") {
-    vertices.property("age").map { age: Integer ⇒ age * 2 }.toList should be(List(54, 58, 70, 64))
+    vertices.property("age").map { age: Integer ⇒ age * 2 }.toSet should be(Set(54, 58, 70, 64))
   }
 
   it("gets the name and the age as tuples") {
-    vertices.map { v ⇒ (v("name"), v("age")) }.toList should be(List(
+    vertices.map { v ⇒ (v("name"), v("age")) }.toSet should be(Set(
       ("lop", null),
       ("vadas", 27),
       ("marko", 29),

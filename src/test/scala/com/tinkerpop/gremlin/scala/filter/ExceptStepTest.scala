@@ -11,7 +11,7 @@ class ExceptStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("emits everything except what is in the supplied collection") {
     val excludeList = List(graph.v(1), graph.v(2), graph.v(3))
-    graph.V.except(excludeList).toList should be(List(graph.v(6), graph.v(5), graph.v(4)))
+    graph.V.except(excludeList).toSet should be(Set(graph.v(6), graph.v(5), graph.v(4)))
   }
 
   it("works nicely with aggregate") {

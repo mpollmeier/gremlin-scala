@@ -38,7 +38,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       val buffer = mutable.Buffer.empty[String]
       graph.v(1).out.aggregate(buffer)(getName).iterate()
 
-      buffer should be(mutable.Buffer("vadas", "josh", "lop"))
+      buffer.toSet should be(Set("vadas", "josh", "lop"))
     }
   }
 
@@ -55,7 +55,7 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       val buffer = mutable.Buffer.empty[String]
       graph.v(1).out.store[String](buffer, getName).iterate()
 
-      buffer should be(mutable.Buffer("vadas", "josh", "lop"))
+      buffer.toSet should be(Set("vadas", "josh", "lop"))
     }
   }
 
@@ -80,9 +80,9 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
       graph.V.groupBy(ageMap)(keyFunction = ageRange, valueFunction = getName).iterate()
 
       val result = ageMap.toMap
-      result(underThirty).toList should be(List("vadas", "marko"))
-      result(overThirty).toList should be(List("peter", "josh"))
-      result(unknown).toList should be(List("lop", "ripple"))
+      result(underThirty).toSet should be(Set("vadas", "marko"))
+      result(overThirty).toSet should be(Set("peter", "josh"))
+      result(unknown).toSet should be(Set("lop", "ripple"))
     }
   }
 

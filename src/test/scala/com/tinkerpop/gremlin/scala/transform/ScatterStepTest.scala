@@ -16,15 +16,15 @@ class ScatterStepTest extends FunSpec with ShouldMatchers with TestGraph {
     val pipe = graph.v(1).out.map(_.getProperty[String]("name")).gather.scatter
 
     val first = pipe.next()
-    first should be("vadas")
+    first should be("lop")
     pipe.hasNext should be(true)
 
     val second = pipe.next()
-    second should be("josh")
+    second should be("vadas")
     pipe.hasNext should be(true)
 
     val third = pipe.next()
-    third should be("lop")
+    third should be("josh")
     pipe.hasNext should be(false)
   }
 
