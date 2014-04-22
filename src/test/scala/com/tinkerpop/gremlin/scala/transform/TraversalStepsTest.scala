@@ -15,12 +15,12 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("gets the out vertices") {
       graph.v(1).out.property("name").toSet should be(Set("vadas", "josh", "lop"))
-      graph.v(1).out(1).property("name").toSet should be(Set("lop"))
+      graph.v(1).out(1).property("name").toSet should be(Set("vadas"))
     }
 
     it("gets the in vertices") {
       graph.v(3).in.property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).in(1).property("name").toSet should be(Set("josh"))
+      graph.v(3).in(1).property("name").toSet should be(Set("marko"))
     }
 
     it("gets both in and out vertices") {
@@ -36,7 +36,7 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("follows out edges") {
       graph.v(1).outE.label.toSet should be(Set("knows", "knows", "created"))
-      graph.v(1).outE(1).label.toSet should be(Set("created"))
+      graph.v(1).outE(1).label.toSet should be(Set("knows"))
 
       graph.v(1).outE("knows", "created").inV.name.toSet should be(Set("vadas", "josh", "lop"))
     }
@@ -81,10 +81,10 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
 
     it("follows in edges by label") {
       graph.v(3).in("created").property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).in(1, "created").property("name").toSet should be(Set("josh"))
+      graph.v(3).in(1, "created").property("name").toSet should be(Set("marko"))
 
       graph.v(3).inE("created").outV.property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).inE(1, "created").outV.property("name").toSet should be(Set("josh"))
+      graph.v(3).inE(1, "created").outV.property("name").toSet should be(Set("marko"))
     }
 
     it("traverses multiple steps") {
