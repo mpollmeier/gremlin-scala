@@ -125,7 +125,7 @@ Adding Gremlin-Scala as a dependency
 =============
 ```scala
 /* sbt */
-/* release  */ "com.michaelpollmeier" % "gremlin-scala" % "2.4.1"
+/* release  */ "com.michaelpollmeier" %% "gremlin-scala" % "2.5.0"
 /* snapshot */ "com.michaelpollmeier" %% "gremlin-scala" % "2.5.0-SNAPSHOT"
 ```
 ```xml
@@ -133,7 +133,7 @@ Adding Gremlin-Scala as a dependency
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
   <artifactId>gremlin-scala</artifactId>
-  <version>2.4.1</version>
+  <version>2.5.0</version>
 </dependency>
 ```
 
