@@ -4,7 +4,7 @@ version := "3.0.0-SNAPSHOT"
 
 organization := "com.tinkerpop.gremlin"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.11.0"
 
 scalacOptions ++= Seq(
  // "-Xlog-implicits"
@@ -17,18 +17,14 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   Seq(
     "com.tinkerpop.tinkerpop3" % "gremlin-core" % gremlinVersion,
     "com.tinkerpop.tinkerpop3" % "tinkergraph-gremlin" % gremlinVersion,
-    "com.tinkerpop.tinkerpop3" % "gremlin-test" % gremlinVersion % "test",
-    "junit" % "junit" % junitVersion % "test",
     "com.novocode" % "junit-interface" % "0.9" % "test->default",
-    /*"com.tinkerpop.blueprints" % "blueprints-tinkergraph" % gremlinVersion,*/
-    /*"com.tinkerpop.blueprints" % "blueprints-core" % gremlinVersion,*/
-    /*"com.tinkerpop.blueprints" % "blueprints-io" % gremlinVersion,*/
-    /*"com.tinkerpop.blueprints" % "blueprints-generator" % gremlinVersion,*/
-    "com.chuusai" % "shapeless" % "2.0.0-M1" cross CrossVersion.full,
+    "com.chuusai" %% "shapeless" % "2.0.0",
     /*"org.scala-lang" % "scala-library" % scalaVersion,*/
     /*"org.scala-lang" % "scala-compiler" % scalaVersion,*/
     /*"org.scala-lang" % "jline" % scalaVersion,*/
-    "org.scalatest" %% "scalatest" % "2.0" % "test"
+    "com.tinkerpop.tinkerpop3" % "gremlin-test" % gremlinVersion % "test",
+    "junit" % "junit" % junitVersion % "test",
+    "org.scalatest" %% "scalatest" % "2.1.4" % "test"
   )
 }
 
@@ -38,6 +34,4 @@ resolvers ++= Seq(
   /*"Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/",*/
   /*"Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",*/
   /*"Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",*/
-  /*"Aduna Software" at "http://repo.aduna-software.org/maven2/releases/", //for org.openrdf.sesame*/
-  /*"Restlet Framework" at "http://maven.restlet.org"*/
 )
