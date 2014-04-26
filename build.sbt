@@ -11,6 +11,9 @@ scalacOptions ++= Seq(
   /*"-Ydebug"*/
 )
 
+// use sbt's new name hashing
+incOptions := incOptions.value.withNameHashing(true)
+
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
