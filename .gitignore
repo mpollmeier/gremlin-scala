@@ -3,6 +3,7 @@
 classes
 .cache
 tags
+.tags
 
 # sbt specific
 dist/*
