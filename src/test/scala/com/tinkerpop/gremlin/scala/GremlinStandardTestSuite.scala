@@ -12,6 +12,7 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process.graph.filter._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import com.tinkerpop.gremlin.structure.Element
 
 object Tests {
   // actual tests are inside an object so that they are not executed twice
@@ -63,23 +64,23 @@ object Tests {
       ScalaGraph(g).v(v1Id).get.out("created").in("created").cyclicPath
   }
 
-  //class ScalaHasTest extends HasTest with StandardTest {
-    //override def get_g_V_hasXname_markoX =  ScalaGraph(g).V.has("name", "marko")
+  class ScalaHasTest extends HasTest with StandardTest {
+    override def get_g_V_hasXname_markoX = ScalaGraph(g).V.has("name", "marko")
 
-    //override def get_g_V_hasXname_blahX = ScalaGraph(g).V.has("name", "blah")
+    override def get_g_V_hasXname_blahX = ScalaGraph(g).V.has("name", "blah")
 
-    //override def get_g_V_hasXblahX = ScalaGraph(g).V.has("blah")
+    override def get_g_V_hasXblahX = ScalaGraph(g).V.has("blah")
 
-    //override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) = 
-      //ScalaGraph(g).v("1").get.has("id", "2")
+    override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.out().has(Element.ID, v2Id)
 
-    //override def get_g_V_hasXage_gt_30X = ScalaGraph(g).V.has("age", T.gt, 30)
+    override def get_g_V_hasXage_gt_30X = ScalaGraph(g).V.has("age", T.gt, 30)
 
-    //override def get_g_E_hasXlabelXknowsX = ScalaGraph(g).E.has("label", "knows")
+    override def get_g_E_hasXlabelXknowsX = ScalaGraph(g).E.has("label", "knows")
 
-    //override def get_g_E_hasXlabelXknows_createdX = 
-      //ScalaGraph(g).E.has("label", T.in, List("knows", "created"))
-  //}
+    override def get_g_E_hasXlabelXknows_createdX =
+      ScalaGraph(g).E.has("label", T.in, List("knows", "created"))
+  }
 }
 
 import Tests._
@@ -89,8 +90,8 @@ class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     classOf[ScalaFilterTest],
     classOf[ScalaExceptTest],
     classOf[ScalaSimplePathTest],
-    classOf[ScalaCyclicPathTest]
-    //classOf[ScalaHasTest]
+    classOf[ScalaCyclicPathTest],
+    classOf[ScalaHasTest]
   ))
 
 trait StandardTest {
