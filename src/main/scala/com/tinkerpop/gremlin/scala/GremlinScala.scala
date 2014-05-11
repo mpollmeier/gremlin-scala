@@ -16,9 +16,6 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def head(): End = toList.head
   def headOption(): Option[End] = Option(head)
 
-  def map[A](fun: Holder[End] => A)(implicit p:Prepend[Types, A::HNil]) =
-    GremlinScala[p.Out, A](traversal.map[A](fun))
-
   def property[A](key: String)(implicit p:Prepend[Types, Property[A]::HNil]) =
     GremlinScala[p.Out, Property[A]](traversal.property[A](key))
 
@@ -26,6 +23,13 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[p.Out, A](traversal.value[A](key))
   def value[A](key: String, default: A)(implicit p:Prepend[Types, A::HNil]) =
     GremlinScala[p.Out, A](traversal.value[A](key, default))
+
+  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Holder[End]] {
+    override def test(h: Holder[End]): Boolean = p(h.get)
+  }))
+
+  def map[A](fun: Holder[End] => A)(implicit p:Prepend[Types, A::HNil]) =
+    GremlinScala[p.Out, A](traversal.map[A](fun))
 
   def path()(implicit p:Prepend[Types, Types::HNil]) =
     GremlinScala[p.Out, Types](traversal.addStep(new TypedPathStep[End, Types](traversal)))
@@ -42,10 +46,6 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def simplePath() = GremlinScala[Types, End](traversal.simplePath())
   def cyclicPath() = GremlinScala[Types, End](traversal.cyclicPath())
-
-  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Holder[End]] {
-    override def test(h: Holder[End]): Boolean = p(h.get)
-  }))
 
   def dedup() = GremlinScala[Types, End](traversal.dedup())
   def dedup[A](uniqueFun: End => A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
