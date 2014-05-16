@@ -249,10 +249,11 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
    *  Note that this is a side effect step: the input will just flow through to the next step, but you can use `cap` to get the buffer into the pipeline.
    *  @see example in SideEffectTest
    */
-  def groupBy[K, V](map: JMap[K, JCollection[Any]] = new JHashMap)(keyFunction: E ⇒ K, valueFunction: E ⇒ V): GremlinScalaPipeline[S, E] =
+  def groupBy[K, V](map: JMap[K, JCollection[V]] = new JHashMap[K, JCollection[V]])(
+    keyFunction: E ⇒ K, valueFunction: E ⇒ V): GremlinScalaPipeline[S, E] =
     addPipe(
       new GroupByPipe(
-        map,
+        map.asInstanceOf[JMap[K, JCollection[Any]]],
         keyFunction,
         new ScalaPipeFunction(valueFunction).asInstanceOf[ScalaPipeFunction[E, Any]])
     )

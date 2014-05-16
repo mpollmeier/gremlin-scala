@@ -75,11 +75,10 @@ class SideEffectTest extends FunSpec with ShouldMatchers with TestGraph {
 
   describe("groupBy") {
     it("groups tinkerpop team by age range") {
-      //      val ageMap = mutable.Map.empty[Integer, mutable.Buffer[Vertex]]
-      val ageMap = new JHashMap[String, JCollection[Any]]
+      val ageMap = new JHashMap[String, JCollection[String]]
       graph.V.groupBy(ageMap)(keyFunction = ageRange, valueFunction = getName).iterate()
 
-      val result = ageMap.toMap
+      val result: Map[String, JCollection[String]] = ageMap.toMap
       result(underThirty).toSet should be(Set("vadas", "marko"))
       result(overThirty).toSet should be(Set("peter", "josh"))
       result(unknown).toSet should be(Set("lop", "ripple"))
