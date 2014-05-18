@@ -132,7 +132,7 @@ Adding Gremlin-Scala as a dependency
 <!-- Maven -->
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
-  <artifactId>gremlin-scala</artifactId>
+  <artifactId>gremlin-scala_2.10</artifactId>
   <version>2.5.0</version>
 </dependency>
 ```
