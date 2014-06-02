@@ -6,8 +6,9 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.gremlin.process.T
 
-trait ScalaElement {
-  def element: Element
+trait ScalaElement[ElementType <: Element] {
+  def element: ElementType
+  def start(): GremlinScala[ElementType :: HNil, ElementType]
 
   def id: AnyRef = element.id
   def label(): String = element.label
@@ -30,9 +31,18 @@ trait ScalaElement {
   def getValueWithDefault[A](key: String, default: A): A = getProperty[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
+
+
+  //duplicated from pipeline so that we can quickly start a pipeline from an element
+  //TODO: add other steps
+
+  def filter(p: ElementType ⇒ Boolean) = start().filter(p)
+  def has(key: String) = start().has(key)
+  def has(key: String, value: Any) = start().has(key, value)
+  def has(key: String, t: T, value: Any) = start().has(key, t, value)
 }
 
-case class ScalaVertex(vertex: Vertex) extends ScalaElement {
+case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
   def out() = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.out())
@@ -66,27 +76,12 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement {
   }
 
 
-  //duplicated from pipeline so that we can quickly start a pipeline from an element
-  //TODO: move up to element?
-  //TODO: add other step
-  def filter(p: Vertex ⇒ Boolean) = start().filter(p)
-
-  def has(key: String) = start().has(key)
-
-  def has(key: String, value: Any) = start().has(key, value)
-
-  def has(key: String, t: T, value: Any) = start().has(key, t, value)
-
-  //TODO: move up to element
   def start() = GremlinScala[Vertex :: HNil, Vertex](vertex.start)
 }
 
-case class ScalaEdge(edge: Edge) extends ScalaElement {
+case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  def has(key: String, value: AnyRef) = start().has(key, value)
-
-  //TODO: move up to element
   def start() = GremlinScala[Edge :: HNil, Edge](edge.start)
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
