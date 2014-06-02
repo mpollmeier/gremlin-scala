@@ -13,14 +13,14 @@ trait ScalaElement[ElementType <: Element] {
   def id: AnyRef = element.id
   def label(): String = element.label
 
-  def getProperty[A](key: String): Property[A] = element.property[A](key)
+  def property[A](key: String): Property[A] = element.property[A](key)
   def keys(): Set[String] = element.keys.toSet
   def properties: Map[String, Any] = element.properties.toMap mapValues (_.value)
   def setProperty(key: String, value: Any): Unit = element.property(key, value)
   def setProperties(properties: Map[String, Any]): Unit =
     properties foreach { case (k,v) => setProperty(k,v) }
   def removeProperty(key: String): Unit = {
-    val p = getProperty(key)
+    val p = property(key)
     if(p.isPresent) p.remove
   }
 
@@ -28,7 +28,7 @@ trait ScalaElement[ElementType <: Element] {
     * in scala exceptions are typically discouraged in situations like this...
     * `value` is only provided so that we are on par with Gremlin Groovy */
   def getValue[A](key: String): A = element.value[A](key)
-  def getValueWithDefault[A](key: String, default: A): A = getProperty[A](key).orElse(default)
+  def getValueWithDefault[A](key: String, default: A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 

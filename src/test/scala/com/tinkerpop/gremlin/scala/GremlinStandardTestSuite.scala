@@ -21,7 +21,7 @@ object Tests {
 
     override def get_g_V_both_dedupXlangX_name =
       ScalaGraph(g).V.both
-        .dedup(_.getProperty[String]("lang").orElse(null))
+        .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name")
   }
 
@@ -31,10 +31,10 @@ object Tests {
     override def get_g_V_filterXtrueX = ScalaGraph(g).V.filter(_ => true)
 
     override def get_g_V_filterXlang_eq_javaX = 
-      ScalaGraph(g).V.filter(_.getProperty("lang").orElse("none") == "java")
+      ScalaGraph(g).V.filter(_.property("lang").orElse("none") == "java")
 
     override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) = 
-      ScalaGraph(g).v(v1Id).get.out.filter(_.getProperty("age").orElse(0) > 30)
+      ScalaGraph(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
 
     override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v =>
       val name = v.getValue[String]("name")

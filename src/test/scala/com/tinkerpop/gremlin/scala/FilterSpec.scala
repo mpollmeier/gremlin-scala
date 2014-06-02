@@ -17,7 +17,7 @@ class FilterSpec extends TestBase {
 
     it("dedups by a given uniqueness function") {
       v(1).out.in
-        .dedup(_.getProperty[String]("lang").orElse(null))
+        .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name").toList should be(List("marko"))
     }
   }
