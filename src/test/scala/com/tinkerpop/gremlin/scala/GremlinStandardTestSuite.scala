@@ -40,6 +40,13 @@ object Tests {
       val name = v.getValue[String]("name")
       name.startsWith("m") || name.startsWith("p")
     }
+
+    override def get_g_E_filterXfalseX = ScalaGraph(g).E.filter(_ ⇒ false)
+
+    override def get_g_E_filterXtrueX = ScalaGraph(g).E.filter(_ ⇒ true)
+
+    override def get_g_v1_filterXage_gt_30X(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.filter(_.property("age").orElse(0) > 30)
   }
 
   class ScalaExceptTest extends ExceptTest with StandardTest {
@@ -80,6 +87,14 @@ object Tests {
 
     override def get_g_E_hasXlabelXknows_createdX =
       ScalaGraph(g).E.has("label", T.in, List("knows", "created"))
+
+    override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = ScalaGraph(g).e(e7Id).get.has("label", "knows")
+
+    override def get_g_v1_hasXage_gt_30X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("age", T.gt, 30)
+
+    override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = ScalaGraph(g).v(v1Id).get.has(key)
+
+    override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("name", "marko")
   }
 }
 

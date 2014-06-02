@@ -4,17 +4,19 @@ import shapeless._
 import ops.hlist._
 import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.structure._
+import com.tinkerpop.gremlin.process.T
 
 trait ScalaElement {
   def element: Element
 
-  def id: AnyRef = element.getId
+  def id: AnyRef = element.id
+  def label(): String = element.label
 
-  def getProperty[A](key: String): Property[A] = element.getProperty[A](key)
-  def getPropertyKeys(): Set[String] = element.getPropertyKeys.toSet
-  def properties: Map[String, Any] = element.getProperties.toMap mapValues (_.get)
-  def setProperty(key: String, value: Any): Unit = element.setProperty(key, value)
-  def setProperties(properties: Map[String, Any]): Unit = 
+  def getProperty[A](key: String): Property[A] = element.property[A](key)
+  def keys(): Set[String] = element.keys.toSet
+  def properties: Map[String, Any] = element.properties.toMap mapValues (_.value)
+  def setProperty(key: String, value: Any): Unit = element.property(key, value)
+  def setProperties(properties: Map[String, Any]): Unit =
     properties foreach { case (k,v) => setProperty(k,v) }
   def removeProperty(key: String): Unit = {
     val p = getProperty(key)
@@ -24,7 +26,7 @@ trait ScalaElement {
   /** note: this may throw an IllegalStateException!
     * in scala exceptions are typically discouraged in situations like this...
     * `value` is only provided so that we are on par with Gremlin Groovy */
-  def getValue[A](key: String): A = element.getValue[A](key)
+  def getValue[A](key: String): A = element.value[A](key)
   def getValueWithDefault[A](key: String, default: A): A = getProperty[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
@@ -62,12 +64,30 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement {
     e.setProperties(properties)
     e
   }
+
+
+  //duplicated from pipeline so that we can quickly start a pipeline from an element
+  //TODO: move up to element?
+  //TODO: add other step
+  def filter(p: Vertex ⇒ Boolean) = start().filter(p)
+
+  def has(key: String) = start().has(key)
+
+  def has(key: String, value: Any) = start().has(key, value)
+
+  def has(key: String, t: T, value: Any) = start().has(key, t, value)
+
+  //TODO: move up to element
+  def start() = GremlinScala[Vertex :: HNil, Vertex](vertex.start)
 }
 
 case class ScalaEdge(edge: Edge) extends ScalaElement {
   override def element = edge
 
-  def label(): String = edge.getLabel
+  def has(key: String, value: AnyRef) = start().has(key, value)
+
+  //TODO: move up to element
+  def start() = GremlinScala[Edge :: HNil, Edge](edge.start)
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist

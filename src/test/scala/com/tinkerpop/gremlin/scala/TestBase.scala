@@ -16,6 +16,6 @@ trait TestGraph {
 
 trait TestBase extends FunSpec with ShouldMatchers with TestGraph {
   implicit class Properties[A](set: Traversable[Property[A]]) {
-    def unroll(): Traversable[A] = set map (_.get)
+    def unroll(): Traversable[A] = set map (_.value)
   }
 }

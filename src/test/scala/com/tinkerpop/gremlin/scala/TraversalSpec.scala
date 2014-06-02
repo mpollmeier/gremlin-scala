@@ -36,27 +36,27 @@ class TraversalSpec extends TestBase {
     }
 
     it("follows out edges") {
-      v(1).outE.toSet map (_.getLabel) should be(Set("knows", "created"))
-      v(1).outE("knows").toSet map (_.getLabel) should be(Set("knows"))
+      v(1).outE.toSet map (_.label) should be(Set("knows", "created"))
+      v(1).outE("knows").toSet map (_.label) should be(Set("knows"))
 
-      v(1).out.outE.toSet map (_.getLabel) should be(Set("created"))
-      v(1).out.outE("created").toSet map (_.getLabel) should be(Set("created"))
+      v(1).out.outE.toSet map (_.label) should be(Set("created"))
+      v(1).out.outE("created").toSet map (_.label) should be(Set("created"))
     }
 
     it("follows in edges") {
-      v(3).inE.toSet map (_.getLabel) should be(Set("created"))
-      v(3).inE("created").toSet map (_.getLabel) should be(Set("created"))
+      v(3).inE.toSet map (_.label) should be(Set("created"))
+      v(3).inE("created").toSet map (_.label) should be(Set("created"))
 
-      v(3).in.inE.toSet map (_.getLabel) should be(Set("knows"))
-      v(3).in.inE("knows").toSet map (_.getLabel) should be(Set("knows"))
+      v(3).in.inE.toSet map (_.label) should be(Set("knows"))
+      v(3).in.inE("knows").toSet map (_.label) should be(Set("knows"))
     }
 
     it("follows both edges") {
-      v(4).bothE.toSet map (_.getLabel) should be(Set("created", "knows"))
-      v(4).bothE("knows").toSet map (_.getLabel) should be(Set("knows"))
+      v(4).bothE.toSet map (_.label) should be(Set("created", "knows"))
+      v(4).bothE("knows").toSet map (_.label) should be(Set("knows"))
 
-      v(4).in.bothE.toSet map (_.getLabel) should be(Set("knows", "created"))
-      v(4).in.bothE("knows").toSet map (_.getLabel) should be(Set("knows"))
+      v(4).in.bothE.toSet map (_.label) should be(Set("knows", "created"))
+      v(4).in.bothE("knows").toSet map (_.label) should be(Set("knows"))
     }
 
     it("does not allow edge steps") {
@@ -91,7 +91,7 @@ class TraversalSpec extends TestBase {
   describe("common steps") {
     describe("property") {
       it("gets properties") {
-        gs.V.property[String]("name").toSet map (_.get) should be(
+        gs.V.property[String]("name").toSet map (_.value) should be(
           Set("marko", "ripple", "vadas", "josh", "lop", "peter"))
       }
     }

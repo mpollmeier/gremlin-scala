@@ -26,15 +26,15 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[p.Out, A](traversal.value[A](key, default))
 
   def has(key: String) = GremlinScala[Types, End](traversal.has(key))
-  def has(key: String, value: AnyRef) = GremlinScala[Types, End](traversal.has(key, value))
+  def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
   def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
   def has(key: String, t: T, list: List[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(list)))
 
-  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Holder[End]] {
-    override def test(h: Holder[End]): Boolean = p(h.get)
+  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
+    override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
 
-  def map[A](fun: Holder[End] => A)(implicit p:Prepend[Types, A::HNil]) =
+  def map[A](fun: Traverser[End] => A)(implicit p:Prepend[Types, A::HNil]) =
     GremlinScala[p.Out, A](traversal.map[A](fun))
 
   def path()(implicit p:Prepend[Types, Types::HNil]) =
@@ -42,8 +42,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def order() = GremlinScala[Types, End](traversal.order())
   def order(lessThan: (End, End) => Boolean) =
-    GremlinScala[Types, End](traversal.order(new Comparator[Holder[End]]() {
-      override def compare(a: Holder[End], b: Holder[End]) = 
+    GremlinScala[Types, End](traversal.order(new Comparator[Traverser[End]]() {
+      override def compare(a: Traverser[End], b: Traverser[End]) =
         if(lessThan(a.get,b.get)) -1
         else 0
     }))
