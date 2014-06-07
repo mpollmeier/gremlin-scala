@@ -24,6 +24,10 @@ trait ScalaElement[ElementType <: Element] {
     if(p.isPresent) p.remove
   }
 
+  def setHiddenProperty(key: String, value: Any): Unit = element.property(Property.hidden(key), value)
+  def hiddenProperties: Map[String, Any] = element.hiddens.toMap mapValues (_.value)
+  def hiddenKeys: Set[String] = hiddenProperties.keySet
+
   /** note: this may throw an IllegalStateException!
     * in scala exceptions are typically discouraged in situations like this...
     * `value` is only provided so that we are on par with Gremlin Groovy */

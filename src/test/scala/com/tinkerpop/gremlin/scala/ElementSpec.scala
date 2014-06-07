@@ -37,6 +37,12 @@ class ElementSpec extends TestBase {
       e(7).removeProperty("doesnt exist")
       e(7).property[String]("edgeProperty").isPresent should be(false)
     }
+
+    it("handles hidden properties") {
+      v(1).setHiddenProperty("hiddenProperty", "hiddenValue")
+      v(1).hiddenKeys shouldBe Set("hiddenProperty")
+      v(1).hiddenProperties shouldBe Map("hiddenProperty" → "hiddenValue")
+    }
   }
 
   describe("values") {
