@@ -12,6 +12,7 @@ import com.tinkerpop.gremlin.process.T
 import java.util.Comparator
 
 case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) {
+  def toSeq(): Seq[End] = traversal.toList.toSeq
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
@@ -28,7 +29,7 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def has(key: String) = GremlinScala[Types, End](traversal.has(key))
   def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
   def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
-  def has(key: String, t: T, list: List[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(list)))
+  def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
 
   def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
