@@ -31,18 +31,18 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
   def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
 
-  def filter(p: End => Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
+  def filter(p: End ⇒ Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
 
-  def map[A](fun: Traverser[End] => A)(implicit p:Prepend[Types, A::HNil]) =
+  def map[A](fun: Traverser[End] ⇒ A)(implicit p:Prepend[Types, A::HNil]) =
     GremlinScala[p.Out, A](traversal.map[A](fun))
 
   def path()(implicit p:Prepend[Types, Types::HNil]) =
     GremlinScala[p.Out, Types](traversal.addStep(new TypedPathStep[End, Types](traversal)))
 
   def order() = GremlinScala[Types, End](traversal.order())
-  def order(lessThan: (End, End) => Boolean) =
+  def order(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[Types, End](traversal.order(new Comparator[Traverser[End]]() {
       override def compare(a: Traverser[End], b: Traverser[End]) =
         if(lessThan(a.get,b.get)) -1
@@ -55,10 +55,10 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def cyclicPath() = GremlinScala[Types, End](traversal.cyclicPath())
 
   def dedup() = GremlinScala[Types, End](traversal.dedup())
-  def dedup[A](uniqueFun: End => A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
+  def dedup[A](uniqueFun: End ⇒ A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
 
   def aggregate(variable: String) = GremlinScala[Types, End](traversal.aggregate(variable))
-  def aggregate[A](variable: String, fun: End => A) = GremlinScala[Types, End](traversal.aggregate(variable, fun))
+  def aggregate[A](variable: String, fun: End ⇒ A) = GremlinScala[Types, End](traversal.aggregate(variable, fun))
 
   def except(someObject: End) = GremlinScala[Types, End](traversal.except(someObject))
   def except(list: Iterable[End]) = GremlinScala[Types, End](traversal.except(list))

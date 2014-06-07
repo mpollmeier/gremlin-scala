@@ -2,7 +2,7 @@ package com.tinkerpop.gremlin
 
 import shapeless._
 import ops.hlist._
-import java.util.function.{Function => JFunction}
+import java.util.function.{Function ⇒ JFunction}
 import com.tinkerpop.gremlin.util.function.SFunction
 import com.tinkerpop.gremlin.scala.GremlinScala._
 

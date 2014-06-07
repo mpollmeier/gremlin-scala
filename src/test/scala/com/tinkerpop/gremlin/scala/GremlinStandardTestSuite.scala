@@ -5,7 +5,7 @@ import com.tinkerpop.gremlin.AbstractGraphProvider
 import com.tinkerpop.gremlin.process.ProcessStandardSuite
 import org.junit.runner.RunWith
 import org.junit.runners.model.RunnerBuilder
-import java.util.{Map => JMap}
+import java.util.{Map ⇒ JMap}
 import java.io.File
 import org.apache.commons.configuration.Configuration
 import scala.collection.JavaConversions._
@@ -26,9 +26,9 @@ object Tests {
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
-    override def get_g_V_filterXfalseX = ScalaGraph(g).V.filter(_ => false)
+    override def get_g_V_filterXfalseX = ScalaGraph(g).V.filter(_ ⇒ false)
 
-    override def get_g_V_filterXtrueX = ScalaGraph(g).V.filter(_ => true)
+    override def get_g_V_filterXtrueX = ScalaGraph(g).V.filter(_ ⇒ true)
 
     override def get_g_V_filterXlang_eq_javaX = 
       ScalaGraph(g).V.filter(_.property("lang").orElse("none") == "java")
@@ -36,7 +36,7 @@ object Tests {
     override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) = 
       ScalaGraph(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
 
-    override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v =>
+    override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v ⇒
       val name = v.getValue[String]("name")
       name.startsWith("m") || name.startsWith("p")
     }

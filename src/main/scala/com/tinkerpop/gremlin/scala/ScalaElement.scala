@@ -18,7 +18,7 @@ trait ScalaElement[ElementType <: Element] {
   def properties: Map[String, Any] = element.properties.toMap mapValues (_.value)
   def setProperty(key: String, value: Any): Unit = element.property(key, value)
   def setProperties(properties: Map[String, Any]): Unit =
-    properties foreach { case (k,v) => setProperty(k,v) }
+    properties foreach { case (k,v) ⇒ setProperty(k,v) }
   def removeProperty(key: String): Unit = {
     val p = property(key)
     if(p.isPresent) p.remove
