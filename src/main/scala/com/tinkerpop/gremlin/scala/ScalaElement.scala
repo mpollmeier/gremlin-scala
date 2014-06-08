@@ -45,6 +45,7 @@ trait ScalaElement[ElementType <: Element] {
   def has(key: String) = start().has(key)
   def has(key: String, value: Any) = start().has(key, value)
   def has(key: String, t: T, value: Any) = start().has(key, t, value)
+  def hasNot(key: String) = start().hasNot(key)
 }
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {

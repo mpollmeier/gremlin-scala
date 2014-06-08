@@ -31,6 +31,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
   def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
 
+  def hasNot(key: String) = GremlinScala[Types, End](traversal.hasNot(key))
+
   def filter(p: End ⇒ Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
