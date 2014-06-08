@@ -31,8 +31,9 @@ trait ScalaElement[ElementType <: Element] {
   /** note: this may throw an IllegalStateException!
     * in scala exceptions are typically discouraged in situations like this...
     * `value` is only provided so that we are on par with Gremlin Groovy */
-  def getValue[A](key: String): A = element.value[A](key)
-  def getValueWithDefault[A](key: String, default: A): A = property[A](key).orElse(default)
+  def value[A](key: String): A = element.value[A](key)
+
+  def valueWithDefault[A](key: String, default: A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 

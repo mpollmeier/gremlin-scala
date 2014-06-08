@@ -6,7 +6,7 @@ class FilterSpec extends TestBase {
 
   it("filters") {
     gs.V
-      .filter { _.getValueWithDefault("age", default = 0) > 30 }
+      .filter { _.valueWithDefault("age", default = 0) > 30 }
       .value[String]("name").toSet should be(Set("josh", "peter"))
   }
 
@@ -41,7 +41,7 @@ class FilterSpec extends TestBase {
 
     it("emits everything unless a property is in a given aggregate variable") {
       v(1).out
-        .aggregate("x", _.getValue[String]("name"))
+        .aggregate("x", _.value[String]("name"))
         .out.value[String]("name").exceptVar("x")
         .toSet should be (Set("ripple"))
     }

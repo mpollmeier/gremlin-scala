@@ -90,7 +90,7 @@ object Tests {
       ScalaGraph(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
 
     override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v ⇒
-      val name = v.getValue[String]("name")
+      val name = v.value[String]("name")
       name.startsWith("m") || name.startsWith("p")
     }
 
