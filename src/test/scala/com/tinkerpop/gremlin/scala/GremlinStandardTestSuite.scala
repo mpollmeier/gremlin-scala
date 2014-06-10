@@ -11,59 +11,66 @@ class StandardTests extends TestBase {
 
   it("dedups") {
     val test = new ScalaDedupTest
-    test.get_g_V_both_dedup_name.toSet shouldBe allNames
-    test.get_g_V_both_dedupXlangX_name.toSet shouldBe Set("lop", "vadas")
+    test.g_V_both_dedup_name
+    test.g_V_both_dedupXlangX_name
   }
 
   it("filters") {
     val test = new ScalaFilterTest
-    test.get_g_V_filterXfalseX.toSet shouldBe Set.empty
-    test.get_g_V_filterXtrueX.toSet map getId shouldBe allVertexIds
-    test.get_g_V_filterXlang_eq_javaX.toSet map getId shouldBe Set(v3Id, v5Id)
-    test.get_g_v1_out_filterXage_gt_30X(v1Id).toSet map getId shouldBe Set(v4Id)
-    test.get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX.toSet map getId shouldBe Set(v1Id, v6Id)
-    test.get_g_E_filterXfalseX.toSet shouldBe Set.empty
-    test.get_g_E_filterXtrueX.toSet map getId shouldBe allEdgeIds
-    test.get_g_v1_filterXage_gt_30X(v1Id).toSet shouldBe Set.empty
+    test.g_V_filterXfalseX
+    test.g_V_filterXtrueX
+    test.g_V_filterXlang_eq_javaX
+    test.g_v1_out_filterXage_gt_30X
+    test.g_V_filterXname_startsWith_m_OR_name_startsWith_pX
+    test.g_E_filterXfalseX
+    test.g_E_filterXtrueX
+    test.g_v1_filterXage_gt_30X
   }
 
   it("excepts") {
     val test = new ScalaExceptTest
-    test.get_g_v1_out_exceptXg_v2X(v1Id, v2Id).toSet map getId shouldBe Set(v3Id, v4Id)
-    test.get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id).toSet map getId shouldBe Set(v5Id)
-    test.get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id).toSet shouldBe Set("josh", "peter")
+    test.g_v1_out_exceptXg_v2X
+    test.g_v1_out_aggregateXxX_out_exceptXxX
+    test.g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX
   }
 
   it("finds the simple path") {
     val test = new ScalaSimplePathTest
-    test.get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id).toSet map getId shouldBe Set(v4Id, v6Id)
+    test.g_v1_outXcreatedX_inXcreatedX_simplePath
   }
 
   it("finds the cyclic path") {
     val test = new ScalaCyclicPathTest
-    test.get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id).toSet map getId shouldBe Set(v1Id)
+    test.g_v1_outXcreatedX_inXcreatedX_simplePath
   }
 
   it("filters with has") {
     val test = new ScalaHasTest
-    test.get_g_V_hasXname_markoX.toSet map getId shouldBe Set(v1Id)
-    test.get_g_V_hasXname_blahX.toSet.size shouldBe 0
-    test.get_g_V_hasXblahX.toSet.size shouldBe 0
-    test.get_g_v1_out_hasXid_2X(v1Id, v2Id).toSet map getId shouldBe Set(v2Id)
-    test.get_g_V_hasXage_gt_30X.toSet map getId shouldBe Set(v4Id, v6Id)
-    test.get_g_E_hasXlabelXknowsX.toSet map getId shouldBe Set(e7Id, e8Id)
-    test.get_g_E_hasXlabelXknows_createdX.toSet map getId shouldBe allEdgeIds
-    test.get_g_e7_hasXlabelXknowsX(e7Id).toSet map getId shouldBe Set(e7Id)
-    test.get_g_v1_hasXage_gt_30X(v1Id).toSet.size shouldBe 0
-    test.get_g_v1_hasXkeyX(v1Id, "circumference").toSet.size shouldBe(0)
-    test.get_g_v1_hasXname_markoX(v1Id).toSet map getId shouldBe Set(v1Id)
+    test.g_V_hasXname_markoX
+    test.g_V_hasXname_blahX
+    test.g_V_hasXblahX
+    test.g_v1_out_hasXid_2X
+    test.g_V_hasXage_gt_30X
+    test.g_E_hasXlabelXknowsX
+    test.g_E_hasXlabelXknows_createdX
+    test.g_e7_hasXlabelXknowsX
+    test.g_v1_hasXage_gt_30X
+    test.g_v1_hasXkeyX
+    test.g_v1_hasXname_markoX
   }
 
   it("filters with has not") {
     val test = new ScalaHasNotTest
-    test.get_g_V_hasNotXprop("circumference").toList.size shouldBe 6
-    test.get_g_v1_hasNotXprop(v1Id, "circumference").toList.size shouldBe 1
+    test.get_g_v1_hasNotXprop()
+    test.get_g_V_hasNotXprop()
   }
+
+  it("filters on interval") {
+    val test = new ScalaIntervalTest
+    //test.g_v1_outE_intervalXweight_0_06X_inV
+    //test.g_v1_outE_intervalXweight_0_06X_inV
+  }
+
 
   val v1Id = 1: Integer
   val v2Id = 2: Integer
@@ -183,6 +190,14 @@ object Tests {
 
     override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = ScalaGraph(g).v(v1Id).get.hasNot(prop)
     override def get_g_V_hasNotXprop(prop: String) = ScalaGraph(g).V.hasNot(prop)
+  }
+
+  //TODO implement
+  class ScalaIntervalTest extends IntervalTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) = ???
+      //ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0, 0.6).inV
   }
 }
 
