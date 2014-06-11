@@ -66,6 +66,12 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def except(list: Iterable[End]) = GremlinScala[Types, End](traversal.except(list))
   /** not named `except` because type End could be String */
   def exceptVar(variable: String) = GremlinScala[Types, End](traversal.except(variable))
+
+  /* startValue: greaterThanEqual
+   * endValue: less than */
+  def interval[A, B](key: String, startValue: Comparable [A], endValue: Comparable[B]) =
+    GremlinScala[Types, End](traversal.interval(key, startValue, endValue))
+
 }
 
 case class ScalaGraph(graph: Graph) {
@@ -129,7 +135,7 @@ object GremlinScala {
   class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
     extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    //def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
-      //GremlinScala[p.Out, Vertex](traversal.inV)
+    def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
+      GremlinScala[p.Out, Vertex](traversal.inV)
   }
 }

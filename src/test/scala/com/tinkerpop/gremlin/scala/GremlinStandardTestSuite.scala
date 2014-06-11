@@ -67,8 +67,7 @@ class StandardTests extends TestBase {
 
   it("filters on interval") {
     val test = new ScalaIntervalTest
-    //test.g_v1_outE_intervalXweight_0_06X_inV
-    //test.g_v1_outE_intervalXweight_0_06X_inV
+    test.g_v1_outE_intervalXweight_0_06X_inV
   }
 
 
@@ -192,12 +191,11 @@ object Tests {
     override def get_g_V_hasNotXprop(prop: String) = ScalaGraph(g).V.hasNot(prop)
   }
 
-  //TODO implement
   class ScalaIntervalTest extends IntervalTest with StandardTest {
     g = TinkerFactory.createClassic()
 
-    override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) = ???
-      //ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0, 0.6).inV
+    override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
   }
 }
 
