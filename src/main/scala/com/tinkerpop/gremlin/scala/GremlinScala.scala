@@ -74,6 +74,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   /** keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all */
   def random(probability: Double) = GremlinScala[Types, End](traversal.random(probability))
+
+  def range(low: Int, high: Int) = GremlinScala[Types, End](traversal.range(low, high))
 }
 
 case class ScalaGraph(graph: Graph) {
@@ -139,5 +141,8 @@ object GremlinScala {
 
     def inV(implicit p:Prepend[Types, Vertex::HNil]) = 
       GremlinScala[p.Out, Vertex](traversal.inV)
+
+    def outV(implicit p:Prepend[Types, Vertex::HNil]) = 
+      GremlinScala[p.Out, Vertex](traversal.outV)
   }
 }
