@@ -72,6 +72,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def interval[A, B](key: String, startValue: Comparable [A], endValue: Comparable[B]) =
     GremlinScala[Types, End](traversal.interval(key, startValue, endValue))
 
+  /** keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all */
+  def random(probability: Double) = GremlinScala[Types, End](traversal.random(probability))
 }
 
 case class ScalaGraph(graph: Graph) {

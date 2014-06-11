@@ -70,6 +70,12 @@ class StandardTests extends TestBase {
     test.g_v1_outE_intervalXweight_0_06X_inV
   }
 
+  it("randoms") {
+    val test = new ScalaRandomTest
+    test.g_V_randomX1X
+    test.g_V_randomX0X
+  }
+
 
   val v1Id = 1: Integer
   val v2Id = 2: Integer
@@ -196,6 +202,13 @@ object Tests {
 
     override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
+  }
+
+  class ScalaRandomTest extends RandomTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_V_randomX1X = ScalaGraph(g).V.random(1.0d)
+    override def get_g_V_randomX0X = ScalaGraph(g).V.random(0.0d)
   }
 }
 
