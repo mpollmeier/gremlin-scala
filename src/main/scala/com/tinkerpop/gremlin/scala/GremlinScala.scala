@@ -76,6 +76,10 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def random(probability: Double) = GremlinScala[Types, End](traversal.random(probability))
 
   def range(low: Int, high: Int) = GremlinScala[Types, End](traversal.range(low, high))
+
+  def retain(variable: String) = GremlinScala[Types, End](traversal.retain(variable))
+  def retainOne(retainObject: End) = GremlinScala[Types, End](traversal.retain(retainObject))
+  def retainAll(retainCollection: Seq[End]) = GremlinScala[Types, End](traversal.retain(retainCollection))
 }
 
 case class ScalaGraph(graph: Graph) {

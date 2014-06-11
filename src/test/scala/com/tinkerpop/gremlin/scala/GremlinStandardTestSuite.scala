@@ -86,6 +86,21 @@ class StandardTests extends TestBase {
       test.g_v1_outXcreatedX_inXcreatedX_rangeX1_2X
       test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
     }
+
+    it("retains certain objects") {
+      val test = new ScalaRetainTest
+      test.g_v1_out_retainXg_v2X
+      test.g_v1_out_aggregateXxX_out_retainXxX
+
+    }
+
+    it("retains a given set of objects") {
+      val g = TinkerFactory.createClassic
+      val graph = ScalaGraph(g)
+      //val retainCollection = Seq(graph.v(v1Id).get, graph.v(v2Id).get)
+      val retainCollection = Seq(g.v(v1Id), g.v(v2Id))
+      graph.V.retainAll(retainCollection).toList.size shouldBe 2
+    }
   }
 
 
@@ -241,6 +256,20 @@ object Tests {
 
     override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
+  }
+
+  class ScalaRetainTest extends RetainTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
+      //val v2 = ScalaGraph(g).v(v2Id).get
+      val v2 = g.v(v2Id)
+      ScalaGraph(g).v(v1Id).get.out.retainOne(v2)
+    }
+
+    override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.out.aggregate("x").out.retain("x")
+
   }
 }
 
