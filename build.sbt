@@ -2,13 +2,13 @@ name := "gremlin-scala"
 
 version := "3.0.0-SNAPSHOT"
 
-organization := "com.tinkerpop.gremlin"
+organization := "com.michaelpollmeier"
 
-scalaVersion := "2.11.0"
+scalaVersion := "2.11.1"
 
 scalacOptions ++= Seq(
- // "-Xlog-implicits"
-  /*"-Ydebug"*/
+  //"-Xlog-implicits"
+  //"-Ydebug"
 )
 
 // use sbt's new name hashing
@@ -22,9 +22,6 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
     "com.novocode" % "junit-interface" % "0.9" % "test->default",
     "com.chuusai" %% "shapeless" % "2.0.0",
-    /*"org.scala-lang" % "scala-library" % scalaVersion,*/
-    /*"org.scala-lang" % "scala-compiler" % scalaVersion,*/
-    /*"org.scala-lang" % "jline" % scalaVersion,*/
     "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
     "org.scalatest" %% "scalatest" % "2.1.4" % "test"
