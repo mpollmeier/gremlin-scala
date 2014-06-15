@@ -113,6 +113,19 @@ class StandardTests extends TestBase {
       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
       test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
     }
+
+    ignore("jumps") {
+      val test = new ScalaJumpTest
+      test.g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX
+    }
+
+    it("maps") {
+      val test = new ScalaMapTest
+      test.g_v1_mapXnameX
+      test.g_v1_outE_label_mapXlengthX
+      test.g_v1_out_mapXnameX_transformXlengthX
+      //test.g_V_asXaX_out_mapXa_nameX
+    }
   }
 
   val v1Id = 1: Integer
@@ -301,8 +314,32 @@ object Tests {
 
     override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
-
   }
+
+  class ScalaJumpTest extends JumpTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
+      //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
+  }
+
+  class ScalaMapTest extends MapTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_mapXnameX(v1Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.map(_.get.value[String]("name"))
+
+    override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
+
+    override def get_g_v1_out_mapXnameX_transformXlengthX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString().length: Integer)
+
+    override def get_g_V_asXaX_out_mapXa_nameX = ???
+      //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
+      //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
+  }
+
 }
 
 trait StandardTest {

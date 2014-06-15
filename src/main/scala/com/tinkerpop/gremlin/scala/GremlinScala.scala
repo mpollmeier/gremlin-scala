@@ -82,8 +82,9 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def retainAll(retainCollection: Seq[End]) = GremlinScala[Types, End](traversal.retain(retainCollection))
 
   def as(name: String) = GremlinScala[Types, End](traversal.as(name))
-  def back[A](to: String)(implicit p:Prepend[Types, A::HNil]) =
-    GremlinScala[p.Out, A](traversal.back[A](to))
+  def back[A](to: String)(implicit p:Prepend[Types, A::HNil]) = GremlinScala[p.Out, A](traversal.back[A](to))
+
+  def label()(implicit p:Prepend[Types, String::HNil]) = GremlinScala[p.Out, String](traversal.label())
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
