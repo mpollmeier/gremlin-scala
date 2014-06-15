@@ -80,9 +80,13 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def retain(variable: String) = GremlinScala[Types, End](traversal.retain(variable))
   def retainOne(retainObject: End) = GremlinScala[Types, End](traversal.retain(retainObject))
   def retainAll(retainCollection: Seq[End]) = GremlinScala[Types, End](traversal.retain(retainCollection))
+
+  def as(name: String) = GremlinScala[Types, End](traversal.as(name))
+  def back[A](to: String)(implicit p:Prepend[Types, A::HNil]) =
+    GremlinScala[p.Out, A](traversal.back[A](to))
 }
 
-case class ScalaGraph(graph: Graph) {
+case class ScalaGraph(graph: Graph) extends AnyVal {
   def addVertex(): ScalaVertex = ScalaVertex(graph.addVertex())
   def addVertex(id: AnyRef): ScalaVertex = addVertex(id, Map.empty)
   def addVertex(id: AnyRef, properties: Map[String, Any]): ScalaVertex = {

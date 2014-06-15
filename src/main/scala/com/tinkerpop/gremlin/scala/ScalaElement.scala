@@ -39,6 +39,7 @@ trait ScalaElement[ElementType <: Element] {
 
 
   //duplicated from pipeline so that we can quickly start a pipeline from an element
+  //TODO: can we do the same with an automatic conversion?
   //TODO: add other steps
 
   def filter(p: ElementType ⇒ Boolean) = start().filter(p)
@@ -46,6 +47,7 @@ trait ScalaElement[ElementType <: Element] {
   def has(key: String, value: Any) = start().has(key, value)
   def has(key: String, t: T, value: Any) = start().has(key, t, value)
   def hasNot(key: String) = start().hasNot(key)
+  def as(name: String) = start().as(name)
 }
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {

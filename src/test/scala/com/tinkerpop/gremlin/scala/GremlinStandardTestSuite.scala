@@ -3,6 +3,7 @@ package com.tinkerpop.gremlin.scala
 import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.step.filter._
+import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 
@@ -93,7 +94,6 @@ class StandardTests extends TestBase {
       val test = new ScalaRetainTest
       test.g_v1_out_retainXg_v2X
       test.g_v1_out_aggregateXxX_out_retainXxX
-
     }
 
     it("retains a given set of objects") {
@@ -105,6 +105,15 @@ class StandardTests extends TestBase {
     }
   }
 
+  describe("map steps") {
+    it("goes back to given step") {
+      val test = new ScalaBackTest
+      test.g_v1_asXhereX_out_backXhereX
+      test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX
+      test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
+      test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
+    }
+  }
 
   val v1Id = 1: Integer
   val v2Id = 2: Integer
@@ -219,7 +228,6 @@ object Tests {
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("name", "marko")
 
     override def get_g_V_hasXname_equalspredicate_markoX() = ScalaGraph(g).V.has("name", "marko")
-			//return g.V().has("name", (v1,v2) -> v1.equals(v2), "marko");
 
   }
 
@@ -274,6 +282,25 @@ object Tests {
 
     override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.aggregate("x").out.retain("x")
+  }
+
+  class ScalaBackTest extends BackTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.as("here").out.back[Vertex]("here")
+
+    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) = 
+      ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here")
+
+    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX(v4Id: AnyRef) = 
+      ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here").value[String]("name")
+
+    override def get_g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.outE.as("here").inV.has("name", "vadas").back[Edge]("here")
+
+    override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
 
   }
 }
