@@ -2,7 +2,7 @@ package com.tinkerpop.gremlin.scala
 
 import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.filter._
+import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 
@@ -58,6 +58,8 @@ class StandardTests extends TestBase {
       test.g_v1_hasXage_gt_30X
       test.g_v1_hasXkeyX
       test.g_v1_hasXname_markoX
+      test.get_g_V_hasXname_equalspredicate_markoX
+
     }
 
     it("filters with has not") {
@@ -215,6 +217,10 @@ object Tests {
     override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = ScalaGraph(g).v(v1Id).get.has(key)
 
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("name", "marko")
+
+    override def get_g_V_hasXname_equalspredicate_markoX() = ScalaGraph(g).V.has("name", "marko")
+			//return g.V().has("name", (v1,v2) -> v1.equals(v2), "marko");
+
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
@@ -262,7 +268,6 @@ object Tests {
     g = TinkerFactory.createClassic()
 
     override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
-      //val v2 = ScalaGraph(g).v(v2Id).get
       val v2 = g.v(v2Id)
       ScalaGraph(g).v(v1Id).get.out.retainOne(v2)
     }
