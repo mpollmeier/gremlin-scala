@@ -4,8 +4,10 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
+import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import java.util.{ArrayList ⇒ JArrayList}
 
 class StandardTests extends TestBase {
   import Tests._
@@ -125,6 +127,14 @@ class StandardTests extends TestBase {
       test.g_v1_outE_label_mapXlengthX
       test.g_v1_out_mapXnameX_transformXlengthX
       //test.g_V_asXaX_out_mapXa_nameX
+    }
+
+    describe("side effects") {
+      it("aggregates") {
+        val test = new ScalaAggregateTest
+        test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
+        test.g_V_aggregateXa_nameX_iterate_getXaX
+      }
     }
   }
 
@@ -338,6 +348,22 @@ object Tests {
     override def get_g_V_asXaX_out_mapXa_nameX = ???
       //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
       //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
+  }
+
+  class ScalaAggregateTest extends AggregateTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
+      //ScalaGraph(g).v(v1Id).get.with("x", new HashSet<>()).aggregate("x").out("created").in("created").except("x")
+
+    override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX() = ???
+      //ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
+
+    override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
+      def getName(v: Vertex) = v.value[String]("name")
+      val list: JArrayList[String] = ScalaGraph(g).V.aggregate("a", getName _).iterate.memory.get("a")
+      list
+    }
   }
 
 }

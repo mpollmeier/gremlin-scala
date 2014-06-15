@@ -17,6 +17,11 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
   def headOption(): Option[End] = Option(head)
+  /** execute pipeline - applies all side effects */
+  def iterate() = {
+    traversal.iterate()
+    GremlinScala[Types, End](traversal)
+  }
 
   def property[A](key: String)(implicit p:Prepend[Types, Property[A]::HNil]) =
     GremlinScala[p.Out, Property[A]](traversal.property[A](key))
