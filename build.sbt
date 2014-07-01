@@ -4,7 +4,9 @@ version := "2.5.2"
 
 organization := "com.michaelpollmeier"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.10.3"
+
+//scalaVersion := "2.11.1"
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0"
@@ -21,7 +23,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.scala-lang" % "scala-library" % scalaVersion,
     "org.scala-lang" % "scala-compiler" % scalaVersion,
     // test dependencies
-    "org.scalatest" % "scalatest_2.11" % "2.2.0" % "test",
+    "org.scalatest" %% "scalatest" % "2.2.0" % "test",
     "com.tinkerpop.gremlin" % "gremlin-test" % gremlinVersion % "test"
   )
 }
