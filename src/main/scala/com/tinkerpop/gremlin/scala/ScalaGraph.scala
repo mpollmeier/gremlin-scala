@@ -4,10 +4,10 @@ import com.tinkerpop.blueprints._
 
 class ScalaGraph(val graph: Graph) {
   /** iterate all vertices */
-  def V: GremlinScalaPipeline[Vertex, Vertex] = new GremlinScalaPipeline[ScalaGraph, Vertex].V(graph)
+  def V: GremlinScalaPipeline[Vertex, Vertex] = GremlinScalaPipeline(graph).V
 
   /** iterate all edges */
-  def E: GremlinScalaPipeline[Edge, Edge] = new GremlinScalaPipeline[ScalaGraph, Edge].E(graph)
+  def E: GremlinScalaPipeline[Edge, Edge] = GremlinScalaPipeline(graph).E
 
   /**Returns the vertices with the specified IDs. */
   def V(ids: Any*): Iterable[Vertex] = ids.map(graph.getVertex)

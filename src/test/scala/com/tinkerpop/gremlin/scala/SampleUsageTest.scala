@@ -10,6 +10,12 @@ import scala.collection.mutable.Map
 
 class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
+  it("iterates all vertices and edges") {
+    val graph = TinkerGraphFactory.createTinkerGraph
+    GremlinScalaPipeline(graph).V.toList.size shouldBe 6
+    GremlinScalaPipeline(graph).E.toList.size shouldBe 6
+  }
+
   describe("Usage with Tinkergraph") {
     it("finds all names of vertices") {
       vertices.name.toSet should be(Set("lop", "vadas", "marko", "peter", "ripple", "josh"))

@@ -22,6 +22,10 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 import scala.reflect.{ classTag, ClassTag }
 
+object GremlinScalaPipeline {
+  def apply[S](starts: S) = new GremlinScalaPipeline[S,S]().start(starts)
+}
+
 class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   def id: GremlinScalaPipeline[S, Object] = addPipe(new IdPipe)
 
@@ -56,11 +60,11 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
     addPipe(new VertexQueryPipe(clazz, direction, null, null, branchFactor, 0, Integer.MAX_VALUE, labels: _*))
   }
 
-  def V(graph: Graph): GremlinScalaPipeline[Vertex, Vertex] =
-    manualStart(graph.getVertices)
+  def V: GremlinScalaPipeline[Vertex, Vertex] =
+    addPipe(new GraphQueryPipe[Vertex](classOf[Vertex])).asInstanceOf[GremlinScalaPipeline[Vertex, Vertex]]
 
-  def E(graph: Graph): GremlinScalaPipeline[Edge, Edge] =
-    manualStart(graph.getEdges)
+  def E: GremlinScalaPipeline[Edge, Edge] =
+    addPipe(new GraphQueryPipe[Edge](classOf[Edge])).asInstanceOf[GremlinScalaPipeline[Edge, Edge]]
 
   /** Check if the element has a property with provided key */
   def has(key: String): GremlinScalaPipeline[S, E] =
