@@ -4,9 +4,9 @@ version := "2.5.2"
 
 organization := "com.michaelpollmeier"
 
-scalaVersion := "2.10.3"
+//scalaVersion := "2.10.3"
 
-//scalaVersion := "2.11.1"
+scalaVersion := "2.11.1"
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0"
@@ -70,3 +70,4 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
   </developers>                                                                                 
 
 credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
+//credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
