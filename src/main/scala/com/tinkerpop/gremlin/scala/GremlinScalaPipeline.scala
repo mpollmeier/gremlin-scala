@@ -135,13 +135,13 @@ class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {
   /// BRANCH PIPES ///
   ////////////////////
   /** Copies incoming object to internal pipes. */
-  def copySplit(pipes: Pipe[E, _]*): GremlinScalaPipeline[S, _] = addPipe(new CopySplitPipe(pipes))
+  def copySplit[F](pipes: Pipe[E, F]*): GremlinScalaPipeline[S, F] = addPipe(new CopySplitPipe(pipes))
 
-  def exhaustMerge: GremlinScalaPipeline[S, _] =
+  def exhaustMerge: GremlinScalaPipeline[S, E] =
     addPipe(new ExhaustMergePipe(FluentUtility.getPreviousPipe(this).asInstanceOf[MetaPipe].getPipes))
 
   /** Used in combination with a copySplit, merging the parallel traversals in a round-robin fashion. */
-  def fairMerge: GremlinScalaPipeline[S, _] =
+  def fairMerge: GremlinScalaPipeline[S, E] =
     addPipe(new FairMergePipe(FluentUtility.getPreviousPipe(this).asInstanceOf[MetaPipe].getPipes))
 
   def ifThenElse(ifFunction: E ⇒ Boolean, thenFunction: E ⇒ _, elseFunction: E ⇒ _): GremlinScalaPipeline[S, _] =
