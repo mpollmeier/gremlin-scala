@@ -4,9 +4,9 @@ version := "2.5.2"
 
 organization := "com.michaelpollmeier"
 
-//scalaVersion := "2.10.3"
-
 scalaVersion := "2.11.1"
+
+crossScalaVersions := Seq("2.10.3", "2.11.1")
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "2.5.0"
