@@ -24,6 +24,7 @@ import scala.reflect.{ classTag, ClassTag }
 
 object GremlinScalaPipeline {
   def apply[S](starts: S) = new GremlinScalaPipeline[S,S]().start(starts)
+  def fromElements[S<:Element](starts: JIterable[S]) = new GremlinScalaPipeline().start(starts).asInstanceOf[GremlinScalaPipeline[S,S]]
 }
 
 class GremlinScalaPipeline[S, E] extends Pipeline[S, E] with Dynamic {

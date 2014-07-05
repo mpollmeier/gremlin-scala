@@ -14,6 +14,9 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
     val graph = TinkerGraphFactory.createTinkerGraph
     GremlinScalaPipeline(graph).V.toList.size shouldBe 6
     GremlinScalaPipeline(graph).E.toList.size shouldBe 6
+
+    GremlinScalaPipeline.fromElements(graph.getVertices("lang", "java")).toSet map (
+      _.getProperty[String]("name")) shouldBe Set("lop", "ripple")
   }
 
   describe("Usage with Tinkergraph") {
