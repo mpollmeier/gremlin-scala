@@ -9,8 +9,8 @@ import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
-import com.tinkerpop.gremlin.util.function.SPredicate
 import com.tinkerpop.gremlin.util.function.SConsumer
+import com.tinkerpop.gremlin.util.function.SPredicate
 import shapeless._
 import shapeless.ops.hlist._
 

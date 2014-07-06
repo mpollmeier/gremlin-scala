@@ -132,32 +132,44 @@ class StandardTests extends TestBase {
       //test.g_V_asXaX_out_mapXa_nameX
     }
 
-    describe("side effects") {
-      it("aggregates") {
-        val test = new ScalaAggregateTest
-        test.g_V_valueXnameX_aggregateXaX_iterate_getXaX
-        test.g_V_aggregateXa_nameX_iterate_getXaX
-        //test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
-      }
-
-      it("counts") {
-        val test = new ScalaCountTest
-        test.g_V_count
-        test.g_V_filterXfalseX_count
-      }
-
-      it("allows side effects") {
-        val test = new ScalaSideEffectTest
-        //test.g_v1_sideEffectXstore_aX_valueXnameX
-        //test.g_v1_out_sideEffectXincr_cX_valueXnameX
-        test.g_v1_out_sideEffectXX_valueXnameX
-      }
-
-      //it("allows side effects with cap") {
-        //val test = new ScalaSideEffectCapTest
-        //test.g_v1_asXaX_outXcreatedX_inXcreatedX_linkBothXcocreator_aX
-      //}
+    it("orders") {
+      val test = new ScalaOrderTest
+      test.g_V_name_order
+      test.g_V_name_orderXabX
+      test.g_V_orderXa_nameXb_nameX_name
     }
+
+    //it("selects") {
+    //val test = new ScalaSelectTest
+    //g_v1_asXaX_outXknowsX_asXbX_select
+    //}
+  }
+
+  describe("side effects") {
+    it("aggregates") {
+      val test = new ScalaAggregateTest
+      test.g_V_valueXnameX_aggregateXaX_iterate_getXaX
+      test.g_V_aggregateXa_nameX_iterate_getXaX
+      //test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
+    }
+
+    it("counts") {
+      val test = new ScalaCountTest
+      test.g_V_count
+      test.g_V_filterXfalseX_count
+    }
+
+    it("allows side effects") {
+      val test = new ScalaSideEffectTest
+      //test.g_v1_sideEffectXstore_aX_valueXnameX
+      //test.g_v1_out_sideEffectXincr_cX_valueXnameX
+      test.g_v1_out_sideEffectXX_valueXnameX
+    }
+
+    //it("allows side effects with cap") {
+    //val test = new ScalaSideEffectCapTest
+    //test.g_v1_asXaX_outXcreatedX_inXcreatedX_linkBothXcocreator_aX
+    //}
   }
 
   val v1Id = 1: Integer
@@ -180,7 +192,7 @@ class StandardTests extends TestBase {
 
 object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_V_both_dedup_name = ScalaGraph(g).V.both.dedup.value[String]("name")
 
@@ -191,7 +203,7 @@ object Tests {
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_V_filterXfalseX = ScalaGraph(g).V.filter(_ ⇒ false)
 
@@ -217,7 +229,7 @@ object Tests {
   }
 
   class ScalaExceptTest extends ExceptTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.except(g.v(v2Id))
@@ -231,21 +243,21 @@ object Tests {
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created").simplePath
   }
 
   class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created").cyclicPath
   }
 
   class ScalaHasTest extends HasTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_V_hasXname_markoX = ScalaGraph(g).V.has("name", "marko")
 
@@ -276,28 +288,28 @@ object Tests {
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = ScalaGraph(g).v(v1Id).get.hasNot(prop)
     override def get_g_V_hasNotXprop(prop: String) = ScalaGraph(g).V.hasNot(prop)
   }
 
   class ScalaIntervalTest extends IntervalTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
   }
 
   class ScalaRandomTest extends RandomTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_V_randomX1X = ScalaGraph(g).V.random(1.0d)
     override def get_g_V_randomX0X = ScalaGraph(g).V.random(0.0d)
   }
 
   class ScalaRangeTest extends RangeTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.range(0, 1)
 
@@ -317,7 +329,7 @@ object Tests {
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
       val v2 = g.v(v2Id)
@@ -329,7 +341,7 @@ object Tests {
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.as("here").out.back[Vertex]("here")
@@ -348,14 +360,14 @@ object Tests {
   }
 
   class ScalaJumpTest extends JumpTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
     //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
   }
 
   class ScalaMapTest extends MapTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_mapXnameX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.map(_.get.value[String]("name"))
@@ -371,8 +383,21 @@ object Tests {
     //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
   }
 
+  class ScalaOrderTest extends OrderTest with StandardTest {
+    g = TinkerFactory.createClassic
+    override def get_g_V_name_order = ScalaGraph(g).V.value[String]("name").order
+
+    override def get_g_V_name_orderXabX = ScalaGraph(g).V.value[String]("name").order {
+      case (a, b) ⇒ a > b
+    }
+
+    override def get_g_V_orderXa_nameXb_nameX_name = ScalaGraph(g).V.order { case (a, b) ⇒
+        a.value[String]("name") < b.value[String]("name")
+    }.value[String]("name")
+  }
+
   class ScalaAggregateTest extends AggregateTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
     //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
@@ -388,13 +413,13 @@ object Tests {
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
     override def get_g_V_count = ScalaGraph(g).V.count
     override def get_g_V_filterXfalseX_count = ScalaGraph(g).V.filter { _ ⇒ false }.count
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
-    g = TinkerFactory.createClassic()
+    g = TinkerFactory.createClassic
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
       ???
@@ -422,10 +447,10 @@ object Tests {
   }
 
   //class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
-    //g = TinkerFactory.createClassic()
+  //g = TinkerFactory.createClassic
 
-    //override def get_g_V_hasXageX_groupCountXa_valueX_out_capXaX =
-      //ScalaGraph(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
+  //override def get_g_V_hasXageX_groupCountXa_valueX_out_capXaX =
+  //ScalaGraph(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
   //}
 
 }
