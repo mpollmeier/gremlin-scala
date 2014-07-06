@@ -137,6 +137,12 @@ class StandardTests extends TestBase {
         test.g_V_aggregateXa_nameX_iterate_getXaX
         //test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
       }
+
+      it("counts") {
+        val test = new ScalaCountTest
+        test.g_V_count
+        test.g_V_filterXfalseX_count
+      }
     }
   }
 
@@ -367,6 +373,12 @@ object Tests {
     }
   }
 
+  class ScalaCountTest extends CountTest with StandardTest {
+    g = TinkerFactory.createClassic()
+    override def get_g_V_count = ScalaGraph(g).V.count
+    override def get_g_V_filterXfalseX_count = ScalaGraph(g).V.filter { _ ⇒ false }.count
+  }
+
 }
 
 trait StandardTest {
@@ -388,24 +400,24 @@ trait StandardTest {
 //import org.apache.commons.configuration.Configuration
 //import java.io.File
 //class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
-  //extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
-  //classOf[ScalaFilterTest],
-  //classOf[ScalaExceptTest],
-  //classOf[ScalaSimplePathTest],
-  //classOf[ScalaCyclicPathTest],
-  //classOf[ScalaHasTest]
-  //))
+//extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
+//classOf[ScalaFilterTest],
+//classOf[ScalaExceptTest],
+//classOf[ScalaSimplePathTest],
+//classOf[ScalaCyclicPathTest],
+//classOf[ScalaHasTest]
+//))
 
 //@RunWith(classOf[ScalaProcessStandardSuite])
 //@AbstractGremlinSuite.GraphProviderClass(classOf[ScalaTinkerGraphProcessStandardTest])
 //class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
-  //override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
-    //Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+//override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
+//Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
-  //override def clear(graph: Graph, configuration: Configuration): Unit =
-    //Option(graph) map { graph ⇒
-      //graph.close()
-      //if (configuration.containsKey("gremlin.tg.directory"))
-        //new File(configuration.getString("gremlin.tg.directory")).delete()
-    //}
+//override def clear(graph: Graph, configuration: Configuration): Unit =
+//Option(graph) map { graph ⇒
+//graph.close()
+//if (configuration.containsKey("gremlin.tg.directory"))
+//new File(configuration.getString("gremlin.tg.directory")).delete()
+//}
 //}
