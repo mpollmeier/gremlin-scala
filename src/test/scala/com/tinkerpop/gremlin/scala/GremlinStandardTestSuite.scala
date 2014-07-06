@@ -133,8 +133,9 @@ class StandardTests extends TestBase {
     describe("side effects") {
       it("aggregates") {
         val test = new ScalaAggregateTest
-        test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
+        test.g_V_valueXnameX_aggregateXaX_iterate_getXaX
         test.g_V_aggregateXa_nameX_iterate_getXaX
+        //test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
       }
     }
   }
@@ -354,10 +355,10 @@ object Tests {
     g = TinkerFactory.createClassic()
 
     override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.with("x", new HashSet<>()).aggregate("x").out("created").in("created").except("x")
+    //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
 
-    override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX() = ???
-    //ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
+    override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX(): JArrayList[String] =
+      ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
 
     override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
       def getName(v: Vertex) = v.value[String]("name")
@@ -379,27 +380,32 @@ trait StandardTest {
  * downside: cannot reuse what the guys built in tp3 for running tests in multiple dbs
  */
 //import Tests._
-//class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) 
-//extends AbstractGremlinSuite(clazz, builder, Array(
-//classOf[ScalaDedupTest],
-//classOf[ScalaFilterTest],
-//classOf[ScalaExceptTest],
-//classOf[ScalaSimplePathTest],
-//classOf[ScalaCyclicPathTest],
-//classOf[ScalaHasTest]
-//))
+//import com.tinkerpop.gremlin._
+//import org.junit.runners.model.RunnerBuilder
+//import org.junit.runner.RunWith
+//import java.util.{ Map ⇒ JMap }
+//import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+//import org.apache.commons.configuration.Configuration
+//import java.io.File
+//class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
+  //extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
+  //classOf[ScalaFilterTest],
+  //classOf[ScalaExceptTest],
+  //classOf[ScalaSimplePathTest],
+  //classOf[ScalaCyclicPathTest],
+  //classOf[ScalaHasTest]
+  //))
 
 //@RunWith(classOf[ScalaProcessStandardSuite])
 //@AbstractGremlinSuite.GraphProviderClass(classOf[ScalaTinkerGraphProcessStandardTest])
 //class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
-//override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
-//Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+  //override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
+    //Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
-//override def clear(graph: Graph, configuration: Configuration): Unit = 
-//Option(graph) map { graph ⇒ 
-//graph.close()
-//if (configuration.containsKey("gremlin.tg.directory"))
-//new File(configuration.getString("gremlin.tg.directory")).delete()
-//}
-
+  //override def clear(graph: Graph, configuration: Configuration): Unit =
+    //Option(graph) map { graph ⇒
+      //graph.close()
+      //if (configuration.containsKey("gremlin.tg.directory"))
+        //new File(configuration.getString("gremlin.tg.directory")).delete()
+    //}
 //}
