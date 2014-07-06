@@ -6,9 +6,11 @@ import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
+import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import com.tinkerpop.gremlin.util.function.SConsumer
 
 class StandardTests extends TestBase {
   import Tests._
@@ -143,6 +145,18 @@ class StandardTests extends TestBase {
         test.g_V_count
         test.g_V_filterXfalseX_count
       }
+
+      it("allows side effects") {
+        val test = new ScalaSideEffectTest
+        //test.g_v1_sideEffectXstore_aX_valueXnameX
+        //test.g_v1_out_sideEffectXincr_cX_valueXnameX
+        test.g_v1_out_sideEffectXX_valueXnameX
+      }
+
+      //it("allows side effects with cap") {
+        //val test = new ScalaSideEffectCapTest
+        //test.g_v1_asXaX_outXcreatedX_inXcreatedX_linkBothXcocreator_aX
+      //}
     }
   }
 
@@ -378,6 +392,41 @@ object Tests {
     override def get_g_V_count = ScalaGraph(g).V.count
     override def get_g_V_filterXfalseX_count = ScalaGraph(g).V.filter { _ ⇒ false }.count
   }
+
+  class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
+    g = TinkerFactory.createClassic()
+
+    override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
+      ???
+      //val a = mutable.Seq.empty[Vertex]
+      //ScalaGraph(g).v(v1Id).with("a", a).sideEffect(traverser -> {
+      //a.clear()
+      //a.add(traverser.get())
+      //}).value("name")
+    }
+
+    override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = ???
+    //final List<Integer> c = new ArrayList<>()
+    //c.add(0)
+    ////ScalaGraph(g).v(v1Id).with("c", c).out().sideEffect(traverser -> {
+    //Integer temp = c.get(0)
+    //c.clear()
+    //c.add(temp + 1)
+    //}).value("name")
+    //}
+
+    override def get_g_v1_out_sideEffectXX_valueXnameX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.out.sideEffect { traverser: Traverser[Vertex] ⇒
+        println("side effect")
+      }.value[String]("name")
+  }
+
+  //class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
+    //g = TinkerFactory.createClassic()
+
+    //override def get_g_V_hasXageX_groupCountXa_valueX_out_capXaX =
+      //ScalaGraph(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
+  //}
 
 }
 

@@ -10,6 +10,7 @@ import com.tinkerpop.gremlin.process.graph.GraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
 import com.tinkerpop.gremlin.util.function.SPredicate
+import com.tinkerpop.gremlin.util.function.SConsumer
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -94,6 +95,14 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def back[A](to: String)(implicit p: Prepend[Types, A :: HNil]) = GremlinScala[p.Out, A](traversal.back[A](to))
 
   def label()(implicit p: Prepend[Types, String :: HNil]) = GremlinScala[p.Out, String](traversal.label())
+
+  def sideEffect(traverse: Traverser[End] ⇒ Any) = {
+    val consumer = new SConsumer[Traverser[End]] {
+      override def accept(t: Traverser[End]) = traverse
+    }
+    GremlinScala[Types, End](traversal.sideEffect(consumer))
+  }
+  //def sideEffect(consumer: SConsumer[Traverser[End]]) = GremlinScala[Types, End](traversal.sideEffect(consumer))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
