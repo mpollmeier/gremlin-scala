@@ -1,13 +1,14 @@
 package com.tinkerpop.gremlin.scala
 
+import java.util.{ ArrayList ⇒ JArrayList }
 import scala.collection.JavaConversions._
+
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import java.util.{ArrayList ⇒ JArrayList}
 
 class StandardTests extends TestBase {
   import Tests._
@@ -45,7 +46,7 @@ class StandardTests extends TestBase {
 
     it("finds the cyclic path") {
       val test = new ScalaCyclicPathTest
-      test.g_v1_outXcreatedX_inXcreatedX_simplePath
+      test.g_v1_outXcreatedX_inXcreatedX_cyclicPath
     }
 
     it("filters with has") {
@@ -156,7 +157,6 @@ class StandardTests extends TestBase {
   def getId(v: Element) = v.id
 }
 
-
 object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
     g = TinkerFactory.createClassic()
@@ -176,10 +176,10 @@ object Tests {
 
     override def get_g_V_filterXtrueX = ScalaGraph(g).V.filter(_ ⇒ true)
 
-    override def get_g_V_filterXlang_eq_javaX = 
+    override def get_g_V_filterXlang_eq_javaX =
       ScalaGraph(g).V.filter(_.property("lang").orElse("none") == "java")
 
-    override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) = 
+    override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
 
     override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v ⇒
@@ -198,10 +198,10 @@ object Tests {
   class ScalaExceptTest extends ExceptTest with StandardTest {
     g = TinkerFactory.createClassic()
 
-    override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = 
+    override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.except(g.v(v2Id))
-  
-    override def get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) = 
+
+    override def get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.aggregate("x").out.exceptVar("x")
 
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id: AnyRef) =
@@ -232,7 +232,7 @@ object Tests {
 
     override def get_g_V_hasXblahX = ScalaGraph(g).V.has("blah")
 
-    override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) = 
+    override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out().has(Element.ID, v2Id)
 
     override def get_g_V_hasXage_gt_30X = ScalaGraph(g).V.has("age", T.gt, 30)
@@ -278,9 +278,9 @@ object Tests {
   class ScalaRangeTest extends RangeTest with StandardTest {
     g = TinkerFactory.createClassic()
 
-    override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.range(0,1)
+    override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.range(0, 1)
 
-    override def get_g_V_outX1X_rangeX0_2X = ScalaGraph(g).V.out(1).range(0,2)
+    override def get_g_V_outX1X_rangeX0_2X = ScalaGraph(g).V.out(1).range(0, 2)
 
     override def get_g_v1_outXknowsX_outEXcreatedX_rangeX0_0X_inV(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("knows").outE("created").range(0, 0).inV
@@ -310,13 +310,13 @@ object Tests {
   class ScalaBackTest extends BackTest with StandardTest {
     g = TinkerFactory.createClassic()
 
-    override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) = 
+    override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.as("here").out.back[Vertex]("here")
 
-    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) = 
+    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) =
       ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here")
 
-    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX(v4Id: AnyRef) = 
+    override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX(v4Id: AnyRef) =
       ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here").value[String]("name")
 
     override def get_g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
@@ -330,34 +330,34 @@ object Tests {
     g = TinkerFactory.createClassic()
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
-      //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
+    //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
   }
 
   class ScalaMapTest extends MapTest with StandardTest {
     g = TinkerFactory.createClassic()
 
-    override def get_g_v1_mapXnameX(v1Id: AnyRef) = 
+    override def get_g_v1_mapXnameX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.map(_.get.value[String]("name"))
 
-    override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) = 
+    override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
 
     override def get_g_v1_out_mapXnameX_transformXlengthX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString().length: Integer)
 
     override def get_g_V_asXaX_out_mapXa_nameX = ???
-      //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
-      //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
+    //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
+    //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic()
 
     override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
-      //ScalaGraph(g).v(v1Id).get.with("x", new HashSet<>()).aggregate("x").out("created").in("created").except("x")
+    //ScalaGraph(g).v(v1Id).get.with("x", new HashSet<>()).aggregate("x").out("created").in("created").except("x")
 
     override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX() = ???
-      //ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
+    //ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
 
     override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
       def getName(v: Vertex) = v.value[String]("name")
@@ -369,8 +369,8 @@ object Tests {
 }
 
 trait StandardTest {
-  implicit def toTraversal[S,E](gs: GremlinScala[_,E]): Traversal[S,E] =
-    gs.traversal.asInstanceOf[Traversal[S,E]]
+  implicit def toTraversal[S, E](gs: GremlinScala[_, E]): Traversal[S, E] =
+    gs.traversal.asInstanceOf[Traversal[S, E]]
 }
 
 /* running the tests with the standard TP3 testsuite broke in 5469da9 for some weired reason..
@@ -380,26 +380,26 @@ trait StandardTest {
  */
 //import Tests._
 //class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder) 
-  //extends AbstractGremlinSuite(clazz, builder, Array(
-    //classOf[ScalaDedupTest],
-    //classOf[ScalaFilterTest],
-    //classOf[ScalaExceptTest],
-    //classOf[ScalaSimplePathTest],
-    //classOf[ScalaCyclicPathTest],
-    //classOf[ScalaHasTest]
-  //))
+//extends AbstractGremlinSuite(clazz, builder, Array(
+//classOf[ScalaDedupTest],
+//classOf[ScalaFilterTest],
+//classOf[ScalaExceptTest],
+//classOf[ScalaSimplePathTest],
+//classOf[ScalaCyclicPathTest],
+//classOf[ScalaHasTest]
+//))
 
 //@RunWith(classOf[ScalaProcessStandardSuite])
 //@AbstractGremlinSuite.GraphProviderClass(classOf[ScalaTinkerGraphProcessStandardTest])
 //class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
-  //override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
-    //Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+//override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
+//Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
-  //override def clear(graph: Graph, configuration: Configuration): Unit = 
-    //Option(graph) map { graph ⇒ 
-      //graph.close()
-      //if (configuration.containsKey("gremlin.tg.directory"))
-        //new File(configuration.getString("gremlin.tg.directory")).delete()
-    //}
+//override def clear(graph: Graph, configuration: Configuration): Unit = 
+//Option(graph) map { graph ⇒ 
+//graph.close()
+//if (configuration.containsKey("gremlin.tg.directory"))
+//new File(configuration.getString("gremlin.tg.directory")).delete()
+//}
 
 //}
