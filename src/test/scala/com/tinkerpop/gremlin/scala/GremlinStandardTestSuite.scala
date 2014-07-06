@@ -139,10 +139,13 @@ class StandardTests extends TestBase {
       test.g_V_orderXa_nameXb_nameX_name
     }
 
-    //it("selects") {
-    //val test = new ScalaSelectTest
-    //g_v1_asXaX_outXknowsX_asXbX_select
-    //}
+    it("selects") {
+      val test = new ScalaSelectTest
+      test.g_v1_asXaX_outXknowsX_asXbX_select
+      //test.g_v1_asXaX_outXknowsX_asXbX_selectXnameX
+      test.g_v1_asXaX_outXknowsX_asXbX_selectXaX
+      //test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
+    }
   }
 
   describe("side effects") {
@@ -391,9 +394,27 @@ object Tests {
       case (a, b) ⇒ a > b
     }
 
-    override def get_g_V_orderXa_nameXb_nameX_name = ScalaGraph(g).V.order { case (a, b) ⇒
+    override def get_g_V_orderXa_nameXb_nameX_name = ScalaGraph(g).V.order {
+      case (a, b) ⇒
         a.value[String]("name") < b.value[String]("name")
     }.value[String]("name")
+  }
+
+  class ScalaSelectTest extends SelectTest with StandardTest {
+    g = TinkerFactory.createClassic
+
+    override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
+
+    //not implementing for now as it's quite cumbersome / not possible to call java varargs
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
+      //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select{v: Vertex ⇒ v.value[String]("name")}
+
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
+
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
+    //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
