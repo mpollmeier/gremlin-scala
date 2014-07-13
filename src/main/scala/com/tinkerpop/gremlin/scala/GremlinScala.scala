@@ -170,10 +170,12 @@ object GremlinScala {
   class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def inV(implicit p: Prepend[Types, Vertex :: HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.inV)
+    def inV(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.inV)
 
-    def outV(implicit p: Prepend[Types, Vertex :: HNil]) =
-      GremlinScala[p.Out, Vertex](traversal.outV)
+    def outV(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.outV)
+
+    def bothV()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.bothV())
+
+    def otherV()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.otherV())
   }
 }

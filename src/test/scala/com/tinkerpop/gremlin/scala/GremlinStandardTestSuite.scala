@@ -148,34 +148,34 @@ class StandardTests extends TestBase {
     }
 
     it("traverses") {
-      // val test = new ScalaTraversalTest
-      // test.g_V
-      // test.g_v1_out
-      // test.g_v2_in
-      // test.g_v4_both
-      // test.g_v1_outX1_knowsX_name
-      // test.g_V_bothX1_createdX_name
-      // test.g_E
-      // test.g_v1_outE
-      // test.g_v2_inE
-      // test.g_v4_bothE
-      // test.g_v4_bothEX1_createdX
-      // test.g_V_inEX2_knowsX_outV_name
-      // test.g_v1_outE_inV
-      // test.g_v2_inE_outV
-      // test.g_V_outE_hasXweight_1X_outV
-      // test.g_V_out_outE_inV_inE_inV_both_name
-      // test.g_v1_outEXknowsX_bothV_name
-      // test.g_v1_outE_otherV
-      // test.g_v4_bothE_outV
-      // test.g_v4_bothE_hasXweight_LT_1X_otherV
-      // test.g_v1_outXknowsX
-      // test.g_v1_outXknows_createdX
-      // test.g_v1_outEXknowsX_inV
-      // test.g_v1_outEXknows_createdX_inV
-      // test.g_V_out_out
-      // test.g_v1_out_out_out
-      // test.g_v1_out_propertyXnameX
+      val test = new ScalaTraversalTest
+      test.g_V
+      test.g_v1_out
+      test.g_v2_in
+      test.g_v4_both
+      test.g_v1_outX1_knowsX_name
+      test.g_V_bothX1_createdX_name
+      test.g_E
+      test.g_v1_outE
+      test.g_v2_inE
+      test.g_v4_bothE
+      test.g_v4_bothEX1_createdX
+      test.g_V_inEX2_knowsX_outV_name
+      test.g_v1_outE_inV
+      test.g_v2_inE_outV
+      test.g_V_outE_hasXweight_1X_outV
+      test.g_V_out_outE_inV_inE_inV_both_name
+      test.g_v1_outEXknowsX_bothV_name
+      test.g_v1_outE_otherV
+      test.g_v4_bothE_outV
+      test.g_v4_bothE_hasXweight_LT_1X_otherV
+      test.g_v1_outXknowsX
+      test.g_v1_outXknows_createdX
+      test.g_v1_outEXknowsX_inV
+      test.g_v1_outEXknows_createdX_inV
+      test.g_V_out_out
+      test.g_v1_out_out_out
+      test.g_v1_out_propertyXnameX
       // test.g_v1_to_XOUT_knowsX
     }
   }
@@ -449,6 +449,49 @@ object Tests {
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
     //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
+  }
+
+  class ScalaTraversalTest extends TraversalTest with StandardTest {
+    g = TinkerFactory.createClassic
+
+    override def get_g_V = ScalaGraph(g).V
+    override def get_g_v1_out(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out
+    override def get_g_v2_in(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.in
+    override def get_g_v4_both(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.both
+
+    override def get_g_v1_outX1_knowsX_name(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.out(1, "knows").value[String]("name")
+
+    override def get_g_V_bothX1_createdX_name =
+      ScalaGraph(g).V.both(1, "created").value[String]("name")
+
+    override def get_g_E = ScalaGraph(g).E
+    override def get_g_v1_outE(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE
+    override def get_g_v2_inE(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.inE
+    override def get_g_v4_bothE(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE
+    override def get_g_v4_bothEX1_createdX(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE(1, "created")
+    override def get_g_V_inEX2_knowsX_outV_name = ScalaGraph(g).V.inE(2, "knows").outV.value[String]("name")
+    override def get_g_v1_outE_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE.inV
+    override def get_g_v2_inE_outV(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.inE.outV
+    override def get_g_V_outE_hasXweight_1X_outV = ScalaGraph(g).V.outE.has("weight", 1.0f).outV
+
+    override def get_g_V_out_outE_inV_inE_inV_both_name = 
+      ScalaGraph(g).V.out.outE.inV.inE.inV.both.value[String]("name")
+
+    override def get_g_v1_outEXknowsX_bothV_name(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.outE("knows").bothV.value[String]("name")
+
+    override def get_g_v1_outXknowsX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out("knows")
+    override def get_g_v1_outXknows_createdX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out("knows", "created")
+    override def get_g_v1_outEXknowsX_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE("knows").inV
+    override def get_g_v1_outEXknows_createdX_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE("knows", "created").inV
+    override def get_g_v1_outE_otherV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE.otherV
+    override def get_g_v4_bothE_otherV(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE.otherV
+    override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE.has("weight", T.lt, 1f).otherV
+    override def get_g_V_out_out = ScalaGraph(g).V.out.out
+    override def get_g_v1_out_out_out(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.out.out
+    override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.value[String]("name")
+    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ???//ScalaGraph(g).v(v1Id).get.to(Direction.OUT, "knows")
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
