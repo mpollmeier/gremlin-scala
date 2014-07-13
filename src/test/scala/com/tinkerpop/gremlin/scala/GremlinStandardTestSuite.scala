@@ -120,8 +120,8 @@ class StandardTests extends TestBase {
     }
 
     ignore("jumps") {
-      val test = new ScalaJumpTest
-      test.g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX
+      // val test = new ScalaJumpTest
+      // test.g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX
     }
 
     it("maps") {
@@ -146,6 +146,38 @@ class StandardTests extends TestBase {
       test.g_v1_asXaX_outXknowsX_asXbX_selectXaX
       //test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
     }
+
+    it("traverses") {
+      // val test = new ScalaTraversalTest
+      // test.g_V
+      // test.g_v1_out
+      // test.g_v2_in
+      // test.g_v4_both
+      // test.g_v1_outX1_knowsX_name
+      // test.g_V_bothX1_createdX_name
+      // test.g_E
+      // test.g_v1_outE
+      // test.g_v2_inE
+      // test.g_v4_bothE
+      // test.g_v4_bothEX1_createdX
+      // test.g_V_inEX2_knowsX_outV_name
+      // test.g_v1_outE_inV
+      // test.g_v2_inE_outV
+      // test.g_V_outE_hasXweight_1X_outV
+      // test.g_V_out_outE_inV_inE_inV_both_name
+      // test.g_v1_outEXknowsX_bothV_name
+      // test.g_v1_outE_otherV
+      // test.g_v4_bothE_outV
+      // test.g_v4_bothE_hasXweight_LT_1X_otherV
+      // test.g_v1_outXknowsX
+      // test.g_v1_outXknows_createdX
+      // test.g_v1_outEXknowsX_inV
+      // test.g_v1_outEXknows_createdX_inV
+      // test.g_V_out_out
+      // test.g_v1_out_out_out
+      // test.g_v1_out_propertyXnameX
+      // test.g_v1_to_XOUT_knowsX
+    }
   }
 
   describe("side effects") {
@@ -159,6 +191,8 @@ class StandardTests extends TestBase {
     it("counts") {
       val test = new ScalaCountTest
       test.g_V_count
+      test.g_V_out_count
+      test.g_V_both_both_count
       test.g_V_filterXfalseX_count
     }
 
@@ -362,12 +396,12 @@ object Tests {
       ScalaGraph(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
   }
 
-  class ScalaJumpTest extends JumpTest with StandardTest {
-    g = TinkerFactory.createClassic
-
-    override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
-  }
+  // class ScalaJumpTest extends JumpTest with StandardTest {
+  //   g = TinkerFactory.createClassic
+  //
+  //   override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
+  //   //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
+  // }
 
   class ScalaMapTest extends MapTest with StandardTest {
     g = TinkerFactory.createClassic
@@ -408,9 +442,9 @@ object Tests {
 
     //not implementing for now as it's quite cumbersome / not possible to call java varargs
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
-      //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select{v: Vertex ⇒ v.value[String]("name")}
+    //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select{v: Vertex ⇒ v.value[String]("name")}
 
-    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = 
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
@@ -436,6 +470,8 @@ object Tests {
   class ScalaCountTest extends CountTest with StandardTest {
     g = TinkerFactory.createClassic
     override def get_g_V_count = ScalaGraph(g).V.count
+    override def get_g_V_out_count = ScalaGraph(g).V.out.count
+    override def get_g_V_both_both_count = ScalaGraph(g).V.both.both.count
     override def get_g_V_filterXfalseX_count = ScalaGraph(g).V.filter { _ ⇒ false }.count
   }
 
