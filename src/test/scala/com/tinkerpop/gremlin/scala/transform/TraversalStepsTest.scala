@@ -14,13 +14,19 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("gets the out vertices") {
-      graph.v(1).out.property("name").toSet should be(Set("vadas", "josh", "lop"))
-      graph.v(1).out(1).property("name").toSet should be(Set("vadas"))
+      val outNames = Set("vadas", "josh", "lop")
+      graph.v(1).out.property("name").toSet should be(outNames)
+      val resultsLimited = graph.v(1).out(1).property("name").toList
+      resultsLimited.size should be(1)
+      outNames.intersect(resultsLimited.toSet).size should be(1)
     }
 
     it("gets the in vertices") {
-      graph.v(3).in.property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).in(1).property("name").toSet should be(Set("marko"))
+      val inNames = Set("marko", "josh", "peter")
+      graph.v(3).in.property("name").toSet should be(inNames)
+      val resultsLimited = graph.v(3).in(1).property("name").toList
+      resultsLimited.size should be(1)
+      inNames.intersect(resultsLimited.toSet).size should be(1)
     }
 
     it("gets both in and out vertices") {
@@ -35,8 +41,11 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("follows out edges") {
-      graph.v(1).outE.label.toSet should be(Set("knows", "knows", "created"))
-      graph.v(1).outE(1).label.toSet should be(Set("knows"))
+      val outLabels = Set("knows", "knows", "created")
+      graph.v(1).outE.label.toSet should be(outLabels)
+      val resultsLimited = graph.v(1).outE(1).label.toList
+      resultsLimited.size should be(1)
+      outLabels.intersect(resultsLimited.toSet).size should be(1)
 
       graph.v(1).outE("knows", "created").inV.name.toSet should be(Set("vadas", "josh", "lop"))
     }
@@ -80,11 +89,16 @@ class TraversalStepsTest extends FunSpec with ShouldMatchers with TestGraph {
     }
 
     it("follows in edges by label") {
-      graph.v(3).in("created").property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).in(1, "created").property("name").toSet should be(Set("marko"))
+      val inNames = Set("marko", "josh", "peter")
+      graph.v(3).in("created").property("name").toSet should be(inNames)
+      var resultsLimited1 = graph.v(3).in(1, "created").property("name").toList
+      resultsLimited1.size should be(1)
+      inNames.intersect(resultsLimited1.toSet).size should be(1)
 
-      graph.v(3).inE("created").outV.property("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.v(3).inE(1, "created").outV.property("name").toSet should be(Set("marko"))
+      graph.v(3).inE("created").outV.property("name").toSet should be(inNames)
+      val resultsLimited2 = graph.v(3).inE(2, "created").outV.property("name").toList
+      resultsLimited2.size should be(2)
+      inNames.intersect(resultsLimited2.toSet).size should be(2)
     }
 
     it("traverses multiple steps") {

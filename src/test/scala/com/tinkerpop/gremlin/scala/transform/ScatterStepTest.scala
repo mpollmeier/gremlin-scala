@@ -13,18 +13,18 @@ import com.tinkerpop.gremlin.scala._
 class ScatterStepTest extends FunSpec with ShouldMatchers with TestGraph {
 
   it("uses scatter to unroll elements that have been gathered before") {
-    val pipe = graph.v(1).out.map(_.getProperty[String]("name")).gather.scatter
+    val pipe = graph.v(1).out.map(_.getProperty[String]("name")).order.gather.scatter
 
     val first = pipe.next()
-    first should be("vadas")
+    first should be("josh")
     pipe.hasNext should be(true)
 
     val second = pipe.next()
-    second should be("josh")
+    second should be("lop")
     pipe.hasNext should be(true)
 
     val third = pipe.next()
-    third should be("lop")
+    third should be("vadas")
     pipe.hasNext should be(false)
   }
 
