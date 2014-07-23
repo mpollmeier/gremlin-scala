@@ -13,7 +13,7 @@ trait ScalaElement extends Element with Dynamic {
   def selectDynamic(key: String): Any = getProperty(key)
 
   /** returns Some[A] if element present and of type A, otherwise None */
-  @implicitNotFound( msg = "No ClassTag available for ${T}" )
+  @implicitNotFound( msg = "No ClassTag available for ${A}" )
   def property[A: ClassTag](name: String): Option[A] = {
     val value: A = element.getProperty(name)
     value match {
