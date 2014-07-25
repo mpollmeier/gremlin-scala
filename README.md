@@ -1,5 +1,10 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
 
+Tinkerpop3
+=============
+Please note that the latest jazz is happening in the tinkerpop3 branch - it's a complete rewrite and this is where the future is! It's not really ready to use but if you want to have a sneak preview have a look. It already features fully typed traversals, i.e. if you go graph.V.outE.inV.property[String]("someName").path you get elements of type Vertex :: Edge :: Vertex :: String :: HNil.
+More will follow soon. I'm happy for anyone who port over more features from tinkerpop3-java.
+
 Gremlin-Scala
 =============
 A thin wrapper for Gremlin to make it easily usable for Scala Developers. 
