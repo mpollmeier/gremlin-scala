@@ -20,6 +20,7 @@ class StandardTests extends TestBase {
       val test = new ScalaDedupTest
       test.g_V_both_dedup_name
       test.g_V_both_dedupXlangX_name
+      test.g_V_both_name_orderXa_bX_dedup
     }
 
     it("filters") {
@@ -39,16 +40,22 @@ class StandardTests extends TestBase {
       test.g_v1_out_exceptXg_v2X
       test.g_v1_out_aggregateXxX_out_exceptXxX
       test.g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX
+      test.g_V_exceptXg_VX
+      test.g_V_exceptXX
+      test.g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path
     }
 
     it("finds the simple path") {
       val test = new ScalaSimplePathTest
       test.g_v1_outXcreatedX_inXcreatedX_simplePath
+      test.g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path
+      test.g_V_asXxX_both_simplePath_jumpXx_3X_path
     }
 
     it("finds the cyclic path") {
       val test = new ScalaCyclicPathTest
       test.g_v1_outXcreatedX_inXcreatedX_cyclicPath
+      // test.g_v1_outXcreatedX_inXcreatedX_cyclicPath_path
     }
 
     it("filters with has") {
@@ -128,8 +135,8 @@ class StandardTests extends TestBase {
       val test = new ScalaMapTest
       test.g_v1_mapXnameX
       test.g_v1_outE_label_mapXlengthX
-     //TODO prio1 test.g_v1_out_mapXnameX_mapXlengthX
-      //test.g_V_asXaX_out_mapXa_nameX
+      test.g_v1_out_mapXnameX_mapXlengthX
+      test.g_V_asXaX_out_mapXa_nameX
     }
 
     it("orders") {
@@ -183,10 +190,9 @@ class StandardTests extends TestBase {
   describe("side effects") {
     it("aggregates") {
       val test = new ScalaAggregateTest
-      //TODO prio1
-      // test.g_V_valueXnameX_aggregateXaX_iterate_getXaX
-      // test.g_V_aggregateXa_nameX_iterate_getXaX
-      //test.g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX
+      test.g_V_valueXnameX_aggregate
+      test.g_V_aggregateXnameX
+      // test.g_V_out_aggregateXaX_path
     }
 
     it("counts") {
@@ -238,6 +244,9 @@ object Tests {
       ScalaGraph(g).V.both
         .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name")
+
+    override def get_g_V_both_name_orderXa_bX_dedup = ???
+    // return g.V().both().property("name").order((a, b) -> ((String) a.get().value()).compareTo((String) b.get().value())).dedup().value()
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
@@ -278,6 +287,15 @@ object Tests {
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created")
         .except(g.v(v1Id)).value[String]("name")
+
+    override def get_g_V_exceptXg_VX = ???
+    // return g.V().except(g.V().toList())
+
+    override def get_g_V_exceptXX = ???
+    // return g.V().except(Collections.emptyList())
+
+    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
+    // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
@@ -285,6 +303,12 @@ object Tests {
 
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created").simplePath
+
+    override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path = ???
+    // return g.V().as("x").both().simplePath().jump("x", t -> t.getLoops() < 3).path()
+
+    override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path = ???
+    // return g.V().as("x").both().simplePath().jump("x", 3).path()
   }
 
   class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
@@ -292,6 +316,9 @@ object Tests {
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created").cyclicPath
+
+    override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) = ???
+    // return g.v(v1Id).out("created").in("created").cyclicPath().path()
   }
 
   class ScalaHasTest extends HasTest with StandardTest {
@@ -413,12 +440,14 @@ object Tests {
     override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
 
-    override def get_g_v1_out_mapXnameX_transformXlengthX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString().length: Integer)
+    override def get_g_v1_out_mapXnameX_mapXlengthX(v1Id: AnyRef) = ???
+    //   ScalaGraph(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString().length: Integer)
+    // return g.v(v1Id).out().map(v -> v.get().value("name")).map(n -> n.get().toString().length())
 
     override def get_g_V_asXaX_out_mapXa_nameX = ???
     //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
     //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
+
   }
 
   class ScalaOrderTest extends OrderTest with StandardTest {
@@ -440,7 +469,7 @@ object Tests {
 
     //TODO prio1
     override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) = ???
-      // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
+    // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
 
     //not implementing for now as it's quite cumbersome / not possible to call java varargs
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
@@ -448,7 +477,7 @@ object Tests {
 
     //TODO prio1
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = ???
-      // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
+    // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
     //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
@@ -478,7 +507,7 @@ object Tests {
     override def get_g_v2_inE_outV(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.inE.outV
     override def get_g_V_outE_hasXweight_1X_outV = ScalaGraph(g).V.outE.has("weight", 1.0f).outV
 
-    override def get_g_V_out_outE_inV_inE_inV_both_name = 
+    override def get_g_V_out_outE_inV_inE_inV_both_name =
       ScalaGraph(g).V.out.outE.inV.inE.inV.both.value[String]("name")
 
     override def get_g_v1_outEXknowsX_bothV_name(v1Id: AnyRef) =
@@ -494,23 +523,32 @@ object Tests {
     override def get_g_V_out_out = ScalaGraph(g).V.out.out
     override def get_g_v1_out_out_out(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.out.out
     override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.value[String]("name")
-    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ???//ScalaGraph(g).v(v1Id).get.to(Direction.OUT, "knows")
+    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //ScalaGraph(g).v(v1Id).get.to(Direction.OUT, "knows")
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
+        override def get_g_V_valueXnameX_aggregate = ???
+            // return (Traversal) g.V().value("name").aggregate()
 
-    override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX(): JArrayList[String] =
-      ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
+        override def get_g_V_aggregateXnameX = ???
+            // return (Traversal) g.V().aggregate(v -> v.value("name"))
 
-    override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
-      def getName(v: Vertex) = v.value[String]("name")
-      val list: JArrayList[String] = ScalaGraph(g).V.aggregate("a", getName _).iterate.memory.get("a")
-      list
-    }
+        override def get_g_V_out_aggregateXaX_path = ???
+            // return g.V().out().aggregate("a").path()
+    //
+    // override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
+    // //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
+    //
+    // override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX(): JArrayList[String] =
+    //   ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
+    //
+    // override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
+    //   def getName(v: Vertex) = v.value[String]("name")
+    //   val list: JArrayList[String] = ScalaGraph(g).V.aggregate("a", getName _).iterate.memory.get("a")
+    //   list
+    // }
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
