@@ -73,8 +73,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def dedup() = GremlinScala[Types, End](traversal.dedup())
   def dedup[A](uniqueFun: End ⇒ A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
 
-  def aggregate(variable: String) = GremlinScala[Types, End](traversal.aggregate(variable))
-  def aggregate[A](variable: String, fun: End ⇒ A) = GremlinScala[Types, End](traversal.aggregate(variable, fun))
+  def aggregate() = GremlinScala[Types, End](traversal.aggregate())
+  def aggregate[A](fun: End ⇒ A) = GremlinScala[Types, End](traversal.aggregate(fun))
 
   def except(someObject: End) = GremlinScala[Types, End](traversal.except(someObject))
   def except(list: Iterable[End]) = GremlinScala[Types, End](traversal.except(list))

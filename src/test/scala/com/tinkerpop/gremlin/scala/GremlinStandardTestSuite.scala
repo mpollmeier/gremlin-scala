@@ -282,8 +282,8 @@ object Tests {
     override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.except(g.v(v2Id))
 
-    override def get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.aggregate("x").out.exceptVar("x")
+    override def get_g_v1_out_aggregate_asXxX_out_exceptXxX(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.out.aggregate.as("x").out.exceptVar("x")
 
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out("created").in("created")
@@ -294,7 +294,7 @@ object Tests {
 
     override def get_g_V_exceptXX = ScalaGraph(g).V.except(Nil)
 
-    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
+    override def  get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregate_asXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
     // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
   }
 
@@ -402,7 +402,7 @@ object Tests {
     }
 
     override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.aggregate("x").out.retain("x")
+      ScalaGraph(g).v(v1Id).get.out.aggregate.as("x").out.retain("x")
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
@@ -533,7 +533,7 @@ object Tests {
         override def get_g_V_aggregateXnameX = ???
             // return (Traversal) g.V().aggregate(v -> v.value("name"))
 
-        override def get_g_V_out_aggregateXaX_path = ???
+        override def get_g_V_out_aggregate_asXaX_path = ???
             // return g.V().out().aggregate("a").path()
     //
     // override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???

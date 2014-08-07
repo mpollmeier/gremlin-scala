@@ -25,7 +25,7 @@ trait ScalaElement[ElementType <: Element] {
     if(p.isPresent) p.remove
   }
 
-  def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hidden(key), value)
+  def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hide(key), value)
   def hiddenProperties: Map[String, Any] = element.hiddens.toMap mapValues (_.value)
   def hiddenKeys: Set[String] = hiddenProperties.keySet
 
