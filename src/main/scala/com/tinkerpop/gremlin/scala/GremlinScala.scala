@@ -2,8 +2,8 @@ package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
 import java.util.{ Comparator, List ⇒ JList }
-import scala.collection.JavaConversions._
 
+import collection.JavaConversions._
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
@@ -98,15 +98,22 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def as(name: String) = GremlinScala[Types, End](traversal.as(name))
   def back[A](to: String)(implicit p: Prepend[Types, A :: HNil]) = GremlinScala[p.Out, A](traversal.back[A](to))
 
+  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = {
+    val flattened = tuples.foldLeft(Seq.empty[AnyRef]) {
+      case (acc, (k, v)) ⇒
+        acc ++: Seq(k, v)
+    }
+    GremlinScala[Types, End](traversal.`with`(flattened: _*))
+  }
+
   def label()(implicit p: Prepend[Types, String :: HNil]) = GremlinScala[p.Out, String](traversal.label())
 
-  def sideEffect(traverse: Traverser[End] ⇒ Any) = {
-    val consumer = new SConsumer[Traverser[End]] {
-      override def accept(t: Traverser[End]) = traverse
-    }
-    GremlinScala[Types, End](traversal.sideEffect(consumer))
-  }
-  //def sideEffect(consumer: SConsumer[Traverser[End]]) = GremlinScala[Types, End](traversal.sideEffect(consumer))
+  def sideEffect(traverse: Traverser[End] ⇒ Any) =
+    GremlinScala[Types, End](traversal.sideEffect(
+      new SConsumer[Traverser[End]] {
+        override def accept(t: Traverser[End]) = traverse(t)
+      })
+    )
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {

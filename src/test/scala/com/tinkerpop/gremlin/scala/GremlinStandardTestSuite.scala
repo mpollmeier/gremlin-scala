@@ -203,11 +203,12 @@ class StandardTests extends TestBase {
       test.g_V_filterXfalseX_count
     }
 
-    it("allows side effects") {
+    it("allows side effects", org.scalatest.Tag("foo")) {
       val test = new ScalaSideEffectTest
-      //test.g_v1_sideEffectXstore_aX_valueXnameX
-      //test.g_v1_out_sideEffectXincr_cX_valueXnameX
-      test.g_v1_out_sideEffectXX_valueXnameX
+      test.g_v1_sideEffectXstore_aX_valueXnameX
+      fail("continue here")
+      // test.g_v1_out_sideEffectXincr_cX_valueXnameX
+      // test.g_v1_out_sideEffectXX_valueXnameX
     }
 
     //it("allows side effects with cap") {
@@ -246,7 +247,7 @@ object Tests {
         .value[String]("name")
 
     override def get_g_V_both_name_orderXa_bX_dedup = ???
-      // ScalaGraph(g).V.both
+    // ScalaGraph(g).V.both
     // return g.V().both().property("name").order((a, b) -> ((String) a.get().value()).compareTo((String) b.get().value())).dedup().value()
   }
 
@@ -289,12 +290,12 @@ object Tests {
       ScalaGraph(g).v(v1Id).get.out("created").in("created")
         .except(g.v(v1Id)).value[String]("name")
 
-    override def get_g_V_exceptXg_VX = 
+    override def get_g_V_exceptXg_VX =
       ScalaGraph(g).V.except(ScalaGraph(g).V.toList)
 
     override def get_g_V_exceptXX = ScalaGraph(g).V.except(Nil)
 
-    override def  get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregate_asXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
+    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregate_asXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
     // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
   }
 
@@ -527,14 +528,14 @@ object Tests {
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic
 
-        override def get_g_V_valueXnameX_aggregate = ???
-            // return (Traversal) g.V().value("name").aggregate()
+    override def get_g_V_valueXnameX_aggregate = ???
+    // return (Traversal) g.V().value("name").aggregate()
 
-        override def get_g_V_aggregateXnameX = ???
-            // return (Traversal) g.V().aggregate(v -> v.value("name"))
+    override def get_g_V_aggregateXnameX = ???
+    // return (Traversal) g.V().aggregate(v -> v.value("name"))
 
-        override def get_g_V_out_aggregate_asXaX_path = ???
-            // return g.V().out().aggregate("a").path()
+    override def get_g_V_out_aggregate_asXaX_path = ???
+    // return g.V().out().aggregate("a").path()
     //
     // override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
     // //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
@@ -558,15 +559,14 @@ object Tests {
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
+    import collection.mutable
     g = TinkerFactory.createClassic
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
-      ???
-      //val a = mutable.Seq.empty[Vertex]
-      //ScalaGraph(g).v(v1Id).with("a", a).sideEffect(traverser -> {
-      //a.clear()
-      //a.add(traverser.get())
-      //}).value("name")
+      val a = new JArrayList[Vertex] //test is expecting a java arraylist..
+      ScalaGraph(g).v(v1Id).get.`with`(("a", a)).sideEffect { traverser ⇒
+        a.add(traverser.get)
+      }.value[String]("name")
     }
 
     override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = ???
