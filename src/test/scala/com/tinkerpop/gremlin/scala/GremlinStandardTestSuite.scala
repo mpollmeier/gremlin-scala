@@ -203,12 +203,11 @@ class StandardTests extends TestBase {
       test.g_V_filterXfalseX_count
     }
 
-    it("allows side effects", org.scalatest.Tag("foo")) {
+    it("allows side effects") {
       val test = new ScalaSideEffectTest
       test.g_v1_sideEffectXstore_aX_valueXnameX
-      fail("continue here")
-      // test.g_v1_out_sideEffectXincr_cX_valueXnameX
-      // test.g_v1_out_sideEffectXX_valueXnameX
+      test.g_v1_out_sideEffectXincr_cX_valueXnameX
+      test.g_v1_out_sideEffectXX_valueXnameX
     }
 
     //it("allows side effects with cap") {
@@ -569,15 +568,15 @@ object Tests {
       }.value[String]("name")
     }
 
-    override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = ???
-    //final List<Integer> c = new ArrayList<>()
-    //c.add(0)
-    ////ScalaGraph(g).v(v1Id).with("c", c).out().sideEffect(traverser -> {
-    //Integer temp = c.get(0)
-    //c.clear()
-    //c.add(temp + 1)
-    //}).value("name")
-    //}
+    override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = {
+      val c = new JArrayList[Integer] //test is expecting a java arraylist..
+      c.add(0)
+      ScalaGraph(g).v(v1Id).get.`with`(("c", c)).out.sideEffect { traverser ⇒
+        val tmp = c.get(0)
+        c.clear()
+        c.add(tmp + 1)
+      }.value[String]("name")
+    }
 
     override def get_g_v1_out_sideEffectXX_valueXnameX(v1Id: AnyRef) =
       ScalaGraph(g).v(v1Id).get.out.sideEffect { traverser: Traverser[Vertex] ⇒
