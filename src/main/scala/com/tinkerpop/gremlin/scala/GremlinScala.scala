@@ -145,8 +145,13 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   def E() = GremlinScala[Edge :: HNil, Edge](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
 }
 
+object GS {
+  // GS(graph) as a shorthand for GremlinScala(graph)
+  def apply(graph: Graph) = GremlinScala(graph)
+}
+
 object GremlinScala {
-  def of(graph: Graph): ScalaGraph = ScalaGraph(graph)
+  def apply(graph: Graph) = ScalaGraph(graph)
 
   class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {

@@ -91,7 +91,7 @@ class ElementSpec extends TestBase {
   describe("adding and removing elements") {
 
     it("adds a vertex") {
-      val gs: ScalaGraph = GremlinScala.of(TinkerGraph.open)
+      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
       val v1 = gs.addVertex()
       val v2 = gs.addVertex()
       v2.setProperty("testkey", "testValue")
@@ -102,7 +102,7 @@ class ElementSpec extends TestBase {
     }
 
     it("adds a vertex with an explicit id") {
-      val gs: ScalaGraph = GremlinScala.of(TinkerGraph.open)
+      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
       val id1 = "vertexId1"
       val id2 = "vertexId2"
       val v1 = gs.addVertex(id1)
@@ -114,7 +114,7 @@ class ElementSpec extends TestBase {
     }
 
     it("adds an edge") {
-      val gs: ScalaGraph = GremlinScala.of(TinkerGraph.open)
+      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
       val v1 = gs.addVertex()
       val v2 = gs.addVertex()
 
@@ -125,7 +125,7 @@ class ElementSpec extends TestBase {
     }
 
     it("adds an edge with additional properties") {
-      val gs: ScalaGraph = GremlinScala.of(TinkerGraph.open)
+      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
       val v1 = gs.addVertex()
       val v2 = gs.addVertex()
 
@@ -137,7 +137,7 @@ class ElementSpec extends TestBase {
     }
 
     it("removes elements") {
-      val gs: ScalaGraph = GremlinScala.of(TinkerGraph.open)
+      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
       val v = gs.addVertex()
       v.remove()
       gs.V.toList.size should be(0)

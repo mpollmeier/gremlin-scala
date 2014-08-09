@@ -110,7 +110,7 @@ class StandardTests extends TestBase {
 
     it("retains a given set of objects") {
       val g = TinkerFactory.createClassic
-      val graph = ScalaGraph(g)
+      val graph = GremlinScala(g)
       //val retainCollection = Seq(graph.v(v1Id).get, graph.v(v2Id).get)
       val retainCollection = Seq(g.v(v1Id), g.v(v2Id))
       graph.V.retainAll(retainCollection).toList.size shouldBe 2
@@ -238,61 +238,61 @@ object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_both_dedup_name = ScalaGraph(g).V.both.dedup.value[String]("name")
+    override def get_g_V_both_dedup_name = GremlinScala(g).V.both.dedup.value[String]("name")
 
     override def get_g_V_both_dedupXlangX_name =
-      ScalaGraph(g).V.both
+      GremlinScala(g).V.both
         .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name")
 
     override def get_g_V_both_name_orderXa_bX_dedup = ???
-    // ScalaGraph(g).V.both
+    // GremlinScala(g).V.both
     // return g.V().both().property("name").order((a, b) -> ((String) a.get().value()).compareTo((String) b.get().value())).dedup().value()
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_filterXfalseX = ScalaGraph(g).V.filter(_ ⇒ false)
+    override def get_g_V_filterXfalseX = GremlinScala(g).V.filter(_ ⇒ false)
 
-    override def get_g_V_filterXtrueX = ScalaGraph(g).V.filter(_ ⇒ true)
+    override def get_g_V_filterXtrueX = GremlinScala(g).V.filter(_ ⇒ true)
 
     override def get_g_V_filterXlang_eq_javaX =
-      ScalaGraph(g).V.filter(_.property("lang").orElse("none") == "java")
+      GremlinScala(g).V.filter(_.property("lang").orElse("none") == "java")
 
     override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
+      GremlinScala(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
 
-    override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = ScalaGraph(g).V.filter { v ⇒
+    override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = GremlinScala(g).V.filter { v ⇒
       val name = v.value[String]("name")
       name.startsWith("m") || name.startsWith("p")
     }
 
-    override def get_g_E_filterXfalseX = ScalaGraph(g).E.filter(_ ⇒ false)
+    override def get_g_E_filterXfalseX = GremlinScala(g).E.filter(_ ⇒ false)
 
-    override def get_g_E_filterXtrueX = ScalaGraph(g).E.filter(_ ⇒ true)
+    override def get_g_E_filterXtrueX = GremlinScala(g).E.filter(_ ⇒ true)
 
     override def get_g_v1_filterXage_gt_30X(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.filter(_.property("age").orElse(0) > 30)
+      GremlinScala(g).v(v1Id).get.filter(_.property("age").orElse(0) > 30)
   }
 
   class ScalaExceptTest extends ExceptTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.except(g.v(v2Id))
+      GremlinScala(g).v(v1Id).get.out.except(g.v(v2Id))
 
     override def get_g_v1_out_aggregate_asXxX_out_exceptXxX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.aggregate.as("x").out.exceptVar("x")
+      GremlinScala(g).v(v1Id).get.out.aggregate.as("x").out.exceptVar("x")
 
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("created").in("created")
+      GremlinScala(g).v(v1Id).get.out("created").in("created")
         .except(g.v(v1Id)).value[String]("name")
 
     override def get_g_V_exceptXg_VX =
-      ScalaGraph(g).V.except(ScalaGraph(g).V.toList)
+      GremlinScala(g).V.except(GremlinScala(g).V.toList)
 
-    override def get_g_V_exceptXX = ScalaGraph(g).V.except(Nil)
+    override def get_g_V_exceptXX = GremlinScala(g).V.except(Nil)
 
     override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregate_asXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
     // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
@@ -302,7 +302,7 @@ object Tests {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("created").in("created").simplePath
+      GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
 
     override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path = ???
     // return g.V().as("x").both().simplePath().jump("x", t -> t.getLoops() < 3).path()
@@ -315,7 +315,7 @@ object Tests {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("created").in("created").cyclicPath
+      GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) = ???
     // return g.v(v1Id).out("created").in("created").cyclicPath().path()
@@ -324,73 +324,73 @@ object Tests {
   class ScalaHasTest extends HasTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_hasXname_markoX = ScalaGraph(g).V.has("name", "marko")
+    override def get_g_V_hasXname_markoX = GremlinScala(g).V.has("name", "marko")
 
-    override def get_g_V_hasXname_blahX = ScalaGraph(g).V.has("name", "blah")
+    override def get_g_V_hasXname_blahX = GremlinScala(g).V.has("name", "blah")
 
-    override def get_g_V_hasXblahX = ScalaGraph(g).V.has("blah")
+    override def get_g_V_hasXblahX = GremlinScala(g).V.has("blah")
 
     override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out().has(Element.ID, v2Id)
+      GremlinScala(g).v(v1Id).get.out().has(Element.ID, v2Id)
 
-    override def get_g_V_hasXage_gt_30X = ScalaGraph(g).V.has("age", T.gt, 30)
+    override def get_g_V_hasXage_gt_30X = GremlinScala(g).V.has("age", T.gt, 30)
 
-    override def get_g_E_hasXlabelXknowsX = ScalaGraph(g).E.has("label", "knows")
+    override def get_g_E_hasXlabelXknowsX = GremlinScala(g).E.has("label", "knows")
 
     override def get_g_E_hasXlabelXknows_createdX =
-      ScalaGraph(g).E.has("label", T.in, List("knows", "created"))
+      GremlinScala(g).E.has("label", T.in, List("knows", "created"))
 
-    override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = ScalaGraph(g).e(e7Id).get.has("label", "knows")
+    override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = GremlinScala(g).e(e7Id).get.has("label", "knows")
 
-    override def get_g_v1_hasXage_gt_30X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("age", T.gt, 30)
+    override def get_g_v1_hasXage_gt_30X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("age", T.gt, 30)
 
-    override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = ScalaGraph(g).v(v1Id).get.has(key)
+    override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = GremlinScala(g).v(v1Id).get.has(key)
 
-    override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.has("name", "marko")
+    override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
 
-    override def get_g_V_hasXname_equalspredicate_markoX() = ScalaGraph(g).V.has("name", "marko")
+    override def get_g_V_hasXname_equalspredicate_markoX() = GremlinScala(g).V.has("name", "marko")
 
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = ScalaGraph(g).v(v1Id).get.hasNot(prop)
-    override def get_g_V_hasNotXprop(prop: String) = ScalaGraph(g).V.hasNot(prop)
+    override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = GremlinScala(g).v(v1Id).get.hasNot(prop)
+    override def get_g_V_hasNotXprop(prop: String) = GremlinScala(g).V.hasNot(prop)
   }
 
   class ScalaIntervalTest extends IntervalTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
+      GremlinScala(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
   }
 
   class ScalaRandomTest extends RandomTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_randomX1X = ScalaGraph(g).V.random(1.0d)
-    override def get_g_V_randomX0X = ScalaGraph(g).V.random(0.0d)
+    override def get_g_V_randomX1X = GremlinScala(g).V.random(1.0d)
+    override def get_g_V_randomX0X = GremlinScala(g).V.random(0.0d)
   }
 
   class ScalaRangeTest extends RangeTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.range(0, 1)
+    override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.range(0, 1)
 
-    override def get_g_V_outX1X_rangeX0_2X = ScalaGraph(g).V.out(1).range(0, 2)
+    override def get_g_V_outX1X_rangeX0_2X = GremlinScala(g).V.out(1).range(0, 2)
 
     override def get_g_v1_outXknowsX_outEXcreatedX_rangeX0_0X_inV(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("knows").outE("created").range(0, 0).inV
+      GremlinScala(g).v(v1Id).get.out("knows").outE("created").range(0, 0).inV
 
     override def get_g_v1_outXknowsX_outXcreatedX_rangeX0_0X(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("knows").out("created").range(0, 0)
+      GremlinScala(g).v(v1Id).get.out("knows").out("created").range(0, 0)
 
     override def get_g_v1_outXcreatedX_inXcreatedX_rangeX1_2X(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("created").in("created").range(1, 2)
+      GremlinScala(g).v(v1Id).get.out("created").in("created").range(1, 2)
 
     override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
+      GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
@@ -398,66 +398,66 @@ object Tests {
 
     override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
       val v2 = g.v(v2Id)
-      ScalaGraph(g).v(v1Id).get.out.retainOne(v2)
+      GremlinScala(g).v(v1Id).get.out.retainOne(v2)
     }
 
     override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.aggregate.as("x").out.retain("x")
+      GremlinScala(g).v(v1Id).get.out.aggregate.as("x").out.retain("x")
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.as("here").out.back[Vertex]("here")
+      GremlinScala(g).v(v1Id).get.as("here").out.back[Vertex]("here")
 
     override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) =
-      ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here")
+      GremlinScala(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here")
 
     override def get_g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX(v4Id: AnyRef) =
-      ScalaGraph(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here").value[String]("name")
+      GremlinScala(g).v(v4Id).get.out.as("here").has("lang", "java").back[Vertex]("here").value[String]("name")
 
     override def get_g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.outE.as("here").inV.has("name", "vadas").back[Edge]("here")
+      GremlinScala(g).v(v1Id).get.outE.as("here").inV.has("name", "vadas").back[Edge]("here")
 
     override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
+      GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
   }
 
   // class ScalaJumpTest extends JumpTest with StandardTest {
   //   g = TinkerFactory.createClassic
   //
   //   override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) = ???
-  //   //ScalaGraph(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
+  //   //GremlinScala(g).v(v1Id).get.as("x").out.jump("x", h -> h.getLoops() < 2).value[String]("name")
   // }
 
   class ScalaMapTest extends MapTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_mapXnameX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.map(_.get.value[String]("name"))
+      GremlinScala(g).v(v1Id).get.map(_.get.value[String]("name"))
 
     override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
+      GremlinScala(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
 
     override def get_g_v1_out_mapXnameX_mapXlengthX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString.length: Integer)
+      GremlinScala(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString.length: Integer)
 
     override def get_g_V_asXaX_out_mapXa_nameX = ???
-    //ScalaGraph(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
-    //ScalaGraph(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
+    //GremlinScala(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
+    //GremlinScala(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
 
   }
 
   class ScalaOrderTest extends OrderTest with StandardTest {
     g = TinkerFactory.createClassic
-    override def get_g_V_name_order = ScalaGraph(g).V.value[String]("name").order
+    override def get_g_V_name_order = GremlinScala(g).V.value[String]("name").order
 
-    override def get_g_V_name_orderXabX = ScalaGraph(g).V.value[String]("name").order {
+    override def get_g_V_name_orderXabX = GremlinScala(g).V.value[String]("name").order {
       case (a, b) ⇒ a > b
     }
 
-    override def get_g_V_orderXa_nameXb_nameX_name = ScalaGraph(g).V.order {
+    override def get_g_V_orderXa_nameXb_nameX_name = GremlinScala(g).V.order {
       case (a, b) ⇒
         a.value[String]("name") < b.value[String]("name")
     }.value[String]("name")
@@ -467,74 +467,74 @@ object Tests {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
+      GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select()
 
     //not implementing for now - the same can be achieved by mapping the result later...
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
-      // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select { v: Vertex ⇒
+      // GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select { v: Vertex ⇒
       //   v.value[String]("name")
       // }
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = 
-      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
+      GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
 
     //not implementing for now - the same can be achieved by mapping the result later...
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
+    //GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
   }
 
   class ScalaTraversalTest extends TraversalTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V = ScalaGraph(g).V
-    override def get_g_v1_out(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out
-    override def get_g_v2_in(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.in
-    override def get_g_v4_both(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.both
+    override def get_g_V = GremlinScala(g).V
+    override def get_g_v1_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out
+    override def get_g_v2_in(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.in
+    override def get_g_v4_both(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.both
 
     override def get_g_v1_outX1_knowsX_name(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out(1, "knows").value[String]("name")
+      GremlinScala(g).v(v1Id).get.out(1, "knows").value[String]("name")
 
     override def get_g_V_bothX1_createdX_name =
-      ScalaGraph(g).V.both(1, "created").value[String]("name")
+      GremlinScala(g).V.both(1, "created").value[String]("name")
 
-    override def get_g_E = ScalaGraph(g).E
-    override def get_g_v1_outE(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE
-    override def get_g_v2_inE(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.inE
-    override def get_g_v4_bothE(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE
-    override def get_g_v4_bothEX1_createdX(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE(1, "created")
-    override def get_g_V_inEX2_knowsX_outV_name = ScalaGraph(g).V.inE(2, "knows").outV.value[String]("name")
-    override def get_g_v1_outE_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE.inV
-    override def get_g_v2_inE_outV(v2Id: AnyRef) = ScalaGraph(g).v(v2Id).get.inE.outV
-    override def get_g_V_outE_hasXweight_1X_outV = ScalaGraph(g).V.outE.has("weight", 1.0f).outV
+    override def get_g_E = GremlinScala(g).E
+    override def get_g_v1_outE(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE
+    override def get_g_v2_inE(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.inE
+    override def get_g_v4_bothE(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE
+    override def get_g_v4_bothEX1_createdX(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE(1, "created")
+    override def get_g_V_inEX2_knowsX_outV_name = GremlinScala(g).V.inE(2, "knows").outV.value[String]("name")
+    override def get_g_v1_outE_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.inV
+    override def get_g_v2_inE_outV(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.inE.outV
+    override def get_g_V_outE_hasXweight_1X_outV = GremlinScala(g).V.outE.has("weight", 1.0f).outV
 
     override def get_g_V_out_outE_inV_inE_inV_both_name =
-      ScalaGraph(g).V.out.outE.inV.inE.inV.both.value[String]("name")
+      GremlinScala(g).V.out.outE.inV.inE.inV.both.value[String]("name")
 
     override def get_g_v1_outEXknowsX_bothV_name(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.outE("knows").bothV.value[String]("name")
+      GremlinScala(g).v(v1Id).get.outE("knows").bothV.value[String]("name")
 
-    override def get_g_v1_outXknowsX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out("knows")
-    override def get_g_v1_outXknows_createdX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out("knows", "created")
-    override def get_g_v1_outEXknowsX_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE("knows").inV
-    override def get_g_v1_outEXknows_createdX_inV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE("knows", "created").inV
-    override def get_g_v1_outE_otherV(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.outE.otherV
-    override def get_g_v4_bothE_otherV(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE.otherV
-    override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = ScalaGraph(g).v(v4Id).get.bothE.has("weight", T.lt, 1f).otherV
-    override def get_g_V_out_out = ScalaGraph(g).V.out.out
-    override def get_g_v1_out_out_out(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.out.out
-    override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = ScalaGraph(g).v(v1Id).get.out.value[String]("name")
-    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //ScalaGraph(g).v(v1Id).get.to(Direction.OUT, "knows")
+    override def get_g_v1_outXknowsX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out("knows")
+    override def get_g_v1_outXknows_createdX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out("knows", "created")
+    override def get_g_v1_outEXknowsX_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE("knows").inV
+    override def get_g_v1_outEXknows_createdX_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE("knows", "created").inV
+    override def get_g_v1_outE_otherV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.otherV
+    override def get_g_v4_bothE_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.otherV
+    override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.has("weight", T.lt, 1f).otherV
+    override def get_g_V_out_out = GremlinScala(g).V.out.out
+    override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
+    override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.value[String]("name")
+    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_V_valueXnameX_aggregate = 
-      ScalaGraph(g).V.value[String]("name").aggregate
+      GremlinScala(g).V.value[String]("name").aggregate
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
     override def get_g_V_aggregateXnameX = 
-      ScalaGraph(g).V.aggregate { v: Vertex ⇒ v.value[String]("name")}
+      GremlinScala(g).V.aggregate { v: Vertex ⇒ v.value[String]("name")}
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
     override def get_g_V_out_aggregate_asXaX_path = ???
@@ -543,10 +543,10 @@ object Tests {
 
   class ScalaCountTest extends CountTest with StandardTest {
     g = TinkerFactory.createClassic
-    override def get_g_V_count = ScalaGraph(g).V.count
-    override def get_g_V_out_count = ScalaGraph(g).V.out.count
-    override def get_g_V_both_both_count = ScalaGraph(g).V.both.both.count
-    override def get_g_V_filterXfalseX_count = ScalaGraph(g).V.filter { _ ⇒ false }.count
+    override def get_g_V_count = GremlinScala(g).V.count
+    override def get_g_V_out_count = GremlinScala(g).V.out.count
+    override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
+    override def get_g_V_filterXfalseX_count = GremlinScala(g).V.filter { _ ⇒ false }.count
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
@@ -555,7 +555,7 @@ object Tests {
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
       val a = new JArrayList[Vertex] //test is expecting a java arraylist..
-      ScalaGraph(g).v(v1Id).get.`with`(("a", a)).sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.`with`(("a", a)).sideEffect { traverser ⇒
         a.add(traverser.get)
       }.value[String]("name")
     }
@@ -563,7 +563,7 @@ object Tests {
     override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = {
       val c = new JArrayList[Integer] //test is expecting a java arraylist..
       c.add(0)
-      ScalaGraph(g).v(v1Id).get.`with`(("c", c)).out.sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.`with`(("c", c)).out.sideEffect { traverser ⇒
         val tmp = c.get(0)
         c.clear()
         c.add(tmp + 1)
@@ -571,7 +571,7 @@ object Tests {
     }
 
     override def get_g_v1_out_sideEffectXX_valueXnameX(v1Id: AnyRef) =
-      ScalaGraph(g).v(v1Id).get.out.sideEffect { traverser: Traverser[Vertex] ⇒
+      GremlinScala(g).v(v1Id).get.out.sideEffect { traverser: Traverser[Vertex] ⇒
         println("side effect")
       }.value[String]("name")
   }
@@ -580,7 +580,7 @@ object Tests {
   //g = TinkerFactory.createClassic
 
   //override def get_g_V_hasXageX_groupCountXa_valueX_out_capXaX =
-  //ScalaGraph(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
+  //GremlinScala(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
   //}
 
 }
