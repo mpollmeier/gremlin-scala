@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
-import java.util.{ Comparator, List ⇒ JList }
+import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap }
 
 import collection.JavaConversions._
 import com.tinkerpop.gremlin._
@@ -53,9 +53,11 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def path()(implicit p: Prepend[Types, Types :: HNil]) =
     GremlinScala[p.Out, Types](traversal.addStep(new TypedPathStep[End, Types](traversal)))
 
-  // def select()(implicit p: Prepend[Types, Path :: HNil]) = GremlinScala[p.Out, Path](traversal.select())
+  def select()(implicit p: Prepend[Types, JMap[String, End] :: HNil]) =
+    GremlinScala[p.Out, JMap[String, End]](traversal.select())
 
-  // def select(asLabels: Seq[String])(implicit p: Prepend[Types, Path :: HNil]) = GremlinScala[p.Out, Path](traversal.select(asLabels: JList[String]))
+  def select(asLabels: Seq[String])(implicit p: Prepend[Types, JMap[String, End] :: HNil]) =
+    GremlinScala[p.Out, JMap[String, End]](traversal.select(asLabels: JList[String]))
 
   def order() = GremlinScala[Types, End](traversal.order())
   def order(lessThan: (End, End) ⇒ Boolean) =

@@ -149,9 +149,9 @@ class StandardTests extends TestBase {
     it("selects") {
       val test = new ScalaSelectTest
       test.g_v1_asXaX_outXknowsX_asXbX_select
-      //test.g_v1_asXaX_outXknowsX_asXbX_selectXnameX
+      // test.g_v1_asXaX_outXknowsX_asXbX_selectXnameX
       test.g_v1_asXaX_outXknowsX_asXbX_selectXaX
-      //test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
+      // test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
     }
 
     it("traverses") {
@@ -466,17 +466,19 @@ object Tests {
   class ScalaSelectTest extends SelectTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) = ???
-    // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
+    override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) =
+      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select()
 
-    //not implementing for now as it's quite cumbersome / not possible to call java varargs
+    //not implementing for now - the same can be achieved by mapping the result later...
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select{v: Vertex ⇒ v.value[String]("name")}
+      // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select { v: Vertex ⇒
+      //   v.value[String]("name")
+      // }
 
-    //TODO prio1
-    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = ???
-    // ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = 
+      ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
 
+    //not implementing for now - the same can be achieved by mapping the result later...
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX(v1Id: AnyRef) = ???
     //ScalaGraph(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
   }
