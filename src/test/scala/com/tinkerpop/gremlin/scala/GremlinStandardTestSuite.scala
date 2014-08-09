@@ -1,6 +1,6 @@
 package com.tinkerpop.gremlin.scala
 
-import java.util.{ ArrayList ⇒ JArrayList }
+import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList }
 import scala.collection.JavaConversions._
 
 import com.tinkerpop.gremlin.process._
@@ -188,7 +188,7 @@ class StandardTests extends TestBase {
   }
 
   describe("side effects") {
-    it("aggregates") {
+    it("aggregates", org.scalatest.Tag("foo")) {
       val test = new ScalaAggregateTest
       test.g_V_valueXnameX_aggregate
       test.g_V_aggregateXnameX
@@ -529,26 +529,16 @@ object Tests {
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_valueXnameX_aggregate = ???
-    // return (Traversal) g.V().value("name").aggregate()
+    override def get_g_V_valueXnameX_aggregate = 
+      ScalaGraph(g).V.value[String]("name").aggregate
+        .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
-    override def get_g_V_aggregateXnameX = ???
-    // return (Traversal) g.V().aggregate(v -> v.value("name"))
+    override def get_g_V_aggregateXnameX = 
+      ScalaGraph(g).V.aggregate { v: Vertex ⇒ v.value[String]("name")}
+        .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
     override def get_g_V_out_aggregate_asXaX_path = ???
     // return g.V().out().aggregate("a").path()
-    //
-    // override def get_g_v1_aggregateXaX_outXcreatedX_inXcreatedX_exceptXaX(v1Id: AnyRef) = ???
-    // //ScalaGraph(g).v(v1Id).get.with("x", new JHashSet[String]()).aggregate("x").out("created").in("created").except("x")
-    //
-    // override def get_g_V_valueXnameX_aggregateXaX_iterate_getXaX(): JArrayList[String] =
-    //   ScalaGraph(g).V.value[String]("name").aggregate("x").iterate.memory.get("x")
-    //
-    // override def get_g_V_aggregateXa_nameX_iterate_getXaX() = {
-    //   def getName(v: Vertex) = v.value[String]("name")
-    //   val list: JArrayList[String] = ScalaGraph(g).V.aggregate("a", getName _).iterate.memory.get("a")
-    //   list
-    // }
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
