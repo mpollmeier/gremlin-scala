@@ -192,7 +192,6 @@ class StandardTests extends TestBase {
     it("values", org.scalatest.Tag("foo")) {
       val test = new ScalaValuesTest
       test.g_V_values
-      fail("continue here")
       test.g_V_valuesXname_ageX
       test.g_E_valuesXid_label_weightX
       test.g_v1_outXcreatedX_values
@@ -541,16 +540,15 @@ object Tests {
   class ScalaValuesTest extends ValuesTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_values = ScalaGraph(g).V.values map mapAsJavaMap
+    override def get_g_V_values = ScalaGraph(g).V.values()
 
-    override def get_g_V_valuesXname_ageX = ???
-    // ScalaGraph(g).V.values("name", "age")
+    override def get_g_V_valuesXname_ageX = ScalaGraph(g).V.values("name", "age")
 
-    override def get_g_E_valuesXid_label_weightX = ???
-    //ScalaGraph(g).E.values("id", "label", "weight")
+    override def get_g_E_valuesXid_label_weightX = 
+      ScalaGraph(g).E.values("id", "label", "weight")
 
-    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) = ???
-    //ScalaGraph(g).v(v1Id).get.out("created").values
+    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) = 
+    ScalaGraph(g).v(v1Id).get.out("created").values()
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {

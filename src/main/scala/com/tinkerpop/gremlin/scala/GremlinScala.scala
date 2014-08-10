@@ -35,12 +35,9 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def value[A](key: String, default: A)(implicit p: Prepend[Types, A :: HNil]) =
     GremlinScala[p.Out, A](traversal.value[A](key, default))
 
-  def values()(implicit p: Prepend[Types, mutable.Map[String, AnyRef] :: HNil]) =
-    GremlinScala[p.Out, mutable.Map[String, AnyRef]](
-      traversal.values().map { traverser: Traverser[JMap[String, AnyRef]] ⇒
-        mapAsScalaMap(traverser.get)
-      }
-    )
+  //TODO return a scala map. problem: calling .map adds a step to the pipeline which changes the result of path...
+  def values(keys: String*)(implicit p: Prepend[Types, JMap[String, AnyRef] :: HNil]) =
+    GremlinScala[p.Out, JMap[String, AnyRef]](traversal.values(keys: _*))
 
   def has(key: String) = GremlinScala[Types, End](traversal.has(key))
   def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
