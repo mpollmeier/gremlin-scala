@@ -4,7 +4,7 @@ version := "3.0.0-SNAPSHOT"
 
 organization := "com.michaelpollmeier"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
 scalacOptions ++= Seq(
   //"-Xlog-implicits"

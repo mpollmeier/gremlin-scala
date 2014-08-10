@@ -106,7 +106,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def retainAll(retainCollection: Seq[End]) = GremlinScala[Types, End](traversal.retain(retainCollection))
 
   def as(name: String) = GremlinScala[Types, End](traversal.as(name))
-  def back[A](to: String)(implicit p: Prepend[Types, A :: HNil]) = GremlinScala[p.Out, A](traversal.back[A](to))
+  def back[A](to: String)(implicit p: Prepend[Types, A :: HNil]) =
+    GremlinScala[p.Out, A](traversal.back[A](to))
 
   def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = {
     val flattened = tuples.foldLeft(Seq.empty[AnyRef]) {
@@ -116,7 +117,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[Types, End](traversal.`with`(flattened: _*))
   }
 
-  def label()(implicit p: Prepend[Types, String :: HNil]) = GremlinScala[p.Out, String](traversal.label())
+  def label()(implicit p: Prepend[Types, String :: HNil]) =
+    GremlinScala[p.Out, String](traversal.label())
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[Types, End](traversal.sideEffect(
@@ -124,6 +126,15 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
         override def accept(t: Traverser[End]) = traverse(t)
       })
     )
+
+  def groupCount()(implicit p: Prepend[Types, JMap[AnyRef, JLong] :: HNil]) =
+    GremlinScala[p.Out, JMap[AnyRef, JLong]](traversal.groupCount()
+      .asInstanceOf[GraphTraversal[_, JMap[AnyRef, JLong]]])
+
+  def groupCount[A](fun: End ⇒ A)(implicit p: Prepend[Types, JMap[A, JLong] :: HNil]) =
+    GremlinScala[p.Out, JMap[A, JLong]](traversal.groupCount(fun)
+      .asInstanceOf[GraphTraversal[_, JMap[A, JLong]]])
+
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {

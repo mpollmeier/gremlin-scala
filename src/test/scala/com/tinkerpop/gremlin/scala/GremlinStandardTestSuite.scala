@@ -1,6 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
-import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList }
+import java.lang.{ Long ⇒ JLong }
+import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap }
 import scala.collection.JavaConversions._
 
 import collection.mutable
@@ -189,7 +190,7 @@ class StandardTests extends TestBase {
       // test.g_v1_to_XOUT_knowsX
     }
 
-    it("values", org.scalatest.Tag("foo")) {
+    it("values") {
       val test = new ScalaValuesTest
       test.g_V_values
       test.g_V_valuesXname_ageX
@@ -225,6 +226,14 @@ class StandardTests extends TestBase {
     //val test = new ScalaSideEffectCapTest
     //test.g_v1_asXaX_outXcreatedX_inXcreatedX_linkBothXcocreator_aX
     //}
+
+    it("groupCounts", org.scalatest.Tag("foo")) {
+      val test = new ScalaGroupCountTest
+      test.g_V_outXcreatedX_groupCountXnameX
+      test.g_V_outXcreatedX_name_groupCount
+      test.g_V_filterXfalseX_groupCount
+      // test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX
+    }
   }
 
   val v1Id = 1: Integer
@@ -540,15 +549,15 @@ object Tests {
   class ScalaValuesTest extends ValuesTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_values = ScalaGraph(g).V.values()
+    override def get_g_V_values = GremlinScala(g).V.values()
 
-    override def get_g_V_valuesXname_ageX = ScalaGraph(g).V.values("name", "age")
+    override def get_g_V_valuesXname_ageX = GremlinScala(g).V.values("name", "age")
 
-    override def get_g_E_valuesXid_label_weightX = 
-      ScalaGraph(g).E.values("id", "label", "weight")
+    override def get_g_E_valuesXid_label_weightX =
+      GremlinScala(g).E.values("id", "label", "weight")
 
-    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) = 
-    ScalaGraph(g).v(v1Id).get.out("created").values()
+    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("created").values()
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
@@ -575,7 +584,6 @@ object Tests {
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
-    import collection.mutable
     g = TinkerFactory.createClassic
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
@@ -608,6 +616,33 @@ object Tests {
   //GremlinScala(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
   //}
 
+  class ScalaGroupCountTest extends GroupCountTest with StandardTest {
+    g = TinkerFactory.createClassic
+
+    override def get_g_V_outXcreatedX_groupCountXnameX =
+      GremlinScala(g).V.out("created").groupCount[String](_.value[String]("name"))
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
+
+    override def get_g_V_outXcreatedX_name_groupCount =
+      GremlinScala(g).V.out("created").value[String]("name").groupCount()
+
+    override def get_g_V_outXcreatedX_name_groupCount_asXaX =
+      GremlinScala(g).V.out("created").value[String]("name").groupCount().as("a")
+
+    override def get_g_V_filterXfalseX_groupCount =
+      GremlinScala(g).V.filter(_ ⇒ false).groupCount
+
+    override def get_g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_loops_lt_2X_capXaX = ???
+    //GremlinScala(g).V.as("x").out
+    // .groupCount(v -> v.value("name")).as("a")
+    // .jump("x", h -> h.getLoops < 2).cap("a")
+
+    override def get_g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX = ???
+    //GremlinScala(g).V.as("x").out
+    // .groupCount(v -> v.value("name")).as("a")
+    // .jump("x", 2).cap("a")
+
+  }
 }
 
 trait StandardTest {
