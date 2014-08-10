@@ -222,12 +222,12 @@ class StandardTests extends TestBase {
       test.g_v1_out_sideEffectXX_valueXnameX
     }
 
-    //it("allows side effects with cap") {
-    //val test = new ScalaSideEffectCapTest
-    //test.g_v1_asXaX_outXcreatedX_inXcreatedX_linkBothXcocreator_aX
-    //}
+    it("allows side effects with cap", org.scalatest.Tag("foo")) {
+      val test = new ScalaSideEffectCapTest
+      // test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
+    }
 
-    it("groupCounts", org.scalatest.Tag("foo")) {
+    it("groupCounts") {
       val test = new ScalaGroupCountTest
       test.g_V_outXcreatedX_groupCountXnameX
       test.g_V_outXcreatedX_name_groupCount
@@ -609,12 +609,15 @@ object Tests {
       }.value[String]("name")
   }
 
-  //class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
-  //g = TinkerFactory.createClassic
+  class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
+    g = TinkerFactory.createClassic
 
-  //override def get_g_V_hasXageX_groupCountXa_valueX_out_capXaX =
-  //GremlinScala(g).V.has("age").groupCount("a", {v ⇒  v.value[Int]("age")}).out.cap("a")
-  //}
+    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX = ???
+      // GremlinScala(g).V.has("age").groupCount { v: Vertex ⇒
+      //   v.value[Int]("age")
+      // }.out.cap("a")
+      //inconsistent types for groupCount step? is it a side effect step or not?
+  }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
     g = TinkerFactory.createClassic
