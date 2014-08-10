@@ -4,6 +4,7 @@ import java.lang.{ Long ⇒ JLong }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap }
 
 import collection.JavaConversions._
+import collection.mutable
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
@@ -33,6 +34,13 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[p.Out, A](traversal.value[A](key))
   def value[A](key: String, default: A)(implicit p: Prepend[Types, A :: HNil]) =
     GremlinScala[p.Out, A](traversal.value[A](key, default))
+
+  def values()(implicit p: Prepend[Types, mutable.Map[String, AnyRef] :: HNil]) =
+    GremlinScala[p.Out, mutable.Map[String, AnyRef]](
+      traversal.values().map { traverser: Traverser[JMap[String, AnyRef]] ⇒
+        mapAsScalaMap(traverser.get)
+      }
+    )
 
   def has(key: String) = GremlinScala[Types, End](traversal.has(key))
   def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))

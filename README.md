@@ -21,6 +21,11 @@ If you would like to help, here's a list of things that needs to be addressed - 
 * adding tests for all steps in combination with the now type safe path step (see below)
 * filling this document and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
+
+Usage
+=============
+TODO
+
 Compile time help and fully typed traversals
 =============
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:

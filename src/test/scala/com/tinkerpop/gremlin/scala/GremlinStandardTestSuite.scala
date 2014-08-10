@@ -3,6 +3,7 @@ package com.tinkerpop.gremlin.scala
 import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList }
 import scala.collection.JavaConversions._
 
+import collection.mutable
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
@@ -185,6 +186,16 @@ class StandardTests extends TestBase {
       test.g_v1_out_propertyXnameX
       // test.g_v1_to_XOUT_knowsX
     }
+
+    it("values") {
+      val test = new ScalaValuesTest
+      test.g_V_values
+      fail("continue here")
+      test.g_V_valuesXname_ageX
+      test.g_E_valuesXid_label_weightX
+      test.g_v1_outXcreatedX_values
+    }
+
   }
 
   describe("side effects") {
@@ -471,11 +482,11 @@ object Tests {
 
     //not implementing for now - the same can be achieved by mapping the result later...
     override def get_g_v1_asXaX_outXknowsX_asXbX_selectXnameX(v1Id: AnyRef) = ???
-      // GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select { v: Vertex ⇒
-      //   v.value[String]("name")
-      // }
+    // GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select { v: Vertex ⇒
+    //   v.value[String]("name")
+    // }
 
-    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) = 
+    override def get_g_v1_asXaX_outXknowsX_asXbX_selectXaX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select(Seq("a"))
 
     //not implementing for now - the same can be achieved by mapping the result later...
@@ -526,15 +537,32 @@ object Tests {
     override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
   }
 
+  class ScalaValuesTest extends ValuesTest with StandardTest {
+    g = TinkerFactory.createClassic
+
+    override def get_g_V_values = ScalaGraph(g).V.values.map { traverser: Traverser[mutable.Map[String, AnyRef]] ⇒
+      mapAsJavaMap(traverser.get)
+    }
+
+    override def get_g_V_valuesXname_ageX = ???
+    // ScalaGraph(g).V.values("name", "age")
+
+    override def get_g_E_valuesXid_label_weightX = ???
+    //ScalaGraph(g).E.values("id", "label", "weight")
+
+    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) = ???
+    //ScalaGraph(g).v(v1Id).get.out("created").values
+  }
+
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_valueXnameX_aggregate = 
+    override def get_g_V_valueXnameX_aggregate =
       GremlinScala(g).V.value[String]("name").aggregate
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
-    override def get_g_V_aggregateXnameX = 
-      GremlinScala(g).V.aggregate { v: Vertex ⇒ v.value[String]("name")}
+    override def get_g_V_aggregateXnameX =
+      GremlinScala(g).V.aggregate { v: Vertex ⇒ v.value[String]("name") }
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
     override def get_g_V_out_aggregate_asXaX_path = ???
