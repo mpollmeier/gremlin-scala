@@ -12,6 +12,8 @@ import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import com.tinkerpop.gremlin.util.function.SConsumer
+import shapeless._
+import shapeless.ops.hlist._
 
 class StandardTests extends TestBase {
   import Tests._
@@ -187,7 +189,7 @@ class StandardTests extends TestBase {
       // test.g_v1_to_XOUT_knowsX
     }
 
-    it("values") {
+    it("values", org.scalatest.Tag("foo")) {
       val test = new ScalaValuesTest
       test.g_V_values
       fail("continue here")
@@ -195,11 +197,10 @@ class StandardTests extends TestBase {
       test.g_E_valuesXid_label_weightX
       test.g_v1_outXcreatedX_values
     }
-
   }
 
   describe("side effects") {
-    it("aggregates", org.scalatest.Tag("foo")) {
+    it("aggregates") {
       val test = new ScalaAggregateTest
       test.g_V_valueXnameX_aggregate
       test.g_V_aggregateXnameX
@@ -446,13 +447,13 @@ object Tests {
     g = TinkerFactory.createClassic
 
     override def get_g_v1_mapXnameX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.map(_.get.value[String]("name"))
+      GremlinScala(g).v(v1Id).get.map(_.value[String]("name"))
 
     override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.outE.label.map(_.get.length: Integer)
+      GremlinScala(g).v(v1Id).get.outE.label.map(_.length: Integer)
 
     override def get_g_v1_out_mapXnameX_mapXlengthX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out.map(_.get.value[String]("name")).map(_.get.toString.length: Integer)
+      GremlinScala(g).v(v1Id).get.out.map(_.value[String]("name")).map(_.toString.length: Integer)
 
     override def get_g_V_asXaX_out_mapXa_nameX = ???
     //GremlinScala(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
@@ -540,9 +541,7 @@ object Tests {
   class ScalaValuesTest extends ValuesTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_values = ScalaGraph(g).V.values.map { traverser: Traverser[mutable.Map[String, AnyRef]] ⇒
-      mapAsJavaMap(traverser.get)
-    }
+    override def get_g_V_values = ScalaGraph(g).V.values map mapAsJavaMap
 
     override def get_g_V_valuesXname_ageX = ???
     // ScalaGraph(g).V.values("name", "age")

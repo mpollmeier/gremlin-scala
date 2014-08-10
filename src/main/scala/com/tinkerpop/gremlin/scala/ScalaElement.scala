@@ -49,7 +49,8 @@ trait ScalaElement[ElementType <: Element] {
   def has(key: String, t: T, value: Any) = start.has(key, t, value)
   def hasNot(key: String) = start.hasNot(key)
   def as(name: String) = start.as(name)
-  def map[A](fun: Traverser[ElementType] ⇒ A) = start.map(fun)
+  def mapTraverser[A](fun: Traverser[ElementType] ⇒ A) = start.mapTraverser(fun)
+  def map[A](fun: ElementType ⇒ A) = start.map(fun)
 }
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {

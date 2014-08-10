@@ -55,7 +55,10 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def count()(implicit p: Prepend[Types, JLong :: HNil]) = GremlinScala[p.Out, JLong](traversal.count())
 
-  def map[A](fun: Traverser[End] ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
+  def map[A](fun: End ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
+    GremlinScala[p.Out, A](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
+
+  def mapTraverser[A](fun: Traverser[End] ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
     GremlinScala[p.Out, A](traversal.map[A](fun))
 
   def path()(implicit p: Prepend[Types, Types :: HNil]) =
