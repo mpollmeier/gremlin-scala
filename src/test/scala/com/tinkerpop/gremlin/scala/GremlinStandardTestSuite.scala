@@ -158,8 +158,8 @@ class StandardTests extends TestBase {
       // test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
     }
 
-    it("traverses") {
-      val test = new ScalaTraversalTest
+    it("traverses vertices") {
+      val test = new ScalaVertexTest
       test.g_V
       test.g_v1_out
       test.g_v2_in
@@ -188,6 +188,10 @@ class StandardTests extends TestBase {
       test.g_v1_out_out_out
       test.g_v1_out_propertyXnameX
       // test.g_v1_to_XOUT_knowsX
+      test.g_v4_bothEX1_knows_createdX
+      test.g_v4_bothEXcreateX
+      test.g_v4_bothX1X_name
+      test.g_v4_bothX2X_name
     }
 
     it("values") {
@@ -503,7 +507,7 @@ object Tests {
     //GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select(As.of("a"), v -> ((Vertex) v).value("name"))
   }
 
-  class ScalaTraversalTest extends TraversalTest with StandardTest {
+  class ScalaVertexTest extends VertexTest with StandardTest {
     g = TinkerFactory.createClassic
 
     override def get_g_V = GremlinScala(g).V
@@ -544,6 +548,18 @@ object Tests {
     override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
     override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.value[String]("name")
     override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
+
+    override def get_g_v4_bothEX1_knows_createdX(v4Id: AnyRef) = 
+      GremlinScala(g).v(v4Id).get.bothE(1, "knows", "created")
+
+    override def get_g_v4_bothEXcreatedX(v4Id: AnyRef) = 
+      GremlinScala(g).v(v4Id).get.bothE("created")
+
+    override def get_g_v4_bothX1X_name(v4Id: AnyRef) =
+      GremlinScala(g).v(v4Id).get.both(1).value[String]("name")
+
+    override def get_g_v4_bothX2X_name(v4Id: AnyRef) = 
+      GremlinScala(g).v(v4Id).get.both(2).value[String]("name")
   }
 
   class ScalaValuesTest extends ValuesTest with StandardTest {
@@ -613,10 +629,10 @@ object Tests {
     g = TinkerFactory.createClassic
 
     override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX = ???
-      // GremlinScala(g).V.has("age").groupCount { v: Vertex ⇒
-      //   v.value[Int]("age")
-      // }.out.cap("a")
-      //inconsistent types for groupCount step? is it a side effect step or not?
+    // GremlinScala(g).V.has("age").groupCount { v: Vertex ⇒
+    //   v.value[Int]("age")
+    // }.out.cap("a")
+    //inconsistent types for groupCount step? is it a side effect step or not?
   }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
