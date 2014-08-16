@@ -7,20 +7,14 @@ This is the current development branch and it's based on Tinkerpop3. So if you'r
  here's some steps to get you started:
 
 * install jdk 8 and configure it to be your `JAVA_HOME` and in your path (check with `echo $JAVA_HOME` and `java -version`)
-* clone [Tinkerpop3](https://github.com/tinkerpop/tinkerpop3)
-* build Tinkerpop3 locally (there's no publicly available builds yet): `mvn clean install -DskipTests`
 * checkout Gremlin-Scala branch `tinkerpop3` and run tests. `sbt test`
-
-Please note that due to the lack of releases of Tinkerpop3 you might get compile errors. That's because Marko and Stephen are adding test methods to test classes Gremlin-Scala implements, and we have to play catchup. 
 
 If you would like to help, here's a list of things that needs to be addressed - if you would like to work on any of those let me know, so that we don't double up the work and I can point you in the right direction:
 
-* fix compile errors as they come up due to changes in Tinkerpop3 (and the lack of releases in TP3)
 * porting over all TP3 tests - see [TP3 testsuite](https://github.com/tinkerpop/tinkerpop3/tree/master/gremlin-test/src/main/java/com/tinkerpop/gremlin/process/graph/step) and [Gremlin-Scala StandardTests](https://github.com/mpollmeier/gremlin-scala/blob/tinkerpop3/src/test/scala/com/tinkerpop/gremlin/scala/GremlinStandardTestSuite.scala) - note that are commented out at the moment...
 * getting GS to work with graph libraries other than tinkergraph - it would be great if we can provide simple sbt builds preconfigured for a specific graph db with some sample code and ready to play around using `sbt console`
 * adding tests for all steps in combination with the now type safe path step (see below)
 * filling this document and provide other documentation, or how-tos, e.g. a blog post or tutorial
-
 
 Usage
 =============
