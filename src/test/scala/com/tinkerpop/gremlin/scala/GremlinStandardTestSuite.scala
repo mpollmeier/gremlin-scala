@@ -228,7 +228,7 @@ class StandardTests extends TestBase {
 
     it("allows side effects with cap", org.scalatest.Tag("foo")) {
       val test = new ScalaSideEffectCapTest
-      // test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
+      test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
     }
 
     it("groupCounts") {
@@ -644,12 +644,15 @@ object Tests {
 
     override def get_g_V_outXcreatedX_name_groupCount =
       GremlinScala(g).V.out("created").value[String]("name").groupCount()
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_outXcreatedX_name_groupCount_asXaX =
       GremlinScala(g).V.out("created").value[String]("name").groupCount().as("a")
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_filterXfalseX_groupCount =
-      GremlinScala(g).V.filter(_ ⇒ false).groupCount
+      GremlinScala(g).V.filter(_ ⇒ false).groupCount()
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_loops_lt_2X_capXaX = ???
     //GremlinScala(g).V.as("x").out

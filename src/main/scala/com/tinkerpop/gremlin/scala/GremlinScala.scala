@@ -127,13 +127,15 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
       })
     )
 
-  def groupCount()(implicit p: Prepend[Types, JMap[AnyRef, JLong] :: HNil]) =
-    GremlinScala[p.Out, JMap[AnyRef, JLong]](traversal.groupCount()
-      .asInstanceOf[GraphTraversal[_, JMap[AnyRef, JLong]]])
+  // note that groupCount is a side effect step, other than the 'count' step..
+  // https://groups.google.com/forum/#!topic/gremlin-users/3wXSizpqRxw
+  def groupCount() = GremlinScala[Types, End](traversal.groupCount())
 
-  def groupCount[A](fun: End ⇒ A)(implicit p: Prepend[Types, JMap[A, JLong] :: HNil]) =
-    GremlinScala[p.Out, JMap[A, JLong]](traversal.groupCount(fun)
-      .asInstanceOf[GraphTraversal[_, JMap[A, JLong]]])
+  def groupCount[A](fun: End ⇒ A) = GremlinScala[Types, End](traversal.groupCount(fun))
+
+  // def groupCount[A]()(implicit p: Prepend[Types, JMap[A, JLong] :: HNil]) =
+  //   GremlinScala[p.Out, JMap[A, JLong]](traversal.groupCount(fun)
+  //     .asInstanceOf[GraphTraversal[_, JMap[A, JLong]]])
 
 }
 
