@@ -628,11 +628,10 @@ object Tests {
   class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX = ???
-    // GremlinScala(g).V.has("age").groupCount { v: Vertex ⇒
-    //   v.value[Int]("age")
-    // }.out.cap("a")
-    //inconsistent types for groupCount step? is it a side effect step or not?
+    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX = 
+      GremlinScala(g).V.has("age")
+        .groupCount(_.value[String]("name")).as("a")
+        .out.cap("a")
   }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
