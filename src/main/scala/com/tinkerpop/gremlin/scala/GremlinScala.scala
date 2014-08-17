@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
-import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap }
+import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
 
 import collection.JavaConversions._
 import collection.mutable
@@ -128,14 +128,26 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     )
 
   // note that groupCount is a side effect step, other than the 'count' step..
-  // https://groups.google.com/forum/#!topic/gremlin-users/3wXSizpqRxw
+  // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
   def groupCount() = GremlinScala[Types, End](traversal.groupCount())
-
   def groupCount[A](fun: End ⇒ A) = GremlinScala[Types, End](traversal.groupCount(fun))
 
-  // def groupCount[A]()(implicit p: Prepend[Types, JMap[A, JLong] :: HNil]) =
-  //   GremlinScala[p.Out, JMap[A, JLong]](traversal.groupCount(fun)
-  //     .asInstanceOf[GraphTraversal[_, JMap[A, JLong]]])
+  def groupBy[A](keyFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.groupBy(keyFunction))
+
+  def groupBy[A, B](keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
+    GremlinScala[Types, End](traversal.groupBy(keyFunction, valueFunction))
+
+  //TODO change reduceFunction: Traversable[B] => C
+  def groupBy[A, B, C](
+    keyFunction: End ⇒ A,
+    valueFunction: End ⇒ B,
+    reduceFunction: JCollection[_] ⇒ _) =
+    GremlinScala[Types, End](traversal.groupBy(
+      keyFunction, 
+      valueFunction, 
+      reduceFunction)
+    )
 
 }
 

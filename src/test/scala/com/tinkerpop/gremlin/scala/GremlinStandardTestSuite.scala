@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
-import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap }
+import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection }
 import scala.collection.JavaConversions._
 
 import collection.mutable
@@ -226,7 +226,7 @@ class StandardTests extends TestBase {
       test.g_v1_out_sideEffectXX_valueXnameX
     }
 
-    it("allows side effects with cap", org.scalatest.Tag("foo")) {
+    it("allows side effects with cap") {
       val test = new ScalaSideEffectCapTest
       test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
     }
@@ -237,6 +237,14 @@ class StandardTests extends TestBase {
       test.g_V_outXcreatedX_name_groupCount
       test.g_V_filterXfalseX_groupCount
       // test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX
+    }
+
+    it("groupsBy", org.scalatest.Tag("foo")) {
+      val test = new ScalaGroupByTest
+      test.g_V_groupByXa_nameX
+      test.g_V_hasXlangX_groupByXlang_nameX_asXaX_out_capXaX
+      test.g_V_hasXlangX_groupByXlang_1_sizeX
+      // test.g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_2X_capXaX
     }
   }
 
@@ -549,16 +557,16 @@ object Tests {
     override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.value[String]("name")
     override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
 
-    override def get_g_v4_bothEX1_knows_createdX(v4Id: AnyRef) = 
+    override def get_g_v4_bothEX1_knows_createdX(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.bothE(1, "knows", "created")
 
-    override def get_g_v4_bothEXcreatedX(v4Id: AnyRef) = 
+    override def get_g_v4_bothEXcreatedX(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.bothE("created")
 
     override def get_g_v4_bothX1X_name(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.both(1).value[String]("name")
 
-    override def get_g_v4_bothX2X_name(v4Id: AnyRef) = 
+    override def get_g_v4_bothX2X_name(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.both(2).value[String]("name")
   }
 
@@ -628,7 +636,7 @@ object Tests {
   class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
     g = TinkerFactory.createClassic
 
-    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX = 
+    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX =
       GremlinScala(g).V.has("age")
         .groupCount(_.value[String]("name")).as("a")
         .out.cap("a")
@@ -664,6 +672,38 @@ object Tests {
     // .jump("x", 2).cap("a")
 
   }
+
+  class ScalaGroupByTest extends GroupByTest with StandardTest {
+    g = TinkerFactory.createClassic
+
+    override def get_g_V_groupByXnameX = 
+      GremlinScala(g).V.groupBy(_.value[String]("name"))
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JList[Vertex]]]]
+    
+
+    override def get_g_V_hasXlangX_groupByXlang_nameX_asXaX_out_capXaX = 
+      GremlinScala(g).V.has("lang").groupBy(
+        keyFunction = _.value[String]("lang"),
+        valueFunction = _.value[String]("name")
+      ).as("a").out.cap("a")
+
+    override def get_g_V_hasXlangX_groupByXlang_1_sizeX = 
+      GremlinScala(g).V.has("lang").groupBy(
+        keyFunction = _.value[String]("lang"),
+        valueFunction = _ ⇒ 1,
+        reduceFunction = {c: JCollection[_] ⇒ c.size}
+      )
+      .traversal.asInstanceOf[Traversal[Vertex, JMap[String, Integer]]]
+
+    override def get_g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_2X_capXaX = 
+      ???
+    // return g.V.as("x").out.groupBy(v -> v.value("name"), v -> v, vv -> vv.size).as("a").jump("x", 2).cap("a")
+
+    override def get_g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_loops_lt_2X_capXaX = 
+      ???
+    // return g.V.as("x").out.groupBy(v -> v.value("name"), v -> v, vv -> vv.size).as("a").jump("x", t -> t.getLoops < 2).cap("a")
+  }
+
 }
 
 trait StandardTest {
