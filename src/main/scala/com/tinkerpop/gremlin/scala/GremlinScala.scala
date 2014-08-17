@@ -144,11 +144,26 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     valueFunction: End ⇒ B,
     reduceFunction: JCollection[_] ⇒ _) =
     GremlinScala[Types, End](traversal.groupBy(
-      keyFunction, 
-      valueFunction, 
+      keyFunction,
+      valueFunction,
       reduceFunction)
     )
 
+  ///////////////////// BRANCH STEPS /////////////////////
+  def jump(as: String) = GremlinScala[Types, End](traversal.jump(as))
+
+  def jump(as: String, loops: Int) = GremlinScala[Types, End](traversal.jump(as, loops))
+
+  def jump(as: String, ifPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, ifPredicate))
+
+  def jump(as: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) = 
+    GremlinScala[Types, End](traversal.jump(as, loops, emitPredicate))
+
+  def jump(as: String, 
+    ifPredicate: Traverser[End] ⇒ Boolean, 
+    emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, ifPredicate, emitPredicate))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
