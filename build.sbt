@@ -15,7 +15,7 @@ scalacOptions ++= Seq(
 incOptions := incOptions.value.withNameHashing(true)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0.M1"
+  val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
   Seq(
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,

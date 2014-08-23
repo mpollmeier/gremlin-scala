@@ -12,6 +12,7 @@ import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import com.tinkerpop.gremlin.util.function.SConsumer
 import shapeless._
 import shapeless.ops.hlist._
@@ -75,6 +76,7 @@ class StandardTests extends TestBase {
       test.g_v1_hasXage_gt_30X
       test.g_v1_hasXkeyX
       test.g_v1_hasXname_markoX
+      test.g_V_hasXlabelXperson_animalX
       test.get_g_V_hasXname_equalspredicate_markoX
 
     }
@@ -106,13 +108,14 @@ class StandardTests extends TestBase {
       test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
     }
 
-    it("retains certain objects") {
+    it("retains certain objects", org.scalatest.Tag("foo")) {
       val test = new ScalaRetainTest
       test.g_v1_out_retainXg_v2X
       test.g_v1_out_aggregateXxX_out_retainXxX
     }
 
     it("retains a given set of objects") {
+      // val g = new StandardTest{}. newTestGraphClassicDouble
       val g = TinkerFactory.createClassic
       val graph = GremlinScala(g)
       //val retainCollection = Seq(graph.v(v1Id).get, graph.v(v2Id).get)
@@ -126,6 +129,7 @@ class StandardTests extends TestBase {
       val test = new ScalaBackTest
       test.g_v1_asXhereX_out_backXhereX
       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX
+      test.g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX
       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
       test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
     }
@@ -237,7 +241,7 @@ class StandardTests extends TestBase {
       test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
     }
 
-    it("groupCounts", org.scalatest.Tag("foo")) {
+    it("groupCounts") {
       val test = new ScalaGroupCountTest
       test.g_V_outXcreatedX_groupCountXnameX
       test.g_V_outXcreatedX_name_groupCount
@@ -245,12 +249,12 @@ class StandardTests extends TestBase {
       test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX
     }
 
-    it("groupsBy", org.scalatest.Tag("foo")) {
+    it("groupsBy") {
       val test = new ScalaGroupByTest
-      test.g_V_groupByXa_nameX
-      test.g_V_hasXlangX_groupByXlang_nameX_asXaX_out_capXaX
+      test.g_V_groupByXnameX
+      test.g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX
       test.g_V_hasXlangX_groupByXlang_1_sizeX
-      test.g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_2X_capXaX
+      test.g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX
     }
   }
 
@@ -274,7 +278,7 @@ class StandardTests extends TestBase {
 
 object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_both_dedup_name = GremlinScala(g).V.both.dedup.value[String]("name")
 
@@ -289,7 +293,7 @@ object Tests {
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_filterXfalseX = GremlinScala(g).V.filter(_ ⇒ false)
 
@@ -315,13 +319,13 @@ object Tests {
   }
 
   class ScalaExceptTest extends ExceptTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out.except(g.v(v2Id))
 
-    override def get_g_v1_out_aggregate_asXxX_out_exceptXxX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out.aggregate.as("x").out.exceptVar("x")
+    override def get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out.aggregate("x").out.exceptVar("x")
 
     override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created")
@@ -332,12 +336,12 @@ object Tests {
 
     override def get_g_V_exceptXX = GremlinScala(g).V.except(Nil)
 
-    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregate_asXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
+    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
     // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
@@ -350,7 +354,7 @@ object Tests {
   }
 
   class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath
@@ -360,7 +364,7 @@ object Tests {
   }
 
   class ScalaHasTest extends HasTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_hasXname_markoX = GremlinScala(g).V.has("name", "marko")
 
@@ -386,33 +390,36 @@ object Tests {
 
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
 
+    override def get_g_V_hasXlabelXperson_animalX =
+      GremlinScala(g).V.has(Element.LABEL, T.in, Seq("person", "animal"))
+
     override def get_g_V_hasXname_equalspredicate_markoX() = GremlinScala(g).V.has("name", "marko")
 
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = GremlinScala(g).v(v1Id).get.hasNot(prop)
     override def get_g_V_hasNotXprop(prop: String) = GremlinScala(g).V.hasNot(prop)
   }
 
   class ScalaIntervalTest extends IntervalTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.outE.interval("weight", 0f, 0.6f).inV
+      GremlinScala(g).v(v1Id).get.outE.interval("weight", 0d, 0.6d).inV
   }
 
   class ScalaRandomTest extends RandomTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_randomX1X = GremlinScala(g).V.random(1.0d)
     override def get_g_V_randomX0X = GremlinScala(g).V.random(0.0d)
   }
 
   class ScalaRangeTest extends RangeTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.range(0, 1)
 
@@ -432,7 +439,7 @@ object Tests {
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
       val v2 = g.v(v2Id)
@@ -440,11 +447,11 @@ object Tests {
     }
 
     override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out.aggregate.as("x").out.retain("x")
+      GremlinScala(g).v(v1Id).get.out.aggregate("x").out.retain("x")
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("here").out.back[Vertex]("here")
@@ -458,12 +465,18 @@ object Tests {
     override def get_g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.outE.as("here").inV.has("name", "vadas").back[Edge]("here")
 
-    override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0f).as("here").inV.has("name", "josh").back[Edge]("here")
+    override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) = 
+    GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
+
+    override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) = 
+    GremlinScala(g).v(v1Id).get.outE("knows").as("here").has("weight", 1.0d).inV.has("name", "josh").back[Edge]("here")
+
+    override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_asXfakeX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
   }
 
   class ScalaJumpTest extends JumpTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("x").out
@@ -514,7 +527,7 @@ object Tests {
   }
 
   class ScalaMapTest extends MapTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_mapXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.map(_.value[String]("name"))
@@ -532,7 +545,7 @@ object Tests {
   }
 
   class ScalaOrderTest extends OrderTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
     override def get_g_V_name_order = GremlinScala(g).V.value[String]("name").order
 
     override def get_g_V_name_orderXabX = GremlinScala(g).V.value[String]("name").order {
@@ -546,7 +559,7 @@ object Tests {
   }
 
   class ScalaSelectTest extends SelectTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select()
@@ -566,7 +579,7 @@ object Tests {
   }
 
   class ScalaVertexTest extends VertexTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V = GremlinScala(g).V
     override def get_g_v1_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out
@@ -587,7 +600,7 @@ object Tests {
     override def get_g_V_inEX2_knowsX_outV_name = GremlinScala(g).V.inE(2, "knows").outV.value[String]("name")
     override def get_g_v1_outE_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.inV
     override def get_g_v2_inE_outV(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.inE.outV
-    override def get_g_V_outE_hasXweight_1X_outV = GremlinScala(g).V.outE.has("weight", 1.0f).outV
+    override def get_g_V_outE_hasXweight_1X_outV = GremlinScala(g).V.outE.has("weight", 1.0d).outV
 
     override def get_g_V_out_outE_inV_inE_inV_both_name =
       GremlinScala(g).V.out.outE.inV.inE.inV.both.value[String]("name")
@@ -601,7 +614,7 @@ object Tests {
     override def get_g_v1_outEXknows_createdX_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE("knows", "created").inV
     override def get_g_v1_outE_otherV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.otherV
     override def get_g_v4_bothE_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.otherV
-    override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.has("weight", T.lt, 1f).otherV
+    override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.has("weight", T.lt, 1d).otherV
     override def get_g_V_out_out = GremlinScala(g).V.out.out
     override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
     override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.value[String]("name")
@@ -621,7 +634,7 @@ object Tests {
   }
 
   class ScalaValuesTest extends ValuesTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_values = GremlinScala(g).V.values()
 
@@ -635,7 +648,7 @@ object Tests {
   }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_valueXnameX_aggregate =
       GremlinScala(g).V.value[String]("name").aggregate
@@ -645,12 +658,12 @@ object Tests {
       GremlinScala(g).V.aggregate { v: Vertex ⇒ v.value[String]("name") }
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
-    override def get_g_V_out_aggregate_asXaX_path = ???
+    override def get_g_V_out_aggregateXaX_path = ???
     // return g.V().out().aggregate("a").path()
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
     override def get_g_V_count = GremlinScala(g).V.count
     override def get_g_V_out_count = GremlinScala(g).V.out.count
     override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
@@ -658,7 +671,7 @@ object Tests {
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
       val a = new JArrayList[Vertex] //test is expecting a java arraylist..
@@ -684,26 +697,26 @@ object Tests {
   }
 
   class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
-    override def get_g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX =
+    override def get_g_V_hasXageX_groupCountXa_nameX_out_capXaX =
       GremlinScala(g).V.has("age")
-        .groupCount(_.value[String]("name")).as("a")
+        .groupCount("a", _.value[String]("name"))
         .out.cap("a")
   }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_outXcreatedX_groupCountXnameX =
-      GremlinScala(g).V.out("created").groupCount[String](_.value[String]("name"))
+      GremlinScala(g).V.out("created").groupCount[String]({ v: Vertex ⇒ v.value[String]("name") })
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_outXcreatedX_name_groupCount =
       GremlinScala(g).V.out("created").value[String]("name").groupCount()
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
-    override def get_g_V_outXcreatedX_name_groupCount_asXaX =
+    override def get_g_V_outXcreatedX_name_groupCountXaX =
       GremlinScala(g).V.out("created").value[String]("name").groupCount().as("a")
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
@@ -711,27 +724,28 @@ object Tests {
       GremlinScala(g).V.filter(_ ⇒ false).groupCount()
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
-    override def get_g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_loops_lt_2X_capXaX =
+    override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
-        .groupCount(_.value[String]("name")).as("a")
+        .groupCount("a", _.value[String]("name"))
         .jump("x", _.getLoops < 2).cap("a")
 
-    override def get_g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX =
+    override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
-        .groupCount(_.value[String]("name")).as("a")
+        .groupCount("a", _.value[String]("name"))
         .jump("x", 2).cap("a")
 
   }
 
   class ScalaGroupByTest extends GroupByTest with StandardTest {
-    g = TinkerFactory.createClassic
+    g = newTestGraphClassicDouble
 
     override def get_g_V_groupByXnameX =
       GremlinScala(g).V.groupBy(_.value[String]("name"))
         .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JList[Vertex]]]]
 
-    override def get_g_V_hasXlangX_groupByXlang_nameX_asXaX_out_capXaX =
+    override def get_g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX =
       GremlinScala(g).V.has("lang").groupBy(
+        memoryKey = "a",
         keyFunction = _.value[String]("lang"),
         valueFunction = _.value[String]("name")
       ).as("a").out.cap("a")
@@ -743,26 +757,47 @@ object Tests {
         reduceFunction = { c: JCollection[_] ⇒ c.size }
       ).traversal.asInstanceOf[Traversal[Vertex, JMap[String, Integer]]]
 
-    override def get_g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_2X_capXaX =
+    override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupBy(
+          memoryKey = "a",
           keyFunction = _.value[String]("name"),
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
         ).as("a").jump("x", 2).cap("a")
 
-    override def get_g_V_asXxX_out_groupByXname_sizeX_asXaX_jumpXx_loops_lt_2X_capXaX =
+    override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupBy(
+          memoryKey = "a",
           keyFunction = _.value[String]("name"),
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
-        ).as("a").jump("x", _.getLoops < 2).cap("a")
+        ).jump("x", _.getLoops < 2).cap("a")
   }
 
 }
 
 trait StandardTest {
+  def newTestGraphClassicDouble = {
+    val g = ScalaGraph(TinkerGraph.open)
+
+    val marko = g.addVertex(1: Integer, Map("name" → "marko", "age" → 29))
+    val vadas = g.addVertex(2: Integer, Map("name" → "vadas", "age" → 27))
+    val lop = g.addVertex(3: Integer, Map("name" → "lop", "lang" → "java"))
+    val josh = g.addVertex(4: Integer, Map("name" → "josh", "age" → 32))
+    val ripple = g.addVertex(5: Integer, Map("name" → "ripple", "lang" → "java"))
+    val peter = g.addVertex(6: Integer, Map("name" → "peter", "age" → 35))
+
+    marko.addEdge(7: Integer, "knows", vadas, Map("weight" → 0.5d))
+    marko.addEdge(8: Integer, "knows", josh, Map("weight" → 1.0d))
+    marko.addEdge(9: Integer, "created", lop, Map("weight" → 0.4d))
+    josh.addEdge(10: Integer, "created", ripple, Map("weight" → 1.0d))
+    josh.addEdge(11: Integer, "created", lop, Map("weight" → 0.4d))
+    peter.addEdge(12: Integer, "created", lop, Map("weight" → 0.2d))
+    g
+  }
+
   implicit def toTraversal[S, E](gs: GremlinScala[_, E]): Traversal[S, E] =
     gs.traversal.asInstanceOf[Traversal[S, E]]
 }

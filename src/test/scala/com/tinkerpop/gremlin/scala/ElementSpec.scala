@@ -118,7 +118,7 @@ class ElementSpec extends TestBase {
       val v1 = gs.addVertex()
       val v2 = gs.addVertex()
 
-      val e = v1.addEdge("testLabel", v2)
+      val e = v1.addEdge("testLabel", v2, Map.empty)
       e.label should be("testLabel")
       v1.outE.head should be(e.edge)
       v1.out("testLabel").head should be(v2.vertex)

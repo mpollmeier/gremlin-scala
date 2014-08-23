@@ -80,8 +80,14 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def bothE(labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.bothE(labels: _*))
   def bothE(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.bothE(branchFactor, labels: _*))
 
-  def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any] = Map.empty): ScalaEdge = {
+  def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
     val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
+    e.setProperties(properties)
+    e
+  }
+
+  def addEdge(id: AnyRef, label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
+    val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex, Element.ID, id))
     e.setProperties(properties)
     e
   }

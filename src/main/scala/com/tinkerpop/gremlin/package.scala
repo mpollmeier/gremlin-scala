@@ -17,6 +17,7 @@ package object scala {
   implicit def wrap(v: Vertex) = ScalaVertex(v)
   implicit def wrap(e: Edge) = ScalaEdge(e)
   implicit def wrap(g: Graph) = ScalaGraph(g)
+  implicit def unwrap(g: ScalaGraph) = g.graph
 
   implicit def toVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End]) =
     new GremlinVertexSteps(gremlinScala)
