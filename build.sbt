@@ -4,6 +4,8 @@ version := "3.0.0-SNAPSHOT"
 
 organization := "com.michaelpollmeier"
 
+crossScalaVersions := Seq("2.10.4", "2.11.2")
+
 scalaVersion := "2.11.2"
 
 scalacOptions ++= Seq(
@@ -11,7 +13,6 @@ scalacOptions ++= Seq(
   //"-Ydebug"
 )
 
-// use sbt's new name hashing
 incOptions := incOptions.value.withNameHashing(true)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
@@ -21,7 +22,11 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,
     "com.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
     "com.novocode" % "junit-interface" % "0.9" % "test->default",
-    "com.chuusai" %% "shapeless" % "2.0.0",
+    "com.chuusai" % "shapeless" % "2.0.0" cross CrossVersion.fullMapped {
+      case "2.10.4" ⇒ "2.10.4"
+      case "2.11.2" ⇒ "2.11"
+      case x ⇒ x
+    },
     "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
     "org.scalatest" %% "scalatest" % "2.1.4" % "test"
