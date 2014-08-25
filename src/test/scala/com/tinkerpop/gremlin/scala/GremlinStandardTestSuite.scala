@@ -241,7 +241,7 @@ class StandardTests extends TestBase {
       test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
     }
 
-    it("groupCounts") {
+    it("groupCounts", org.scalatest.Tag("foo")) {
       val test = new ScalaGroupCountTest
       test.g_V_outXcreatedX_groupCountXnameX
       test.g_V_outXcreatedX_name_groupCount
@@ -249,7 +249,7 @@ class StandardTests extends TestBase {
       test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX
     }
 
-    it("groupsBy") {
+    it("groupsBy", org.scalatest.Tag("foo")) {
       val test = new ScalaGroupByTest
       test.g_V_groupByXnameX
       test.g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX
@@ -703,6 +703,7 @@ object Tests {
       GremlinScala(g).V.has("age")
         .groupCount("a", _.value[String]("name"))
         .out.cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[String, JLong]]] //only for Scala 2.10...
   }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
@@ -728,11 +729,13 @@ object Tests {
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
         .jump("x", _.getLoops < 2).cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] //only for Scala 2.10...
 
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
         .jump("x", 2).cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] //only for Scala 2.10...
 
   }
 
@@ -749,6 +752,7 @@ object Tests {
         keyFunction = _.value[String]("lang"),
         valueFunction = _.value[String]("name")
       ).as("a").out.cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[String, JList[String]]]] //only for Scala 2.10...
 
     override def get_g_V_hasXlangX_groupByXlang_1_sizeX =
       GremlinScala(g).V.has("lang").groupBy(
@@ -765,6 +769,7 @@ object Tests {
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
         ).as("a").jump("x", 2).cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
 
     override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
@@ -774,6 +779,7 @@ object Tests {
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
         ).jump("x", _.getLoops < 2).cap("a")
+        .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
   }
 
 }
