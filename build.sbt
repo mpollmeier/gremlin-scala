@@ -13,7 +13,8 @@ scalacOptions ++= Seq(
   //"-Ydebug"
 )
 
-incOptions := incOptions.value.withNameHashing(true)
+// doesn't work on travis ;(
+// incOptions := incOptions.value.withNameHashing(true)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0.M1"
