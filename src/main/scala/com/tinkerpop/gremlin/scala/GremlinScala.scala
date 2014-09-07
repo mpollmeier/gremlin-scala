@@ -27,25 +27,6 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[Types, End](traversal)
   }
 
-  def property[A](key: String)(implicit p: Prepend[Types, Property[A] :: HNil]) =
-    GremlinScala[p.Out, Property[A]](traversal.property[A](key))
-
-  def value[A](key: String)(implicit p: Prepend[Types, A :: HNil]) =
-    GremlinScala[p.Out, A](traversal.value[A](key))
-  def value[A](key: String, default: A)(implicit p: Prepend[Types, A :: HNil]) =
-    GremlinScala[p.Out, A](traversal.value[A](key, default))
-
-  //TODO return a scala map. problem: calling .map adds a step to the pipeline which changes the result of path...
-  def values(keys: String*)(implicit p: Prepend[Types, JMap[String, AnyRef] :: HNil]) =
-    GremlinScala[p.Out, JMap[String, AnyRef]](traversal.values(keys: _*))
-
-  def has(key: String) = GremlinScala[Types, End](traversal.has(key))
-  def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
-  def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
-  def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
-
-  def hasNot(key: String) = GremlinScala[Types, End](traversal.hasNot(key))
-
   def filter(p: End ⇒ Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
@@ -81,26 +62,22 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def cyclicPath() = GremlinScala[Types, End](traversal.cyclicPath())
 
   def dedup() = GremlinScala[Types, End](traversal.dedup())
-  def dedup[A](uniqueFun: End ⇒ A) = GremlinScala[Types, End](traversal.dedup(uniqueFun))
+
+  def dedup[A](uniqueFun: End ⇒ A) = GremlinScala[Types, End](traversal.dedup(liftTraverser(uniqueFun)))
 
   def aggregate() = GremlinScala[Types, End](traversal.aggregate())
-  def aggregate(memoryKey: String) = GremlinScala[Types, End](traversal.aggregate(memoryKey))
+  def aggregate(sideEffectKey: String) = GremlinScala[Types, End](traversal.aggregate(sideEffectKey))
 
-  def aggregate[A](preAggregateFunction: End ⇒ A) = 
-    GremlinScala[Types, End](traversal.aggregate(preAggregateFunction))
+  def aggregate[A](preAggregateFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.aggregate(liftTraverser(preAggregateFunction)))
 
-  def aggregate[A](memoryKey: String, preAggregateFunction: End ⇒ A) = 
-    GremlinScala[Types, End](traversal.aggregate(memoryKey, preAggregateFunction))
+  def aggregate[A](sideEffectKey: String, preAggregateFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.aggregate(sideEffectKey, liftTraverser(preAggregateFunction)))
 
   def except(someObject: End) = GremlinScala[Types, End](traversal.except(someObject))
   def except(list: Iterable[End]) = GremlinScala[Types, End](traversal.except(list))
   /** not named `except` because type End could be String */
   def exceptVar(variable: String) = GremlinScala[Types, End](traversal.except(variable))
-
-  /* startValue: greaterThanEqual
-   * endValue: less than */
-  def interval[A, B](key: String, startValue: Comparable[A], endValue: Comparable[B]) =
-    GremlinScala[Types, End](traversal.interval(key, startValue, endValue))
 
   /** keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all */
   def random(probability: Double) = GremlinScala[Types, End](traversal.random(probability))
@@ -137,55 +114,73 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
   def groupCount() = GremlinScala[Types, End](traversal.groupCount())
 
-  def groupCount(memoryKey: String) = GremlinScala[Types, End](traversal.groupCount(memoryKey))
+  def groupCount(sideEffectKey: String) = GremlinScala[Types, End](traversal.groupCount(sideEffectKey))
 
-  def groupCount[A](preGroupFunction: End ⇒ A) = 
-    GremlinScala[Types, End](traversal.groupCount(preGroupFunction))
+  def groupCount[A](preGroupFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.groupCount(liftTraverser(preGroupFunction)))
 
-  def groupCount[A](memoryKey: String, preGroupFunction: End ⇒ A) =
-    GremlinScala[Types, End](traversal.groupCount(memoryKey, preGroupFunction))
+  def groupCount[A](sideEffectKey: String, preGroupFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.groupCount(sideEffectKey, liftTraverser(preGroupFunction)))
 
   def groupBy[A](keyFunction: End ⇒ A) =
-    GremlinScala[Types, End](traversal.groupBy(keyFunction))
+    GremlinScala[Types, End](traversal.groupBy(liftTraverser(keyFunction)))
 
   def groupBy[A, B](keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
-    GremlinScala[Types, End](traversal.groupBy(keyFunction, valueFunction))
+    GremlinScala[Types, End](traversal.groupBy(
+      liftTraverser(keyFunction), 
+      liftTraverser(valueFunction)))
 
-  //TODO change reduceFunction: Traversable[B] => C
+  def groupBy[A](sideEffectKey: String, keyFunction: End ⇒ A) =
+    GremlinScala[Types, End](traversal.groupBy(
+      sideEffectKey,
+      liftTraverser(keyFunction)))
+
+  //TODO change reduceFunction to type Traversable[B] => C
   def groupBy[A, B, C](
     keyFunction: End ⇒ A,
     valueFunction: End ⇒ B,
     reduceFunction: JCollection[_] ⇒ _) =
-    GremlinScala[Types, End](traversal.groupBy(keyFunction, valueFunction, reduceFunction))
+    GremlinScala[Types, End](traversal.groupBy(
+      liftTraverser(keyFunction),
+      liftTraverser(valueFunction),
+      reduceFunction))
 
-  def groupBy[A](memoryKey: String, keyFunction: End ⇒ A) =
-    GremlinScala[Types, End](traversal.groupBy(memoryKey, keyFunction))
-
-  def groupBy[A, B](memoryKey: String, keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
-    GremlinScala[Types, End](traversal.groupBy(memoryKey, keyFunction, valueFunction))
+  def groupBy[A, B](sideEffectKey: String, keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
+    GremlinScala[Types, End](traversal.groupBy(
+      sideEffectKey, 
+      liftTraverser(keyFunction), 
+      liftTraverser(valueFunction)))
 
   def groupBy[A, B, C](
-    memoryKey: String,
+    sideEffectKey: String,
     keyFunction: End ⇒ A,
     valueFunction: End ⇒ B,
     reduceFunction: JCollection[_] ⇒ _) =
-    GremlinScala[Types, End](traversal.groupBy(memoryKey, keyFunction, valueFunction, reduceFunction))
+    GremlinScala[Types, End](traversal.groupBy(
+      sideEffectKey,
+      liftTraverser(keyFunction), 
+      liftTraverser(valueFunction), 
+      reduceFunction))
 
   ///////////////////// BRANCH STEPS /////////////////////
   def jump(as: String) = GremlinScala[Types, End](traversal.jump(as))
 
   def jump(as: String, loops: Int) = GremlinScala[Types, End](traversal.jump(as, loops))
 
-  def jump(as: String, ifPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[Types, End](traversal.jump(as, ifPredicate))
+  def jump(as: String, ifPredicate: End ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, liftTraverser(ifPredicate)))
 
-  def jump(as: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[Types, End](traversal.jump(as, loops, emitPredicate))
+  def jump(as: String, loops: Int, emitPredicate: End ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(
+      as, loops, liftTraverser(emitPredicate)))
 
   def jump(as: String,
-           ifPredicate: Traverser[End] ⇒ Boolean,
-           emitPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[Types, End](traversal.jump(as, ifPredicate, emitPredicate))
+           ifPredicate: End ⇒ Boolean,
+           emitPredicate: End ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(
+      as, 
+      liftTraverser(ifPredicate),
+      liftTraverser(emitPredicate)))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
@@ -222,6 +217,34 @@ object GS {
 
 object GremlinScala {
   def apply(graph: Graph) = ScalaGraph(graph)
+
+  class GremlinElementSteps[Types <: HList, End <: Element](gremlinScala: GremlinScala[Types, End])
+      extends GremlinScala[Types, End](gremlinScala.traversal) {
+
+    def property[A](key: String)(implicit p: Prepend[Types, Property[A] :: HNil]) =
+      GremlinScala[p.Out, Property[A]](traversal.property[A](key))
+
+    def value[A](key: String)(implicit p: Prepend[Types, A :: HNil]) =
+      GremlinScala[p.Out, A](traversal.value[A](key))
+    def value[A](key: String, default: A)(implicit p: Prepend[Types, A :: HNil]) =
+      GremlinScala[p.Out, A](traversal.value[A](key, default))
+
+    //TODO return a scala map. problem: calling .map adds a step to the pipeline which changes the result of path...
+    def values(keys: String*)(implicit p: Prepend[Types, JMap[String, AnyRef] :: HNil]) =
+      GremlinScala[p.Out, JMap[String, AnyRef]](traversal.values(keys: _*))
+
+    def has(key: String) = GremlinScala[Types, End](traversal.has(key))
+    def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
+    def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
+    def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
+
+    def hasNot(key: String) = GremlinScala[Types, End](traversal.hasNot(key))
+
+    /* startValue: greaterThanEqual
+   * endValue: less than */
+    def interval[A, B](key: String, startValue: Comparable[A], endValue: Comparable[B]) =
+      GremlinScala[Types, End](traversal.interval(key, startValue, endValue))
+  }
 
   class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {

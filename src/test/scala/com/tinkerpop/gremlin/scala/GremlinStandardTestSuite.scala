@@ -10,7 +10,6 @@ import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
-import com.tinkerpop.gremlin.structure.Element
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import com.tinkerpop.gremlin.util.function.SConsumer

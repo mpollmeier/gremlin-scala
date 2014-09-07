@@ -43,14 +43,14 @@ trait ScalaElement[ElementType <: Element] {
   //TODO: can we do the same with an automatic conversion?
   //TODO: add other steps
 
-  def filter(p: ElementType ⇒ Boolean) = start.filter(p)
-  def has(key: String) = start.has(key)
-  def has(key: String, value: Any) = start.has(key, value)
-  def has(key: String, t: T, value: Any) = start.has(key, t, value)
-  def hasNot(key: String) = start.hasNot(key)
-  def as(name: String) = start.as(name)
-  def mapTraverser[A](fun: Traverser[ElementType] ⇒ A) = start.mapTraverser(fun)
-  def map[A](fun: ElementType ⇒ A) = start.map(fun)
+  // def filter(p: ElementType ⇒ Boolean) = start.filter(p)
+  // def has(key: String) = start.has(key)
+  // def has(key: String, value: Any) = start.has(key, value)
+  // def has(key: String, t: T, value: Any) = start.has(key, t, value)
+  // def hasNot(key: String) = start.hasNot(key)
+  // def as(name: String) = start.as(name)
+  // def mapTraverser[A](fun: Traverser[ElementType] ⇒ A) = start.mapTraverser(fun)
+  // def map[A](fun: ElementType ⇒ A) = start.map(fun)
 }
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {

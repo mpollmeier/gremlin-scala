@@ -12,12 +12,16 @@ import shapeless.ops.hlist._
 package object scala {
   type Vertex = structure.Vertex
   type Edge = structure.Edge
+  type Element = structure.Element
   type Graph = structure.Graph
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
   implicit def wrap(e: Edge) = ScalaEdge(e)
   implicit def wrap(g: Graph) = ScalaGraph(g)
   implicit def unwrap(g: ScalaGraph) = g.graph
+
+  implicit def toElementSteps[Types <: HList, End <: Element](gremlinScala: GremlinScala[Types, End]) =
+    new GremlinElementSteps(gremlinScala)
 
   implicit def toVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End]) =
     new GremlinVertexSteps(gremlinScala)
@@ -36,5 +40,8 @@ package object scala {
   implicit def toSPredicate[A](f: Function1[A, Boolean]) = new SPredicate[A] {
     override def test(a: A) = f(a)
   }
+
+  implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
+    { t: Traverser[A] ⇒ fun(t.get) }
 }
 
