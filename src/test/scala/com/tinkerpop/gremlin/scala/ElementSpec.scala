@@ -10,12 +10,12 @@ class ElementSpec extends TestBase {
       v(1).keys should be (Set("name", "age"))
       v(1).property[String]("name").value should be("marko")
       v(1).property[String]("doesnt exit").isPresent should be(false)
-      v(1).properties should be (Map("name" -> "marko", "age" -> 29))
+      v(1).properties("name", "age") should be (Map("name" -> "marko", "age" -> 29))
 
       e(7).keys should be (Set("weight"))
       e(7).property[Float]("weight").value should be (0.5)
       e(7).property[Float]("doesnt exit").isPresent should be(false)
-      e(7).properties should be (Map("weight" -> 0.5))
+      e(7).properties("weight") should be (Map("weight" -> 0.5))
     }
 
     it("sets a property") {
@@ -41,7 +41,7 @@ class ElementSpec extends TestBase {
     it("handles hidden properties") {
       v(1).setHiddenProperty("hiddenProperty", "hiddenValue")
       v(1).hiddenKeys shouldBe Set("hiddenProperty")
-      v(1).hiddenProperties shouldBe Map("hiddenProperty" → "hiddenValue")
+      v(1).hiddenProperties("hiddenProperty") shouldBe Map("hiddenProperty" → "hiddenValue")
     }
   }
 
@@ -131,7 +131,7 @@ class ElementSpec extends TestBase {
 
       val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
       e.label should be("testLabel")
-      e.properties should be(Map("testKey" -> "testValue"))
+      e.properties("testKey") should be(Map("testKey" -> "testValue"))
       v1.outE.head should be(e.edge)
       v1.out("testLabel").head should be(v2.vertex)
     }

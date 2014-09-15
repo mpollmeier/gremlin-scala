@@ -221,8 +221,12 @@ object GremlinScala {
   class GremlinElementSteps[Types <: HList, End <: Element](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def property[A](key: String)(implicit p: Prepend[Types, Property[A] :: HNil]) =
-      GremlinScala[p.Out, Property[A]](traversal.property[A](key))
+    def properties(keys: String*)(implicit p: Prepend[Types, Property[Any] :: HNil]) =
+      GremlinScala[p.Out, Property[Any]](traversal.properties(keys: _*)
+        .asInstanceOf[GraphTraversal[_, Property[Any]]])
+
+    def propertyMap(keys: String*)(implicit p: Prepend[Types, JMap[String, Any] :: HNil]) =
+      GremlinScala[p.Out, JMap[String, Any]](traversal.propertyMap(keys: _*))
 
     def value[A](key: String)(implicit p: Prepend[Types, A :: HNil]) =
       GremlinScala[p.Out, A](traversal.value[A](key))

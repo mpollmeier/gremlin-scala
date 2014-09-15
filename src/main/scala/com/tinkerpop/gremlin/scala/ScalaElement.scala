@@ -1,11 +1,11 @@
 package com.tinkerpop.gremlin.scala
 
-import shapeless._
-import ops.hlist._
 import scala.collection.JavaConversions._
-import com.tinkerpop.gremlin.structure._
-import com.tinkerpop.gremlin.process.Traverser
+
 import com.tinkerpop.gremlin.process.T
+import com.tinkerpop.gremlin.process.Traverser
+import com.tinkerpop.gremlin.structure._
+import shapeless._
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
@@ -14,30 +14,49 @@ trait ScalaElement[ElementType <: Element] {
   def id: AnyRef = element.id
   def label(): String = element.label
 
-  def property[A](key: String): Property[A] = element.property[A](key)
   def keys(): Set[String] = element.keys.toSet
-  def properties: Map[String, Any] = element.properties.toMap mapValues (_.value)
+
+  def property[A](key: String): Property[A] = element.property[A](key)
+
+  def properties(keys: String*): Seq[Property[Any]] = 
+    element.iterators
+      .properties[Any](keys: _*)
+      .asInstanceOf[java.util.Iterator[Property[Any]]]
+      .toSeq
+
+  def propertyMap(): Map[String, Any] =
+    keys map { key ⇒ (key, value(key)) } toMap
+
   def setProperty(key: String, value: Any): Unit = element.property(key, value)
   def setProperties(properties: Map[String, Any]): Unit =
-    properties foreach { case (k,v) ⇒ setProperty(k,v) }
+    properties foreach { case (k, v) ⇒ setProperty(k, v) }
   def removeProperty(key: String): Unit = {
     val p = property(key)
-    if(p.isPresent) p.remove
+    if (p.isPresent) p.remove
   }
 
   def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hide(key), value)
-  def hiddenProperties: Map[String, Any] = element.hiddens.toMap mapValues (_.value)
-  def hiddenKeys: Set[String] = hiddenProperties.keySet
 
-  /** note: this may throw an IllegalStateException!
-    * in scala exceptions are typically discouraged in situations like this...
-    * `value` is only provided so that we are on par with Gremlin Groovy */
+  def hiddenProperties(keys: String*): Seq[Property[Any]] = 
+    element.iterators
+      .hiddens[Any](keys: _*)
+      .asInstanceOf[java.util.Iterator[Property[Any]]]
+      .toSeq
+
+  def hiddenKeys: Set[String] = element.hiddenKeys.toSet
+
+  /**
+   * note: this may throw an IllegalStateException!
+   * in scala exceptions are typically discouraged in situations like this...
+   * `value` is only provided so that we are on par with Gremlin Groovy
+   */
   def value[A](key: String): A = element.value[A](key)
+  def valueMap(): Map[String, Any] =
+    keys map { key ⇒ (key, value(key)) } toMap
 
   def valueWithDefault[A](key: String, default: A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
-
 
   //duplicated from pipeline so that we can quickly start a pipeline from an element
   //TODO: can we do the same with an automatic conversion?
@@ -92,7 +111,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def `with`[A <: AnyRef,B <: AnyRef](tuples: (A,B)*) = start.`with`(tuples: _*)
+  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
 
   def start() = GremlinScala[Vertex :: HNil, Vertex](vertex.start)
 }
@@ -100,7 +119,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  def `with`[A <: AnyRef,B <: AnyRef](tuples: (A,B)*) = start.`with`(tuples: _*)
+  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
 
   def start() = GremlinScala[Edge :: HNil, Edge](edge.start)
 
