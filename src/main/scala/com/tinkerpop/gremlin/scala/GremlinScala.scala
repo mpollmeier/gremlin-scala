@@ -170,9 +170,15 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def jump(as: String, ifPredicate: End ⇒ Boolean) =
     GremlinScala[Types, End](traversal.jump(as, liftTraverser(ifPredicate)))
 
+  def jumpWithTraverser(as: String, ifPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, ifPredicate))
+
   def jump(as: String, loops: Int, emitPredicate: End ⇒ Boolean) =
     GremlinScala[Types, End](traversal.jump(
       as, loops, liftTraverser(emitPredicate)))
+
+  def jumpWithTraverser(as: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, loops, emitPredicate))
 
   def jump(as: String,
            ifPredicate: End ⇒ Boolean,
@@ -181,6 +187,11 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
       as, 
       liftTraverser(ifPredicate),
       liftTraverser(emitPredicate)))
+
+  def jumpWithTraverser(as: String,
+           ifPredicate: Traverser[End] ⇒ Boolean,
+           emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[Types, End](traversal.jump(as, ifPredicate, emitPredicate))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {

@@ -12,27 +12,27 @@ class TraversalSpec extends TestBase {
     }
 
     it("follows the out vertices") {
-      v(1).out.property[String]("name").toSet.unroll should be(Set("vadas", "josh", "lop"))
-      v(1).out("knows").property[String]("name").toSet.unroll should be(Set("vadas", "josh"))
+      v(1).out.value[String]("name").toSet should be(Set("vadas", "josh", "lop"))
+      v(1).out("knows").value[String]("name").toSet should be(Set("vadas", "josh"))
 
-      v(1).out.out.property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
-      v(1).out.out("created").property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
+      v(1).out.out.value[String]("name").toSet should be(Set("ripple", "lop"))
+      v(1).out.out("created").value[String]("name").toSet should be(Set("ripple", "lop"))
     }
 
     it("follows the in vertices") {
-      v(3).in.property[String]("name").toSet.unroll should be(Set("marko", "josh", "peter"))
-      v(3).in("created").property[String]("name").toSet.unroll should be(Set("marko", "josh", "peter"))
+      v(3).in.value[String]("name").toSet should be(Set("marko", "josh", "peter"))
+      v(3).in("created").value[String]("name").toSet should be(Set("marko", "josh", "peter"))
 
-      v(3).in.in.property[String]("name").toSet.unroll should be(Set("marko"))
-      v(3).in.in("knows").property[String]("name").toSet.unroll should be(Set("marko"))
+      v(3).in.in.value[String]("name").toSet should be(Set("marko"))
+      v(3).in.in("knows").value[String]("name").toSet should be(Set("marko"))
     }
 
     it("follows both in and out vertices") {
-      v(4).both.property[String]("name").toSet.unroll should be(Set("marko", "ripple", "lop"))
-      v(4).both("knows").property[String]("name").toSet.unroll should be(Set("marko"))
+      v(4).both.value[String]("name").toSet should be(Set("marko", "ripple", "lop"))
+      v(4).both("knows").value[String]("name").toSet should be(Set("marko"))
 
-      v(4).both.both.property[String]("name").toSet.unroll should be(Set("marko", "lop", "peter", "josh", "vadas"))
-      v(4).both.both("knows").property[String]("name").toSet.unroll should be(Set("josh", "vadas"))
+      v(4).both.both.value[String]("name").toSet should be(Set("marko", "lop", "peter", "josh", "vadas"))
+      v(4).both.both("knows").value[String]("name").toSet should be(Set("josh", "vadas"))
     }
 
     it("follows out edges") {
@@ -73,13 +73,13 @@ class TraversalSpec extends TestBase {
     it("follows in vertex") {
       //TODO: wait until this is consistent in T3 between Vertex and Edge
       //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
-      //e(7).inV//.out.property[String]("name").toSet.unroll should be(Set("vadas", "josh", "lop"))
-      //v(1).out("knows").property[String]("name").toSet.unroll should be(Set("vadas", "josh"))
-      //v(1).out(1, "knows").property[String]("name").toSet.unroll should be(Set("vadas"))
+      //e(7).inV//.out.value[String]("name").toSet should be(Set("vadas", "josh", "lop"))
+      //v(1).out("knows").value[String]("name").toSet should be(Set("vadas", "josh"))
+      //v(1).out(1, "knows").value[String]("name").toSet should be(Set("vadas"))
 
-      //v(1).out.out.property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
-      //v(1).out.out("created").property[String]("name").toSet.unroll should be(Set("ripple", "lop"))
-      //v(1).out.out(1, "created").property[String]("name").toSet.unroll should be(Set("lop"))
+      //v(1).out.out.value[String]("name").toSet should be(Set("ripple", "lop"))
+      //v(1).out.out("created").value[String]("name").toSet should be(Set("ripple", "lop"))
+      //v(1).out.out(1, "created").value[String]("name").toSet should be(Set("lop"))
     }
 
     //it("does not allow vertex steps") {
@@ -89,13 +89,6 @@ class TraversalSpec extends TestBase {
   }
 
   describe("common steps") {
-    describe("property") {
-      it("gets properties") {
-        gs.V.property[String]("name").toSet map (_.value) should be(
-          Set("marko", "ripple", "vadas", "josh", "lop", "peter"))
-      }
-    }
-
     describe("value") {
       it("gets values") {
         gs.V.value[Int]("age").toSet should be(Set(27, 29, 32, 35))

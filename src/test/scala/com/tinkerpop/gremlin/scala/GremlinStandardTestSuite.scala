@@ -10,6 +10,7 @@ import com.tinkerpop.gremlin.process.graph.step.filter._
 import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
+import com.tinkerpop.gremlin.structure
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import com.tinkerpop.gremlin.util.function.SConsumer
@@ -203,13 +204,14 @@ class StandardTests extends TestBase {
       test.g_v4_bothX2X_name
     }
 
-    it("values") {
-      val test = new ScalaValuesTest
-      test.g_V_values
-      test.g_V_valuesXname_ageX
-      test.g_E_valuesXid_label_weightX
-      test.g_v1_outXcreatedX_values
-    }
+    // TODO: implement ValueMapTest
+    // it("values") {
+    //   val test = new ScalaValuesTest
+    //   test.g_V_values
+    //   test.g_V_valuesXname_ageX
+    //   test.g_E_valuesXid_label_weightX
+    //   test.g_v1_outXcreatedX_values
+    // }
   }
 
   describe("side effects") {
@@ -372,7 +374,7 @@ object Tests {
     override def get_g_V_hasXblahX = GremlinScala(g).V.has("blah")
 
     override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out().has(Element.ID, v2Id)
+      GremlinScala(g).v(v1Id).get.out().has(structure.Element.ID, v2Id)
 
     override def get_g_V_hasXage_gt_30X = GremlinScala(g).V.has("age", T.gt, 30)
 
@@ -390,7 +392,7 @@ object Tests {
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
 
     override def get_g_V_hasXlabelXperson_animalX =
-      GremlinScala(g).V.has(Element.LABEL, T.in, Seq("person", "animal"))
+      GremlinScala(g).V.has(structure.Element.LABEL, T.in, Seq("person", "animal"))
 
     override def get_g_V_hasXname_equalspredicate_markoX() = GremlinScala(g).V.has("name", "marko")
 
@@ -464,11 +466,11 @@ object Tests {
     override def get_g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.outE.as("here").inV.has("name", "vadas").back[Edge]("here")
 
-    override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) = 
-    GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
+    override def get_g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
 
-    override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) = 
-    GremlinScala(g).v(v1Id).get.outE("knows").as("here").has("weight", 1.0d).inV.has("name", "josh").back[Edge]("here")
+    override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.outE("knows").as("here").has("weight", 1.0d).inV.has("name", "josh").back[Edge]("here")
 
     override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_asXfakeX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
@@ -479,15 +481,15 @@ object Tests {
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("x").out
-        .jump("x", _.getLoops < 2)
+        .jumpWithTraverser("x", _.getLoops < 2)
         .value[String]("name")
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2X =
-      GremlinScala(g).V.as("x").out.jump("x", _.getLoops < 2)
+      GremlinScala(g).V.as("x").out.jumpWithTraverser("x", _.getLoops < 2)
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX =
       GremlinScala(g).V.as("x").out
-        .jump("x", _.getLoops < 2, _ ⇒ true)
+        .jumpWithTraverser("x", _.getLoops < 2, _ ⇒ true)
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path = ???
     // GremlinScala(g).V.as("x").out.jump("x", t -> t.getLoops < 2, t -> true).path
@@ -497,8 +499,8 @@ object Tests {
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2X_asXyX_in_jumpXy_loops_lt_2X_name =
       GremlinScala(g).V.as("x").out
-        .jump("x", _.getLoops < 2).as("y").in
-        .jump("y", _.getLoops < 2).value[String]("name")
+        .jumpWithTraverser("x", _.getLoops < 2).as("y").in
+        .jumpWithTraverser("y", _.getLoops < 2).value[String]("name")
 
     override def get_g_V_asXxX_out_jumpXx_2X_asXyX_in_jumpXy_2X_name =
       GremlinScala(g).V.as("x").out
@@ -510,7 +512,7 @@ object Tests {
 
     override def get_g_V_asXxX_out_jumpXx_2_trueX =
       GremlinScala(g).V.as("x").out
-        .jump("x", 2, { _: Traverser[_] ⇒ true })
+        .jumpWithTraverser("x", 2, { _: Traverser[_] ⇒ true })
 
     override def get_g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path(v1Id: AnyRef) = ???
     //GremlinScala(g).v(v1Id).out.jump("x", t -> t.get.out.hasNext).in.jump("y").as("x").out.as("y").path
@@ -520,7 +522,7 @@ object Tests {
 
     override def get_g_v1_asXaX_jumpXb_loops_gt_1X_out_jumpXaX_asXbX_name(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("a")
-        .jump("b", _.getLoops > 1)
+        .jumpWithTraverser("b", _.getLoops > 1)
         .out.jump("a").as("b").value[String]("name")
 
   }
@@ -632,19 +634,20 @@ object Tests {
       GremlinScala(g).v(v4Id).get.both(2).value[String]("name")
   }
 
-  class ScalaValuesTest extends ValuesTest with StandardTest {
-    g = newTestGraphClassicDouble
-
-    override def get_g_V_values = GremlinScala(g).V.values()
-
-    override def get_g_V_valuesXname_ageX = GremlinScala(g).V.values("name", "age")
-
-    override def get_g_E_valuesXid_label_weightX =
-      GremlinScala(g).E.values("id", "label", "weight")
-
-    override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out("created").values()
-  }
+  // TODO: implement ValueMapTest
+  // class ScalaValuesTest extends ValuesTest with StandardTest {
+  //   g = newTestGraphClassicDouble
+  //
+  //   override def get_g_V_values = GremlinScala(g).V.values()
+  //
+  //   override def get_g_V_valuesXname_ageX = GremlinScala(g).V.values("name", "age")
+  //
+  //   override def get_g_E_valuesXid_label_weightX =
+  //     GremlinScala(g).E.values("id", "label", "weight")
+  //
+  //   override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) =
+  //     GremlinScala(g).v(v1Id).get.out("created").values()
+  // }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     g = newTestGraphClassicDouble
@@ -727,7 +730,7 @@ object Tests {
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
-        .jump("x", _.getLoops < 2).cap("a")
+        .jumpWithTraverser("x", _.getLoops < 2).cap("a")
         .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] //only for Scala 2.10...
 
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_2X_capXaX =
@@ -747,7 +750,7 @@ object Tests {
 
     override def get_g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX =
       GremlinScala(g).V.has("lang").groupBy(
-        memoryKey = "a",
+        sideEffectKey = "a",
         keyFunction = _.value[String]("lang"),
         valueFunction = _.value[String]("name")
       ).as("a").out.cap("a")
@@ -763,7 +766,7 @@ object Tests {
     override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupBy(
-          memoryKey = "a",
+          sideEffectKey = "a",
           keyFunction = _.value[String]("name"),
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
@@ -773,11 +776,11 @@ object Tests {
     override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupBy(
-          memoryKey = "a",
+          sideEffectKey = "a",
           keyFunction = _.value[String]("name"),
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
-        ).jump("x", _.getLoops < 2).cap("a")
+        ).jumpWithTraverser("x", _.getLoops < 2).cap("a")
         .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
   }
 
