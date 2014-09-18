@@ -68,7 +68,7 @@ trait ScalaElement[ElementType <: Element] {
   def has(key: String, t: T, value: Any) = start.has(key, t, value)
   def hasNot(key: String) = start.hasNot(key)
   def as(name: String) = start.as(name)
-  def mapTraverser[A](fun: Traverser[ElementType] ⇒ A) = start.mapTraverser(fun)
+  def mapWithTraverser[A](fun: Traverser[ElementType] ⇒ A) = start.mapWithTraverser(fun)
   def map[A](fun: ElementType ⇒ A) = start.map(fun)
 }
 

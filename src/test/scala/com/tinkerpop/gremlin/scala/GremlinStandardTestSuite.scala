@@ -78,7 +78,7 @@ class StandardTests extends TestBase {
       test.g_v1_hasXname_markoX
       test.g_V_hasXlabelXperson_animalX
       test.get_g_V_hasXname_equalspredicate_markoX
-
+      test.g_V_hasXperson_name_markoX_age
     }
 
     it("filters with has not") {
@@ -132,6 +132,7 @@ class StandardTests extends TestBase {
       test.g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX
       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
       test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
+      test.g_V_asXhereXout_valueXnameX_backXhereX
     }
 
     it("jumps") {
@@ -150,6 +151,7 @@ class StandardTests extends TestBase {
       test.g_v1_mapXnameX
       test.g_v1_outE_label_mapXlengthX
       test.g_v1_out_mapXnameX_mapXlengthX
+      test.g_V_asXaX_out_out_mapXa_name_it_nameX
       // test.g_V_asXaX_out_mapXa_nameX
     }
 
@@ -394,7 +396,11 @@ object Tests {
     override def get_g_V_hasXlabelXperson_animalX =
       GremlinScala(g).V.has(structure.Element.LABEL, T.in, Seq("person", "animal"))
 
-    override def get_g_V_hasXname_equalspredicate_markoX() = GremlinScala(g).V.has("name", "marko")
+    override def get_g_V_hasXname_equalspredicate_markoX = GremlinScala(g).V.has("name", "marko")
+
+    override def get_g_V_hasXperson_name_markoX_age = ???
+      // GremlinScala(g).V.has("person", "name", "marko").value[Int]("age")
+ 
 
   }
 
@@ -474,6 +480,9 @@ object Tests {
 
     override def get_g_v1_outEXknowsX_asXhereX_hasXweight_1X_asXfakeX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
+
+    override def get_g_V_asXhereXout_valueXnameX_backXhereX =
+      GremlinScala(g).V.as("here").out.value[String]("name").back[Vertex]("here")
   }
 
   class ScalaJumpTest extends JumpTest with StandardTest {
@@ -543,6 +552,13 @@ object Tests {
     //GremlinScala(g).V.as("a").out.map(v -> ((Vertex) v.getPath().get("a")).value("name")).trackPaths()
     //GremlinScala(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
 
+    override def get_g_V_asXaX_out_out_mapXa_name_it_nameX =
+      GremlinScala(g).V.as("a").out.out.mapWithTraverser{ t: Traverser[Vertex] ⇒ 
+        val a = t.get[Vertex]("a")
+        val aName = a.value[String]("name")
+        val vName = t.get.value[String]("name")
+        s"$aName$vName"
+      }
   }
 
   class ScalaOrderTest extends OrderTest with StandardTest {
