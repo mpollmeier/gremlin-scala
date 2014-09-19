@@ -376,7 +376,7 @@ object Tests {
     override def get_g_V_hasXblahX = GremlinScala(g).V.has("blah")
 
     override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out().has(structure.Element.ID, v2Id)
+      GremlinScala(g).v(v1Id).get.out().has(T.id.toString, v2Id)
 
     override def get_g_V_hasXage_gt_30X = GremlinScala(g).V.has("age", T.gt, 30)
 
@@ -394,7 +394,7 @@ object Tests {
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
 
     override def get_g_V_hasXlabelXperson_animalX =
-      GremlinScala(g).V.has(structure.Element.LABEL, T.in, Seq("person", "animal"))
+      GremlinScala(g).V.has(T.label.toString, T.in, Seq("person", "animal"))
 
     override def get_g_V_hasXname_equalspredicate_markoX = GremlinScala(g).V.has("name", "marko")
 

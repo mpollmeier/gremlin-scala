@@ -198,7 +198,7 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   def addVertex(): ScalaVertex = ScalaVertex(graph.addVertex())
   def addVertex(id: AnyRef): ScalaVertex = addVertex(id, Map.empty)
   def addVertex(id: AnyRef, properties: Map[String, Any]): ScalaVertex = {
-    val v = ScalaVertex(graph.addVertex(Element.ID, id))
+    val v = ScalaVertex(graph.addVertex(T.id, id))
     v.setProperties(properties)
     v
   }

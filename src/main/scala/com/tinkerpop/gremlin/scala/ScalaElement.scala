@@ -15,35 +15,40 @@ trait ScalaElement[ElementType <: Element] {
   def label(): String = element.label
 
   def keys(): Set[String] = element.keys.toSet
-
-  def property[A](key: String): Property[A] = element.property[A](key)
-
-  def properties(keys: String*): Seq[Property[Any]] = 
-    element.iterators
-      .properties[Any](keys: _*)
-      .asInstanceOf[java.util.Iterator[Property[Any]]]
-      .toSeq
-
-  def propertyMap(): Map[String, Any] =
-    keys map { key ⇒ (key, value(key)) } toMap
+  def hiddenKeys: Set[String] = element.hiddenKeys.toSet
 
   def setProperty(key: String, value: Any): Unit = element.property(key, value)
+  def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hide(key), value)
   def setProperties(properties: Map[String, Any]): Unit =
     properties foreach { case (k, v) ⇒ setProperty(k, v) }
+
   def removeProperty(key: String): Unit = {
     val p = property(key)
     if (p.isPresent) p.remove
   }
 
-  def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hide(key), value)
+  def property[A](key: String): Property[A] = element.property[A](key)
+  def hiddenProperty[A](key: String): Property[A] = element.property[A](Graph.Key.hide(key))
 
-  def hiddenProperties(keys: String*): Seq[Property[Any]] = 
-    element.iterators
-      .hiddens[Any](keys: _*)
-      .asInstanceOf[java.util.Iterator[Property[Any]]]
-      .toSeq
+  def properties(wantedKeys: String*): Seq[Property[Any]] = {
+    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else keys
+    requiredKeys map property[Any] toSeq
+  }
 
-  def hiddenKeys: Set[String] = element.hiddenKeys.toSet
+  def hiddenProperties(wantedKeys: String*): Seq[Property[Any]] = {
+    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else hiddenKeys
+    requiredKeys map hiddenProperty[Any] toSeq
+  }
+
+  def propertyMap(wantedKeys: String*): Map[String, Any] = {
+    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else keys
+    requiredKeys map { key ⇒ (key, value(key)) } toMap
+  }
+
+  def hiddenPropertyMap(wantedKeys: String*): Map[String, Any] = {
+    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else hiddenKeys
+    requiredKeys map { key ⇒ (key, hiddenValue(key)) } toMap
+  }
 
   /**
    * note: this may throw an IllegalStateException!
@@ -51,6 +56,8 @@ trait ScalaElement[ElementType <: Element] {
    * `value` is only provided so that we are on par with Gremlin Groovy
    */
   def value[A](key: String): A = element.value[A](key)
+  def hiddenValue[A](key: String): A = element.value[A](Graph.Key.hide(key))
+
   def valueMap(): Map[String, Any] =
     keys map { key ⇒ (key, value(key)) } toMap
 
@@ -106,7 +113,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   }
 
   def addEdge(id: AnyRef, label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
-    val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex, Element.ID, id))
+    val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex, T.id, id))
     e.setProperties(properties)
     e
   }

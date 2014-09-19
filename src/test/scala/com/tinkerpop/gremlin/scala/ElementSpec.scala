@@ -1,21 +1,24 @@
 package com.tinkerpop.gremlin.scala
 
-import org.scalatest.matchers.ShouldMatchers
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import org.scalatest.matchers.ShouldMatchers
 
 class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
-      v(1).keys should be (Set("name", "age"))
+      v(1).keys should be(Set("name", "age"))
       v(1).property[String]("name").value should be("marko")
       v(1).property[String]("doesnt exit").isPresent should be(false)
-      v(1).properties("name", "age") should be (Map("name" -> "marko", "age" -> 29))
+      v(1).propertyMap() should be(Map("name" -> "marko", "age" -> 29))
+      v(1).propertyMap("name", "age") should be(Map("name" -> "marko", "age" -> 29))
+      v(1).properties("name", "age") should have length (2)
+      v(1).properties() should have length (2)
 
-      e(7).keys should be (Set("weight"))
-      e(7).property[Float]("weight").value should be (0.5)
+      e(7).keys should be(Set("weight"))
+      e(7).property[Float]("weight").value should be(0.5)
       e(7).property[Float]("doesnt exit").isPresent should be(false)
-      e(7).properties("weight") should be (Map("weight" -> 0.5))
+      e(7).propertyMap("weight") should be(Map("weight" -> 0.5))
     }
 
     it("sets a property") {
@@ -27,10 +30,10 @@ class ElementSpec extends TestBase {
     }
 
     it("removes a property") {
-      v(1).setProperty("vertexProperty", "updated")
-      v(1).removeProperty("vertexProperty")
+      v(1).setProperty("vertexProperty1", "updated")
+      v(1).removeProperty("vertexProperty1")
       v(1).removeProperty("doesnt exist")
-      v(1).property[String]("vertexProperty").isPresent should be(false)
+      v(1).property[String]("vertexProperty1").isPresent should be(false)
 
       e(7).setProperty("edgeProperty", "updated")
       e(7).removeProperty("edgeProperty")
@@ -41,19 +44,22 @@ class ElementSpec extends TestBase {
     it("handles hidden properties") {
       v(1).setHiddenProperty("hiddenProperty", "hiddenValue")
       v(1).hiddenKeys shouldBe Set("hiddenProperty")
-      v(1).hiddenProperties("hiddenProperty") shouldBe Map("hiddenProperty" → "hiddenValue")
+      v(1).hiddenValue[String]("hiddenProperty") shouldBe "hiddenValue"
+      v(1).hiddenProperty[String]("hiddenProperty").value shouldBe "hiddenValue"
+      v(1).hiddenPropertyMap("hiddenProperty") shouldBe Map("hiddenProperty" → "hiddenValue")
+      v(1).hiddenProperties("hiddenProperty") should have length(1)
     }
   }
 
   describe("values") {
     it("gets a value") {
       v(1).value[String]("name") should be("marko")
-      e(7).value[Float]("weight") should be (0.5)
+      e(7).value[Float]("weight") should be(0.5)
     }
 
     it("falls back to default value if value doesnt exist") {
       v(1).valueWithDefault("doesnt exist", "blub") should be("blub")
-      e(7).valueWithDefault("doesnt exist", 0.8) should be (0.8)
+      e(7).valueWithDefault("doesnt exist", 0.8) should be(0.8)
     }
 
     it("throws an exception if a value doesnt exist") {
@@ -131,7 +137,7 @@ class ElementSpec extends TestBase {
 
       val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
       e.label should be("testLabel")
-      e.properties("testKey") should be(Map("testKey" -> "testValue"))
+      e.propertyMap("testKey") should be(Map("testKey" -> "testValue"))
       v1.outE.head should be(e.edge)
       v1.out("testLabel").head should be(v2.vertex)
     }
