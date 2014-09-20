@@ -37,8 +37,8 @@ class SampleUsageTest extends FunSpec with ShouldMatchers with TestGraph {
 
       //property returns Some[A] if element present and of type A, otherwise None
       vertex.property[Integer]("age") should be(Some(29))
+      // vertex.property[Int]("age") should be(Some(29)) //only works from Scala 2.11
       vertex.property[String]("age") should be(None)
-      vertex.property[Int]("age") should be(None)
       vertex.property("nonExistentProperty") should equal(None)
     }
 

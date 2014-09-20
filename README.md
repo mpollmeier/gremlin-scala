@@ -130,7 +130,7 @@ Adding Gremlin-Scala as a dependency
 =============
 ```scala
 // sbt: cross released for scala 2.11 and 2.10
-"com.michaelpollmeier" %% "gremlin-scala" % "2.5.2" 
+"com.michaelpollmeier" %% "gremlin-scala" % "2.6.0" 
 
 ```
 ```xml
@@ -138,7 +138,7 @@ Adding Gremlin-Scala as a dependency
 <dependency>
   <groupId>com.michaelpollmeier</groupId>
   <artifactId>gremlin-scala_2.11</artifactId>
-  <version>2.5.2</version>
+  <version>2.6.0</version>
 </dependency>
 ```
 

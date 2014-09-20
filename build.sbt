@@ -1,15 +1,15 @@
 name := "gremlin-scala"
 
-version := "2.5.3"
+version := "2.6.0"
 
 organization := "com.michaelpollmeier"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
-crossScalaVersions := Seq("2.10.3", "2.11.1")
+crossScalaVersions := Seq("2.10.3", "2.11.2")
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "2.5.0"
+  val gremlinVersion = "2.6.0"
   Seq(
     "com.tinkerpop.gremlin" % "gremlin-java" % gremlinVersion,
     "com.tinkerpop" % "pipes" % gremlinVersion,
