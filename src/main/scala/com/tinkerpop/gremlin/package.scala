@@ -29,6 +29,11 @@ package object scala {
   implicit def toEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End]) =
     new GremlinEdgeSteps(gremlinScala)
 
+  //TODO make vertexSteps extend elementSteps and return VertexSteps here
+  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex :: HNil, Vertex] = v.start
+
+  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[Edge :: HNil, Edge] = e.start
+
   implicit def toJavaFunction[A, B](f: Function1[A, B]) = new JFunction[A, B] {
     override def apply(a: A): B = f(a)
   }
