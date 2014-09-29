@@ -264,7 +264,8 @@ object GremlinScala {
 
     // def has(key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[Types, End](traversal.has(key, predicate, value))
 
-    def has(label: String, key: String, value: Any) = GremlinScala[Types, End](traversal.has(label, key, value))
+    def has(label: String, key: String, value: Any) = 
+      GremlinScala[Types, End](traversal.has(label, key, value))
 
     def has(label: String, key: String, value: Seq[_]) = GremlinScala[Types, End](traversal.has(label, key, asJavaCollection(value)))
 
