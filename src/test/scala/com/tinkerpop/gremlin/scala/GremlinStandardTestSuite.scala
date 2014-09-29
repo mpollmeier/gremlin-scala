@@ -63,7 +63,7 @@ class StandardTests extends TestBase {
       // test.g_v1_outXcreatedX_inXcreatedX_cyclicPath_path
     }
 
-    it("filters with has") {
+    it("filters with has", org.scalatest.Tag("foo")) {
       val test = new ScalaHasTest
       test.g_V_hasXname_markoX
       test.g_V_hasXname_blahX
@@ -108,7 +108,7 @@ class StandardTests extends TestBase {
       test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
     }
 
-    it("retains certain objects", org.scalatest.Tag("foo")) {
+    it("retains certain objects") {
       val test = new ScalaRetainTest
       test.g_v1_out_retainXg_v2X
       test.g_v1_out_aggregateXxX_out_retainXxX
@@ -244,7 +244,7 @@ class StandardTests extends TestBase {
       test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
     }
 
-    it("groupCounts", org.scalatest.Tag("foo")) {
+    it("groupCounts") {
       val test = new ScalaGroupCountTest
       test.g_V_outXcreatedX_groupCountXnameX
       test.g_V_outXcreatedX_name_groupCount
@@ -252,7 +252,7 @@ class StandardTests extends TestBase {
       test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX
     }
 
-    it("groupsBy", org.scalatest.Tag("foo")) {
+    it("groupsBy") {
       val test = new ScalaGroupByTest
       test.g_V_groupByXnameX
       test.g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX
@@ -376,16 +376,16 @@ object Tests {
     override def get_g_V_hasXblahX = GremlinScala(g).V.has("blah")
 
     override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out().has(T.id.toString, v2Id)
+      GremlinScala(g).v(v1Id).get.out.has(T.id, v2Id)
 
     override def get_g_V_hasXage_gt_30X = GremlinScala(g).V.has("age", T.gt, 30)
 
-    override def get_g_E_hasXlabelXknowsX = GremlinScala(g).E.has("label", "knows")
+    override def get_g_E_hasXlabelXknowsX = GremlinScala(g).E.has(T.label, "knows")
 
     override def get_g_E_hasXlabelXknows_createdX =
-      GremlinScala(g).E.has("label", T.in, List("knows", "created"))
+      GremlinScala(g).E.has(T.label, T.in, List("knows", "created"))
 
-    override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = GremlinScala(g).e(e7Id).get.has("label", "knows")
+    override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = GremlinScala(g).e(e7Id).get.has(T.label, "knows")
 
     override def get_g_v1_hasXage_gt_30X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("age", T.gt, 30)
 
@@ -394,20 +394,21 @@ object Tests {
     override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
 
     override def get_g_V_hasXlabelXperson_animalX =
-      GremlinScala(g).V.has(T.label.toString, T.in, Seq("person", "animal"))
+      GremlinScala(g).V.has(T.label, T.in, Seq("person", "animal"))
 
     override def get_g_V_hasXname_equalspredicate_markoX = GremlinScala(g).V.has("name", "marko")
 
-    override def get_g_V_hasXperson_name_markoX_age = ???
-      // GremlinScala(g).V.has("person", "name", "marko").value[Int]("age")
- 
+    override def get_g_V_hasXperson_name_markoX_age = 
+      GremlinScala(g).V.has("person", "name", "marko").value[Integer]("age")
 
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
     g = newTestGraphClassicDouble
 
-    override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) = GremlinScala(g).v(v1Id).get.hasNot(prop)
+    override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) =
+      GremlinScala(g).v(v1Id).get.hasNot(prop)
+
     override def get_g_V_hasNotXprop(prop: String) = GremlinScala(g).V.hasNot(prop)
   }
 
@@ -553,7 +554,7 @@ object Tests {
     //GremlinScala(g).V.as("a").out.map(_.getPath.get("a").value[String]("name")).trackPaths
 
     override def get_g_V_asXaX_out_out_mapXa_name_it_nameX =
-      GremlinScala(g).V.as("a").out.out.mapWithTraverser{ t: Traverser[Vertex] ⇒ 
+      GremlinScala(g).V.as("a").out.out.mapWithTraverser { t: Traverser[Vertex] ⇒
         val a = t.get[Vertex]("a")
         val aName = a.value[String]("name")
         val vName = t.get.value[String]("name")

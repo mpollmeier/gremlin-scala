@@ -16,6 +16,8 @@ scalacOptions ++= Seq(
 // doesn't work on travis ;(
 // incOptions := incOptions.value.withNameHashing(true)
 
+testOptions in Test += Tests.Argument("-oF")
+
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
@@ -30,7 +32,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     },
     "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
-    "org.scalatest" %% "scalatest" % "2.1.4" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   )
 }
 

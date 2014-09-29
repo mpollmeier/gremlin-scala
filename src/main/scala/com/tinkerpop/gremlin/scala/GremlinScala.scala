@@ -249,9 +249,30 @@ object GremlinScala {
       GremlinScala[p.Out, JMap[String, AnyRef]](traversal.values(keys: _*))
 
     def has(key: String) = GremlinScala[Types, End](traversal.has(key))
+
     def has(key: String, value: Any) = GremlinScala[Types, End](traversal.has(key, value))
-    def has(key: String, t: T, value: Any) = GremlinScala[Types, End](traversal.has(key, t, value))
-    def has(key: String, t: T, seq: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(seq)))
+
+    def has(accessor: T, value: Any) = GremlinScala[Types, End](traversal.has(accessor, value))
+
+    def has(key: String, predicate: T, value: Any) = GremlinScala[Types, End](traversal.has(key, predicate, value))
+
+    def has(key: String, t: T, value: Seq[_]) = GremlinScala[Types, End](traversal.has(key, t, asJavaCollection(value)))
+
+    def has(accessor: T, predicate: T, value: Any) = GremlinScala[Types, End](traversal.has(accessor, predicate, value))
+
+    def has(accessor: T, predicate: T, value: Seq[_]) = GremlinScala[Types, End](traversal.has(accessor, predicate, asJavaCollection(value)))
+
+    // def has(key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[Types, End](traversal.has(key, predicate, value))
+
+    def has(label: String, key: String, value: Any) = GremlinScala[Types, End](traversal.has(label, key, value))
+
+    def has(label: String, key: String, value: Seq[_]) = GremlinScala[Types, End](traversal.has(label, key, asJavaCollection(value)))
+
+    def has(label: String, key: String, predicate: T, value: Any) = GremlinScala[Types, End](traversal.has(label, key, predicate, value))
+
+    def has(label: String, key: String, predicate: T, value: Seq[_]) = GremlinScala[Types, End](traversal.has(label, key, predicate, asJavaCollection(value)))
+
+    // def has(label: String, key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[Types, End](traversal.has(label, key, predicate, value))
 
     def hasNot(key: String) = GremlinScala[Types, End](traversal.hasNot(key))
 
