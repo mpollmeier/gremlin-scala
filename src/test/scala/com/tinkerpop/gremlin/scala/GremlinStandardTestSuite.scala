@@ -75,8 +75,8 @@ class StandardTests extends TestBase {
       test.g_v1_hasXkeyX
       test.g_v1_hasXname_markoX
       test.get_g_V_hasXname_equalspredicate_markoX
-      //TODO get these back in
-      // test.g_V_hasXperson_name_markoX_age
+      //TODO need graph 'CREW'
+      // test.g_V_hasXperson_name_markoX_age 
       // test.g_E_hasXlabelXuses_traversesX
       // test.g_V_hasXlabelXperson_software_blahX
     }
