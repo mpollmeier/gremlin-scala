@@ -1,11 +1,9 @@
 package com.tinkerpop.gremlin
 
-import java.util.function.{ Function ⇒ JFunction }
+import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate }
 
 import com.tinkerpop.gremlin.process.Traverser
 import com.tinkerpop.gremlin.scala.GremlinScala._
-import com.tinkerpop.gremlin.util.function.SFunction
-import com.tinkerpop.gremlin.util.function.SPredicate
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -38,12 +36,8 @@ package object scala {
     override def apply(a: A): B = f(a)
   }
 
-  implicit def toSFunction[A, B](f: Function1[A, B]) = new SFunction[A, B] {
-    override def apply(a: A): B = f(a)
-  }
-
-  implicit def toSPredicate[A](f: Function1[A, Boolean]) = new SPredicate[A] {
-    override def test(a: A) = f(a)
+  implicit def toJavaPredicate[A](f: Function1[A, Boolean]) = new JPredicate[A] {
+    override def test(a: A): Boolean = f(a)
   }
 
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =

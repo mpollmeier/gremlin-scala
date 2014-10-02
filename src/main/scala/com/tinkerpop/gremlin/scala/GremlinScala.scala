@@ -1,6 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
+import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
 
 import collection.JavaConversions._
@@ -10,8 +11,6 @@ import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
-import com.tinkerpop.gremlin.util.function.SConsumer
-import com.tinkerpop.gremlin.util.function.SPredicate
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -27,7 +26,7 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[Types, End](traversal)
   }
 
-  def filter(p: End ⇒ Boolean) = GremlinScala[Types, End](traversal.filter(new SPredicate[Traverser[End]] {
+  def filter(p: End ⇒ Boolean) = GremlinScala[Types, End](traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
 
@@ -105,7 +104,7 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[Types, End](traversal.sideEffect(
-      new SConsumer[Traverser[End]] {
+      new JConsumer[Traverser[End]] {
         override def accept(t: Traverser[End]) = traverse(t)
       })
     )
@@ -127,7 +126,7 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def groupBy[A, B](keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
     GremlinScala[Types, End](traversal.groupBy(
-      liftTraverser(keyFunction), 
+      liftTraverser(keyFunction),
       liftTraverser(valueFunction)))
 
   def groupBy[A](sideEffectKey: String, keyFunction: End ⇒ A) =
@@ -147,8 +146,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
 
   def groupBy[A, B](sideEffectKey: String, keyFunction: End ⇒ A, valueFunction: End ⇒ B) =
     GremlinScala[Types, End](traversal.groupBy(
-      sideEffectKey, 
-      liftTraverser(keyFunction), 
+      sideEffectKey,
+      liftTraverser(keyFunction),
       liftTraverser(valueFunction)))
 
   def groupBy[A, B, C](
@@ -158,8 +157,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     reduceFunction: JCollection[_] ⇒ _) =
     GremlinScala[Types, End](traversal.groupBy(
       sideEffectKey,
-      liftTraverser(keyFunction), 
-      liftTraverser(valueFunction), 
+      liftTraverser(keyFunction),
+      liftTraverser(valueFunction),
       reduceFunction))
 
   ///////////////////// BRANCH STEPS /////////////////////
@@ -184,13 +183,13 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
            ifPredicate: End ⇒ Boolean,
            emitPredicate: End ⇒ Boolean) =
     GremlinScala[Types, End](traversal.jump(
-      as, 
+      as,
       liftTraverser(ifPredicate),
       liftTraverser(emitPredicate)))
 
   def jumpWithTraverser(as: String,
-           ifPredicate: Traverser[End] ⇒ Boolean,
-           emitPredicate: Traverser[End] ⇒ Boolean) =
+                        ifPredicate: Traverser[End] ⇒ Boolean,
+                        emitPredicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[Types, End](traversal.jump(as, ifPredicate, emitPredicate))
 }
 
@@ -264,7 +263,7 @@ object GremlinScala {
 
     // def has(key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[Types, End](traversal.has(key, predicate, value))
 
-    def has(label: String, key: String, value: Any) = 
+    def has(label: String, key: String, value: Any) =
       GremlinScala[Types, End](traversal.has(label, key, value))
 
     def has(label: String, key: String, value: Seq[_]) = GremlinScala[Types, End](traversal.has(label, key, asJavaCollection(value)))
