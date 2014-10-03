@@ -38,8 +38,12 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
     GremlinScala[p.Out, A](traversal.map[A](fun))
 
-  def path()(implicit p: Prepend[Types, Types :: HNil]) =
-    GremlinScala[p.Out, Types](traversal.addStep(new TypedPathStep[End, Types](traversal)))
+  def path()(implicit p: Prepend[Types, Path :: HNil]) =
+    GremlinScala[p.Out, Path](traversal.path())
+
+  /** like path, but contains only the labelled steps - see @as step */
+  def pathWithTypes()(implicit p: Prepend[Types, Path :: HNil]) =
+    GremlinScala[p.Out, Path](traversal.path())
 
   def select()(implicit p: Prepend[Types, JMap[String, End] :: HNil]) =
     GremlinScala[p.Out, JMap[String, End]](traversal.select())
