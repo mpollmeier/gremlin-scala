@@ -9,7 +9,7 @@ import shapeless._
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
-  def start(): GremlinScala[ElementType :: HNil, ElementType]
+  def start(): GremlinScala[HNil, ElementType]
 
   def id: AnyRef = element.id
   def label(): String = element.label
@@ -69,29 +69,29 @@ trait ScalaElement[ElementType <: Element] {
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  def out() = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.out())
-  def out(labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.out(labels: _*))
-  def out(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.out(branchFactor, labels: _*))
+  def out() = GremlinScala[HNil, Vertex](vertex.out())
+  def out(labels: String*) = GremlinScala[HNil, Vertex](vertex.out(labels: _*))
+  def out(branchFactor: Int, labels: String*) = GremlinScala[HNil, Vertex](vertex.out(branchFactor, labels: _*))
 
-  def outE() = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.outE())
-  def outE(labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.outE(labels: _*))
-  def outE(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.outE(branchFactor, labels: _*))
+  def outE() = GremlinScala[HNil, Edge](vertex.outE())
+  def outE(labels: String*) = GremlinScala[HNil, Edge](vertex.outE(labels: _*))
+  def outE(branchFactor: Int, labels: String*) = GremlinScala[HNil, Edge](vertex.outE(branchFactor, labels: _*))
 
-  def in() = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.in())
-  def in(labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.in(labels: _*))
-  def in(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.in(branchFactor, labels: _*))
+  def in() = GremlinScala[HNil, Vertex](vertex.in())
+  def in(labels: String*) = GremlinScala[HNil, Vertex](vertex.in(labels: _*))
+  def in(branchFactor: Int, labels: String*) = GremlinScala[HNil, Vertex](vertex.in(branchFactor, labels: _*))
 
-  def inE() = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.inE())
-  def inE(labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.inE(labels: _*))
-  def inE(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.inE(branchFactor, labels: _*))
+  def inE() = GremlinScala[HNil, Edge](vertex.inE())
+  def inE(labels: String*) = GremlinScala[HNil, Edge](vertex.inE(labels: _*))
+  def inE(branchFactor: Int, labels: String*) = GremlinScala[HNil, Edge](vertex.inE(branchFactor, labels: _*))
 
-  def both() = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.both())
-  def both(labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.both(labels: _*))
-  def both(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Vertex :: HNil, Vertex](vertex.both(branchFactor, labels: _*))
+  def both() = GremlinScala[HNil, Vertex](vertex.both())
+  def both(labels: String*) = GremlinScala[HNil, Vertex](vertex.both(labels: _*))
+  def both(branchFactor: Int, labels: String*) = GremlinScala[HNil, Vertex](vertex.both(branchFactor, labels: _*))
 
-  def bothE() = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.bothE())
-  def bothE(labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.bothE(labels: _*))
-  def bothE(branchFactor: Int, labels: String*) = GremlinScala[Vertex :: Edge :: HNil, Edge](vertex.bothE(branchFactor, labels: _*))
+  def bothE() = GremlinScala[HNil, Edge](vertex.bothE())
+  def bothE(labels: String*) = GremlinScala[HNil, Edge](vertex.bothE(labels: _*))
+  def bothE(branchFactor: Int, labels: String*) = GremlinScala[HNil, Edge](vertex.bothE(branchFactor, labels: _*))
 
   def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
     val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
@@ -107,7 +107,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
 
-  def start() = GremlinScala[Vertex :: HNil, Vertex](vertex.start)
+  def start() = GremlinScala[HNil, Vertex](vertex.start)
 }
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
@@ -115,10 +115,10 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
 
-  def start() = GremlinScala[Edge :: HNil, Edge](edge.start)
+  def start() = GremlinScala[HNil, Edge](edge.start)
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist
-  //def inV() = GremlinScala[Edge :: Vertex :: HNil, Vertex](edge.inV())
+  //def inV() = GremlinScala[HNil, Vertex](edge.inV())
 }
 

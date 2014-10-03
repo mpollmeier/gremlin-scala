@@ -30,26 +30,22 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
 
-  def count()(implicit p: Prepend[Types, JLong :: HNil]) = GremlinScala[p.Out, JLong](traversal.count())
+  def count() = GremlinScala[Types, JLong](traversal.count())
 
-  def map[A](fun: End ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
-    GremlinScala[p.Out, A](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
+  def map[A](fun: End ⇒ A) = GremlinScala[Types, A](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
 
-  def mapWithTraverser[A](fun: Traverser[End] ⇒ A)(implicit p: Prepend[Types, A :: HNil]) =
-    GremlinScala[p.Out, A](traversal.map[A](fun))
+  def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
+    GremlinScala[Types, A](traversal.map[A](fun))
 
-  def path()(implicit p: Prepend[Types, Path :: HNil]) =
-    GremlinScala[p.Out, Path](traversal.path())
+  def path() = GremlinScala[Types, Path](traversal.path())
 
-  /** like path, but contains only the labelled steps - see @as step */
-  def pathWithTypes()(implicit p: Prepend[Types, Path :: HNil]) =
-    GremlinScala[p.Out, Path](traversal.path())
+  /** like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec` */
+  def labelledPath() = GremlinScala[Types, Types](traversal.addStep(new LabelledPathStep[End, Types](traversal)))
 
-  def select()(implicit p: Prepend[Types, JMap[String, End] :: HNil]) =
-    GremlinScala[p.Out, JMap[String, End]](traversal.select())
+  def select() = GremlinScala[Types, JMap[String, End]](traversal.select())
 
-  def select(asLabels: Seq[String])(implicit p: Prepend[Types, JMap[String, End] :: HNil]) =
-    GremlinScala[p.Out, JMap[String, End]](traversal.select(asLabels: JList[String]))
+  def select(asLabels: Seq[String]) =
+    GremlinScala[Types, JMap[String, End]](traversal.select(asLabels: JList[String]))
 
   def order() = GremlinScala[Types, End](traversal.order())
   def order(lessThan: (End, End) ⇒ Boolean) =
@@ -91,9 +87,10 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
   def retainOne(retainObject: End) = GremlinScala[Types, End](traversal.retain(retainObject))
   def retainAll(retainCollection: Seq[End]) = GremlinScala[Types, End](traversal.retain(retainCollection))
 
-  def as(name: String) = GremlinScala[Types, End](traversal.as(name))
-  def back[A](to: String)(implicit p: Prepend[Types, A :: HNil]) =
-    GremlinScala[p.Out, A](traversal.back[A](to))
+  /** labels the current step and preserves the type - see `labelledPath` steps */
+  def as(name: String)(implicit p: Prepend[Types, End :: HNil]) = GremlinScala[p.Out, End](traversal.as(name))
+
+  def back[A](to: String) = GremlinScala[Types, A](traversal.back[A](to))
 
   def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = {
     val flattened = tuples.foldLeft(Seq.empty[AnyRef]) {
@@ -103,8 +100,8 @@ case class GremlinScala[Types <: HList, End](traversal: GraphTraversal[_, End]) 
     GremlinScala[Types, End](traversal.`with`(flattened: _*))
   }
 
-  def label()(implicit p: Prepend[Types, String :: HNil]) =
-    GremlinScala[p.Out, String](traversal.label())
+  def label() =
+    GremlinScala[Types, String](traversal.label())
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[Types, End](traversal.sideEffect(
@@ -219,9 +216,9 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   }
 
   /** get all vertices */
-  def V() = GremlinScala[Vertex :: HNil, Vertex](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
+  def V() = GremlinScala[HNil, Vertex](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
   /** get all edges */
-  def E() = GremlinScala[Edge :: HNil, Edge](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
+  def E() = GremlinScala[HNil, Edge](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
 }
 
 object GS {
@@ -235,21 +232,21 @@ object GremlinScala {
   class GremlinElementSteps[Types <: HList, End <: Element](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def properties(keys: String*)(implicit p: Prepend[Types, Property[Any] :: HNil]) =
-      GremlinScala[p.Out, Property[Any]](traversal.properties(keys: _*)
+    def properties(keys: String*) =
+      GremlinScala[Types, Property[Any]](traversal.properties(keys: _*)
         .asInstanceOf[GraphTraversal[_, Property[Any]]])
 
-    def propertyMap(keys: String*)(implicit p: Prepend[Types, JMap[String, Any] :: HNil]) =
-      GremlinScala[p.Out, JMap[String, Any]](traversal.propertyMap(keys: _*))
+    def propertyMap(keys: String*) =
+      GremlinScala[Types, JMap[String, Any]](traversal.propertyMap(keys: _*))
 
-    def value[A](key: String)(implicit p: Prepend[Types, A :: HNil]) =
-      GremlinScala[p.Out, A](traversal.value[A](key))
-    def value[A](key: String, default: A)(implicit p: Prepend[Types, A :: HNil]) =
-      GremlinScala[p.Out, A](traversal.value[A](key, default))
+    def value[A](key: String) =
+      GremlinScala[Types, A](traversal.value[A](key))
+    def value[A](key: String, default: A) =
+      GremlinScala[Types, A](traversal.value[A](key, default))
 
     //TODO return a scala map. problem: calling .map adds a step to the pipeline which changes the result of path...
-    def values(keys: String*)(implicit p: Prepend[Types, JMap[String, AnyRef] :: HNil]) =
-      GremlinScala[p.Out, JMap[String, AnyRef]](traversal.values(keys: _*))
+    def values(keys: String*) =
+      GremlinScala[Types, JMap[String, AnyRef]](traversal.values(keys: _*))
 
     def has(key: String) = GremlinScala[Types, End](traversal.has(key))
 
@@ -289,40 +286,40 @@ object GremlinScala {
   class GremlinVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def out()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.out())
-    def out(labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.out(labels: _*))
-    def out(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.out(branchFactor, labels: _*))
+    def out() = GremlinScala[Types, Vertex](traversal.out())
+    def out(labels: String*) = GremlinScala[Types, Vertex](traversal.out(labels: _*))
+    def out(branchFactor: Int, labels: String*) = GremlinScala[Types, Vertex](traversal.out(branchFactor, labels: _*))
 
-    def outE()(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.outE())
-    def outE(labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.outE(labels: _*))
-    def outE(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.outE(branchFactor, labels: _*))
+    def outE() = GremlinScala[Types, Edge](traversal.outE())
+    def outE(labels: String*) = GremlinScala[Types, Edge](traversal.outE(labels: _*))
+    def outE(branchFactor: Int, labels: String*) = GremlinScala[Types, Edge](traversal.outE(branchFactor, labels: _*))
 
-    def in()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.in())
-    def in(labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.in(labels: _*))
-    def in(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.in(branchFactor, labels: _*))
+    def in() = GremlinScala[Types, Vertex](traversal.in())
+    def in(labels: String*) = GremlinScala[Types, Vertex](traversal.in(labels: _*))
+    def in(branchFactor: Int, labels: String*) = GremlinScala[Types, Vertex](traversal.in(branchFactor, labels: _*))
 
-    def inE()(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.inE())
-    def inE(labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.inE(labels: _*))
-    def inE(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.inE(branchFactor, labels: _*))
+    def inE() = GremlinScala[Types, Edge](traversal.inE())
+    def inE(labels: String*) = GremlinScala[Types, Edge](traversal.inE(labels: _*))
+    def inE(branchFactor: Int, labels: String*) = GremlinScala[Types, Edge](traversal.inE(branchFactor, labels: _*))
 
-    def both()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.both())
-    def both(labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.both(labels: _*))
-    def both(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.both(branchFactor, labels: _*))
+    def both() = GremlinScala[Types, Vertex](traversal.both())
+    def both(labels: String*) = GremlinScala[Types, Vertex](traversal.both(labels: _*))
+    def both(branchFactor: Int, labels: String*) = GremlinScala[Types, Vertex](traversal.both(branchFactor, labels: _*))
 
-    def bothE()(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.bothE())
-    def bothE(labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.bothE(labels: _*))
-    def bothE(branchFactor: Int, labels: String*)(implicit p: Prepend[Types, Edge :: HNil]) = GremlinScala[p.Out, Edge](traversal.bothE(branchFactor, labels: _*))
+    def bothE() = GremlinScala[Types, Edge](traversal.bothE())
+    def bothE(labels: String*) = GremlinScala[Types, Edge](traversal.bothE(labels: _*))
+    def bothE(branchFactor: Int, labels: String*) = GremlinScala[Types, Edge](traversal.bothE(branchFactor, labels: _*))
   }
 
   class GremlinEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End])
       extends GremlinScala[Types, End](gremlinScala.traversal) {
 
-    def inV(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.inV)
+    def inV = GremlinScala[Types, Vertex](traversal.inV)
 
-    def outV(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.outV)
+    def outV = GremlinScala[Types, Vertex](traversal.outV)
 
-    def bothV()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.bothV())
+    def bothV() = GremlinScala[Types, Vertex](traversal.bothV())
 
-    def otherV()(implicit p: Prepend[Types, Vertex :: HNil]) = GremlinScala[p.Out, Vertex](traversal.otherV())
+    def otherV() = GremlinScala[Types, Vertex](traversal.otherV())
   }
 }
