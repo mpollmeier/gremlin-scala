@@ -18,13 +18,13 @@ package object scala {
   implicit def wrap(g: Graph) = ScalaGraph(g)
   implicit def unwrap(g: ScalaGraph) = g.graph
 
-  implicit def toElementSteps[Types <: HList, End <: Element](gremlinScala: GremlinScala[Types, End]) =
+  implicit def toElementSteps[Labels <: HList, End <: Element](gremlinScala: GremlinScala[Labels, End]) =
     new GremlinElementSteps(gremlinScala)
 
-  implicit def toVertexSteps[Types <: HList, End <: Vertex](gremlinScala: GremlinScala[Types, End]) =
+  implicit def toVertexSteps[Labels <: HList, End <: Vertex](gremlinScala: GremlinScala[Labels, End]) =
     new GremlinVertexSteps(gremlinScala)
 
-  implicit def toEdgeSteps[Types <: HList, End <: Edge](gremlinScala: GremlinScala[Types, End]) =
+  implicit def toEdgeSteps[Labels <: HList, End <: Edge](gremlinScala: GremlinScala[Labels, End]) =
     new GremlinEdgeSteps(gremlinScala)
 
   //TODO make vertexSteps extend elementSteps and return VertexSteps here
