@@ -835,7 +835,7 @@ trait StandardTest {
     g
   }
 
-  implicit def toTraversal[S, E](gs: GremlinScala[_, E]): Traversal[S, E] =
+  implicit def toTraversal[S, E](gs: GremlinScala[E, _]): Traversal[S, E] =
     gs.traversal.asInstanceOf[Traversal[S, E]]
 }
 

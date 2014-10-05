@@ -18,19 +18,19 @@ package object scala {
   implicit def wrap(g: Graph) = ScalaGraph(g)
   implicit def unwrap(g: ScalaGraph) = g.graph
 
-  implicit def toElementSteps[Labels <: HList, End <: Element](gremlinScala: GremlinScala[Labels, End]) =
+  implicit def toElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
     new GremlinElementSteps(gremlinScala)
 
-  implicit def toVertexSteps[Labels <: HList, End <: Vertex](gremlinScala: GremlinScala[Labels, End]) =
+  implicit def toVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
     new GremlinVertexSteps(gremlinScala)
 
-  implicit def toEdgeSteps[Labels <: HList, End <: Edge](gremlinScala: GremlinScala[Labels, End]) =
+  implicit def toEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
     new GremlinEdgeSteps(gremlinScala)
 
   //TODO make vertexSteps extend elementSteps and return VertexSteps here
-  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[HNil, Vertex] = v.start
+  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex, HNil] = v.start
 
-  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[HNil, Edge] = e.start
+  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[Edge, HNil] = e.start
 
   implicit def toJavaFunction[A, B](f: Function1[A, B]) = new JFunction[A, B] {
     override def apply(a: A): B = f(a)
