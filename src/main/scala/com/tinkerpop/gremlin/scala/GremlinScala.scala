@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
-import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer }
+import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
 
 import collection.JavaConversions._
@@ -244,7 +244,6 @@ object GremlinScala {
     def value[A](key: String, default: A) =
       GremlinScala[A, Labels](traversal.value[A](key, default))
 
-    //TODO return a scala map. problem: calling .map adds a step to the pipeline which changes the result of path...
     def values(keys: String*) =
       GremlinScala[JMap[String, AnyRef], Labels](traversal.values(keys: _*))
 
@@ -254,13 +253,13 @@ object GremlinScala {
 
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
-    def has(key: String, predicate: T, value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
+    def has(key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
 
-    def has(key: String, t: T, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, t, asJavaCollection(value)))
+    def has(key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, predicate, asJavaCollection(value)))
 
-    def has(accessor: T, predicate: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
+    def has(accessor: T, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
 
-    def has(accessor: T, predicate: T, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
+    def has(accessor: T, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
 
     // def has(key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[ End, Labels](traversal.has(key, predicate, value))
 
@@ -269,9 +268,9 @@ object GremlinScala {
 
     def has(label: String, key: String, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, asJavaCollection(value)))
 
-    def has(label: String, key: String, predicate: T, value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
+    def has(label: String, key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
 
-    def has(label: String, key: String, predicate: T, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
+    def has(label: String, key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
 
     // def has(label: String, key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[ End, Labels](traversal.has(label, key, predicate, value))
 

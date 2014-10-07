@@ -1,6 +1,6 @@
 name := "gremlin-scala"
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0.M3"
 
 organization := "com.michaelpollmeier"
 
@@ -16,10 +16,11 @@ scalacOptions ++= Seq(
 // doesn't work on travis ;(
 // incOptions := incOptions.value.withNameHashing(true)
 
-testOptions in Test += Tests.Argument("-oF")
+// full stack traces
+// testOptions in Test += Tests.Argument("-oF")
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0-SNAPSHOT"
+  val gremlinVersion = "3.0.0.M3"
   val junitVersion = "4.11"
   Seq(
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,
