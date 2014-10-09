@@ -253,6 +253,11 @@ object GremlinScala {
 
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
+    /* there can e.g. be one of: 
+     * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
+     * com.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
+     * com.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
+     */
     def has(key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
 
     def has(key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, predicate, asJavaCollection(value)))
@@ -260,8 +265,6 @@ object GremlinScala {
     def has(accessor: T, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
 
     def has(accessor: T, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
-
-    // def has(key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[ End, Labels](traversal.has(key, predicate, value))
 
     def has(label: String, key: String, value: Any) =
       GremlinScala[End, Labels](traversal.has(label, key, value))
@@ -271,8 +274,6 @@ object GremlinScala {
     def has(label: String, key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
 
     def has(label: String, key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
-
-    // def has(label: String, key: String, predicate: (End, ??) ⇒ Boolean, value: Any) = GremlinScala[ End, Labels](traversal.has(label, key, predicate, value))
 
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 

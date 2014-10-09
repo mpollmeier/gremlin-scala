@@ -1,6 +1,6 @@
 package com.tinkerpop.gremlin
 
-import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate }
+import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
 
 import com.tinkerpop.gremlin.process.Traverser
 import com.tinkerpop.gremlin.scala.GremlinScala._
@@ -39,6 +39,12 @@ package object scala {
   implicit def toJavaPredicate[A](f: Function1[A, Boolean]) = new JPredicate[A] {
     override def test(a: A): Boolean = f(a)
   }
+
+  //converts e.g. `(i: Int, s: String) ⇒ true` into a BiPredicate
+  implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean) =
+    new BiPredicate[A, B] {
+      def test(a: A, b: B) = predicate(a, b)
+    }
 
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
     { t: Traverser[A] ⇒ fun(t.get) }
