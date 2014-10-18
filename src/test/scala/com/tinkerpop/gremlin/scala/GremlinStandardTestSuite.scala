@@ -107,6 +107,7 @@ class StandardTests extends TestBase {
       test.g_v1_outXknowsX_outXcreatedX_rangeX0_0X
       test.g_v1_outXcreatedX_inXcreatedX_rangeX1_2X
       test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
+      test.g_V_asXaX_both_jumpXa_3X_rangeX5_10X
     }
 
     it("retains certain objects") {
@@ -161,6 +162,7 @@ class StandardTests extends TestBase {
       test.g_V_name_order
       test.g_V_name_orderXabX
       test.g_V_orderXa_nameXb_nameX_name
+      test.g_V_lang_order
     }
 
     // it("selects") {
@@ -234,6 +236,7 @@ class StandardTests extends TestBase {
       test.g_V_out_count
       // test.g_V_both_both_count -- has to run with grateful graph..
       test.g_V_filterXfalseX_count
+      //test.g_V_asXaX_out_jumpXa_loops_lt_3X_count -- has to run with grateful graph..
     }
 
     it("allows side effects") {
@@ -395,10 +398,10 @@ object Tests {
     override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = GremlinScala(g).e(e7Id).get.has(T.label, "knows")
 
     override def get_g_V_hasXlabelXperson_software_blahX =
-    GremlinScala(g).V.has(T.label, Contains.in, Seq("person", "software"))
+      GremlinScala(g).V.has(T.label, Contains.within, Seq("person", "software"))
 
     override def get_g_E_hasXlabelXuses_traversesX =
-    GremlinScala(g).E.has(T.label, Contains.in, List("uses", "traverses"))
+      GremlinScala(g).E.has(T.label, Contains.within, List("uses", "traverses"))
 
     override def get_g_V_hasXname_equalspredicate_markoX = GremlinScala(g).V.has("name", "marko")
 
@@ -460,6 +463,9 @@ object Tests {
 
     override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
+
+    override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_10X = 
+      GremlinScala(g).V.as("a").both.jump("a", 3).range(5, 10)
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
@@ -590,6 +596,8 @@ object Tests {
       case (a, b) ⇒
         a.value[String]("name") < b.value[String]("name")
     }.value[String]("name")
+
+    override def get_g_V_lang_order = GremlinScala(g).V.value[String]("lang").order
   }
 
   // class ScalaSelectTest extends SelectTest with StandardTest {
@@ -705,6 +713,8 @@ object Tests {
     override def get_g_V_out_count = GremlinScala(g).V.out.count
     override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
     override def get_g_V_filterXfalseX_count = GremlinScala(g).V.filter { _ ⇒ false }.count
+    override def get_g_V_asXaX_out_jumpXa_loops_lt_3X_count = 
+      GremlinScala(g).V.as("a").out.jumpWithTraverser("a", _.getLoops < 3).count
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
@@ -739,7 +749,7 @@ object Tests {
     override def get_g_V_hasXageX_groupCountXa_nameX_out_capXaX =
       GremlinScala(g).V.has("age")
         .groupCount("a", _.value[String]("name"))
-        .out.cap("a")
+        .out.cap("a").traversal
         .asInstanceOf[Traversal[Vertex, JMap[String, JLong]]] //only for Scala 2.10...
   }
 
@@ -781,7 +791,7 @@ object Tests {
 
     override def get_g_V_groupByXnameX =
       GremlinScala(g).V.groupBy(_.value[String]("name"))
-        .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JList[Vertex]]]]
+        .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JCollection[Vertex]]]]
 
     override def get_g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX =
       GremlinScala(g).V.has("lang").groupBy(
@@ -789,7 +799,8 @@ object Tests {
         keyFunction = _.value[String]("lang"),
         valueFunction = _.value[String]("name")
       ).out.cap("a")
-        .asInstanceOf[Traversal[Vertex, JMap[String, JList[String]]]] //only for Scala 2.10...
+        .traversal
+        .asInstanceOf[Traversal[Vertex, JMap[String, JCollection[String]]]] //only for Scala 2.10...
 
     override def get_g_V_hasXlangX_groupByXlang_1_sizeX =
       GremlinScala(g).V.has("lang").groupBy(
@@ -806,6 +817,7 @@ object Tests {
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
         ).jump("x", 2).cap("a")
+        .traversal
         .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
 
     override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
@@ -816,6 +828,7 @@ object Tests {
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
         ).jumpWithTraverser("x", _.getLoops < 2).cap("a")
+        .traversal
         .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
   }
 

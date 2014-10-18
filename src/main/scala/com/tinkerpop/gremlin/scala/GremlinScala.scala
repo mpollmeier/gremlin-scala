@@ -26,6 +26,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal)
   }
 
+  def cap() = GremlinScala[End, Labels](traversal.cap())
+  def cap(sideEffectKey: String) = GremlinScala[End, Labels](traversal.cap(sideEffectKey))
+
   def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
