@@ -6,6 +6,7 @@ import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.marker.PathConsumer
 import com.tinkerpop.gremlin.process.graph.step.map.MapStep
 import com.tinkerpop.gremlin.structure.Graph.Key
+import com.tinkerpop.gremlin.structure.Graph.System
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -18,9 +19,11 @@ class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends M
   def toList(path: Path): List[Any] = {
     val labels = path.getLabels
 
-    def hasNonHiddenLabel(i: Int) = labels(i) exists (key ⇒ !Key.isHidden(key))
+    def hasUserLabel(i: Int) = labels(i) exists { key ⇒ 
+      !(Key.isHidden(key) || System.isSystem(key))
+    }
 
-    (0 until path.size) filter hasNonHiddenLabel map path.get[Any] toList
+    (0 until path.size) filter hasUserLabel map path.get[Any] toList
   }
 
 
