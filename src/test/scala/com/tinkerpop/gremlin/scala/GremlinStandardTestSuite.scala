@@ -79,8 +79,12 @@ object Tests {
 
     override def get_g_V_exceptXX = GremlinScala(g).V.except(Nil)
 
-    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) = ???
-    // return g.v(v1Id).as("x").bothE("created").except("e").aggregate("e").otherV().jump("x", x -> true, x -> true).path()
+    override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.as("x")
+        .bothE("created").exceptVar("e").aggregate("e")
+        .otherV
+        .jump("x", _ ⇒ true, _ ⇒ true)
+        .path()
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
@@ -594,7 +598,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     Array( //testsToExecute
       classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
-      // classOf[ScalaExceptTest],
+      classOf[ScalaExceptTest],
       // classOf[ScalaSimplePathTest],
       // classOf[ScalaCyclicPathTest],
       classOf[ScalaHasTest],
