@@ -109,8 +109,8 @@ object Tests {
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath
 
-    override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) = ???
-    // return g.v(v1Id).out("created").in("created").cyclicPath().path()
+    override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath.path
   }
 
   class ScalaHasTest extends HasTest with StandardTest {
@@ -603,7 +603,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaFilterTest],
       classOf[ScalaExceptTest],
       classOf[ScalaSimplePathTest],
-      // classOf[ScalaCyclicPathTest],
+      classOf[ScalaCyclicPathTest],
       classOf[ScalaHasTest],
       classOf[ScalaHasNotTest],
       classOf[ScalaIntervalTest],
