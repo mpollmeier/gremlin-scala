@@ -11,280 +11,280 @@ import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure
-import com.tinkerpop.gremlin.structure.{Compare, Contains}
+import com.tinkerpop.gremlin.structure.{ Compare, Contains }
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless._
 import shapeless.ops.hlist._
 
-class StandardTests extends TestBase {
-  import Tests._
-
-  describe("filter steps") {
-    it("dedups") {
-      val test = new ScalaDedupTest
-      test.g_V_both_dedup_name
-      test.g_V_both_dedupXlangX_name
-      // test.g_V_both_name_orderXa_bX_dedup
-    }
-
-    it("filters") {
-      val test = new ScalaFilterTest
-      test.g_V_filterXfalseX
-      test.g_V_filterXtrueX
-      test.g_V_filterXlang_eq_javaX
-      test.g_v1_out_filterXage_gt_30X
-      test.g_V_filterXname_startsWith_m_OR_name_startsWith_pX
-      test.g_E_filterXfalseX
-      test.g_E_filterXtrueX
-      test.g_v1_filterXage_gt_30X
-    }
-
-    it("excepts") {
-      val test = new ScalaExceptTest
-      test.g_v1_out_exceptXg_v2X
-      test.g_v1_out_aggregateXxX_out_exceptXxX
-      test.g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX
-      test.g_V_exceptXg_VX
-      test.g_V_exceptXX
-      // test.g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path
-    }
-
-    it("finds the simple path") {
-      val test = new ScalaSimplePathTest
-      test.g_v1_outXcreatedX_inXcreatedX_simplePath
-      // test.g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path
-      // test.g_V_asXxX_both_simplePath_jumpXx_3X_path
-    }
-
-    it("finds the cyclic path") {
-      val test = new ScalaCyclicPathTest
-      test.g_v1_outXcreatedX_inXcreatedX_cyclicPath
-      // test.g_v1_outXcreatedX_inXcreatedX_cyclicPath_path
-    }
-
-    it("filters with has") {
-      val test = new ScalaHasTest
-      test.g_V_hasXname_markoX
-      test.g_V_hasXname_blahX
-      test.g_V_hasXblahX
-      test.g_v1_out_hasXid_2X
-      test.g_V_hasXage_gt_30X
-      test.g_E_hasXlabelXknowsX
-      test.g_e7_hasXlabelXknowsX
-      test.g_v1_hasXage_gt_30X
-      test.g_v1_hasXkeyX
-      test.g_v1_hasXname_markoX
-      test.get_g_V_hasXname_equalspredicate_markoX
-      //TODO need graph 'CREW'
-      // test.g_V_hasXperson_name_markoX_age 
-      // test.g_E_hasXlabelXuses_traversesX
-      // test.g_V_hasXlabelXperson_software_blahX
-    }
-
-    it("filters with has not") {
-      val test = new ScalaHasNotTest
-      test.get_g_v1_hasNotXprop()
-      test.get_g_V_hasNotXprop()
-    }
-
-    it("filters on interval") {
-      val test = new ScalaIntervalTest
-      test.g_v1_outE_intervalXweight_0_06X_inV
-    }
-
-    it("filters randomly based on probability") {
-      val test = new ScalaRandomTest
-      test.g_V_randomX1X
-      test.g_V_randomX0X
-    }
-
-    it("filters on range") {
-      val test = new ScalaRangeTest
-      test.g_v1_out_rangeX0_1X
-      test.g_V_outX1X_rangeX0_2X
-      test.g_v1_outXknowsX_outEXcreatedX_rangeX0_0X_inV
-      test.g_v1_outXknowsX_outXcreatedX_rangeX0_0X
-      test.g_v1_outXcreatedX_inXcreatedX_rangeX1_2X
-      test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
-      test.g_V_asXaX_both_jumpXa_3X_rangeX5_10X
-    }
-
-    it("retains certain objects") {
-      val test = new ScalaRetainTest
-      test.g_v1_out_retainXg_v2X
-      test.g_v1_out_aggregateXxX_out_retainXxX
-    }
-
-    it("retains a given set of objects") {
-      // val g = new StandardTest{}. newTestGraphClassicDouble
-      val g = TinkerFactory.createClassic
-      val graph = GremlinScala(g)
-      //val retainCollection = Seq(graph.v(v1Id).get, graph.v(v2Id).get)
-      val retainCollection = Seq(g.v(v1Id), g.v(v2Id))
-      graph.V.retainAll(retainCollection).toList.size shouldBe 2
-    }
-  }
-
-  describe("map steps") {
-    it("goes back to given step") {
-      val test = new ScalaBackTest
-      test.g_v1_asXhereX_out_backXhereX
-      test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX
-      test.g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX
-      test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
-      test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
-      test.g_V_asXhereXout_valueXnameX_backXhereX
-    }
-
-    it("jumps") {
-      val test = new ScalaJumpTest
-      test.g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX
-      test.g_V_asXxX_out_jumpXx_2X_asXyX_in_jumpXy_2X_name
-      test.g_V_asXxX_out_jumpXx_2
-      test.g_V_asXxX_out_jumpXx_2_trueX
-      test.g_V_jumpXxX_out_out_asXxX
-      // test.g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path
-      // test.g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path
-    }
-
-    it("maps") {
-      val test = new ScalaMapTest
-      test.g_v1_mapXnameX
-      test.g_v1_outE_label_mapXlengthX
-      test.g_v1_out_mapXnameX_mapXlengthX
-      test.g_V_asXaX_out_out_mapXa_name_it_nameX
-      // test.g_V_asXaX_out_mapXa_nameX
-    }
-
-    it("orders") {
-      val test = new ScalaOrderTest
-      test.g_V_name_order
-      test.g_V_name_orderXabX
-      test.g_V_orderXa_nameXb_nameX_name
-      test.g_V_lang_order
-    }
-
-    // it("selects") {
-    //   val test = new ScalaSelectTest
-    //   test.g_v1_asXaX_outXknowsX_asXbX_select
-    //   // test.g_v1_asXaX_outXknowsX_asXbX_selectXnameX
-    //   test.g_v1_asXaX_outXknowsX_asXbX_selectXaX
-    //   // test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
-    // }
-
-    it("traverses vertices") {
-      val test = new ScalaVertexTest
-      test.g_V
-      test.g_v1_out
-      test.g_v2_in
-      test.g_v4_both
-      test.g_v1_outX1_knowsX_name
-      test.g_V_bothX1_createdX_name
-      test.g_E
-      test.g_v1_outE
-      test.g_v2_inE
-      test.g_v4_bothE
-      test.g_v4_bothEX1_createdX
-      test.g_V_inEX2_knowsX_outV_name
-      test.g_v1_outE_inV
-      test.g_v2_inE_outV
-      test.g_V_outE_hasXweight_1X_outV
-      test.g_V_out_outE_inV_inE_inV_both_name
-      test.g_v1_outEXknowsX_bothV_name
-      test.g_v1_outE_otherV
-      // test.g_v4_bothE_outV
-      test.g_v4_bothE_hasXweight_LT_1X_otherV
-      test.g_v1_outXknowsX
-      test.g_v1_outXknows_createdX
-      test.g_v1_outEXknowsX_inV
-      test.g_v1_outEXknows_createdX_inV
-      test.g_V_out_out
-      test.g_v1_out_out_out
-      test.g_v1_out_propertyXnameX
-      // test.g_v1_to_XOUT_knowsX
-      test.g_v4_bothEX1_knows_createdX
-      test.g_v4_bothEXcreateX
-      test.g_v4_bothX1X_name
-      test.g_v4_bothX2X_name
-    }
-
-    // it("iterates the paths", org.scalatest.Tag("foo")) {
-    // }
-
-    // TODO: implement ValueMapTest
-    // it("values") {
-    //   val test = new ScalaValuesTest
-    //   test.g_V_values
-    //   test.g_V_valuesXname_ageX
-    //   test.g_E_valuesXid_label_weightX
-    //   test.g_v1_outXcreatedX_values
-    // }
-  }
-
-  describe("side effects") {
-    it("aggregates") {
-      val test = new ScalaAggregateTest
-      test.g_V_valueXnameX_aggregate
-      test.g_V_aggregateXnameX
-      // test.g_V_out_aggregateXaX_path
-    }
-
-    it("counts") {
-      val test = new ScalaCountTest
-      test.g_V_count
-      test.g_V_out_count
-      // test.g_V_both_both_count -- has to run with grateful graph..
-      test.g_V_filterXfalseX_count
-      //test.g_V_asXaX_out_jumpXa_loops_lt_3X_count -- has to run with grateful graph..
-    }
-
-    it("allows side effects") {
-      val test = new ScalaSideEffectTest
-      test.g_v1_sideEffectXstore_aX_valueXnameX
-      test.g_v1_out_sideEffectXincr_cX_valueXnameX
-      test.g_v1_out_sideEffectXX_valueXnameX
-    }
-
-    it("allows side effects with cap") {
-      val test = new ScalaSideEffectCapTest
-      test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
-    }
-
-    it("groupCounts") {
-      val test = new ScalaGroupCountTest
-      test.g_V_outXcreatedX_groupCountXnameX
-      test.g_V_outXcreatedX_name_groupCount
-      test.g_V_filterXfalseX_groupCount
-      // test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX //weired noSuchMethodError...
-    }
-
-    it("groupsBy") {
-      val test = new ScalaGroupByTest
-      test.g_V_groupByXnameX
-      test.g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX
-      test.g_V_hasXlangX_groupByXlang_1_sizeX
-      test.g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX
-    }
-  }
-
-  val v1Id = 1: Integer
-  val v2Id = 2: Integer
-  val v3Id = 3: Integer
-  val v4Id = 4: Integer
-  val v5Id = 5: Integer
-  val v6Id = 6: Integer
-  val e7Id = 7: Integer
-  val e8Id = 8: Integer
-  val e9Id = 9: Integer
-  val e10Id = 10: Integer
-  val e11Id = 11: Integer
-  val e12Id = 12: Integer
-  val allNames = Set("lop", "vadas", "josh", "marko", "peter", "ripple")
-  val allVertexIds = Set(v1Id, v2Id, v3Id, v4Id, v5Id, v6Id)
-  val allEdgeIds = Set(e7Id, e8Id, e9Id, e10Id, e11Id, e12Id)
-  def getId(v: Element) = v.id
-}
+// class StandardTests extends TestBase {
+//   import Tests._
+//
+//   describe("filter steps") {
+//     it("dedups") {
+//       val test = new ScalaDedupTest
+//       test.g_V_both_dedup_name
+//       test.g_V_both_dedupXlangX_name
+//       // test.g_V_both_name_orderXa_bX_dedup
+//     }
+//
+//     it("filters") {
+//       val test = new ScalaFilterTest
+//       test.g_V_filterXfalseX
+//       test.g_V_filterXtrueX
+//       test.g_V_filterXlang_eq_javaX
+//       test.g_v1_out_filterXage_gt_30X
+//       test.g_V_filterXname_startsWith_m_OR_name_startsWith_pX
+//       test.g_E_filterXfalseX
+//       test.g_E_filterXtrueX
+//       test.g_v1_filterXage_gt_30X
+//     }
+//
+//     it("excepts") {
+//       val test = new ScalaExceptTest
+//       test.g_v1_out_exceptXg_v2X
+//       test.g_v1_out_aggregateXxX_out_exceptXxX
+//       test.g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_valueXnameX
+//       test.g_V_exceptXg_VX
+//       test.g_V_exceptXX
+//       // test.g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path
+//     }
+//
+//     it("finds the simple path") {
+//       val test = new ScalaSimplePathTest
+//       test.g_v1_outXcreatedX_inXcreatedX_simplePath
+//       // test.g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path
+//       // test.g_V_asXxX_both_simplePath_jumpXx_3X_path
+//     }
+//
+//     it("finds the cyclic path") {
+//       val test = new ScalaCyclicPathTest
+//       test.g_v1_outXcreatedX_inXcreatedX_cyclicPath
+//       // test.g_v1_outXcreatedX_inXcreatedX_cyclicPath_path
+//     }
+//
+//     it("filters with has") {
+//       val test = new ScalaHasTest
+//       test.g_V_hasXname_markoX
+//       test.g_V_hasXname_blahX
+//       test.g_V_hasXblahX
+//       test.g_v1_out_hasXid_2X
+//       test.g_V_hasXage_gt_30X
+//       test.g_E_hasXlabelXknowsX
+//       test.g_e7_hasXlabelXknowsX
+//       test.g_v1_hasXage_gt_30X
+//       test.g_v1_hasXkeyX
+//       test.g_v1_hasXname_markoX
+//       test.get_g_V_hasXname_equalspredicate_markoX
+//       //TODO need graph 'CREW'
+//       // test.g_V_hasXperson_name_markoX_age 
+//       // test.g_E_hasXlabelXuses_traversesX
+//       // test.g_V_hasXlabelXperson_software_blahX
+//     }
+//
+//     it("filters with has not") {
+//       val test = new ScalaHasNotTest
+//       test.get_g_v1_hasNotXprop()
+//       test.get_g_V_hasNotXprop()
+//     }
+//
+//     it("filters on interval") {
+//       val test = new ScalaIntervalTest
+//       test.g_v1_outE_intervalXweight_0_06X_inV
+//     }
+//
+//     it("filters randomly based on probability") {
+//       val test = new ScalaRandomTest
+//       test.g_V_randomX1X
+//       test.g_V_randomX0X
+//     }
+//
+//     it("filters on range") {
+//       val test = new ScalaRangeTest
+//       test.g_v1_out_rangeX0_1X
+//       test.g_V_outX1X_rangeX0_2X
+//       test.g_v1_outXknowsX_outEXcreatedX_rangeX0_0X_inV
+//       test.g_v1_outXknowsX_outXcreatedX_rangeX0_0X
+//       test.g_v1_outXcreatedX_inXcreatedX_rangeX1_2X
+//       test.g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV
+//       test.g_V_asXaX_both_jumpXa_3X_rangeX5_10X
+//     }
+//
+//     it("retains certain objects") {
+//       val test = new ScalaRetainTest
+//       test.g_v1_out_retainXg_v2X
+//       test.g_v1_out_aggregateXxX_out_retainXxX
+//     }
+//
+//     it("retains a given set of objects") {
+//       // val g = new StandardTest{}. newTestGraphClassicDouble
+//       val g = TinkerFactory.createClassic
+//       val graph = GremlinScala(g)
+//       //val retainCollection = Seq(graph.v(v1Id).get, graph.v(v2Id).get)
+//       val retainCollection = Seq(g.v(v1Id), g.v(v2Id))
+//       graph.V.retainAll(retainCollection).toList.size shouldBe 2
+//     }
+//   }
+//
+//   describe("map steps") {
+//     it("goes back to given step") {
+//       val test = new ScalaBackTest
+//       test.g_v1_asXhereX_out_backXhereX
+//       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX
+//       test.g_v1_outE_asXhereX_inV_hasXname_vadasX_backXhereX
+//       test.g_v4_out_asXhereX_hasXlang_javaX_backXhereX_valueXnameX
+//       test.g_v1_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX
+//       test.g_V_asXhereXout_valueXnameX_backXhereX
+//     }
+//
+//     it("jumps") {
+//       val test = new ScalaJumpTest
+//       test.g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX
+//       test.g_V_asXxX_out_jumpXx_2X_asXyX_in_jumpXy_2X_name
+//       test.g_V_asXxX_out_jumpXx_2
+//       test.g_V_asXxX_out_jumpXx_2_trueX
+//       test.g_V_jumpXxX_out_out_asXxX
+//       // test.g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path
+//       // test.g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path
+//     }
+//
+//     it("maps") {
+//       val test = new ScalaMapTest
+//       test.g_v1_mapXnameX
+//       test.g_v1_outE_label_mapXlengthX
+//       test.g_v1_out_mapXnameX_mapXlengthX
+//       test.g_V_asXaX_out_out_mapXa_name_it_nameX
+//       // test.g_V_asXaX_out_mapXa_nameX
+//     }
+//
+//     it("orders") {
+//       val test = new ScalaOrderTest
+//       test.g_V_name_order
+//       test.g_V_name_orderXabX
+//       test.g_V_orderXa_nameXb_nameX_name
+//       test.g_V_lang_order
+//     }
+//
+//     // it("selects") {
+//     //   val test = new ScalaSelectTest
+//     //   test.g_v1_asXaX_outXknowsX_asXbX_select
+//     //   // test.g_v1_asXaX_outXknowsX_asXbX_selectXnameX
+//     //   test.g_v1_asXaX_outXknowsX_asXbX_selectXaX
+//     //   // test.g_v1_asXaX_outXknowsX_asXbX_selectXa_nameX
+//     // }
+//
+//     it("traverses vertices") {
+//       val test = new ScalaVertexTest
+//       test.g_V
+//       test.g_v1_out
+//       test.g_v2_in
+//       test.g_v4_both
+//       test.g_v1_outX1_knowsX_name
+//       test.g_V_bothX1_createdX_name
+//       test.g_E
+//       test.g_v1_outE
+//       test.g_v2_inE
+//       test.g_v4_bothE
+//       test.g_v4_bothEX1_createdX
+//       test.g_V_inEX2_knowsX_outV_name
+//       test.g_v1_outE_inV
+//       test.g_v2_inE_outV
+//       test.g_V_outE_hasXweight_1X_outV
+//       test.g_V_out_outE_inV_inE_inV_both_name
+//       test.g_v1_outEXknowsX_bothV_name
+//       test.g_v1_outE_otherV
+//       // test.g_v4_bothE_outV
+//       test.g_v4_bothE_hasXweight_LT_1X_otherV
+//       test.g_v1_outXknowsX
+//       test.g_v1_outXknows_createdX
+//       test.g_v1_outEXknowsX_inV
+//       test.g_v1_outEXknows_createdX_inV
+//       test.g_V_out_out
+//       test.g_v1_out_out_out
+//       test.g_v1_out_propertyXnameX
+//       // test.g_v1_to_XOUT_knowsX
+//       test.g_v4_bothEX1_knows_createdX
+//       test.g_v4_bothEXcreateX
+//       test.g_v4_bothX1X_name
+//       test.g_v4_bothX2X_name
+//     }
+//
+//     // it("iterates the paths", org.scalatest.Tag("foo")) {
+//     // }
+//
+//     // TODO: implement ValueMapTest
+//     // it("values") {
+//     //   val test = new ScalaValuesTest
+//     //   test.g_V_values
+//     //   test.g_V_valuesXname_ageX
+//     //   test.g_E_valuesXid_label_weightX
+//     //   test.g_v1_outXcreatedX_values
+//     // }
+//   }
+//
+//   describe("side effects") {
+//     it("aggregates") {
+//       val test = new ScalaAggregateTest
+//       test.g_V_valueXnameX_aggregate
+//       test.g_V_aggregateXnameX
+//       // test.g_V_out_aggregateXaX_path
+//     }
+//
+//     it("counts") {
+//       val test = new ScalaCountTest
+//       test.g_V_count
+//       test.g_V_out_count
+//       // test.g_V_both_both_count -- has to run with grateful graph..
+//       test.g_V_filterXfalseX_count
+//       //test.g_V_asXaX_out_jumpXa_loops_lt_3X_count -- has to run with grateful graph..
+//     }
+//
+//     it("allows side effects") {
+//       val test = new ScalaSideEffectTest
+//       test.g_v1_sideEffectXstore_aX_valueXnameX
+//       test.g_v1_out_sideEffectXincr_cX_valueXnameX
+//       test.g_v1_out_sideEffectXX_valueXnameX
+//     }
+//
+//     it("allows side effects with cap") {
+//       val test = new ScalaSideEffectCapTest
+//       test.g_V_hasXageX_groupCountXnameX_asXaX_out_capXaX
+//     }
+//
+//     it("groupCounts") {
+//       val test = new ScalaGroupCountTest
+//       test.g_V_outXcreatedX_groupCountXnameX
+//       test.g_V_outXcreatedX_name_groupCount
+//       test.g_V_filterXfalseX_groupCount
+//       // test.g_V_asXxX_out_groupCountXnameX_asXaX_jumpXx_2X_capXaX //weired noSuchMethodError...
+//     }
+//
+//     it("groupsBy") {
+//       val test = new ScalaGroupByTest
+//       test.g_V_groupByXnameX
+//       test.g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX
+//       test.g_V_hasXlangX_groupByXlang_1_sizeX
+//       test.g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX
+//     }
+//   }
+//
+//   val v1Id = 1: Integer
+//   val v2Id = 2: Integer
+//   val v3Id = 3: Integer
+//   val v4Id = 4: Integer
+//   val v5Id = 5: Integer
+//   val v6Id = 6: Integer
+//   val e7Id = 7: Integer
+//   val e8Id = 8: Integer
+//   val e9Id = 9: Integer
+//   val e10Id = 10: Integer
+//   val e11Id = 11: Integer
+//   val e12Id = 12: Integer
+//   val allNames = Set("lop", "vadas", "josh", "marko", "peter", "ripple")
+//   val allVertexIds = Set(v1Id, v2Id, v3Id, v4Id, v5Id, v6Id)
+//   val allEdgeIds = Set(e7Id, e8Id, e9Id, e10Id, e11Id, e12Id)
+//   def getId(v: Element) = v.id
+// }
 
 object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
@@ -464,7 +464,7 @@ object Tests {
     override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
 
-    override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_10X = 
+    override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_10X =
       GremlinScala(g).V.as("a").both.jump("a", 3).range(5, 10)
   }
 
@@ -713,7 +713,7 @@ object Tests {
     override def get_g_V_out_count = GremlinScala(g).V.out.count
     override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
     override def get_g_V_filterXfalseX_count = GremlinScala(g).V.filter { _ ⇒ false }.count
-    override def get_g_V_asXaX_out_jumpXa_loops_lt_3X_count = 
+    override def get_g_V_asXaX_out_jumpXa_loops_lt_3X_count =
       GremlinScala(g).V.as("a").out.jumpWithTraverser("a", _.getLoops < 3).count
   }
 
@@ -863,33 +863,55 @@ trait StandardTest {
  * falling back to manually calling them in scalatest - that's more flexible anyway
  * downside: cannot reuse what the guys built in tp3 for running tests in multiple dbs
  */
-//import Tests._
-//import com.tinkerpop.gremlin._
-//import org.junit.runners.model.RunnerBuilder
-//import org.junit.runner.RunWith
-//import java.util.{ Map ⇒ JMap }
-//import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-//import org.apache.commons.configuration.Configuration
-//import java.io.File
-//class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
-//extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
-//classOf[ScalaFilterTest],
-//classOf[ScalaExceptTest],
-//classOf[ScalaSimplePathTest],
-//classOf[ScalaCyclicPathTest],
-//classOf[ScalaHasTest]
-//))
+import Tests._
+import com.tinkerpop.gremlin._
+import org.junit.runners.model.RunnerBuilder
+import org.junit.runner.RunWith
+import java.util.{ Map ⇒ JMap }
+import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+// import com.tinkerpop.gremlin.tinkergraph.TinkerGraphGraphProvider //send a pr?
+import com.tinkerpop.gremlin.structure.StructureStandardSuite
+import org.apache.commons.configuration.Configuration
+import java.io.File
+class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
+  extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
+    // classOf[ScalaFilterTest],
+    // classOf[ScalaExceptTest],
+    // classOf[ScalaSimplePathTest],
+    // classOf[ScalaCyclicPathTest],
+    classOf[ScalaHasTest]
+  ))
 
-//@RunWith(classOf[ScalaProcessStandardSuite])
-//@AbstractGremlinSuite.GraphProviderClass(classOf[ScalaTinkerGraphProcessStandardTest])
-//class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
-//override def getBaseConfiguration(graphName: String): JMap[String, AnyRef] =
-//Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+@RunWith(classOf[ScalaProcessStandardSuite])
+@AbstractGremlinSuite.GraphProviderClass(
+  provider = classOf[ScalaTinkerGraphProcessStandardTest],
+  graph = classOf[TinkerGraph])
+class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
+  override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
+    Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
-//override def clear(graph: Graph, configuration: Configuration): Unit =
-//Option(graph) map { graph ⇒
-//graph.close()
-//if (configuration.containsKey("gremlin.tg.directory"))
-//new File(configuration.getString("gremlin.tg.directory")).delete()
-//}
-//}
+  override def clear(graph: Graph, configuration: Configuration): Unit =
+    Option(graph) map { graph ⇒
+      graph.close()
+      if (configuration.containsKey("gremlin.tg.directory"))
+        new File(configuration.getString("gremlin.tg.directory")).delete()
+    }
+}
+
+
+// class TinkerGraphGraphProvider extends AbstractGraphProvider {
+//   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
+//     Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+//
+//   override def clear(graph: Graph, configuration: Configuration): Unit =
+//     Option(graph) map { graph ⇒
+//       graph.close()
+//       if (configuration.containsKey("gremlin.tg.directory"))
+//         new File(configuration.getString("gremlin.tg.directory")).delete()
+//     }
+// }
+//
+// @RunWith(classOf[StructureStandardSuite])
+// @AbstractGremlinSuite.GraphProviderClass(provider = classOf[TinkerGraphGraphProvider], graph = classOf[TinkerGraph])
+// class ScalaStructureStandardTest {
+// }
