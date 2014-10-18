@@ -251,11 +251,13 @@ object Tests {
       GremlinScala(g).V.as("x").out
         .jumpWithTraverser("x", _.getLoops < 2, _ ⇒ true)
 
-    override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path = ???
-    // GremlinScala(g).V.as("x").out.jump("x", t -> t.getLoops < 2, t -> true).path
+    override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path = 
+      GremlinScala(g).V.as("x").out
+        .jumpWithTraverser("x", _.getLoops < 2, _ ⇒ true).path
 
-    override def get_g_V_asXxX_out_jumpXx_2_trueX_path = ???
-    //GremlinScala(g).V.as("x").out.jump("x", 2, t -> true).path
+    override def get_g_V_asXxX_out_jumpXx_2_trueX_path = 
+      GremlinScala(g).V.as("x").out.jump("x", 2, {_: Vertex ⇒ true}).path
+    //TODO why does it need the type for _ ?
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2X_asXyX_in_jumpXy_loops_lt_2X_name =
       GremlinScala(g).V.as("x").out
@@ -274,8 +276,11 @@ object Tests {
       GremlinScala(g).V.as("x").out
         .jumpWithTraverser("x", 2, { _: Traverser[_] ⇒ true })
 
-    override def get_g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path(v1Id: AnyRef) = ???
-    //GremlinScala(g).v(v1Id).out.jump("x", t -> t.get.out.hasNext).in.jump("y").as("x").out.as("y").path
+    override def get_g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path(v1Id: AnyRef) = 
+      GremlinScala(g).v(v1Id).get.out
+        .jump("x", _.out().hasNext) //TODO why do I need to specify parenthesis here?
+        .in.jump("y").as("x")
+        .out.as("y").path
 
     override def get_g_V_jumpXxX_out_out_asXxX =
       GremlinScala(g).V.jump("x").out.out.as("x")
@@ -611,7 +616,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaRangeTest],
       classOf[ScalaRetainTest],
       classOf[ScalaBackTest],
-      // classOf[ScalaJumpTest],
+      classOf[ScalaJumpTest],
       // classOf[ScalaMapTest],
       classOf[ScalaOrderTest],
       // classOf[ScalaSelectTest],
