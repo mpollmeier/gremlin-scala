@@ -28,9 +28,11 @@ object Tests {
         .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name")
 
-    override def get_g_V_both_name_orderXa_bX_dedup = ???
-    // GremlinScala(g).V.both
-    // return g.V().both().property("name").order((a, b) -> ((String) a.get().value()).compareTo((String) b.get().value())).dedup().value()
+    override def get_g_V_both_name_orderXa_bX_dedup = 
+      GremlinScala(g).V.both
+        .value[String]("name")
+        .order{(a,b) ⇒ a < b }
+        .dedup
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
@@ -590,7 +592,7 @@ import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute
-      // classOf[ScalaDedupTest],
+      classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
       // classOf[ScalaExceptTest],
       // classOf[ScalaSimplePathTest],
