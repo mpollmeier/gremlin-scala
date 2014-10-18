@@ -873,20 +873,30 @@ import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import com.tinkerpop.gremlin.structure.StructureStandardSuite
 import org.apache.commons.configuration.Configuration
 import java.io.File
-class ScalaProcessStandardSuite(clazz: Class[_], builder: RunnerBuilder)
-  extends AbstractGremlinSuite(clazz, builder, Array( //classOf[ScalaDedupTest],
-    // classOf[ScalaFilterTest],
-    // classOf[ScalaExceptTest],
-    // classOf[ScalaSimplePathTest],
-    // classOf[ScalaCyclicPathTest],
-    classOf[ScalaHasTest]
-  ))
+class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
+  extends AbstractGremlinSuite(
+    clazz, 
+    builder, 
+    Array( //testsToExecute
+      //classOf[ScalaDedupTest],
+//     // classOf[ScalaFilterTest],
+//     // classOf[ScalaExceptTest],
+//     // classOf[ScalaSimplePathTest],
+//     // classOf[ScalaCyclicPathTest],
+      classOf[ScalaHasTest]
+    ),
+    Array.empty, //testsToEnforce
+    true //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
+  )
 
-@RunWith(classOf[ScalaProcessStandardSuite])
+@RunWith(classOf[GremlinScalaStandardSuite])
 @AbstractGremlinSuite.GraphProviderClass(
-  provider = classOf[ScalaTinkerGraphProcessStandardTest],
+  provider = classOf[TinkerGraphGraphProvider],
   graph = classOf[TinkerGraph])
-class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
+class ScalaTinkerGraphStandardTest {}
+
+
+class TinkerGraphGraphProvider extends AbstractGraphProvider {
   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
     Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
@@ -897,21 +907,3 @@ class ScalaTinkerGraphProcessStandardTest extends AbstractGraphProvider {
         new File(configuration.getString("gremlin.tg.directory")).delete()
     }
 }
-
-
-// class TinkerGraphGraphProvider extends AbstractGraphProvider {
-//   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
-//     Map("gremlin.graph" -> classOf[TinkerGraph].getName)
-//
-//   override def clear(graph: Graph, configuration: Configuration): Unit =
-//     Option(graph) map { graph ⇒
-//       graph.close()
-//       if (configuration.containsKey("gremlin.tg.directory"))
-//         new File(configuration.getString("gremlin.tg.directory")).delete()
-//     }
-// }
-//
-// @RunWith(classOf[StructureStandardSuite])
-// @AbstractGremlinSuite.GraphProviderClass(provider = classOf[TinkerGraphGraphProvider], graph = classOf[TinkerGraph])
-// class ScalaStructureStandardTest {
-// }
