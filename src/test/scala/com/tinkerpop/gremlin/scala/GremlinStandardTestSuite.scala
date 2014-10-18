@@ -93,11 +93,14 @@ object Tests {
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
 
-    override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path = ???
-    // return g.V().as("x").both().simplePath().jump("x", t -> t.getLoops() < 3).path()
+    override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path = 
+      GremlinScala(g).V.as("x").both
+        .simplePath
+        .jumpWithTraverser("x", _.getLoops < 3)
+        .path
 
-    override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path = ???
-    // return g.V().as("x").both().simplePath().jump("x", 3).path()
+    override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path = 
+      GremlinScala(g).V.as("x").both.simplePath.jump("x", 3).path
   }
 
   class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
@@ -599,7 +602,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
       classOf[ScalaExceptTest],
-      // classOf[ScalaSimplePathTest],
+      classOf[ScalaSimplePathTest],
       // classOf[ScalaCyclicPathTest],
       classOf[ScalaHasTest],
       classOf[ScalaHasNotTest],
