@@ -13,11 +13,11 @@ import shapeless.ops.hlist._
 class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends MapStep[S, Labels](traversal) with PathConsumer {
 
   this.setFunction { traverser: Traverser[S] ⇒
-    toHList(toList(traverser.getPath)): Labels
+    toHList(toList(traverser.path)): Labels
   }
 
   def toList(path: Path): List[Any] = {
-    val labels = path.getLabels
+    val labels = path.labels
 
     def hasUserLabel(i: Int) = labels(i) exists { key ⇒ 
       !(Key.isHidden(key) || System.isSystem(key))
