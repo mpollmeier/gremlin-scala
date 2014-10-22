@@ -85,7 +85,7 @@ object Tests {
         .bothE("created").exceptVar("e").aggregate("e")
         .otherV
         .jump("x", _ ⇒ true, _ ⇒ true)
-        .path()
+        .path
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
@@ -495,7 +495,7 @@ object Tests {
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_outXcreatedX_name_groupCount =
-      GremlinScala(g).V.out("created").value[String]("name").groupCount()
+      GremlinScala(g).V.out("created").value[String]("name").groupCount
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_outXcreatedX_name_groupCountXaX =
@@ -503,7 +503,7 @@ object Tests {
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_filterXfalseX_groupCount =
-      GremlinScala(g).V.filter(_ ⇒ false).groupCount()
+      GremlinScala(g).V.filter(_ ⇒ false).groupCount
         .traversal.asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_loops_lt_2X_capXaX =

@@ -219,9 +219,9 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   }
 
   /** get all vertices */
-  def V() = GremlinScala[Vertex, HNil](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
+  def V = GremlinScala[Vertex, HNil](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
   /** get all edges */
-  def E() = GremlinScala[Edge, HNil](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
+  def E = GremlinScala[Edge, HNil](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
 }
 
 object GS {

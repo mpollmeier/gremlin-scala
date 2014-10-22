@@ -47,7 +47,7 @@ class ElementSpec extends TestBase {
       v(1).hiddenValue[String]("hiddenProperty") shouldBe "hiddenValue"
       v(1).hiddenProperty[String]("hiddenProperty").value shouldBe "hiddenValue"
       v(1).hiddenPropertyMap("hiddenProperty") shouldBe Map("hiddenProperty" → "hiddenValue")
-      v(1).hiddenProperties("hiddenProperty") should have length(1)
+      v(1).hiddenProperties("hiddenProperty") should have length (1)
     }
   }
 
