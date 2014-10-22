@@ -7,7 +7,7 @@ class LabelledPathSpec extends TestBase {
 
   describe("type safety for labelled steps") {
 
-    it("blubs", org.scalatest.Tag("foo")) {
+    it("blubs") {
       val path: List[Edge :: HNil] =
         v(1).outE.as("a").labelledPath.toList
 
