@@ -12,7 +12,7 @@ import com.tinkerpop.gremlin.process.graph.step.map._
 import com.tinkerpop.gremlin.process.graph.step.sideEffect
 import com.tinkerpop.gremlin.process.graph.step.sideEffect._
 import com.tinkerpop.gremlin.structure
-import com.tinkerpop.gremlin.structure.{ Compare, Contains }
+import com.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless._
@@ -370,8 +370,6 @@ object Tests {
   }
 
   class ScalaVertexTest extends VertexTest with StandardTest {
-    g = newTestGraphClassicDouble
-
     override def get_g_V = GremlinScala(g).V
     override def get_g_v1_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out
     override def get_g_v2_in(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.in
@@ -411,7 +409,7 @@ object Tests {
     override def get_g_V_out_out = GremlinScala(g).V.out.out
     override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
     override def get_g_v1_out_valueXnameX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.values[String]("name")
-    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = ??? //GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
+    override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
 
     override def get_g_v4_bothEX1_knows_createdX(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.bothE(1, "knows", "created")
@@ -636,8 +634,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       // classOf[ScalaJumpTest],
       // classOf[ScalaMapTest],
       // classOf[ScalaOrderTest],
-      // classOf[ScalaSelectTest] //doesnt fully work yet..
-    // classOf[ScalaVertexTest]
+      // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
+    classOf[ScalaVertexTest]
     // classOf[ScalaValuesTest],
     // classOf[ScalaAggregateTest],
     // classOf[ScalaCountTest],

@@ -47,10 +47,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def select() = GremlinScala[JMap[String, End], Labels](traversal.select())
 
-  def select[A,B](fun: A ⇒ B) = 
+  def select[A, B](fun: A ⇒ B) =
     GremlinScala[JMap[String, B], Labels](traversal.select(fun))
 
-  def select[A, B](label: String, labelFun: A ⇒ B) = 
+  def select[A, B](label: String, labelFun: A ⇒ B) =
     GremlinScala[B, Labels](traversal.select(label, labelFun))
 
   def select(asLabels: Seq[String]) =
@@ -110,6 +110,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     )
 
   def label() = GremlinScala[String, Labels](traversal.label())
+
+  def identity() = GremlinScala[End, Labels](traversal.identity())
+
+  def to(direction: Direction, edgeLabels: String*) =
+    GremlinScala[Vertex, Labels](traversal.to(direction, edgeLabels: _*))
+
+  def to(direction: Direction, branchFactor: Int, edgeLabels: String*) =
+    GremlinScala[Vertex, Labels](traversal.to(direction, branchFactor, edgeLabels: _*))
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
