@@ -12,27 +12,27 @@ class TraversalSpec extends TestBase {
     }
 
     it("follows the out vertices") {
-      v(1).out.value[String]("name").toSet should be(Set("vadas", "josh", "lop"))
-      v(1).out("knows").value[String]("name").toSet should be(Set("vadas", "josh"))
+      v(1).out.values[String]("name").toSet should be(Set("vadas", "josh", "lop"))
+      v(1).out("knows").values[String]("name").toSet should be(Set("vadas", "josh"))
 
-      v(1).out.out.value[String]("name").toSet should be(Set("ripple", "lop"))
-      v(1).out.out("created").value[String]("name").toSet should be(Set("ripple", "lop"))
+      v(1).out.out.values[String]("name").toSet should be(Set("ripple", "lop"))
+      v(1).out.out("created").values[String]("name").toSet should be(Set("ripple", "lop"))
     }
 
     it("follows the in vertices") {
-      v(3).in.value[String]("name").toSet should be(Set("marko", "josh", "peter"))
-      v(3).in("created").value[String]("name").toSet should be(Set("marko", "josh", "peter"))
+      v(3).in.values[String]("name").toSet should be(Set("marko", "josh", "peter"))
+      v(3).in("created").values[String]("name").toSet should be(Set("marko", "josh", "peter"))
 
-      v(3).in.in.value[String]("name").toSet should be(Set("marko"))
-      v(3).in.in("knows").value[String]("name").toSet should be(Set("marko"))
+      v(3).in.in.values[String]("name").toSet should be(Set("marko"))
+      v(3).in.in("knows").values[String]("name").toSet should be(Set("marko"))
     }
 
     it("follows both in and out vertices") {
-      v(4).both.value[String]("name").toSet should be(Set("marko", "ripple", "lop"))
-      v(4).both("knows").value[String]("name").toSet should be(Set("marko"))
+      v(4).both.values[String]("name").toSet should be(Set("marko", "ripple", "lop"))
+      v(4).both("knows").values[String]("name").toSet should be(Set("marko"))
 
-      v(4).both.both.value[String]("name").toSet should be(Set("marko", "lop", "peter", "josh", "vadas"))
-      v(4).both.both("knows").value[String]("name").toSet should be(Set("josh", "vadas"))
+      v(4).both.both.values[String]("name").toSet should be(Set("marko", "lop", "peter", "josh", "vadas"))
+      v(4).both.both("knows").values[String]("name").toSet should be(Set("josh", "vadas"))
     }
 
     it("follows out edges") {
@@ -73,13 +73,13 @@ class TraversalSpec extends TestBase {
     it("follows in vertex") {
       //TODO: wait until this is consistent in T3 between Vertex and Edge
       //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
-      //e(7).inV//.out.value[String]("name").toSet should be(Set("vadas", "josh", "lop"))
-      //v(1).out("knows").value[String]("name").toSet should be(Set("vadas", "josh"))
-      //v(1).out(1, "knows").value[String]("name").toSet should be(Set("vadas"))
+      //e(7).inV//.out.values[String]("name").toSet should be(Set("vadas", "josh", "lop"))
+      //v(1).out("knows").values[String]("name").toSet should be(Set("vadas", "josh"))
+      //v(1).out(1, "knows").values[String]("name").toSet should be(Set("vadas"))
 
-      //v(1).out.out.value[String]("name").toSet should be(Set("ripple", "lop"))
-      //v(1).out.out("created").value[String]("name").toSet should be(Set("ripple", "lop"))
-      //v(1).out.out(1, "created").value[String]("name").toSet should be(Set("lop"))
+      //v(1).out.out.values[String]("name").toSet should be(Set("ripple", "lop"))
+      //v(1).out.out("created").values[String]("name").toSet should be(Set("ripple", "lop"))
+      //v(1).out.out(1, "created").values[String]("name").toSet should be(Set("lop"))
     }
 
     //it("does not allow vertex steps") {
@@ -91,18 +91,18 @@ class TraversalSpec extends TestBase {
   describe("common steps") {
     describe("value") {
       it("gets values") {
-        gs.V.value[Int]("age").toSet should be(Set(27, 29, 32, 35))
+        gs.V.values[Int]("age").toSet should be(Set(27, 29, 32, 35))
       }
     }
 
     describe("order") {
       it("sorts by natural order") {
-        gs.V.value[Int]("age").order.toList should be(List(27, 29, 32, 35))
+        gs.V.values[Int]("age").order.toList should be(List(27, 29, 32, 35))
       }
 
       it("sorts by provided comparator") {
-        gs.V.value[Int]("age").order(_ < _).toList should be(List(27, 29, 32, 35))
-        gs.V.value[Int]("age").order(_ > _).toList should be(List(35, 32, 29, 27))
+        gs.V.values[Int]("age").order(_ < _).toList should be(List(27, 29, 32, 35))
+        gs.V.values[Int]("age").order(_ > _).toList should be(List(35, 32, 29, 27))
       }
     }
   }

@@ -244,8 +244,11 @@ object GremlinScala {
     def value[A](key: String) =
       GremlinScala[A, Labels](traversal.values[A](key))
 
-    def values(keys: String*) =
-      GremlinScala[JMap[String, AnyRef], Labels](traversal.values(keys: _*))
+    def values[A](key: String*) =
+      GremlinScala[A, Labels](traversal.values[A](key: _*))
+
+    def valueMap(keys: String*) =
+      GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap(keys: _*))
 
     def has(key: String) = GremlinScala[End, Labels](traversal.has(key))
 

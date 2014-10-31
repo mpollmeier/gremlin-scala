@@ -7,7 +7,7 @@ class FilterSpec extends TestBase {
   it("filters") {
     gs.V
       .filter { _.valueWithDefault("age", default = 0) > 30 }
-      .value[String]("name").toSet should be(Set("josh", "peter"))
+      .values[String]("name").toSet should be(Set("josh", "peter"))
   }
 
   describe("dedup") {
@@ -18,31 +18,31 @@ class FilterSpec extends TestBase {
     it("dedups by a given uniqueness function") {
       v(1).out.in
         .dedup(_.property[String]("lang").orElse(null))
-        .value[String]("name").toList should be(List("marko"))
+        .values[String]("name").toList should be(List("marko"))
     }
   }
 
   describe("except") {
     it("emits everything but a given object") {
-      v(1).out.except(v(2).vertex).value[String]("name")
+      v(1).out.except(v(2).vertex).values[String]("name")
         .toSet should be(Set("lop", "josh"))
     }
 
     it("emits everything but an 'except' list") { 
-      v(1).out.except(List(v(2).vertex)).value[String]("name")
+      v(1).out.except(List(v(2).vertex)).values[String]("name")
         .toSet should be(Set("lop", "josh"))
     }
 
     it("emits everything unless the vertex is in a given aggregate variable") {
       v(1).out.aggregate("x")
         .out.exceptVar("x")
-        .value[String]("name").toSet should be (Set("ripple"))
+        .values[String]("name").toSet should be (Set("ripple"))
     }
 
     it("emits everything unless a property is in a given aggregate variable") {
       v(1).out
         .aggregate("x", _.value[String]("name"))
-        .out.value[String]("name").exceptVar("x")
+        .out.values[String]("name").exceptVar("x")
         .toSet should be (Set("ripple"))
     }
   }
