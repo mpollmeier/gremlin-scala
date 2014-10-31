@@ -105,7 +105,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
+  def `with`[A](key: String, value: A) = start.`with`(key, value)
 
   def start() = GremlinScala[ Vertex, HNil](vertex.start)
 }
@@ -113,7 +113,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = start.`with`(tuples: _*)
+  def `with`[A](key: String, value: A) = start.`with`(key, value)
 
   def start() = GremlinScala[ Edge, HNil](edge.start)
 

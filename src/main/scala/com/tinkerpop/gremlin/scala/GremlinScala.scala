@@ -1,7 +1,7 @@
 package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
-import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate }
+import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
 
 import collection.JavaConversions._
@@ -95,16 +95,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def back[A](to: String) = GremlinScala[A, Labels](traversal.back[A](to))
 
-  def `with`[A <: AnyRef, B <: AnyRef](tuples: (A, B)*) = {
-    val flattened = tuples.foldLeft(Seq.empty[AnyRef]) {
-      case (acc, (k, v)) ⇒
-        acc ++: Seq(k, v)
-    }
-    GremlinScala[End, Labels](traversal.`with`(flattened: _*))
-  }
+  def `with`[A](key: String, value: A) =
+    GremlinScala[End, Labels](
+      traversal.`with`(
+        key,
+        new Supplier[A] { override def get = value }
+      )
+    )
 
-  def label() =
-    GremlinScala[String, Labels](traversal.label())
+  def label() = GremlinScala[String, Labels](traversal.label())
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
@@ -243,9 +242,7 @@ object GremlinScala {
       GremlinScala[JMap[String, Any], Labels](traversal.propertyMap(keys: _*))
 
     def value[A](key: String) =
-      GremlinScala[A, Labels](traversal.value[A](key))
-    def value[A](key: String, default: A) =
-      GremlinScala[A, Labels](traversal.value[A](key, default))
+      GremlinScala[A, Labels](traversal.values[A](key))
 
     def values(keys: String*) =
       GremlinScala[JMap[String, AnyRef], Labels](traversal.values(keys: _*))
@@ -261,22 +258,22 @@ object GremlinScala {
      * com.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
      * com.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
      */
-    def has(key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
+    def has(key: String, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
 
-    def has(key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, predicate, asJavaCollection(value)))
+    def has(key: String, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, predicate, asJavaCollection(value)))
 
-    def has(accessor: T, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
+    def has(accessor: T, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
 
-    def has(accessor: T, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
+    def has(accessor: T, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
 
     def has(label: String, key: String, value: Any) =
       GremlinScala[End, Labels](traversal.has(label, key, value))
 
     def has(label: String, key: String, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, asJavaCollection(value)))
 
-    def has(label: String, key: String, predicate: BiPredicate[_,_], value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
+    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
 
-    def has(label: String, key: String, predicate: BiPredicate[_,_], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
+    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
 
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 

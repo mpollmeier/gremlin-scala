@@ -93,10 +93,6 @@ class TraversalSpec extends TestBase {
       it("gets values") {
         gs.V.value[Int]("age").toSet should be(Set(27, 29, 32, 35))
       }
-
-      it("gets values, defaults if not set") {
-        gs.V.value[Int]("age", 99).toSet should be(Set(27, 29, 32, 35, 99))
-      }
     }
 
     describe("order") {

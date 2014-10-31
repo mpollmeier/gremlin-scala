@@ -29,7 +29,7 @@ object Tests {
         .dedup(_.property[String]("lang").orElse(null))
         .value[String]("name")
 
-    override def get_g_V_both_name_orderXa_bX_dedup =
+    override def get_g_V_both_propertiesXnameX_orderXa_bX_dedup_value =
       GremlinScala(g).V.both
         .value[String]("name")
         .order { (a, b) ⇒ a < b }
@@ -75,7 +75,7 @@ object Tests {
       GremlinScala(g).v(v1Id).get.out("created").in("created")
         .except(g.v(v1Id)).value[String]("name")
 
-    override def get_g_V_exceptXg_VX =
+    override def get_g_V_exceptXg_V_toListX =
       GremlinScala(g).V.except(GremlinScala(g).V.toList)
 
     override def get_g_V_exceptXX = GremlinScala(g).V.except(Nil)
@@ -177,24 +177,24 @@ object Tests {
   class ScalaRangeTest extends RangeTest with StandardTest {
     g = newTestGraphClassicDouble
 
-    override def get_g_v1_out_rangeX0_1X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.range(0, 1)
+    override def get_g_v1_out_rangeX0_2X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.range(0, 2)
 
-    override def get_g_V_outX1X_rangeX0_2X = GremlinScala(g).V.out(1).range(0, 2)
+    override def get_g_V_outX1X_rangeX0_3X = GremlinScala(g).V.out(1).range(0, 3)
 
-    override def get_g_v1_outXknowsX_outEXcreatedX_rangeX0_0X_inV(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out("knows").outE("created").range(0, 0).inV
+    override def get_g_v1_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("knows").outE("created").range(0, 1).inV
 
-    override def get_g_v1_outXknowsX_outXcreatedX_rangeX0_0X(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out("knows").out("created").range(0, 0)
+    override def get_g_v1_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("knows").out("created").range(0, 1)
 
-    override def get_g_v1_outXcreatedX_inXcreatedX_rangeX1_2X(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out("created").in("created").range(1, 2)
+    override def get_g_v1_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("created").in("created").range(1, 3)
 
-    override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_2X_outV(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 2).outV
+    override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 3).outV
 
-    override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_10X =
-      GremlinScala(g).V.as("a").both.jump("a", 3).range(5, 10)
+    override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_11X =
+      GremlinScala(g).V.as("a").both.jump("a", 3).range(5, 11)
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
@@ -326,12 +326,12 @@ object Tests {
       case (a, b) ⇒ a > b
     }
 
-    override def get_g_V_orderXa_nameXb_nameX_name = GremlinScala(g).V.order {
-      case (a, b) ⇒
-        a.value[String]("name") < b.value[String]("name")
-    }.value[String]("name")
+    // override def get_g_V_orderXa_nameXb_nameX_name = GremlinScala(g).V.order {
+    //   case (a, b) ⇒
+    //     a.value[String]("name") < b.value[String]("name")
+    // }.value[String]("name")
 
-    override def get_g_V_lang_order = GremlinScala(g).V.value[String]("lang").order
+    // override def get_g_V_lang_order = GremlinScala(g).V.value[String]("lang").order
   }
 
   // class ScalaSelectTest extends SelectTest with StandardTest {
@@ -456,7 +456,7 @@ object Tests {
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
       val a = new JArrayList[Vertex] //test is expecting a java arraylist..
-      GremlinScala(g).v(v1Id).get.`with`(("a", a)).sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.`with`("a", a).sideEffect { traverser ⇒
         a.add(traverser.get)
       }.value[String]("name")
     }
@@ -464,7 +464,7 @@ object Tests {
     override def get_g_v1_out_sideEffectXincr_cX_valueXnameX(v1Id: AnyRef) = {
       val c = new JArrayList[Integer] //test is expecting a java arraylist..
       c.add(0)
-      GremlinScala(g).v(v1Id).get.`with`(("c", c)).out.sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.`with`("c", c).out.sideEffect { traverser ⇒
         val tmp = c.get(0)
         c.clear()
         c.add(tmp + 1)
