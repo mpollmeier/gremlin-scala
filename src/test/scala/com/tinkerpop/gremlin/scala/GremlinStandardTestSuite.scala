@@ -20,7 +20,6 @@ import shapeless.ops.hlist._
 
 object Tests {
   class ScalaDedupTest extends DedupTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_both_dedup_name = GremlinScala(g).V.both.dedup.values[String]("name")
 
@@ -37,7 +36,6 @@ object Tests {
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_filterXfalseX = GremlinScala(g).V.filter(_ ⇒ false)
 
@@ -63,7 +61,6 @@ object Tests {
   }
 
   class ScalaExceptTest extends ExceptTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out.except(g.v(v2Id))
@@ -89,7 +86,6 @@ object Tests {
   }
 
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
@@ -105,7 +101,6 @@ object Tests {
   }
 
   class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath
@@ -115,7 +110,6 @@ object Tests {
   }
 
   class ScalaHasTest extends HasTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = GremlinScala(g).v(v1Id).get.has(key)
 
@@ -152,7 +146,6 @@ object Tests {
   }
 
   class ScalaHasNotTest extends HasNotTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) =
       GremlinScala(g).v(v1Id).get.hasNot(prop)
@@ -161,21 +154,18 @@ object Tests {
   }
 
   class ScalaIntervalTest extends IntervalTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_outE_intervalXweight_0_06X_inV(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.outE.interval("weight", 0d, 0.6d).inV
   }
 
   class ScalaRandomTest extends RandomTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_randomX1X = GremlinScala(g).V.random(1.0d)
     override def get_g_V_randomX0X = GremlinScala(g).V.random(0.0d)
   }
 
   class ScalaRangeTest extends RangeTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_rangeX0_2X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.range(0, 2)
 
@@ -198,7 +188,6 @@ object Tests {
   }
 
   class ScalaRetainTest extends RetainTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
       val v2 = g.v(v2Id)
@@ -210,7 +199,6 @@ object Tests {
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXhereX_out_backXhereX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("here").out.back[Vertex]("here")
@@ -238,7 +226,6 @@ object Tests {
   }
 
   class ScalaJumpTest extends JumpTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_valueXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("x").out
@@ -294,7 +281,6 @@ object Tests {
   }
 
   class ScalaMapTest extends MapTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_mapXnameX(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.map(_.value[String]("name"))
@@ -319,7 +305,6 @@ object Tests {
   }
 
   class ScalaOrderTest extends OrderTest with StandardTest {
-    g = newTestGraphClassicDouble
     override def get_g_V_name_order = GremlinScala(g).V.values[String]("name").order
 
     override def get_g_V_name_orderXabX = GremlinScala(g).V.values[String]("name").order {
@@ -335,7 +320,6 @@ object Tests {
   }
 
   class ScalaSelectTest extends SelectTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_asXaX_outXknowsX_asXbX_select(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("a").out("knows").as("b").select()
@@ -439,7 +423,6 @@ object Tests {
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
-    g = newTestGraphClassicDouble
     override def get_g_V_count = GremlinScala(g).V.count
     override def get_g_V_out_count = GremlinScala(g).V.out.count
     override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
@@ -449,7 +432,6 @@ object Tests {
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_v1_sideEffectXstore_aX_valueXnameX(v1Id: AnyRef) = {
       val a = new JArrayList[Vertex] //test is expecting a java arraylist..
@@ -475,7 +457,6 @@ object Tests {
   }
 
   class ScalaSideEffectCapTest extends SideEffectCapTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_hasXageX_groupCountXa_nameX_out_capXaX =
       GremlinScala(g).V.has("age")
@@ -485,7 +466,6 @@ object Tests {
   }
 
   class ScalaGroupCountTest extends GroupCountTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_outXcreatedX_groupCountXnameX =
       GremlinScala(g).V.out("created").groupCount[String] { v: Vertex ⇒
@@ -519,7 +499,6 @@ object Tests {
   }
 
   class ScalaGroupByTest extends GroupByTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_groupByXnameX =
       GremlinScala(g).V.groupBy(_.value[String]("name"))
@@ -567,25 +546,6 @@ object Tests {
 }
 
 trait StandardTest {
-  def newTestGraphClassicDouble = {
-    val g = ScalaGraph(TinkerGraph.open)
-
-    val marko = g.addVertex(1: Integer, Map("name" → "marko", "age" → 29))
-    val vadas = g.addVertex(2: Integer, Map("name" → "vadas", "age" → 27))
-    val lop = g.addVertex(3: Integer, Map("name" → "lop", "lang" → "java"))
-    val josh = g.addVertex(4: Integer, Map("name" → "josh", "age" → 32))
-    val ripple = g.addVertex(5: Integer, Map("name" → "ripple", "lang" → "java"))
-    val peter = g.addVertex(6: Integer, Map("name" → "peter", "age" → 35))
-
-    marko.addEdge(7: Integer, "knows", vadas, Map("weight" → 0.5d))
-    marko.addEdge(8: Integer, "knows", josh, Map("weight" → 1.0d))
-    marko.addEdge(9: Integer, "created", lop, Map("weight" → 0.4d))
-    josh.addEdge(10: Integer, "created", ripple, Map("weight" → 1.0d))
-    josh.addEdge(11: Integer, "created", lop, Map("weight" → 0.4d))
-    peter.addEdge(12: Integer, "created", lop, Map("weight" → 0.2d))
-    g
-  }
-
   implicit def toTraversal[S, E](gs: GremlinScala[E, _]): Traversal[S, E] =
     gs.traversal.asInstanceOf[Traversal[S, E]]
 }
