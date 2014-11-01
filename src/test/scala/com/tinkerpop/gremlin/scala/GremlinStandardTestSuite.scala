@@ -364,9 +364,9 @@ object Tests {
       }
 
     override def get_g_V_asXaX_valueXnameX_order_asXbX_selectXname_itX = ???
-      // GremlinScala(g).V.as("a").values[String]("name").order.as("b").select { name: String ⇒
-      //   v.value[String]("name")
-      // }
+    // GremlinScala(g).V.as("a").values[String]("name").order.as("b").select { name: String ⇒
+    //   v.value[String]("name")
+    // }
   }
 
   class ScalaVertexTest extends VertexTest with StandardTest {
@@ -424,34 +424,18 @@ object Tests {
       GremlinScala(g).v(v4Id).get.both(2).values[String]("name")
   }
 
-  // TODO: implement ValueMapTest
-  // class ScalaValuesTest extends ValuesTest with StandardTest {
-  //   g = newTestGraphClassicDouble
-  //
-  //   override def get_g_V_values = GremlinScala(g).V.values()
-  //
-  //   override def get_g_V_valuesXname_ageX = GremlinScala(g).V.values("name", "age")
-  //
-  //   override def get_g_E_valuesXid_label_weightX =
-  //     GremlinScala(g).E.values("id", "label", "weight")
-  //
-  //   override def get_g_v1_outXcreatedX_values(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").values()
-  // }
-
   class ScalaAggregateTest extends AggregateTest with StandardTest {
-    g = newTestGraphClassicDouble
 
     override def get_g_V_valueXnameX_aggregate =
       GremlinScala(g).V.values[String]("name").aggregate
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
     override def get_g_V_aggregateXnameX =
-      GremlinScala(g).V.aggregate { v: Vertex ⇒ v.values[String]("name") }
+      GremlinScala(g).V.aggregate { v: Vertex ⇒ v.value[String]("name") }
         .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
 
-    override def get_g_V_out_aggregateXaX_path = ???
-    // return g.V().out().aggregate("a").path()
+    override def get_g_V_out_aggregateXaX_path =
+      GremlinScala(g).V.out.aggregate("a").path
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
@@ -618,31 +602,30 @@ import org.apache.commons.configuration.Configuration
 import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
-    Array( //testsToExecute
-      // classOf[ScalaDedupTest],
-      // classOf[ScalaFilterTest],
-      // classOf[ScalaExceptTest],
-      // classOf[ScalaSimplePathTest],
-      // classOf[ScalaCyclicPathTest],
-      // classOf[ScalaHasTest],
-      // classOf[ScalaHasNotTest],
-      // classOf[ScalaIntervalTest],
-      // classOf[ScalaRandomTest],
-      // classOf[ScalaRangeTest],
-      // classOf[ScalaRetainTest],
-      // classOf[ScalaBackTest],
-      // classOf[ScalaJumpTest],
-      // classOf[ScalaMapTest],
-      // classOf[ScalaOrderTest],
-      // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
-    classOf[ScalaVertexTest]
-    // classOf[ScalaValuesTest],
-    // classOf[ScalaAggregateTest],
+    Array( //testsToExecute - all are in ProcessStandardSuite
+      classOf[ScalaDedupTest],
+      classOf[ScalaFilterTest],
+      classOf[ScalaExceptTest],
+      classOf[ScalaSimplePathTest],
+      classOf[ScalaCyclicPathTest],
+      classOf[ScalaHasTest],
+      classOf[ScalaHasNotTest],
+      classOf[ScalaIntervalTest],
+      classOf[ScalaRandomTest],
+      classOf[ScalaRangeTest],
+      classOf[ScalaRetainTest],
+      classOf[ScalaBackTest],
+      classOf[ScalaJumpTest],
+      classOf[ScalaMapTest],
+      classOf[ScalaOrderTest],
+      classOf[ScalaVertexTest],
+      classOf[ScalaAggregateTest]
     // classOf[ScalaCountTest],
     // classOf[ScalaSideEffectTest],
     // classOf[ScalaSideEffectCapTest],
     // classOf[ScalaGroupCountTest],
     // classOf[ScalaGroupByTest]
+    // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     ),
     Array.empty, //testsToEnforce
     true //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
