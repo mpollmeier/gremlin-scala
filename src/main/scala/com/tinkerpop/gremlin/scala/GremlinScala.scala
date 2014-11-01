@@ -4,6 +4,7 @@ import java.lang.{ Long ⇒ JLong }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
 
+import _root_.scala.reflect._
 import collection.JavaConversions._
 import collection.mutable
 import com.tinkerpop.gremlin._
@@ -36,6 +37,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def count() = GremlinScala[JLong, Labels](traversal.count())
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
+
+  def toCC[T: ClassTag] = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒
+    val runtimeClass = classTag[T].runtimeClass
+    val params = runtimeClass.getDeclaredFields map {
+      case field if field.getName == "id" => t.get.id.toString
+      case field => t.get.value[AnyRef](field.getName)
+    }
+    runtimeClass.getDeclaredConstructors.head.newInstance(params: _*).asInstanceOf[T]
+  })
 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
@@ -222,6 +232,16 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   def V = GremlinScala[Vertex, HNil](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
   /** get all edges */
   def E = GremlinScala[Edge, HNil](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
+
+  def saveCC[A: ClassTag](cc: A) = {
+    val runtimeClass = classTag[A].runtimeClass
+    val params = (runtimeClass.getDeclaredFields map { field =>
+      field.setAccessible(true)
+      field.getName -> field.get(cc)
+    } filter (_._1 != "id")).toMap + ("label" -> runtimeClass.getSimpleName)
+
+    graph.addVertex().setProperties(params)
+  }
 }
 
 object GS {
