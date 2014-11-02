@@ -351,7 +351,7 @@ object Tests {
       }
 
     override def get_g_V_asXaX_name_order_asXbX_selectXname_itX = ???
-            // return g.V().as("a").values("name").order().as("b").select(v -> ((Vertex) v).value("name"), Function.identity());
+    // return g.V().as("a").values("name").order().as("b").select(v -> ((Vertex) v).value("name"), Function.identity());
     // GremlinScala(g).V.as("a").values[String]("name").order.as("b").select { name: String ⇒
     //   v.value[String]("name")
     // }
@@ -400,7 +400,7 @@ object Tests {
     override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
     override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
 
-    override def get_g_v4_bothEXknows_createdX_localLimitX1X(v4Id: AnyRef) = 
+    override def get_g_v4_bothEXknows_createdX_localLimitX1X(v4Id: AnyRef) =
       GremlinScala(g).v(v4Id).get.bothE("knows", "created").localLimit(1)
 
     override def get_g_v4_bothEXcreatedX(v4Id: AnyRef) =
@@ -594,9 +594,9 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest],
       classOf[ScalaSideEffectTest],
-      classOf[ScalaSideEffectCapTest]
-    // classOf[ScalaGroupCountTest]
-    // classOf[ScalaGroupByTest]
+      classOf[ScalaSideEffectCapTest],
+      classOf[ScalaGroupCountTest],
+      classOf[ScalaGroupByTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     ),
     Array.empty, //testsToEnforce
