@@ -92,6 +92,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def range(low: Int, high: Int) = GremlinScala[End, Labels](traversal.range(low, high))
 
+  def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
+
   def retain(variable: String) = GremlinScala[End, Labels](traversal.retain(variable))
   def retainOne(retainObject: End) = GremlinScala[End, Labels](traversal.retain(retainObject))
   def retainAll(retainCollection: Seq[End]) = GremlinScala[End, Labels](traversal.retain(retainCollection))
@@ -115,9 +117,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def to(direction: Direction, edgeLabels: String*) =
     GremlinScala[Vertex, Labels](traversal.to(direction, edgeLabels: _*))
-
-  def to(direction: Direction, branchFactor: Int, edgeLabels: String*) =
-    GremlinScala[Vertex, Labels](traversal.to(direction, branchFactor, edgeLabels: _*))
 
   def sideEffect(traverse: Traverser[End] ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
@@ -298,6 +297,11 @@ object GremlinScala {
    * endValue: less than */
     def interval[A, B](key: String, startValue: Comparable[A], endValue: Comparable[B]) =
       GremlinScala[End, Labels](traversal.interval(key, startValue, endValue))
+
+    def localRange(low: Int, high: Int) = GremlinScala[End, Labels](traversal.localRange(low, high))
+
+    def localLimit(limit: Int) = GremlinScala[End, Labels](traversal.localLimit(limit))
+
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
@@ -305,27 +309,21 @@ object GremlinScala {
 
     def out() = GremlinScala[Vertex, Labels](traversal.out())
     def out(labels: String*) = GremlinScala[Vertex, Labels](traversal.out(labels: _*))
-    def out(branchFactor: Int, labels: String*) = GremlinScala[Vertex, Labels](traversal.out(branchFactor, labels: _*))
 
     def outE() = GremlinScala[Edge, Labels](traversal.outE())
     def outE(labels: String*) = GremlinScala[Edge, Labels](traversal.outE(labels: _*))
-    def outE(branchFactor: Int, labels: String*) = GremlinScala[Edge, Labels](traversal.outE(branchFactor, labels: _*))
 
     def in() = GremlinScala[Vertex, Labels](traversal.in())
     def in(labels: String*) = GremlinScala[Vertex, Labels](traversal.in(labels: _*))
-    def in(branchFactor: Int, labels: String*) = GremlinScala[Vertex, Labels](traversal.in(branchFactor, labels: _*))
 
     def inE() = GremlinScala[Edge, Labels](traversal.inE())
     def inE(labels: String*) = GremlinScala[Edge, Labels](traversal.inE(labels: _*))
-    def inE(branchFactor: Int, labels: String*) = GremlinScala[Edge, Labels](traversal.inE(branchFactor, labels: _*))
 
     def both() = GremlinScala[Vertex, Labels](traversal.both())
     def both(labels: String*) = GremlinScala[Vertex, Labels](traversal.both(labels: _*))
-    def both(branchFactor: Int, labels: String*) = GremlinScala[Vertex, Labels](traversal.both(branchFactor, labels: _*))
 
     def bothE() = GremlinScala[Edge, Labels](traversal.bothE())
     def bothE(labels: String*) = GremlinScala[Edge, Labels](traversal.bothE(labels: _*))
-    def bothE(branchFactor: Int, labels: String*) = GremlinScala[Edge, Labels](traversal.bothE(branchFactor, labels: _*))
   }
 
   class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels])

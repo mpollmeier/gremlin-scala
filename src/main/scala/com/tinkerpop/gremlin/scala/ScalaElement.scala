@@ -71,27 +71,21 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def out() = GremlinScala[ Vertex, HNil](vertex.out())
   def out(labels: String*) = GremlinScala[ Vertex, HNil](vertex.out(labels: _*))
-  def out(branchFactor: Int, labels: String*) = GremlinScala[ Vertex, HNil](vertex.out(branchFactor, labels: _*))
 
   def outE() = GremlinScala[ Edge, HNil](vertex.outE())
   def outE(labels: String*) = GremlinScala[ Edge, HNil](vertex.outE(labels: _*))
-  def outE(branchFactor: Int, labels: String*) = GremlinScala[ Edge, HNil](vertex.outE(branchFactor, labels: _*))
 
   def in() = GremlinScala[ Vertex, HNil](vertex.in())
   def in(labels: String*) = GremlinScala[ Vertex, HNil](vertex.in(labels: _*))
-  def in(branchFactor: Int, labels: String*) = GremlinScala[ Vertex, HNil](vertex.in(branchFactor, labels: _*))
 
   def inE() = GremlinScala[ Edge, HNil](vertex.inE())
   def inE(labels: String*) = GremlinScala[ Edge, HNil](vertex.inE(labels: _*))
-  def inE(branchFactor: Int, labels: String*) = GremlinScala[ Edge, HNil](vertex.inE(branchFactor, labels: _*))
 
   def both() = GremlinScala[ Vertex, HNil](vertex.both())
   def both(labels: String*) = GremlinScala[ Vertex, HNil](vertex.both(labels: _*))
-  def both(branchFactor: Int, labels: String*) = GremlinScala[ Vertex, HNil](vertex.both(branchFactor, labels: _*))
 
   def bothE() = GremlinScala[ Edge, HNil](vertex.bothE())
   def bothE(labels: String*) = GremlinScala[ Edge, HNil](vertex.bothE(labels: _*))
-  def bothE(branchFactor: Int, labels: String*) = GremlinScala[ Edge, HNil](vertex.bothE(branchFactor, labels: _*))
 
   def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
     val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
