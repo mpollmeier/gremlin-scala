@@ -314,12 +314,11 @@ object Tests {
       case (a, b) ⇒ a > b
     }
 
-    // override def get_g_V_orderXa_nameXb_nameX_name = GremlinScala(g).V.order {
-    //   case (a, b) ⇒
-    //     a.values[String]("name") < b.values[String]("name")
-    // }.values[String]("name")
+    override def get_g_V_name_orderXa1_b1__b2_a2X =
+      GremlinScala(g).V.values[String]("name")
+        .order { case (a, b) ⇒ a.substring(1,2) < b.substring(1,2)}
+        .order { case (a, b) ⇒ b.substring(2,3) < a.substring(2,3)}
 
-    // override def get_g_V_lang_order = GremlinScala(g).V.values[String]("lang").order
   }
 
   class ScalaSelectTest extends SelectTest with StandardTest {
