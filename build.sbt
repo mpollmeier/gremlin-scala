@@ -4,9 +4,9 @@ version := "3.0.0-SNAPSHOT"
 
 organization := "com.michaelpollmeier"
 
-crossScalaVersions := Seq("2.10.4", "2.11.2")
+crossScalaVersions := Seq("2.10.4", "2.11.4")
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 scalacOptions ++= Seq(
   //"-Xlog-implicits"
@@ -28,8 +28,8 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.novocode" % "junit-interface" % "0.9" % "test->default",
     "com.chuusai" % "shapeless" % "2.0.0" cross CrossVersion.fullMapped {
       case "2.10.4" ⇒ "2.10.4"
-      case "2.11.2" ⇒ "2.11"
-      case x ⇒ x
+      case v if v.startsWith("2.11") ⇒ "2.11"
+      case v ⇒ v
     },
     "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",

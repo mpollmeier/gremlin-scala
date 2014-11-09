@@ -316,8 +316,8 @@ object Tests {
 
     override def get_g_V_name_orderXa1_b1__b2_a2X =
       GremlinScala(g).V.values[String]("name")
-        .order { case (a, b) ⇒ a.substring(1,2) < b.substring(1,2)}
         .order { case (a, b) ⇒ b.substring(2,3) < a.substring(2,3)}
+        .order { case (a, b) ⇒ a.substring(1,2) < b.substring(1,2)}
 
   }
 
@@ -497,16 +497,18 @@ object Tests {
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
-        .jumpWithTraverser("x", _.loops < 2).cap("a")
+        .jumpWithTraverser("x", _.loops < 2)
+        .cap("a")
         .traversal
-        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] //only for Scala 2.10...
+        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] 
 
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
-        .jump("x", 2).cap("a")
+        .jump("x", 2)
+        .cap("a")
         .traversal
-        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] //only for Scala 2.10...
+        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
   }
 
   class ScalaGroupByTest extends GroupByTest with StandardTest {
