@@ -1,6 +1,6 @@
 name := "gremlin-scala"
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0.M5"
 
 organization := "com.michaelpollmeier"
 
@@ -22,7 +22,7 @@ scalacOptions ++= Seq(
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0.M4"
+  val gremlinVersion = "3.0.0.M5"
   val junitVersion = "4.11"
   Seq(
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,
@@ -82,4 +82,4 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
   </developers>                                                                                 
 
 credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
-//credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
+// credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
