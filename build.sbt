@@ -22,7 +22,7 @@ scalacOptions ++= Seq(
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0-SNAPSHOT"
+  val gremlinVersion = "3.0.0.M4"
   val junitVersion = "4.11"
   Seq(
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,
