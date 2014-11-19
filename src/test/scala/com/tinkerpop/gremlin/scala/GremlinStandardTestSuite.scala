@@ -316,8 +316,8 @@ object Tests {
 
     override def get_g_V_name_orderXa1_b1__b2_a2X =
       GremlinScala(g).V.values[String]("name")
-        .order { case (a, b) ⇒ b.substring(2,3) < a.substring(2,3)}
-        .order { case (a, b) ⇒ a.substring(1,2) < b.substring(1,2)}
+        .order { case (a, b) ⇒ b.substring(2, 3) < a.substring(2, 3) }
+        .order { case (a, b) ⇒ a.substring(1, 2) < b.substring(1, 2) }
 
   }
 
@@ -350,7 +350,7 @@ object Tests {
       }
 
     override def get_g_V_asXaX_name_order_asXbX_selectXname_itX = ???
-    // return g.V().as("a").values("name").order().as("b").select(v -> ((Vertex) v).value("name"), Function.identity());
+    // return g.V().as("a").values("name").order().as("b").select(v -> ((Vertex) v).value("name"), Function.identity())
     // GremlinScala(g).V.as("a").values[String]("name").order.as("b").select { name: String ⇒
     //   v.value[String]("name")
     // }
@@ -500,7 +500,7 @@ object Tests {
         .jumpWithTraverser("x", _.loops < 2)
         .cap("a")
         .traversal
-        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]] 
+        .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
 
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_2X_capXaX =
       GremlinScala(g).V.as("x").out
@@ -556,6 +556,23 @@ object Tests {
         .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
   }
 
+  class ScalaUntilTest extends UntilTest with StandardTest {
+    override def get_g_v1_untilXa_loops_gt_1X_out_asXaX_name(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.untilWithTraverser("a", _.loops > 1).out.as("a").values[String]("name")
+
+    override def get_g_v1_untilXa_1X_out_asXaX_name(v1Id: AnyRef) =
+      GremlinScala(g).v(v1Id).get.untilWithTraverser("a", 1).out.as("a").values[String]("name")
+
+    override def get_g_V_untilXa_loops_gt_1X_out_asXaX_count =
+      GremlinScala(g).V.untilWithTraverser("a", _.loops > 1).out.as("a").count
+
+    override def get_g_V_untilXa_1X_out_asXaX_count =
+      GremlinScala(g).V.untilWithTraverser("a", 1).out.as("a").count
+
+    override def get_g_V_untilXa_1_trueX_out_asXaX_name =
+      GremlinScala(g).V.untilWithTraverser("a", 1, { _: Any ⇒ true }).out.as("a").values[String]("name")
+  }
+
 }
 
 trait StandardTest {
@@ -597,7 +614,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaSideEffectTest],
       classOf[ScalaSideEffectCapTest],
       classOf[ScalaGroupCountTest],
-      classOf[ScalaGroupByTest]
+      classOf[ScalaGroupByTest],
+      classOf[ScalaUntilTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     ),
     Array.empty, //testsToEnforce

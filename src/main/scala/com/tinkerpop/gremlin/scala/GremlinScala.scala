@@ -207,6 +207,21 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
                         ifPredicate: Traverser[End] ⇒ Boolean,
                         emitPredicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(as, ifPredicate, emitPredicate))
+
+  def untilWithTraverser(
+    breakLabel: String,
+    breakPredicate: Traverser[End] ⇒ Boolean,
+    emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, breakPredicate, emitPredicate))
+
+  def untilWithTraverser(breakLabel: String, breakPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, breakPredicate))
+
+  def untilWithTraverser(breakLabel: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, loops, emitPredicate))
+
+  def untilWithTraverser(breakLabel: String, loops: Int) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, loops))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
