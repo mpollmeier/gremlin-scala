@@ -208,6 +208,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
                         emitPredicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(as, ifPredicate, emitPredicate))
 
+  def until(
+    breakLabel: String,
+    breakPredicate: End ⇒ Boolean,
+    emitPredicate: End ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(
+      breakLabel, liftTraverser(breakPredicate), liftTraverser(emitPredicate)))
+
   def untilWithTraverser(
     breakLabel: String,
     breakPredicate: Traverser[End] ⇒ Boolean,
@@ -217,10 +224,16 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def untilWithTraverser(breakLabel: String, breakPredicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(breakLabel, breakPredicate))
 
+  def until(breakLabel: String, breakPredicate: End ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, liftTraverser(breakPredicate)))
+
   def untilWithTraverser(breakLabel: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(breakLabel, loops, emitPredicate))
 
-  def untilWithTraverser(breakLabel: String, loops: Int) =
+  def until(breakLabel: String, loops: Int, emitPredicate: End ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(breakLabel, loops, liftTraverser(emitPredicate)))
+
+  def until(breakLabel: String, loops: Int) =
     GremlinScala[End, Labels](traversal.until(breakLabel, loops))
 }
 
