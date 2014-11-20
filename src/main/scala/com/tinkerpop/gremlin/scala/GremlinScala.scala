@@ -37,15 +37,16 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def count() = GremlinScala[JLong, Labels](traversal.count())
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
-
-  def toCC[T: ClassTag] = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒
-    val runtimeClass = classTag[T].runtimeClass
+  
+  def toCC[A: ClassTag] = gs.map[A] { t =>
+    val vertex = t.asInstanceOf[Vertex]
+    val runtimeClass = classTag[A].runtimeClass
     val params = runtimeClass.getDeclaredFields map {
-      case field if field.getName == "id" => t.get.id.toString
-      case field => t.get.value[AnyRef](field.getName)
+      case field if field.getName == "id"  => vertex.id.toString
+      case field => vertex.value[AnyRef](field.getName)
     }
-    runtimeClass.getDeclaredConstructors.head.newInstance(params: _*).asInstanceOf[T]
-  })
+    runtimeClass.getDeclaredConstructors.head.newInstance(params: _*).asInstanceOf[A]
+  }
 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
