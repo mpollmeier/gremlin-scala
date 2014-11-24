@@ -445,7 +445,7 @@ object Tests {
 
     override def get_g_v1_sideEffectXstore_aX_name(v1Id: AnyRef) = {
       val a = new JArrayList[Vertex] //test is expecting a java arraylist..
-      GremlinScala(g).v(v1Id).get.`with`("a", a).sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.withSideEffect("a", a).sideEffect { traverser ⇒
         a.add(traverser.get)
       }.values[String]("name")
     }
@@ -453,7 +453,7 @@ object Tests {
     override def get_g_v1_out_sideEffectXincr_cX_name(v1Id: AnyRef) = {
       val c = new JArrayList[Integer] //test is expecting a java arraylist..
       c.add(0)
-      GremlinScala(g).v(v1Id).get.`with`("c", c).out.sideEffect { traverser ⇒
+      GremlinScala(g).v(v1Id).get.withSideEffect("c", c).out.sideEffect { traverser ⇒
         val tmp = c.get(0)
         c.clear()
         c.add(tmp + 1)

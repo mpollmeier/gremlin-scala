@@ -103,9 +103,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def back[A](to: String) = GremlinScala[A, Labels](traversal.back[A](to))
 
-  def `with`[A](key: String, value: A) =
+  def withSideEffect[A](key: String, value: A) =
     GremlinScala[End, Labels](
-      traversal.`with`(
+      traversal.withSideEffect(
         key,
         new Supplier[A] { override def get = value }
       )
