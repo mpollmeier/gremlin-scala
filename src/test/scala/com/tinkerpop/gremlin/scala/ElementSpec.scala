@@ -44,7 +44,9 @@ class ElementSpec extends TestBase {
     it("handles hidden properties") {
       v(1).setHiddenProperty("hiddenProperty", "hiddenValue")
       v(1).hiddenKeys shouldBe Set("~hiddenProperty")
-      v(1).hiddenValue[String]("hiddenProperty") shouldBe "hiddenValue"
+      v(1).hiddenValue[String]("hiddenProperty") shouldBe Some("hiddenValue")
+      v(1).hiddenValue("doesnt exist") shouldBe None
+      v(1).getHiddenValue[String]("hiddenProperty") shouldBe "hiddenValue"
       v(1).hiddenProperty[String]("hiddenProperty").value shouldBe "hiddenValue"
       v(1).hiddenPropertyMap("hiddenProperty") shouldBe Map("hiddenProperty" → "hiddenValue")
       v(1).hiddenProperties("hiddenProperty") should have length (1)
@@ -53,24 +55,20 @@ class ElementSpec extends TestBase {
 
   describe("values") {
     it("gets a value") {
-      v(1).value[String]("name") should be("marko")
-      e(7).value[Float]("weight") should be(0.5)
+      v(1).value[String]("name") shouldBe Some("marko")
+      v(1).value[String]("doesn't exist") shouldBe None
+      v(1).getValue[String]("name") shouldBe "marko"
+      e(7).value[Float]("weight") shouldBe Some(0.5)
     }
 
     it("falls back to default value if value doesnt exist") {
-      v(1).valueWithDefault("doesnt exist", "blub") should be("blub")
-      e(7).valueWithDefault("doesnt exist", 0.8) should be(0.8)
+      v(1).valueOrElse("doesnt exist", "blub") should be("blub")
+      e(7).valueOrElse("doesnt exist", 0.8) should be(0.8)
     }
 
-    it("throws an exception if a value doesnt exist") {
-      //note: in scala exceptions are typically discouraged in situations like this...
-      //value is only provided so that we are on par with Gremlin Groovy
-      intercept[IllegalStateException] {
-        v(1).value[String]("doesnt exit")
-      }
-      intercept[IllegalStateException] {
-        e(7).value[Float]("doesnt exit")
-      }
+    it("returns None if it doesn't exist") {
+      v(1).value[String]("doesnt exit") shouldBe None
+      e(7).value[Float]("doesnt exit") shouldBe None
     }
   }
 

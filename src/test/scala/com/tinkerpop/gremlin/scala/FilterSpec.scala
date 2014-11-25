@@ -6,7 +6,7 @@ class FilterSpec extends TestBase {
 
   it("filters") {
     gs.V
-      .filter { _.valueWithDefault("age", default = 0) > 30 }
+      .filter { _.valueOrElse("age", default = 0) > 30 }
       .values[String]("name").toSet should be(Set("josh", "peter"))
   }
 

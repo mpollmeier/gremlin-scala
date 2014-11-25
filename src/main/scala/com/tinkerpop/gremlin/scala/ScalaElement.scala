@@ -42,26 +42,34 @@ trait ScalaElement[ElementType <: Element] {
 
   def propertyMap(wantedKeys: String*): Map[String, Any] = {
     val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else keys
-    requiredKeys map { key ⇒ (key, value(key)) } toMap
+    requiredKeys map { key ⇒ (key, getValue(key)) } toMap
   }
 
   def hiddenPropertyMap(wantedKeys: String*): Map[String, Any] = {
     val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else hiddenKeys
-    requiredKeys map { key ⇒ (key, hiddenValue(key)) } toMap
+    requiredKeys map { key ⇒ (key, getHiddenValue(key)) } toMap
   }
 
-  /**
-   * note: this may throw an IllegalStateException!
-   * in scala exceptions are typically discouraged in situations like this...
-   * `value` is only provided so that we are on par with Gremlin Groovy
-   */
-  def value[A](key: String): A = element.value[A](key)
-  def hiddenValue[A](key: String): A = element.value[A](Graph.Key.hide(key))
+  // note: this may throw an IllegalStateException - better use `value`
+  def getValue[A](key: String): A = element.value[A](key)
+  def value[A](key: String): Option[A] = {
+    val p = property[A](key)
+    if (p.isPresent) Some(p.value)
+    else None
+  }
+
+  // note: this may throw an IllegalStateException - better use `hiddenValue`
+  def getHiddenValue[A](key: String): A = element.value[A](Graph.Key.hide(key))
+  def hiddenValue[A](key: String): Option[A] = {
+    val p = hiddenProperty[A](key)
+    if (p.isPresent) Some(p.value)
+    else None
+  }
 
   def valueMap(): Map[String, Any] =
-    keys map { key ⇒ (key, value(key)) } toMap
+    keys map { key ⇒ (key, getValue(key)) } toMap
 
-  def valueWithDefault[A](key: String, default: A): A = property[A](key).orElse(default)
+  def valueOrElse[A](key: String, default: A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 }
