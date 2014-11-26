@@ -19,7 +19,7 @@ scalacOptions ++= Seq(
 // full stack traces
 // testOptions in Test += Tests.Argument("-oF")
 
-// net.virtualvoid.sbt.graph.Plugin.graphSettings
+net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
