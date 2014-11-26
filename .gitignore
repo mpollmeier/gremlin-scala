@@ -23,3 +23,6 @@ project/plugins/project/
 .settings
 *.swp
 .lib-src
+
+#intellij IDEA
+.idea
