@@ -2,6 +2,8 @@ package com.tinkerpop.gremlin.scala
 
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
+import com.tinkerpop.gremlin.process.T
+
 
 class ElementSpec extends TestBase {
 
@@ -105,16 +107,16 @@ class ElementSpec extends TestBase {
       gs.V.toList.size should be(2)
     }
 
-    it("adds a vertex with an explicit id") {
+    it("adds a vertex with a given label") {
       val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
-      val id1 = "vertexId1"
-      val id2 = "vertexId2"
-      val v1 = gs.addVertex(id1)
-      val v2 = gs.addVertex(id2, Map("testkey" -> "testValue"))
+      val label1 = "label1"
+      val label2 = "label2"
+      val v1 = gs.addVertex(label1)
+      val v2 = gs.addVertex(label2, Map("testkey" → "testValue"))
 
-      gs.v(id1) should be(Some(v1))
-      gs.v(id2).get.property[String]("testkey").value should be("testValue")
-      gs.V.toList.size should be(2)
+      gs.V.has(T.label, label1).head shouldBe v1.vertex
+      gs.V.has(T.label, label2).head shouldBe v2.vertex
+      gs.V.has(T.label, label2).head.value[String]("testkey") shouldBe "testValue"
     }
 
     it("adds an edge") {

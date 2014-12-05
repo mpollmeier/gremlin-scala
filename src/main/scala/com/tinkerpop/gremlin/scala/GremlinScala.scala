@@ -238,10 +238,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
-  def addVertex(): ScalaVertex = ScalaVertex(graph.addVertex())
-  def addVertex(id: AnyRef): ScalaVertex = addVertex(id, Map.empty)
-  def addVertex(id: AnyRef, properties: Map[String, Any]): ScalaVertex = {
-    val v = ScalaVertex(graph.addVertex(T.id, id))
+  def addVertex() = ScalaVertex(graph.addVertex())
+  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
+  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
+    val v = addVertex(label)
     v.setProperties(properties)
     v
   }
