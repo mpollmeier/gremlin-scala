@@ -52,6 +52,7 @@ trait ScalaElement[ElementType <: Element] {
 
   // note: this may throw an IllegalStateException - better use `value`
   def getValue[A](key: String): A = element.value[A](key)
+
   def value[A](key: String): Option[A] = {
     val p = property[A](key)
     if (p.isPresent) Some(p.value)
@@ -60,6 +61,7 @@ trait ScalaElement[ElementType <: Element] {
 
   // note: this may throw an IllegalStateException - better use `hiddenValue`
   def getHiddenValue[A](key: String): A = element.value[A](Graph.Key.hide(key))
+
   def hiddenValue[A](key: String): Option[A] = {
     val p = hiddenProperty[A](key)
     if (p.isPresent) Some(p.value)
@@ -69,7 +71,7 @@ trait ScalaElement[ElementType <: Element] {
   def valueMap(): Map[String, Any] =
     keys map { key ⇒ (key, getValue(key)) } toMap
 
-  def valueOrElse[A](key: String, default: A): A = property[A](key).orElse(default)
+  def valueOrElse[A](key: String, default: ⇒ A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 }
