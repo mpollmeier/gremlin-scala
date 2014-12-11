@@ -89,20 +89,43 @@ class TraversalSpec extends TestBase {
   }
 
   describe("common steps") {
+
+    describe("head") {
+      it("gets the first element") {
+        gs.V.values[String]("name").head shouldBe "marko"
+      }
+
+      it("throws an exception if there is no result") {
+        intercept[NoSuchElementException] {
+          gs.V.filter(_ ⇒ false).values[String]("name").head
+        }
+      }
+    }
+
+    describe("headOption") {
+      it("gets the first element") {
+        gs.V.values[String]("name").headOption shouldBe Some("marko")
+      }
+
+      it("returns None if there is no result") {
+        gs.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
+      }
+    }
+
     describe("value") {
       it("gets values") {
-        gs.V.values[Int]("age").toSet should be(Set(27, 29, 32, 35))
+        gs.V.values[Int]("age").toSet shouldBe Set(27, 29, 32, 35)
       }
     }
 
     describe("order") {
       it("sorts by natural order") {
-        gs.V.values[Int]("age").order.toList should be(List(27, 29, 32, 35))
+        gs.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
       }
 
       it("sorts by provided comparator") {
-        gs.V.values[Int]("age").order(_ < _).toList should be(List(27, 29, 32, 35))
-        gs.V.values[Int]("age").order(_ > _).toList should be(List(35, 32, 29, 27))
+        gs.V.values[Int]("age").order(_ < _).toList shouldBe List(27, 29, 32, 35)
+        gs.V.values[Int]("age").order(_ > _).toList shouldBe List(35, 32, 29, 27)
       }
     }
   }

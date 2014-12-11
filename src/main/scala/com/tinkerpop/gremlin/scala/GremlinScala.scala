@@ -11,15 +11,16 @@ import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
-import shapeless._
-import shapeless.ops.hlist._
+import shapeless.{ HList, HNil, :: }
+import shapeless.ops.hlist.Prepend
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toSeq(): Seq[End] = traversal.toList.toSeq
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
-  def headOption(): Option[End] = Option(head)
+  def headOption(): Option[End] = toList.headOption
+
   /** execute pipeline - applies all side effects */
   def iterate() = {
     traversal.iterate()
