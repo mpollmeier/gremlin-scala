@@ -331,6 +331,8 @@ object GremlinScala {
 
     def localLimit(limit: Int) = GremlinScala[End, Labels](traversal.localLimit(limit))
 
+    def timeLimit(millis: Long) = GremlinScala[End, Labels](traversal.timeLimit(millis))
+
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
