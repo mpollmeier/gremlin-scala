@@ -179,35 +179,35 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       reduceFunction))
 
   ///////////////////// BRANCH STEPS /////////////////////
-  def jump(as: String) = GremlinScala[End, Labels](traversal.jump(as))
+  def jump(to: String) = GremlinScala[End, Labels](traversal.jump(to))
 
-  def jump(as: String, loops: Int) = GremlinScala[End, Labels](traversal.jump(as, loops))
+  def jump(to: String, loops: Int) = GremlinScala[End, Labels](traversal.jump(to, loops))
 
-  def jump(as: String, ifPredicate: End ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(as, liftTraverser(ifPredicate)))
+  def jump(to: String, ifPredicate: End ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.jump(to, liftTraverser(ifPredicate)))
 
-  def jumpWithTraverser(as: String, ifPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(as, ifPredicate))
+  def jumpWithTraverser(to: String, ifPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.jump(to, ifPredicate))
 
-  def jump(as: String, loops: Int, emitPredicate: End ⇒ Boolean) =
+  def jump(to: String, loops: Int, emitPredicate: End ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(
-      as, loops, liftTraverser(emitPredicate)))
+      to, loops, liftTraverser(emitPredicate)))
 
-  def jumpWithTraverser(as: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(as, loops, emitPredicate))
+  def jumpWithTraverser(to: String, loops: Int, emitPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.jump(to, loops, emitPredicate))
 
-  def jump(as: String,
+  def jump(to: String,
            ifPredicate: End ⇒ Boolean,
            emitPredicate: End ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(
-      as,
+      to,
       liftTraverser(ifPredicate),
       liftTraverser(emitPredicate)))
 
-  def jumpWithTraverser(as: String,
+  def jumpWithTraverser(to: String,
                         ifPredicate: Traverser[End] ⇒ Boolean,
                         emitPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(as, ifPredicate, emitPredicate))
+    GremlinScala[End, Labels](traversal.jump(to, ifPredicate, emitPredicate))
 
   def until(
     breakLabel: String,
