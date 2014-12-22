@@ -17,16 +17,6 @@ trait ScalaElement[ElementType <: Element] {
   def keys(): Set[String] = element.keys.toSet
   def hiddenKeys: Set[String] = element.hiddenKeys.toSet
 
-  def setProperty(key: String, value: Any): Unit = element.property(key, value)
-  def setHiddenProperty(key: String, value: Any): Unit = element.property(Graph.Key.hide(key), value)
-  def setProperties(properties: Map[String, Any]): Unit =
-    properties foreach { case (k, v) ⇒ setProperty(k, v) }
-
-  def removeProperty(key: String): Unit = {
-    val p = property(key)
-    if (p.isPresent) p.remove
-  }
-
   def property[A](key: String): Property[A] = element.property[A](key)
   def hiddenProperty[A](key: String): Property[A] = element.property[A](Graph.Key.hide(key))
 
@@ -79,6 +69,27 @@ trait ScalaElement[ElementType <: Element] {
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
+  def setProperty(key: String, value: Any): ScalaVertex = {
+    element.property(key, value)
+    this
+  }
+
+  def setHiddenProperty(key: String, value: Any): ScalaVertex = {
+    element.property(Graph.Key.hide(key), value)
+    this
+  }
+
+  def setProperties(properties: Map[String, Any]): ScalaVertex = {
+    properties foreach { case (k, v) ⇒ setProperty(k, v) }
+    this
+  }
+
+  def removeProperty(key: String): ScalaVertex = {
+    val p = property(key)
+    if (p.isPresent) p.remove
+    this
+  }
+
   def out() = GremlinScala[ Vertex, HNil](vertex.out())
   def out(labels: String*) = GremlinScala[ Vertex, HNil](vertex.out(labels: _*))
 
@@ -116,6 +127,27 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
+
+  def setProperty(key: String, value: Any): ScalaEdge = {
+    element.property(key, value)
+    this
+  }
+
+  def setHiddenProperty(key: String, value: Any): ScalaEdge = {
+    element.property(Graph.Key.hide(key), value)
+    this
+  }
+
+  def setProperties(properties: Map[String, Any]): ScalaEdge = {
+    properties foreach { case (k, v) ⇒ setProperty(k, v) }
+    this
+  }
+
+  def removeProperty(key: String): ScalaEdge = {
+    val p = property(key)
+    if (p.isPresent) p.remove
+    this
+  }
 
   def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
