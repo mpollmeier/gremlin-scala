@@ -183,11 +183,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def jump(to: String, loops: Int) = GremlinScala[End, Labels](traversal.jump(to, loops))
 
-  def jump(to: String, ifPredicate: End ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(to, liftTraverser(ifPredicate)))
+  def jump(to: String, jumpPredicate: End ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.jump(to, liftTraverser(jumpPredicate)))
 
-  def jumpWithTraverser(to: String, ifPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(to, ifPredicate))
+  def jumpWithTraverser(to: String, jumpPredicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.jump(to, jumpPredicate))
 
   def jump(to: String, loops: Int, emitPredicate: End ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(
@@ -197,17 +197,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.jump(to, loops, emitPredicate))
 
   def jump(to: String,
-           ifPredicate: End ⇒ Boolean,
+           jumpPredicate: End ⇒ Boolean,
            emitPredicate: End ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.jump(
       to,
-      liftTraverser(ifPredicate),
+      liftTraverser(jumpPredicate),
       liftTraverser(emitPredicate)))
 
   def jumpWithTraverser(to: String,
-                        ifPredicate: Traverser[End] ⇒ Boolean,
+                        jumpPredicate: Traverser[End] ⇒ Boolean,
                         emitPredicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.jump(to, ifPredicate, emitPredicate))
+    GremlinScala[End, Labels](traversal.jump(to, jumpPredicate, emitPredicate))
 
   def until(
     breakLabel: String,
