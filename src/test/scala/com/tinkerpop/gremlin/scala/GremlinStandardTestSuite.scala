@@ -558,13 +558,13 @@ object Tests {
 
   class ScalaUntilTest extends UntilTest with StandardTest {
     override def get_g_v1_untilXa_loops_gt_1X_out_asXaX_name(v1Id: AnyRef) =
-      GremlinScala(g).v(v1Id).get.untilWithTraverser("a", _.loops > 1).out.as("a").values[String]("name")
+      GremlinScala(g).v(v1Id).get.until("a", _.loops > 1).out.as("a").values[String]("name")
 
     override def get_g_v1_untilXa_1X_out_asXaX_name(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.until("a", 1).out.as("a").values[String]("name")
 
     override def get_g_V_untilXa_loops_gt_1X_out_asXaX_count =
-      GremlinScala(g).V.untilWithTraverser("a", _.loops > 1).out.as("a").count
+      GremlinScala(g).V.until("a", _.loops > 1).out.as("a").count
 
     override def get_g_V_untilXa_1X_out_asXaX_count =
       GremlinScala(g).V.until("a", 1).out.as("a").count
