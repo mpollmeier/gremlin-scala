@@ -93,7 +93,7 @@ object Tests {
     override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path =
       GremlinScala(g).V.as("x").both
         .simplePath
-        .jumpWithTraverser("x", _.loops < 3)
+        .jump("x", _.loops < 3)
         .path
 
     override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path =
@@ -232,19 +232,19 @@ object Tests {
 
     override def get_g_v1_asXxX_out_jumpXx_loops_lt_2X_name(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("x").out
-        .jumpWithTraverser("x", _.loops < 2)
+        .jump("x", _.loops < 2)
         .values[String]("name")
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2X =
-      GremlinScala(g).V.as("x").out.jumpWithTraverser("x", _.loops < 2)
+      GremlinScala(g).V.as("x").out.jump("x", _.loops < 2)
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX =
       GremlinScala(g).V.as("x").out
-        .jumpWithTraverser("x", _.loops < 2, _ ⇒ true)
+        .jump("x", _.loops < 2, _ ⇒ true)
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2_trueX_path =
       GremlinScala(g).V.as("x").out
-        .jumpWithTraverser("x", _.loops < 2, _ ⇒ true).path
+        .jump("x", _.loops < 2, _ ⇒ true).path
 
     override def get_g_V_asXxX_out_jumpXx_2_trueX_path =
       GremlinScala(g).V.as("x").out.jump("x", 2, { _: Vertex ⇒ true }).path
@@ -252,8 +252,8 @@ object Tests {
 
     override def get_g_V_asXxX_out_jumpXx_loops_lt_2X_asXyX_in_jumpXy_loops_lt_2X_name =
       GremlinScala(g).V.as("x").out
-        .jumpWithTraverser("x", _.loops < 2).as("y").in
-        .jumpWithTraverser("y", _.loops < 2).values[String]("name")
+        .jump("x", _.loops < 2).as("y").in
+        .jump("y", _.loops < 2).values[String]("name")
 
     override def get_g_V_asXxX_out_jumpXx_2X_asXyX_in_jumpXy_2X_name =
       GremlinScala(g).V.as("x").out
@@ -265,11 +265,11 @@ object Tests {
 
     override def get_g_V_asXxX_out_jumpXx_2_trueX =
       GremlinScala(g).V.as("x").out
-        .jumpWithTraverser("x", 2, { _: Traverser[_] ⇒ true })
+        .jump("x", 2, { _: Traverser[_] ⇒ true })
 
     override def get_g_v1_out_jumpXx_t_out_hasNextX_in_jumpXyX_asXxX_out_asXyX_path(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.out
-        .jump("x", _.out().hasNext) //TODO why do I need to specify parenthesis here?
+        .jump("x", _.get.out().hasNext) //TODO why do I need to specify parenthesis here?
         .in.jump("y").as("x")
         .out.as("y").path
 
@@ -278,7 +278,7 @@ object Tests {
 
     override def get_g_v1_asXaX_jumpXb_loops_gt_1X_out_jumpXaX_asXbX_name(v1Id: AnyRef) =
       GremlinScala(g).v(v1Id).get.as("a")
-        .jumpWithTraverser("b", _.loops > 1)
+        .jump("b", _.loops > 1)
         .out.jump("a").as("b").values[String]("name")
 
   }
@@ -438,7 +438,7 @@ object Tests {
     override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
     override def get_g_V_filterXfalseX_count = GremlinScala(g).V.filter { _ ⇒ false }.count
     override def get_g_V_asXaX_out_jumpXa_loops_lt_3X_count =
-      GremlinScala(g).V.as("a").out.jumpWithTraverser("a", _.loops < 3).count
+      GremlinScala(g).V.as("a").out.jump("a", _.loops < 3).count
   }
 
   class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
@@ -497,7 +497,7 @@ object Tests {
     override def get_g_V_asXxX_out_groupCountXa_nameX_jumpXx_loops_lt_2X_capXaX =
       GremlinScala(g).V.as("x").out
         .groupCount("a", _.value[String]("name"))
-        .jumpWithTraverser("x", _.loops < 2)
+        .jump("x", _.loops < 2)
         .cap("a")
         .traversal
         .asInstanceOf[Traversal[Vertex, JMap[AnyRef, JLong]]]
@@ -551,7 +551,7 @@ object Tests {
           keyFunction = _.value[String]("name"),
           valueFunction = v ⇒ v,
           reduceFunction = { c: JCollection[_] ⇒ c.size }
-        ).jumpWithTraverser("x", _.loops < 2).cap("a")
+        ).jump("x", _.loops < 2).cap("a")
         .traversal
         .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
   }
