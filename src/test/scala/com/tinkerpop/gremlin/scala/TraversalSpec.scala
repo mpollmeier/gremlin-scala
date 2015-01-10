@@ -124,8 +124,8 @@ class TraversalSpec extends TestBase {
       }
 
       it("sorts by provided comparator") {
-        gs.V.values[Int]("age").order(_ < _).toList shouldBe List(27, 29, 32, 35)
-        gs.V.values[Int]("age").order(_ > _).toList shouldBe List(35, 32, 29, 27)
+        gs.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
+        gs.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
       }
     }
   }

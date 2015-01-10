@@ -7,17 +7,6 @@ class LabelledPathSpec extends TestBase {
 
   describe("type safety for labelled steps") {
 
-    it("blubs") {
-      val path: List[Edge :: HNil] =
-        v(1).outE.as("a").labelledPath.toList
-
-      path should be(List(
-        e(9).edge :: HNil,
-        e(7).edge :: HNil,
-        e(8).edge :: HNil
-      ))
-    }
-
     it("includes labelled steps") {
       val path: List[Edge :: HNil] =
         v(1).outE.as("a").labelledPath.toList

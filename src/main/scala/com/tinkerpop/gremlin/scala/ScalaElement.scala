@@ -15,19 +15,12 @@ trait ScalaElement[ElementType <: Element] {
   def label(): String = element.label
 
   def keys(): Set[String] = element.keys.toSet
-  def hiddenKeys: Set[String] = element.hiddenKeys.toSet
 
   def property[A](key: String): Property[A] = element.property[A](key)
-  def hiddenProperty[A](key: String): Property[A] = element.property[A](Graph.Key.hide(key))
 
   def properties(wantedKeys: String*): Seq[Property[Any]] = {
     val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else keys
     requiredKeys map property[Any] toSeq
-  }
-
-  def hiddenProperties(wantedKeys: String*): Seq[Property[Any]] = {
-    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else hiddenKeys
-    requiredKeys map hiddenProperty[Any] toSeq
   }
 
   def propertyMap(wantedKeys: String*): Map[String, Any] = {
@@ -35,25 +28,11 @@ trait ScalaElement[ElementType <: Element] {
     requiredKeys map { key ⇒ (key, getValue(key)) } toMap
   }
 
-  def hiddenPropertyMap(wantedKeys: String*): Map[String, Any] = {
-    val requiredKeys = if(!wantedKeys.isEmpty) wantedKeys else hiddenKeys
-    requiredKeys map { key ⇒ (key, getHiddenValue(key)) } toMap
-  }
-
   // note: this may throw an IllegalStateException - better use `value`
   def getValue[A](key: String): A = element.value[A](key)
 
   def value[A](key: String): Option[A] = {
     val p = property[A](key)
-    if (p.isPresent) Some(p.value)
-    else None
-  }
-
-  // note: this may throw an IllegalStateException - better use `hiddenValue`
-  def getHiddenValue[A](key: String): A = element.value[A](Graph.Key.hide(key))
-
-  def hiddenValue[A](key: String): Option[A] = {
-    val p = hiddenProperty[A](key)
     if (p.isPresent) Some(p.value)
     else None
   }
@@ -71,11 +50,6 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
-    this
-  }
-
-  def setHiddenProperty(key: String, value: Any): ScalaVertex = {
-    element.property(Graph.Key.hide(key), value)
     this
   }
 
@@ -130,11 +104,6 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   def setProperty(key: String, value: Any): ScalaEdge = {
     element.property(key, value)
-    this
-  }
-
-  def setHiddenProperty(key: String, value: Any): ScalaEdge = {
-    element.property(Graph.Key.hide(key), value)
     this
   }
 

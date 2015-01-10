@@ -17,7 +17,7 @@ class FilterSpec extends TestBase {
 
     it("dedups by a given uniqueness function") {
       v(1).out.in
-        .dedup(_.property[String]("lang").orElse(null))
+        .dedup().by(_.property[String]("lang").orElse(null))
         .values[String]("name").toList should be(List("marko"))
     }
   }
@@ -41,7 +41,7 @@ class FilterSpec extends TestBase {
 
     it("emits everything unless a property is in a given aggregate variable") {
       v(1).out
-        .aggregate("x", _.value[String]("name"))
+        .aggregate("x").by(_.value[String]("name"))
         .out.values[String]("name").exceptVar("x")
         .toSet should be (Set("ripple"))
     }
