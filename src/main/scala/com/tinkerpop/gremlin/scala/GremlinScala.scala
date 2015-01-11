@@ -21,7 +21,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def head(): End = toList.head
   def headOption(): Option[End] = toList.headOption
 
-  /** execute pipeline - applies all side effects */
+  // execute pipeline - applies all side effects 
   def iterate() = {
     traversal.iterate()
     GremlinScala[End, Labels](traversal)
@@ -43,7 +43,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def path() = GremlinScala[Path, Labels](traversal.path())
 
-  /** like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec` */
+  // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec` 
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
   def select() = GremlinScala[JMap[String, End], Labels](traversal.select())
@@ -67,10 +67,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def except(someObject: End) = GremlinScala[End, Labels](traversal.except(someObject))
   def except(list: Iterable[End]) = GremlinScala[End, Labels](traversal.except(list))
-  /** not named `except` because type End could be String */
+  // not named `except` because type End could be String 
   def exceptVar(variable: String) = GremlinScala[End, Labels](traversal.except(variable))
 
-  /** keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all */
+  // keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all 
   def coin(probability: Double) = GremlinScala[End, Labels](traversal.coin(probability))
 
   def range(low: Int, high: Int) = GremlinScala[End, Labels](traversal.range(low, high))
@@ -81,7 +81,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def retainOne(retainObject: End) = GremlinScala[End, Labels](traversal.retain(retainObject))
   def retainAll(retainCollection: Seq[End]) = GremlinScala[End, Labels](traversal.retain(retainCollection))
 
-  /** labels the current step and preserves the type - see `labelledPath` steps */
+  // labels the current step and preserves the type - see `labelledPath` steps 
   def as(name: String)(implicit p: Prepend[Labels, End :: HNil]) = GremlinScala[End, p.Out](traversal.as(name))
 
   def back[A](to: String) = GremlinScala[A, Labels](traversal.back[A](to))
@@ -125,6 +125,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def profile() = GremlinScala[End, Labels](traversal.profile)
 
+  def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
+
 
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
@@ -140,6 +142,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         else 0
     }))
 
+  def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_,_]]) =
+    GremlinScala[JMap[String, A], Labels](
+      traversal.`match`(
+        startLabel,
+        traversals map (_.traversal) : _*)
+      )
+
+  def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
+
+  def fold() = GremlinScala[JList[End], Labels](traversal.fold())
+
+  def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
@@ -151,23 +165,23 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
     v
   }
 
-  /** get vertex by id */
+  // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
     GremlinScala(graph.V(id)).headOption map ScalaVertex.apply
 
-  /** get edge by id */
+  // get edge by id
   def e(id: AnyRef): Option[ScalaEdge] = 
     GremlinScala(graph.E(id)).headOption map ScalaEdge.apply
 
-  /** start traversal with all vertices */
+  // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.V().asInstanceOf[GraphTraversal[_, Vertex]])
-  /** start traversal with all edges */
+  // start traversal with all edges 
   def E = GremlinScala[Edge, HNil](graph.E().asInstanceOf[GraphTraversal[_, Edge]])
 
-  /** start traversal with some vertices identified by given ids */
+  // start traversal with some vertices identified by given ids 
   def V(vertexIds: Seq[AnyRef]) = GremlinScala[Vertex, HNil](graph.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
 
-  /** start traversal with some edges identified by given ids */
+  // start traversal with some edges identified by given ids 
   def E(edgeIds: Seq[AnyRef]) = GremlinScala[Edge, HNil](graph.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
 }
 
@@ -188,6 +202,8 @@ object GremlinScala {
 
     def propertyMap(keys: String*) =
       GremlinScala[JMap[String, Any], Labels](traversal.propertyMap(keys: _*))
+
+    def key() = GremlinScala[String, Labels](traversal.key)
 
     def value[A](key: String) =
       GremlinScala[A, Labels](traversal.values[A](key))
