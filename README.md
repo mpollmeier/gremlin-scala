@@ -1,5 +1,7 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
+<!--
 [![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=master)](http://travis-ci.org/mpollmeier/gremlin-scala)
+-->
 
 ## Gremlin-Scala for Tinkerpop 3
 A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Scala. 

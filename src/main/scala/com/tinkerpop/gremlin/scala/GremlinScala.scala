@@ -34,6 +34,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
 
+  def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
+    override def test(h: Traverser[End]): Boolean = p(h)
+  }))
+
   def count() = GremlinScala[JLong, Labels](traversal.count())
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
@@ -115,10 +119,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def to(direction: Direction, edgeLabels: String*) =
     GremlinScala[Vertex, Labels](traversal.to(direction, edgeLabels: _*))
 
-  def sideEffect(traverse: Traverser[End] ⇒ Any) =
+  def sideEffect(fun: End ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
       new JConsumer[Traverser[End]] {
-        override def accept(t: Traverser[End]) = traverse(t)
+        override def accept(t: Traverser[End]) = fun(t.get)
+      })
+    )
+
+  def sideEffectWithTraverser(fun: Traverser[End] ⇒ Any) =
+    GremlinScala[End, Labels](traversal.sideEffect(
+      new JConsumer[Traverser[End]] {
+        override def accept(t: Traverser[End]) = fun(t)
       })
     )
 
@@ -168,6 +179,28 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def fold() = GremlinScala[JList[End], Labels](traversal.fold())
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
+
+  def emit() = GremlinScala[End, Labels](traversal.emit())
+
+  def emit(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
+
+  def branch(fun: End ⇒ Iterable[String]) = 
+    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒ 
+      fun(t.get): JCollection[String]
+    })
+
+  def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) = 
+    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒ 
+      fun(t): JCollection[String]
+    })
+
+  def union(traversals: GremlinScala[End, _]*) = 
+    GremlinScala[End, Labels](traversal.union(traversals map (_.traversal): _*))
+
+  def repeat(t: GremlinScala[End, _]) =
+    GremlinScala[End, Labels](traversal.repeat(t.traversal))
+
+  def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 }
 
 case class ScalaGraph(graph: Graph) extends AnyVal {
