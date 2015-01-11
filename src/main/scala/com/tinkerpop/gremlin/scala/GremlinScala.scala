@@ -2,7 +2,7 @@ package com.tinkerpop.gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }
-import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection }
+import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator }
 
 import collection.JavaConversions._
 import collection.mutable
@@ -40,6 +40,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
+
+  def flatMap[A](fun: End ⇒ Iterable[A]) =
+    GremlinScala[A, Labels](
+      traversal.flatMap[A] { t: Traverser[End] ⇒
+        fun(t.get).toIterator: JIterator[A]
+      }
+    )
+
+  def flatMapWithTraverser[A](fun: Traverser[End] ⇒ Iterable[A]) =
+    GremlinScala[A, Labels](
+      traversal.flatMap[A]{ e: Traverser[End] ⇒
+        fun(e).toIterator: JIterator[A]
+      }
+    )
 
   def path() = GremlinScala[Path, Labels](traversal.path())
 
