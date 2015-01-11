@@ -2,7 +2,6 @@ package com.tinkerpop.gremlin
 
 import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
 
-import com.tinkerpop.gremlin.process.Traverser
 import com.tinkerpop.gremlin.scala.GremlinScala._
 import shapeless._
 import shapeless.ops.hlist._
@@ -12,6 +11,8 @@ package object scala {
   type Edge = structure.Edge
   type Element = structure.Element
   type Graph = structure.Graph
+  type Property[A] = structure.Property[A]
+  type Traverser[A] = process.Traverser[A]
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
   implicit def wrap(e: Edge) = ScalaEdge(e)
