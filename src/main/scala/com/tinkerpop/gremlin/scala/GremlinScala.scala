@@ -9,6 +9,7 @@ import collection.mutable
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.GraphTraversal
+import com.tinkerpop.gremlin.process.graph.AnonymousGraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
@@ -143,11 +144,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def groupCount(sideEffectKey: String) = GremlinScala[End, Labels](traversal.groupCount(sideEffectKey))
 
-  def until(predicate: Traverser[End] ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.until(predicate))
-
-  def times(maxLoops: Int) = GremlinScala[End, Labels](traversal.times(maxLoops))
-
   def profile() = GremlinScala[End, Labels](traversal.profile)
 
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
@@ -197,8 +193,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def union(traversals: GremlinScala[End, _]*) = 
     GremlinScala[End, Labels](traversal.union(traversals map (_.traversal): _*))
 
-  def repeat(t: GremlinScala[End, _]) =
-    GremlinScala[End, Labels](traversal.repeat(t.traversal))
+  // repeats the provided anonymous traversal which starts at the current End
+  // best combined with `times` or `until` step
+  // e.g. gs.V(1).repeat(_.out).times(2)
+  def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) = 
+    GremlinScala[End, Labels](
+      traversal.repeat(
+        repeatTraversal(GremlinScala(AnonymousGraphTraversal.Tokens.__.start())).traversal
+      )
+    )
+
+  def until(predicate: Traverser[End] ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.until(predicate))
+
+  def times(maxLoops: Int) = GremlinScala[End, Labels](traversal.times(maxLoops))
 
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 }
@@ -267,7 +275,7 @@ object GremlinScala {
 
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
-    /* there can e.g. be one of: 
+    /* there can e.g. be one of:
      * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
      * com.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
      * com.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
