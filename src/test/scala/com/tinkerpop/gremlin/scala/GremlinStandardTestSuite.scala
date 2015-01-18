@@ -19,21 +19,17 @@ import shapeless._
 import shapeless.ops.hlist._
 
 object Tests {
-  // class ScalaDedupTest extends DedupTest with StandardTest {
-  //
-  //   override def get_g_V_both_dedup_name = GremlinScala(g).V.both.dedup.values[String]("name")
-  //
-  //   override def get_g_V_both_dedupXlangX_name =
-  //     GremlinScala(g).V.both
-  //       .dedup().by(_.property[String]("lang").orElse(null))
-  //       .values[String]("name")
-  //
-  //   override def get_g_V_both_propertiesXnameX_orderXa_bX_dedup_value =
-  //     GremlinScala(g).V.both
-  //       .values[String]("name")
-  //       .order.by { (a, b) ⇒ a < b }
-  //       .dedup
-  // }
+
+  class ScalaDedupTest extends DedupTest with StandardTest {
+    override def get_g_V_both_dedup_name =
+      GremlinScala(g).V.both.dedup.values[String]("name")
+
+    override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
+      GremlinScala(g).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
+
+    override def get_g_V_both_propertiesXnameX_orderXa_bX_dedup_value =
+      GremlinScala(g).V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup
+  }
 
   // class ScalaFilterTest extends FilterTest with StandardTest {
   //
@@ -94,14 +90,14 @@ object Tests {
   //   override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
   //     GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
 
-    // override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path =
-    //   GremlinScala(g).V.as("x").both
-    //     .simplePath
-    //     .jump("x", _.loops < 3)
-    //     .path
-    //
-    // override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path =
-    //   GremlinScala(g).V.as("x").both.simplePath.jump("x", 3).path
+  // override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path =
+  //   GremlinScala(g).V.as("x").both
+  //     .simplePath
+  //     .jump("x", _.loops < 3)
+  //     .path
+  //
+  // override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path =
+  //   GremlinScala(g).V.as("x").both.simplePath.jump("x", 3).path
   // }
 
   // class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
@@ -521,27 +517,27 @@ import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute - all are in ProcessStandardSuite
-      // classOf[ScalaDedupTest],
-      // classOf[ScalaFilterTest],
-      // classOf[ScalaExceptTest],
-      // classOf[ScalaSimplePathTest],
-      // classOf[ScalaCyclicPathTest],
-      // classOf[ScalaHasTest],
-      // classOf[ScalaHasNotTest],
-      // classOf[ScalaBetweenTest],
-      // classOf[ScalaCoinTest],
-      // classOf[ScalaRangeTest],
-      // classOf[ScalaRetainTest],
-      // classOf[ScalaBackTest],
-      // classOf[ScalaMapTest],
-      // classOf[ScalaOrderTest],
-      // classOf[ScalaVertexTest],
-      // classOf[ScalaAggregateTest],
-      // classOf[ScalaCountTest],
-      // classOf[ScalaSideEffectTest],
-      // classOf[ScalaSideEffectCapTest],
-      // classOf[ScalaGroupCountTest],
-      // classOf[ScalaGroupTest]
+      classOf[ScalaDedupTest]
+    // classOf[ScalaFilterTest],
+    // classOf[ScalaExceptTest],
+    // classOf[ScalaSimplePathTest],
+    // classOf[ScalaCyclicPathTest],
+    // classOf[ScalaHasTest],
+    // classOf[ScalaHasNotTest],
+    // classOf[ScalaBetweenTest],
+    // classOf[ScalaCoinTest],
+    // classOf[ScalaRangeTest],
+    // classOf[ScalaRetainTest],
+    // classOf[ScalaBackTest],
+    // classOf[ScalaMapTest],
+    // classOf[ScalaOrderTest],
+    // classOf[ScalaVertexTest],
+    // classOf[ScalaAggregateTest],
+    // classOf[ScalaCountTest],
+    // classOf[ScalaSideEffectTest],
+    // classOf[ScalaSideEffectCapTest],
+    // classOf[ScalaGroupCountTest],
+    // classOf[ScalaGroupTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     ),
     Array.empty, //testsToEnforce
@@ -571,7 +567,7 @@ class TinkerGraphGraphProvider extends AbstractGraphProvider {
       classOf[TinkerVertexProperty[_]],
       classOf[DefaultGraphTraversal[_, _]],
       classOf[AnonymousGraphTraversal.Tokens]
-    ): Set[Class[_]] 
+    ): Set[Class[_]]
 
   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
     Map("gremlin.graph" -> classOf[TinkerGraph].getName)
