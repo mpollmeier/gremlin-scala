@@ -1,6 +1,6 @@
 name := "gremlin-scala"
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0.M7"
 
 organization := "com.michaelpollmeier"
 
@@ -22,7 +22,7 @@ scalacOptions ++= Seq(
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0-SNAPSHOT"
+  val gremlinVersion = "3.0.0.M7"
   val junitVersion = "4.11"
   Seq(
     "com.tinkerpop" % "gremlin-core" % gremlinVersion,
