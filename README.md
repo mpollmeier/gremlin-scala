@@ -7,8 +7,8 @@ This is the current development branch, based on [Tinkerpop3](https://github.com
 
 
 ### Branches
-[master](https://github.com/mpollmeier/gremlin-scala/) - the latest snapshot
-[stable](https://github.com/mpollmeier/gremlin-scala/tree/stable) - the latest stable version (milestone)
+* [master](https://github.com/mpollmeier/gremlin-scala/) - the latest snapshot
+* [stable](https://github.com/mpollmeier/gremlin-scala/tree/stable) - the latest stable version (milestone)
 
 ### Usage
 Clone the [examples project](https://github.com/mpollmeier/gremlin-scala-examples) and start with
