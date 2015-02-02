@@ -8,8 +8,7 @@ import collection.JavaConversions._
 import collection.mutable
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.GraphTraversal
-import com.tinkerpop.gremlin.process.graph.AnonymousGraphTraversal
+import com.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
@@ -73,8 +72,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[JMap[String, End], Labels](traversal.select(stepLabels: _*))
 
   def order() = GremlinScala[End, Labels](traversal.order())
-
-  def shuffle() = GremlinScala[End, Labels](traversal.shuffle())
 
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
   def cyclicPath() = GremlinScala[End, Labels](traversal.cyclicPath())
@@ -148,7 +145,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
 
-
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
@@ -196,12 +192,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // repeats the provided anonymous traversal which starts at the current End
   // best combined with `times` or `until` step
   // e.g. gs.V(1).repeat(_.out).times(2)
-  def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) = 
-    GremlinScala[End, Labels](
-      traversal.repeat(
-        repeatTraversal(GremlinScala(AnonymousGraphTraversal.Tokens.__.start())).traversal
-      )
-    )
+  // def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+  //   GremlinScala[End, Labels](
+  //     traversal.repeat(
+  //       repeatTraversal(GremlinScala(AnonymousGraphTraversal.Tokens.__.start())).traversal
+  //     )
+  //   )
 
   def until(predicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(predicate))
@@ -299,14 +295,9 @@ object GremlinScala {
 
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 
-    // startValue: greaterThanEqual,  endValue: less than
-    def between[A, B](key: String, startValue: Comparable[A], endValue: Comparable[B]) =
-      GremlinScala[End, Labels](traversal.between(key, startValue, endValue))
-
     def local[A](localTraversal: GremlinScala[A, _]) = GremlinScala[A, Labels](traversal.local(localTraversal.traversal))
 
     def timeLimit(millis: Long) = GremlinScala[End, Labels](traversal.timeLimit(millis))
-
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])

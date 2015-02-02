@@ -6,11 +6,11 @@ import scala.collection.JavaConversions._
 
 import collection.mutable
 import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.step.branch._
-import com.tinkerpop.gremlin.process.graph.step.filter._
-import com.tinkerpop.gremlin.process.graph.step.map._
-import com.tinkerpop.gremlin.process.graph.step.sideEffect
-import com.tinkerpop.gremlin.process.graph.step.sideEffect._
+import com.tinkerpop.gremlin.process.graph.traversal.step.branch._
+import com.tinkerpop.gremlin.process.graph.traversal.step.filter._
+import com.tinkerpop.gremlin.process.graph.traversal.step.map._
+import com.tinkerpop.gremlin.process.graph.traversal.step.sideEffect
+import com.tinkerpop.gremlin.process.graph.traversal.step.sideEffect._
 import com.tinkerpop.gremlin.structure
 import com.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
@@ -553,8 +553,7 @@ class ScalaTinkerGraphStandardTest {}
 
 class TinkerGraphGraphProvider extends AbstractGraphProvider {
   import com.tinkerpop.gremlin.tinkergraph.structure._
-  import com.tinkerpop.gremlin.process.graph.AnonymousGraphTraversal
-  import com.tinkerpop.gremlin.process.graph.util.DefaultGraphTraversal
+  import com.tinkerpop.gremlin.process.graph.traversal.DefaultGraphTraversal
 
   override def getImplementations =
     Set(
@@ -565,8 +564,8 @@ class TinkerGraphGraphProvider extends AbstractGraphProvider {
       classOf[TinkerProperty[_]],
       classOf[TinkerVertex],
       classOf[TinkerVertexProperty[_]],
-      classOf[DefaultGraphTraversal[_, _]],
-      classOf[AnonymousGraphTraversal.Tokens]
+      classOf[DefaultGraphTraversal[_, _]]
+      // classOf[AnonymousGraphTraversal.Tokens]
     ): Set[Class[_]]
 
   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
