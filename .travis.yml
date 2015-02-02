@@ -13,4 +13,4 @@ env:
   - secure: ckc8wVBi9QhJErs1MxTukyCVRx76vEaoLEnIjfIUPTMg7qX6NAXTNsPbY6FmI3c2+sL2ljKFyQt5PwIXACQVetkOkmdNYoBDE8njhvIQ21ITupsTSkxDd+bMiUft1r2jhmZYQwXnGIHeX0Pml44eVTci3r8WFt0XZpdCUzE9mxw=
 branches:
   except:
-    - snapshot
+    - master
