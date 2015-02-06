@@ -1,25 +1,8 @@
 name := "gremlin-scala"
-
 version := "3.0.0-SNAPSHOT"
-
 organization := "com.michaelpollmeier"
-
-crossScalaVersions := Seq("2.10.4", "2.11.5")
-
 scalaVersion := "2.11.5"
-
-scalacOptions ++= Seq(
-  //"-Xlog-implicits"
-  //"-Ydebug"
-)
-
-// doesn't work on travis ;(
-// incOptions := incOptions.value.withNameHashing(true)
-
-// full stack traces
-// testOptions in Test += Tests.Argument("-oF")
-
-net.virtualvoid.sbt.graph.Plugin.graphSettings
+crossScalaVersions := Seq("2.10.4", scalaVersion.value)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
@@ -39,15 +22,19 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   )
 }
 
-resolvers += Resolver.mavenLocal
+scalacOptions ++= Seq(
+  //"-Xlog-implicits"
+  //"-Ydebug"
+)
+// full stack traces
+// testOptions in Test += Tests.Argument("-oF")
 
-// resolvers ++= Seq(
-//   "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + "/.m2/repository"
-//   "Maven Central" at "http://repo1.maven.org/maven2/",
-//   "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/",
-//   "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
-//   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-// )
+// doesn't work on travis ;(
+// incOptions := incOptions.value.withNameHashing(true)
+
+net.virtualvoid.sbt.graph.Plugin.graphSettings
+
+resolvers += Resolver.mavenLocal
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
@@ -56,9 +43,7 @@ publishTo <<= version { (v: String) =>
 }
 
 publishMavenStyle := true
-
 publishArtifact in Test := false
-
 pomIncludeRepository := { _ ⇒ false }
 
 pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
