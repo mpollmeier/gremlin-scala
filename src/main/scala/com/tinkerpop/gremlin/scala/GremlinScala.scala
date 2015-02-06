@@ -9,6 +9,7 @@ import collection.mutable
 import com.tinkerpop.gremlin._
 import com.tinkerpop.gremlin.process._
 import com.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
+import com.tinkerpop.gremlin.process.graph.traversal.__
 import com.tinkerpop.gremlin.process.T
 import com.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
@@ -192,12 +193,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // repeats the provided anonymous traversal which starts at the current End
   // best combined with `times` or `until` step
   // e.g. gs.V(1).repeat(_.out).times(2)
-  // def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
-  //   GremlinScala[End, Labels](
-  //     traversal.repeat(
-  //       repeatTraversal(GremlinScala(AnonymousGraphTraversal.Tokens.__.start())).traversal
-  //     )
-  //   )
+  def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+    GremlinScala[End, Labels](
+      traversal.repeat(
+        repeatTraversal(GremlinScala(__.start())).traversal
+      )
+    )
 
   def until(predicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(predicate))
