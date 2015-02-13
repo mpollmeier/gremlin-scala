@@ -1,4 +1,4 @@
-package com.tinkerpop.gremlin.scala
+package gremlin.scala
 
 import scala.reflect._
 import scala.reflect.ClassTag

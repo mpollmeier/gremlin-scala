@@ -1,4 +1,4 @@
-package com.tinkerpop.gremlin.scala
+package gremlin.scala
 
 import scala.collection.JavaConversions._
 import com.tinkerpop.gremlin.process.T

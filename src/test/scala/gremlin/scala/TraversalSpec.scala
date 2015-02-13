@@ -1,4 +1,4 @@
-package com.tinkerpop.gremlin.scala
+package gremlin.scala
 
 import org.scalatest.matchers.ShouldMatchers
 import shapeless.test.illTyped

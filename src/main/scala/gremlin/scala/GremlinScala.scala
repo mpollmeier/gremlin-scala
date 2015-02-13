@@ -1,4 +1,4 @@
-package com.tinkerpop.gremlin.scala
+package gremlin.scala
 
 import java.lang.{ Long ⇒ JLong }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }

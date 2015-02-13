@@ -1,8 +1,8 @@
-package com.tinkerpop.gremlin
+package gremlin
 
 import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
 
-import com.tinkerpop.gremlin.scala.GremlinScala._
+import gremlin.scala.GremlinScala._
 import com.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
 import shapeless._
 import shapeless.ops.hlist._

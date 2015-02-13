@@ -1,4 +1,4 @@
-package com.tinkerpop.gremlin.scala
+package gremlin.scala
 
 import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.FunSpec
