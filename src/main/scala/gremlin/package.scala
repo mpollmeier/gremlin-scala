@@ -3,7 +3,9 @@ package gremlin
 import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
 
 import gremlin.scala.GremlinScala._
-import com.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
+import org.apache.tinkerpop.gremlin.process
+import org.apache.tinkerpop.gremlin.structure
 import shapeless._
 import shapeless.ops.hlist._
 

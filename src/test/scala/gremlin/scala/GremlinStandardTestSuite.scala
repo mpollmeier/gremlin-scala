@@ -5,16 +5,16 @@ import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Colle
 import scala.collection.JavaConversions._
 
 import collection.mutable
-import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.traversal.step.branch._
-import com.tinkerpop.gremlin.process.graph.traversal.step.filter._
-import com.tinkerpop.gremlin.process.graph.traversal.step.map._
-import com.tinkerpop.gremlin.process.graph.traversal.step.sideEffect
-import com.tinkerpop.gremlin.process.graph.traversal.step.sideEffect._
-import com.tinkerpop.gremlin.structure
-import com.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import org.apache.tinkerpop.gremlin.process._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.branch._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.filter._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.sideEffect
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.sideEffect._
+import org.apache.tinkerpop.gremlin.structure
+import org.apache.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -505,13 +505,13 @@ trait StandardTest {
 }
 
 import Tests._
-import com.tinkerpop.gremlin._
+import org.apache.tinkerpop.gremlin._
 import org.junit.runners.model.RunnerBuilder
 import org.junit.runner.RunWith
 import java.util.{ Map ⇒ JMap }
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-// import com.tinkerpop.gremlin.tinkergraph.TinkerGraphGraphProvider //send a pr?
-import com.tinkerpop.gremlin.structure.StructureStandardSuite
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+// import org.apache.tinkerpop.gremlin.tinkergraph.TinkerGraphGraphProvider //send a pr?
+import org.apache.tinkerpop.gremlin.structure.StructureStandardSuite
 import org.apache.commons.configuration.Configuration
 import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
@@ -552,8 +552,8 @@ class ScalaTinkerGraphStandardTest {}
 //TODO configure sbt to run with junit so it properly prints the test count - does that work in gremlin-java?
 
 class TinkerGraphGraphProvider extends AbstractGraphProvider {
-  import com.tinkerpop.gremlin.tinkergraph.structure._
-  import com.tinkerpop.gremlin.process.graph.traversal.DefaultGraphTraversal
+  import org.apache.tinkerpop.gremlin.tinkergraph.structure._
+  import org.apache.tinkerpop.gremlin.process.graph.traversal.DefaultGraphTraversal
 
   override def getImplementations =
     Set(

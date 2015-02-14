@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import scala.collection.JavaConversions._
-import com.tinkerpop.gremlin.process.T
+import org.apache.tinkerpop.gremlin.process.T
 import shapeless._
 
 trait ScalaElement[ElementType <: Element] {

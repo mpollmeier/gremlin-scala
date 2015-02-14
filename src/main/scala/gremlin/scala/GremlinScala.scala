@@ -6,12 +6,12 @@ import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCol
 
 import collection.JavaConversions._
 import collection.mutable
-import com.tinkerpop.gremlin._
-import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
-import com.tinkerpop.gremlin.process.graph.traversal.__
-import com.tinkerpop.gremlin.process.T
-import com.tinkerpop.gremlin.structure._
+import org.apache.tinkerpop.gremlin._
+import org.apache.tinkerpop.gremlin.process._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.graph.traversal.__
+import org.apache.tinkerpop.gremlin.process.T
+import org.apache.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 
@@ -274,8 +274,8 @@ object GremlinScala {
 
     /* there can e.g. be one of:
      * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
-     * com.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
-     * com.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
+     * org.apache.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
+     * org.apache.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
      */
     def has(key: String, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
 

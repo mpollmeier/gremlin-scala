@@ -8,15 +8,15 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
   Seq(
-    "com.tinkerpop" % "gremlin-core" % gremlinVersion,
-    "com.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
+    "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
+    "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
     "com.chuusai" % "shapeless" % "2.0.0" cross CrossVersion.fullMapped {
       case "2.10.4" ⇒ "2.10.4"
       case v if v.startsWith("2.11") ⇒ "2.11"
       case v ⇒ v
     },
-    "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
+    "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
     "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   )

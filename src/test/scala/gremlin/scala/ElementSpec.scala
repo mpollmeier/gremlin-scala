@@ -1,8 +1,8 @@
 package gremlin.scala
 
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
-import com.tinkerpop.gremlin.process.T
+import org.apache.tinkerpop.gremlin.process.T
 
 
 class ElementSpec extends TestBase {

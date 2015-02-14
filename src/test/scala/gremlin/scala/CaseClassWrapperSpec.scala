@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import com.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 

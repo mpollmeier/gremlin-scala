@@ -1,22 +1,22 @@
 package gremlin.scala
 
 import collection.JavaConversions._
-import com.tinkerpop.gremlin.process._
-import com.tinkerpop.gremlin.process.graph.traversal.step.map.MapStep
-import com.tinkerpop.gremlin.process.traverser.TraverserRequirement
+import org.apache.tinkerpop.gremlin.process._
+import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map.MapStep
+import org.apache.tinkerpop.gremlin.process.traverser.TraverserRequirement
+import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import shapeless._
 import shapeless.ops.hlist._
 
-class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends MapStep[S, Labels](traversal.asAdmin) {
+class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends MapStep[S, Labels](traversal.asAdmin) with TraversalParent {
 
   override def getRequirements = Set(
     TraverserRequirement.PATH,
     TraverserRequirement.PATH_ACCESS
   )
 
-  this.setFunction { traverser: Traverser[S] ⇒
-    toHList(toList(traverser.path)): Labels
-  }
+  override def map(traverser: Traverser.Admin[S]): Labels =
+    toHList(toList(traverser.path))
 
   def toList(path: Path): List[Any] = {
     val labels = path.labels
