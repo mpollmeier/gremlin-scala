@@ -11,7 +11,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
-    "com.chuusai" % "shapeless" % "2.0.0" cross CrossVersion.fullMapped {
+    "com.chuusai" % "shapeless" % "2.1.0" cross CrossVersion.fullMapped {
       case "2.10.4" ⇒ "2.10.4"
       case v if v.startsWith("2.11") ⇒ "2.11"
       case v ⇒ v
