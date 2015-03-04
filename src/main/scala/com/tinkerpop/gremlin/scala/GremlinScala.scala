@@ -38,9 +38,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
   
-  def toCC[A: TypeTag] = gs.map[A] { end =>
-    val vertex = end.asInstanceOf[Vertex]
-
+  def toCC[A: TypeTag] = gs.map[A] { case vertex: Vertex =>
     val mirror = runtimeMirror(getClass.getClassLoader)
     val classA = typeOf[A].typeSymbol.asClass
     val classMirror = mirror.reflectClass(classA)
@@ -48,7 +46,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
     val params = constructor.paramss.head map {
       case field if field.name.decoded == "id" => vertex.id.toString
-      case field => vertex.value(field.name.decoded, null)
+      case field if field.typeSignature.typeSymbol.fullName == typeOf[Option[_]].typeSymbol.fullName =>
+        Option(vertex.valueOrElse(field.name.decoded, null))
+      case field => vertex.valueOrElse(field.name.decoded, null)
     }
 
     val constructorMirror = classMirror.reflectConstructor(constructor)
