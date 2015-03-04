@@ -240,13 +240,18 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   def V = GremlinScala[Vertex, HNil](graph.V.asInstanceOf[GraphTraversal[_, Vertex]])
   /** get all edges */
   def E = GremlinScala[Edge, HNil](graph.E.asInstanceOf[GraphTraversal[_, Edge]])
+  
+  def saveCC[A: TypeTag: ClassTag](cc: A) = {
+    val mirror = runtimeMirror(cc.getClass.getClassLoader)
+    val instanceMirror = mirror.reflect(cc)
 
-  def saveCC[A: ClassTag](cc: A) = {
-    val runtimeClass = classTag[A].runtimeClass
-    val params = (runtimeClass.getDeclaredFields map { field =>
-      field.setAccessible(true)
-      field.getName -> field.get(cc)
-    } filter (_._1 != "id")).toMap + ("label" -> runtimeClass.getSimpleName)
+    val params = (typeOf[A].declarations map (_.asTerm) filter (_.isGetter) map { term =>
+      val fieldMirror = instanceMirror.reflectField(term)
+      term.name.decoded -> (term.typeSignature.typeSymbol.fullName match {
+        case t if t == typeOf[Option[_]].typeSymbol.fullName => fieldMirror.get.asInstanceOf[Option[_]].get
+        case _ => fieldMirror.get
+      })
+    } filter (_._1 != "id")).toMap + ("label" -> cc.getClass.getSimpleName)
 
     graph.addVertex().setProperties(params)
   }
