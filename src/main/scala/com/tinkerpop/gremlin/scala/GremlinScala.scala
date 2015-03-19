@@ -211,35 +211,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 }
 
-case class ScalaGraph(graph: Graph) extends AnyVal {
-  def addVertex() = ScalaVertex(graph.addVertex())
-  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
-  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex(label)
-    v.setProperties(properties)
-    v
-  }
-
-  // get vertex by id
-  def v(id: AnyRef): Option[ScalaVertex] =
-    GremlinScala(graph.V(id)).headOption map ScalaVertex.apply
-
-  // get edge by id
-  def e(id: AnyRef): Option[ScalaEdge] = 
-    GremlinScala(graph.E(id)).headOption map ScalaEdge.apply
-
-  // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](graph.V().asInstanceOf[GraphTraversal[_, Vertex]])
-  // start traversal with all edges 
-  def E = GremlinScala[Edge, HNil](graph.E().asInstanceOf[GraphTraversal[_, Edge]])
-
-  // start traversal with some vertices identified by given ids 
-  def V(vertexIds: Seq[AnyRef]) = GremlinScala[Vertex, HNil](graph.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
-
-  // start traversal with some edges identified by given ids 
-  def E(edgeIds: Seq[AnyRef]) = GremlinScala[Edge, HNil](graph.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
-}
-
 object GS {
   // GS(graph) as a shorthand for GremlinScala(graph)
   def apply(graph: Graph) = GremlinScala(graph)

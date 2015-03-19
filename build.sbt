@@ -4,9 +4,9 @@ version := "3.0.0.M7"
 
 organization := "com.michaelpollmeier"
 
-crossScalaVersions := Seq("2.10.4", "2.11.5")
+crossScalaVersions := Seq("2.10.5", "2.11.6")
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
 scalacOptions ++= Seq(
   //"-Xlog-implicits"
@@ -33,6 +33,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
       case v if v.startsWith("2.11") ⇒ "2.11"
       case v ⇒ v
     },
+    "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
     "junit" % "junit" % junitVersion % "test",
     "org.scalatest" %% "scalatest" % "2.2.1" % "test"
