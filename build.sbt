@@ -34,6 +34,7 @@ scalacOptions ++= Seq(
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
+resolvers += "Apache Snapshots" at "https://repository.apache.org/content/repositories/snapshots/"
 resolvers += Resolver.mavenLocal
 
 publishTo <<= version { (v: String) =>
