@@ -5,8 +5,7 @@ scalaVersion := "2.11.5"
 crossScalaVersions := Seq("2.10.4", scalaVersion.value)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  // val gremlinVersion = "3.0.0-SNAPSHOT"
-  val gremlinVersion = "3.0.0.M8"
+  val gremlinVersion = "3.0.0-SNAPSHOT"
   val junitVersion = "4.11"
   Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
@@ -35,7 +34,7 @@ scalacOptions ++= Seq(
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
-resolvers += "Apache Snapshots" at "https://repository.apache.org/content/repositories/snapshots/"
+resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal
 
 publishTo <<= version { (v: String) =>
