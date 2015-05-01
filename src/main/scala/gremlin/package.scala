@@ -54,4 +54,3 @@ package object scala {
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
     { t: Traverser[A] ⇒ fun(t.get) }
 }
-

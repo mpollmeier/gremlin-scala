@@ -4,9 +4,9 @@ import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Path
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
-// import org.apache.tinkerpop.gremlin.process.traversal.{ Traverser, Traversal }
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map.MapStep
-// import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
+import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapStep
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser
+import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import shapeless._
 import shapeless.ops.hlist._
 

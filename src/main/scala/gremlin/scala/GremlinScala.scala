@@ -9,8 +9,9 @@ import collection.mutable
 import org.apache.tinkerpop.gremlin._
 import org.apache.tinkerpop.gremlin.process._
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.process.graph.traversal.__
-import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
+import org.apache.tinkerpop.gremlin.process.traversal.Path
+import org.apache.tinkerpop.gremlin.process.traversal.T
 import org.apache.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend

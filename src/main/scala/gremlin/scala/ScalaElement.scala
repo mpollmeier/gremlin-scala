@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import scala.collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.process.traversal.T
 import shapeless._
 
 trait ScalaElement[ElementType <: Element] {
@@ -124,4 +124,3 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist
   //def inV() = GremlinScala[ Vertex, HNil](edge.inV())
 }
-
