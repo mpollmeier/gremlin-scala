@@ -2,11 +2,12 @@ package gremlin.scala
 
 import scala.collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.T
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
-  def start(): GremlinScala[ ElementType, HNil]
+  def start(): GremlinScala[ElementType, HNil]
 
   def id: AnyRef = element.id
   def label(): String = element.label
@@ -61,24 +62,23 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     this
   }
 
-  //TODO get back to work
-  // def out() = GremlinScala[ Vertex, HNil](vertex.out())
-  // def out(labels: String*) = GremlinScala[ Vertex, HNil](vertex.out(labels: _*))
+  def out() = start.out()
+  def out(labels: String*) = start.out(labels: _*)
 
-  // def outE() = GremlinScala[ Edge, HNil](vertex.outE())
-  // def outE(labels: String*) = GremlinScala[ Edge, HNil](vertex.outE(labels: _*))
+  def outE() = start.outE()
+  def outE(labels: String*) = start.outE(labels: _*)
 
-  // def in() = GremlinScala[ Vertex, HNil](vertex.in())
-  // def in(labels: String*) = GremlinScala[ Vertex, HNil](vertex.in(labels: _*))
+  def in() = start.in()
+  def in(labels: String*) = start.in(labels: _*)
 
-  // def inE() = GremlinScala[ Edge, HNil](vertex.inE())
-  // def inE(labels: String*) = GremlinScala[ Edge, HNil](vertex.inE(labels: _*))
+  def inE() = start.inE()
+  def inE(labels: String*) = start.inE(labels: _*)
 
-  // def both() = GremlinScala[ Vertex, HNil](vertex.both())
-  // def both(labels: String*) = GremlinScala[ Vertex, HNil](vertex.both(labels: _*))
+  def both() = start.both()
+  def both(labels: String*) = start.both(labels: _*)
 
-  // def bothE() = GremlinScala[ Edge, HNil](vertex.bothE())
-  // def bothE(labels: String*) = GremlinScala[ Edge, HNil](vertex.bothE(labels: _*))
+  def bothE() = start.bothE()
+  def bothE(labels: String*) = start.bothE(labels: _*)
 
   def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
     val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
@@ -94,7 +94,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
-  def start() = GremlinScala[Vertex, HNil](vertex.graph.traversal.V(vertex.id))
+  def start() = GremlinScala[Vertex, HNil](__.__(vertex.id))
 }
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
@@ -118,9 +118,9 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
-  def start() = GremlinScala[Edge, HNil](edge.graph.traversal.E(edge.id))
+  def start() = GremlinScala[Edge, HNil](__.__(edge.id))
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist
-  //def inV() = GremlinScala[ Vertex, HNil](edge.inV())
+  //def inV() = GremlinScala[Vertex, HNil](edge.inV())
 }
