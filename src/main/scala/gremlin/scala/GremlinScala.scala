@@ -80,7 +80,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def dedup() = GremlinScala[End, Labels](traversal.dedup())
 
-  def aggregate() = GremlinScala[End, Labels](traversal.aggregate())
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))      
 
   def except(someObject: End) = GremlinScala[End, Labels](traversal.except(someObject))
@@ -133,13 +132,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       })
     )
 
-  def group() = GremlinScala[End, Labels](traversal.group())
+  // def group() = GremlinScala[End, Labels](traversal.group())
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
   // note that groupCount is a side effect step, other than the 'count' step..
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
-  def groupCount() = GremlinScala[End, Labels](traversal.groupCount())
+  // def groupCount() = GremlinScala[End, Labels](traversal.groupCount())
 
   def groupCount(sideEffectKey: String) = GremlinScala[End, Labels](traversal.groupCount(sideEffectKey))
 
@@ -220,22 +219,22 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
-    GremlinScala(graph.V(id)).headOption map ScalaVertex.apply
+    GremlinScala(graph.traversal.V(id)).headOption map ScalaVertex.apply
 
   // get edge by id
   def e(id: AnyRef): Option[ScalaEdge] = 
-    GremlinScala(graph.E(id)).headOption map ScalaEdge.apply
+    GremlinScala(graph.traversal.E(id)).headOption map ScalaEdge.apply
 
   // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](graph.V().asInstanceOf[GraphTraversal[_, Vertex]])
+  def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
   // start traversal with all edges 
-  def E = GremlinScala[Edge, HNil](graph.E().asInstanceOf[GraphTraversal[_, Edge]])
+  def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
 
   // start traversal with some vertices identified by given ids 
-  def V(vertexIds: Seq[AnyRef]) = GremlinScala[Vertex, HNil](graph.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(vertexIds: Seq[AnyRef]) = GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
 
   // start traversal with some edges identified by given ids 
-  def E(edgeIds: Seq[AnyRef]) = GremlinScala[Edge, HNil](graph.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
+  def E(edgeIds: Seq[AnyRef]) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
 }
 
 object GS {
