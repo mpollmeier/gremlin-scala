@@ -65,7 +65,7 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
       <name>Michael Pollmeier</name>
       <url>http://www.michaelpollmeier.com</url>
     </developer>
-  </developers>                                                                                 
+  </developers>;
 
 credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
 // credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
