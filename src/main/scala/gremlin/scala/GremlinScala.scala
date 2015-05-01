@@ -8,9 +8,9 @@ import collection.JavaConversions._
 import collection.mutable
 import org.apache.tinkerpop.gremlin._
 import org.apache.tinkerpop.gremlin.process._
-import org.apache.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.graph.traversal.__
-import org.apache.tinkerpop.gremlin.process.T
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
@@ -22,7 +22,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def head(): End = toList.head
   def headOption(): Option[End] = toList.headOption
 
-  // execute pipeline - applies all side effects 
+  // execute pipeline - applies all side effects
   def iterate() = {
     traversal.iterate()
     GremlinScala[End, Labels](traversal)

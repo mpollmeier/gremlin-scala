@@ -1,12 +1,12 @@
 package gremlin.scala
 
 import collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.process
-import org.apache.tinkerpop.gremlin.process.Traverser
-import org.apache.tinkerpop.gremlin.process.Traversal
-import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map.MapStep
-import org.apache.tinkerpop.gremlin.process.traverser.TraverserRequirement
-import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
+import org.apache.tinkerpop.gremlin.process.traversal.Path
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal
+import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
+// import org.apache.tinkerpop.gremlin.process.traversal.{ Traverser, Traversal }
+// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map.MapStep
+// import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -20,7 +20,7 @@ class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends M
   override def map(traverser: Traverser.Admin[S]): Labels =
     toHList(toList(traverser.path))
 
-  def toList(path: process.Path): List[Any] = {
+  def toList(path: Path): List[Any] = {
     val labels = path.labels
     def hasUserLabel(i: Int) = !labels(i).isEmpty
 

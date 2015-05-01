@@ -3,9 +3,9 @@ package gremlin
 import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
 
 import gremlin.scala.GremlinScala._
-import org.apache.tinkerpop.gremlin.process.graph.traversal.GraphTraversal
-import org.apache.tinkerpop.gremlin.process
 import org.apache.tinkerpop.gremlin.structure
+import org.apache.tinkerpop.gremlin.process.traversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -15,7 +15,7 @@ package object scala {
   type Element = structure.Element
   type Graph = structure.Graph
   type Property[A] = structure.Property[A]
-  type Traverser[A] = process.Traverser[A]
+  type Traverser[A] = traversal.Traverser[A]
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
   implicit def wrap(e: Edge) = ScalaEdge(e)
