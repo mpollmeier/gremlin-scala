@@ -12,6 +12,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.Path
 import org.apache.tinkerpop.gremlin.process.traversal.T
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
@@ -132,14 +133,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       })
     )
 
-  // def group() = GremlinScala[End, Labels](traversal.group())
+  def group[A, B]() = GremlinScala[JMap[A, B], Labels](traversal.group())
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
+  def groupCount[A]() = GremlinScala[JMap[A, JLong], Labels](traversal.groupCount())
+
   // note that groupCount is a side effect step, other than the 'count' step..
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
-  // def groupCount() = GremlinScala[End, Labels](traversal.groupCount())
-
   def groupCount(sideEffectKey: String) = GremlinScala[End, Labels](traversal.groupCount(sideEffectKey))
 
   def profile() = GremlinScala[End, Labels](traversal.profile)
@@ -147,18 +148,24 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
 
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
+  def by() = GremlinScala[End, Labels](traversal.by())
+
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
-  def by[A <: AnyRef](tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
+  def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
 
-  def by[A <: AnyRef](elementPropertyProjection: String) = GremlinScala[End, Labels](traversal.by(elementPropertyProjection))
+  def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
 
-  def by[A <: AnyRef](lessThan: (End, End) ⇒ Boolean) = 
+  def by(lessThan: (End, End) ⇒ Boolean) = 
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
       override def compare(a: End, b: End) =
         if (lessThan(a, b)) -1
         else 0
     }))
+
+  def by(byTraversal: Traversal[_,_]) = GremlinScala[End, Labels](traversal.by(byTraversal))
+
+  def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
 
   def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_,_]]) =
     GremlinScala[JMap[String, A], Labels](

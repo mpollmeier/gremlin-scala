@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import java.lang.{ Long ⇒ JLong }
+import java.lang.{ Long ⇒ JLong, Double => JDouble }
 import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
 import scala.collection.JavaConversions._
 
@@ -18,23 +18,27 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless._
 import shapeless.ops.hlist._
 import org.apache.tinkerpop.gremlin.process.traversal._
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 
 object Tests {
 
-  // class ScalaDedupTest extends DedupTest with StandardTest {
-  //   override def get_g_V_both_dedup_name =
-  //     GremlinScala(graph).V.both.dedup.values[String]("name")
+  class ScalaDedupTest extends DedupTest with StandardTest {
+    override def get_g_V_both_dedup_name =
+      GremlinScala(graph).V.both.dedup.values[String]("name")
 
-  //   override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
-  //     GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
+    override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
+      GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
 
-  //   override def get_g_V_both_name_orderXa_bX_dedup = 
-  //     GremlinScala(graph).V.both.values[String]("name").order.by{ (a, b) => a < b }.dedup
+    override def get_g_V_both_name_orderXa_bX_dedup = 
+      GremlinScala(graph).V.both.values[String]("name").order.by{ (a, b) => a < b }.dedup
 
-  //   // override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
-  //   //   GremlinScala(graph).V.group().by(T.label)
-  //           // return g.V().<String, Set<Double>>group().by(T.label).by(bothE().values("weight").fold()).by(dedup(Scope.local));
-  // }
+    override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX = GremlinScala(graph).V.group()
+      .by(T.label)
+      .by(__.bothE().values[java.lang.Float]("weight").fold())
+      .by(__.dedup(Scope.local))
+      .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
+    //TODO: get rid of cast
+  }
 
   // class ScalaFilterTest extends FilterTest with StandardTest {
   //
@@ -522,7 +526,7 @@ import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute - all are in ProcessStandardSuite
-      // classOf[ScalaDedupTest]
+      classOf[ScalaDedupTest]
     // classOf[ScalaFilterTest],
     // classOf[ScalaExceptTest],
     // classOf[ScalaSimplePathTest],
@@ -549,37 +553,37 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     true //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
   )
 
-// @RunWith(classOf[GremlinScalaStandardSuite])
-// @AbstractGremlinSuite.GraphProviderClass(
-//   provider = classOf[TinkerGraphGraphProvider],
-//   graph = classOf[TinkerGraph])
-// class ScalaTinkerGraphStandardTest {}
+@RunWith(classOf[GremlinScalaStandardSuite])
+@AbstractGremlinSuite.GraphProviderClass(
+  provider = classOf[TinkerGraphGraphProvider],
+  graph = classOf[TinkerGraph])
+class ScalaTinkerGraphStandardTest {}
 // //TODO configure sbt to run with junit so it properly prints the test count - does that work in gremlin-java?
 
-// class TinkerGraphGraphProvider extends AbstractGraphProvider {
-//   import org.apache.tinkerpop.gremlin.tinkergraph.structure._
-//   import org.apache.tinkerpop.gremlin.process.graph.traversal.DefaultGraphTraversal
+class TinkerGraphGraphProvider extends AbstractGraphProvider {
+  import org.apache.tinkerpop.gremlin.tinkergraph.structure._
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal
 
-//   override def getImplementations =
-//     Set(
-//       classOf[TinkerEdge],
-//       classOf[TinkerElement],
-//       classOf[TinkerGraph],
-//       classOf[TinkerGraphVariables],
-//       classOf[TinkerProperty[_]],
-//       classOf[TinkerVertex],
-//       classOf[TinkerVertexProperty[_]],
-//       classOf[DefaultGraphTraversal[_, _]]
-//       // classOf[AnonymousGraphTraversal.Tokens]
-//     ): Set[Class[_]]
+  override def getImplementations =
+    Set(
+      classOf[TinkerEdge],
+      classOf[TinkerElement],
+      classOf[TinkerGraph],
+      classOf[TinkerGraphVariables],
+      classOf[TinkerProperty[_]],
+      classOf[TinkerVertex],
+      classOf[TinkerVertexProperty[_]],
+      classOf[DefaultGraphTraversal[_, _]]
+      // classOf[AnonymousGraphTraversal.Tokens]
+    ): Set[Class[_]]
 
-//   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
-//     Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+  override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
+    Map("gremlin.graph" -> classOf[TinkerGraph].getName)
 
-//   override def clear(graph: Graph, configuration: Configuration): Unit =
-//     Option(graph) map { graph ⇒
-//       graph.close()
-//       if (configuration.containsKey("gremlin.tg.directory"))
-//         new File(configuration.getString("gremlin.tg.directory")).delete()
-//     }
-// }
+  override def clear(graph: Graph, configuration: Configuration): Unit =
+    Option(graph) map { graph ⇒
+      graph.close()
+      if (configuration.containsKey("gremlin.tg.directory"))
+        new File(configuration.getString("gremlin.tg.directory")).delete()
+    }
+}
