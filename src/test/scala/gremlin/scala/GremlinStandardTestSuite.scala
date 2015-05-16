@@ -41,30 +41,29 @@ object Tests {
     //TODO: get rid of cast
   }
 
-  // class ScalaFilterTest extends FilterTest with StandardTest {
-  //
-  //   override def get_g_V_filterXfalseX = GremlinScala(g).V.filter(_ ⇒ false)
-  //
-  //   override def get_g_V_filterXtrueX = GremlinScala(g).V.filter(_ ⇒ true)
-  //
-  //   override def get_g_V_filterXlang_eq_javaX =
-  //     GremlinScala(g).V.filter(_.property("lang").orElse("none") == "java")
-  //
-  //   override def get_g_v1_out_filterXage_gt_30X(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.filter(_.property("age").orElse(0) > 30)
-  //
-  //   override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = GremlinScala(g).V.filter { v ⇒
-  //     val name = v.value[String]("name")
-  //     name.startsWith("m") || name.startsWith("p")
-  //   }
-  //
-  //   override def get_g_E_filterXfalseX = GremlinScala(g).E.filter(_ ⇒ false)
-  //
-  //   override def get_g_E_filterXtrueX = GremlinScala(g).E.filter(_ ⇒ true)
-  //
-  //   override def get_g_v1_filterXage_gt_30X(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.filter(_.property("age").orElse(0) > 30)
-  // }
+  class ScalaFilterTest extends FilterTest with StandardTest {
+    override def get_g_V_filterXfalseX = GremlinScala(graph).V.filter(_ ⇒ false)
+
+    override def get_g_V_filterXtrueX = GremlinScala(graph).V.filter(_ ⇒ true)
+
+    override def get_g_V_filterXlang_eq_javaX =
+      GremlinScala(graph).V.filter(_.property("lang").orElse("none") == "java")
+
+    override def get_g_VX1X_filterXage_gt_30X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).filter(_.property[Int]("age").orElse(0) > 30)
+
+    override def get_g_V_filterXname_startsWith_m_OR_name_startsWith_pX = GremlinScala(graph).V.filter { v ⇒
+      val name = v.value[String]("name")
+      name.startsWith("m") || name.startsWith("p")
+    }
+
+    override def get_g_VX1X_out_filterXage_gt_30X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.filter(_.property[Int]("age").orElse(0) > 30)
+
+    override def get_g_E_filterXfalseX = GremlinScala(graph).E.filter(_ ⇒ false)
+
+    override def get_g_E_filterXtrueX = GremlinScala(graph).E.filter(_ ⇒ true)
+  }
 
   // class ScalaExceptTest extends ExceptTest with StandardTest {
   //
@@ -527,8 +526,8 @@ import java.io.File
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute - all are in ProcessStandardSuite
-      classOf[ScalaDedupTest]
-    // classOf[ScalaFilterTest],
+      classOf[ScalaDedupTest],
+      classOf[ScalaFilterTest]
     // classOf[ScalaExceptTest],
     // classOf[ScalaSimplePathTest],
     // classOf[ScalaCyclicPathTest],
