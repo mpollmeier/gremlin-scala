@@ -1,20 +1,20 @@
 package gremlin.scala
 
-// import java.lang.{ Long ⇒ JLong }
-// import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
-// import scala.collection.JavaConversions._
+import java.lang.{ Long ⇒ JLong }
+import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
+import scala.collection.JavaConversions._
 
-// import collection.mutable
-// import org.apache.tinkerpop.gremlin.process._
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.branch._
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.filter._
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.map._
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.sideEffect
-// import org.apache.tinkerpop.gremlin.process.graph.traversal.step.sideEffect._
-// import org.apache.tinkerpop.gremlin.structure
-// import org.apache.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
-// import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-// import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import collection.mutable
+import org.apache.tinkerpop.gremlin.process._
+import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
+import org.apache.tinkerpop.gremlin.process.traversal.step.branch._
+import org.apache.tinkerpop.gremlin.process.traversal.step.map._
+import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect
+import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
+import org.apache.tinkerpop.gremlin.structure
+import org.apache.tinkerpop.gremlin.structure.{ Compare, Contains, Direction }
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import shapeless._
 import shapeless.ops.hlist._
 import org.apache.tinkerpop.gremlin.process.traversal._
@@ -23,13 +23,17 @@ object Tests {
 
   // class ScalaDedupTest extends DedupTest with StandardTest {
   //   override def get_g_V_both_dedup_name =
-  //     GremlinScala(g).V.both.dedup.values[String]("name")
+  //     GremlinScala(graph).V.both.dedup.values[String]("name")
 
   //   override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
-  //     GremlinScala(g).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
+  //     GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
 
-  //   override def get_g_V_both_propertiesXnameX_orderXa_bX_dedup_value =
-  //     GremlinScala(g).V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup
+  //   override def get_g_V_both_name_orderXa_bX_dedup = 
+  //     GremlinScala(graph).V.both.values[String]("name").order.by{ (a, b) => a < b }.dedup
+
+  //   // override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
+  //   //   GremlinScala(graph).V.group().by(T.label)
+  //           // return g.V().<String, Set<Double>>group().by(T.label).by(bothE().values("weight").fold()).by(dedup(Scope.local));
   // }
 
   // class ScalaFilterTest extends FilterTest with StandardTest {
