@@ -94,7 +94,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
-  def start() = GremlinScala[Vertex, HNil](__.__(vertex.id))
+  def start() = GremlinScala[Vertex, HNil](__.__(vertex))
 }
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
@@ -118,7 +118,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
-  def start() = GremlinScala[Edge, HNil](__.__(edge.id))
+  def start() = GremlinScala[Edge, HNil](__.__(edge))
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist

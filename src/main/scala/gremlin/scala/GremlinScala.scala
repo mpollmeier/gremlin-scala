@@ -231,10 +231,10 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
   def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
 
   // start traversal with some vertices identified by given ids 
-  def V(vertexIds: Seq[AnyRef]) = GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(vertexIds: AnyRef*) = GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
 
   // start traversal with some edges identified by given ids 
-  def E(edgeIds: Seq[AnyRef]) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
+  def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
 }
 
 object GS {
