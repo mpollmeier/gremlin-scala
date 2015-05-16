@@ -8,6 +8,8 @@ import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
 import shapeless.ops.hlist._
+import _root_.scala.language.implicitConversions
+import _root_.scala.reflect.runtime.universe._
 
 package object scala {
   type Vertex = structure.Vertex
@@ -53,4 +55,25 @@ package object scala {
 
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
     { t: Traverser[A] ⇒ fun(t.get) }
+
+  implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
+
+    // load a vertex values into a case class
+    def load[A: TypeTag] = gs.map[A] { case vertex =>
+      val mirror = runtimeMirror(getClass.getClassLoader)
+      val classA = typeOf[A].typeSymbol.asClass
+      val classMirror = mirror.reflectClass(classA)
+      val constructor = typeOf[A].declaration(nme.CONSTRUCTOR).asMethod
+
+      val params = constructor.paramss.head map {
+        case field if field.name.decoded == "id" => vertex.id.toString
+        case field if field.typeSignature.typeSymbol.fullName == typeOf[Option.type].typeSymbol.fullName =>
+          Option(vertex.valueOrElse(field.name.decoded, null))
+        case field => vertex.valueOrElse(field.name.decoded, null)
+      }
+
+      val constructorMirror = classMirror.reflectConstructor(constructor)
+      constructorMirror(params: _*).asInstanceOf[A]
+    }
+  }
 }

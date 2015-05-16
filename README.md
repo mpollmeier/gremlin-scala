@@ -45,6 +45,18 @@ GremlinScala(graph).V.as("a")
 You can label as many steps as you like and Gremlin-Scala will preserve the types for you. For more examples see [LabelledPathSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/src/test/scala/gremlin/scala/LabelledPathSpec.scala).
 In comparison: Gremlin-Java and Gremlin-Groovy just return a `List[Any]` and you then have to cast the elements - the types got lost on the way. Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
+### Saving / loading case classes
+You can save and load case classes as a vertex - this is still experimental but pretty cool:
+
+```scala
+  val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
+  val gs = GremlinScala(graph)
+  val v = gs.save(example)
+  v.start.load[ExampleClass].head shouldBe example
+```
+
+Thanks to <a href="https://github.com/joan38">joan38</a> for <a href="https://github.com/mpollmeier/gremlin-scala/pull/66">contributing</a> this feature!
+
 ## Help - it's open source!
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)

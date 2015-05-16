@@ -10,6 +10,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
   Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
+    "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
     "com.chuusai" % "shapeless" % "2.1.0" cross CrossVersion.fullMapped {
       case "2.10.4" ⇒ "2.10.4"

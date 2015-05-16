@@ -208,7 +208,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 }
 
-case class ScalaGraph(graph: Graph) extends AnyVal {
+case class ScalaGraph(graph: Graph) {
+  import scala.reflect.ClassTag
+  import scala.reflect.runtime.universe._
+
   def addVertex() = ScalaVertex(graph.addVertex())
   def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
   def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
@@ -235,6 +238,40 @@ case class ScalaGraph(graph: Graph) extends AnyVal {
 
   // start traversal with some edges identified by given ids 
   def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
+
+  // save an object's values into a new vertex
+  def save[A: TypeTag : ClassTag](cc: A): ScalaVertex = {
+    val persistableType = Seq(
+      typeOf[Option.type],
+      typeOf[String],
+      typeOf[Int],
+      typeOf[Double],
+      typeOf[Float],
+      typeOf[Long],
+      typeOf[Short],
+      typeOf[Char],
+      typeOf[Byte]
+    ) map (_.typeSymbol.fullName)
+
+    val mirror = runtimeMirror(getClass.getClassLoader)
+    val instanceMirror = mirror.reflect(cc)
+
+    val params = (typeOf[A].declarations map (_.asTerm) filter (t => t.isParamAccessor && t.isGetter) map { term =>
+      val termName = term.name.decoded
+      val termType = term.typeSignature.typeSymbol.fullName
+      if (!persistableType.contains(termType))
+        throw new IllegalArgumentException(s"The field '$termName: $termType' is not persistable.")
+
+      val fieldMirror = instanceMirror.reflectField(term)
+      termName -> (term.typeSignature.typeSymbol.fullName match {
+        case t if t == typeOf[Option.type].typeSymbol.fullName =>
+          fieldMirror.get.asInstanceOf[Option[Any]].orNull
+        case _ => fieldMirror.get
+      })
+    } filter { case (key, value) => key != "id" && value != null}).toMap + ("label" -> cc.getClass.getSimpleName)
+
+    addVertex().setProperties(params)
+  }
 }
 
 object GS {
