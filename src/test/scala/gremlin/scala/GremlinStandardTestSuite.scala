@@ -29,14 +29,15 @@ object Tests {
     override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
       GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
 
-    override def get_g_V_both_name_orderXa_bX_dedup = 
-      GremlinScala(graph).V.both.values[String]("name").order.by{ (a, b) => a < b }.dedup
+    override def get_g_V_both_name_orderXa_bX_dedup =
+      GremlinScala(graph).V.both.values[String]("name").order.by { (a, b) => a < b }.dedup
 
-    override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX = GremlinScala(graph).V.group()
-      .by(T.label)
-      .by(__.bothE().values[java.lang.Float]("weight").fold())
-      .by(__.dedup(Scope.local))
-      .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
+    override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
+      GremlinScala(graph).V.group()
+        .by(T.label)
+        .by(__.bothE().values[java.lang.Float]("weight").fold())
+        .by(__.dedup(Scope.local))
+        .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
     //TODO: get rid of cast
   }
 
@@ -551,18 +552,19 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     ),
     Array.empty, //testsToEnforce
     true //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
-  )
+    )
 
 @RunWith(classOf[GremlinScalaStandardSuite])
 @AbstractGremlinSuite.GraphProviderClass(
   provider = classOf[TinkerGraphGraphProvider],
-  graph = classOf[TinkerGraph])
+  graph = classOf[TinkerGraph]
+)
 class ScalaTinkerGraphStandardTest {}
 // //TODO configure sbt to run with junit so it properly prints the test count - does that work in gremlin-java?
 
 class TinkerGraphGraphProvider extends AbstractGraphProvider {
   import org.apache.tinkerpop.gremlin.tinkergraph.structure._
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal
+  import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTraversal
 
   override def getImplementations =
     Set(
@@ -574,7 +576,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.DefaultGraphTrav
       classOf[TinkerVertex],
       classOf[TinkerVertexProperty[_]],
       classOf[DefaultGraphTraversal[_, _]]
-      // classOf[AnonymousGraphTraversal.Tokens]
+    // classOf[AnonymousGraphTraversal.Tokens]
     ): Set[Class[_]]
 
   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
