@@ -24,16 +24,15 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
 }
 
 scalacOptions ++= Seq(
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-deprecation",
+  "-feature"
   //"-Xlog-implicits"
   //"-Ydebug"
 )
-// full stack traces
-// testOptions in Test += Tests.Argument("-oF")
-
-// doesn't work on travis ;(
-// incOptions := incOptions.value.withNameHashing(true)
-
-net.virtualvoid.sbt.graph.Plugin.graphSettings
+// testOptions in Test += Tests.Argument("-oF") // full stack traces
+// incOptions := incOptions.value.withNameHashing(true) // doesn't work on travis ;(
 
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal

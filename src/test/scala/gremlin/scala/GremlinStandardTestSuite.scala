@@ -509,6 +509,7 @@ object Tests {
 }
 
 trait StandardTest {
+  import scala.language.implicitConversions
   implicit def toTraversal[S, E](gs: GremlinScala[E, _]): Traversal[S, E] =
     gs.traversal.asInstanceOf[Traversal[S, E]]
 }

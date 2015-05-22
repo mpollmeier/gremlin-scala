@@ -16,6 +16,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.structure._
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
+import scala.language.existentials
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toSeq(): Seq[End] = traversal.toList.toSeq
@@ -263,8 +264,8 @@ case class ScalaGraph(graph: Graph) {
     val mirror = runtimeMirror(getClass.getClassLoader)
     val instanceMirror = mirror.reflect(cc)
 
-    val params = (typeOf[A].declarations map (_.asTerm) filter (t => t.isParamAccessor && t.isGetter) map { term =>
-      val termName = term.name.decoded
+    val params = (typeOf[A].decls map (_.asTerm) filter (t => t.isParamAccessor && t.isGetter) map { term =>
+      val termName = term.name.decodedName.toString
       val termType = term.typeSignature.typeSymbol.fullName
       if (!persistableType.contains(termType))
         throw new IllegalArgumentException(s"The field '$termName: $termType' is not persistable.")

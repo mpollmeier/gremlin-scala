@@ -63,13 +63,13 @@ package object scala {
       val mirror = runtimeMirror(getClass.getClassLoader)
       val classA = typeOf[A].typeSymbol.asClass
       val classMirror = mirror.reflectClass(classA)
-      val constructor = typeOf[A].declaration(nme.CONSTRUCTOR).asMethod
+      val constructor = typeOf[A].decl(termNames.CONSTRUCTOR).asMethod
 
-      val params = constructor.paramss.head map {
-        case field if field.name.decoded == "id" => vertex.id.toString
+      val params = constructor.paramLists.head map {
+        case field if field.name.decodedName.toString == "id" => vertex.id.toString
         case field if field.typeSignature.typeSymbol.fullName == typeOf[Option.type].typeSymbol.fullName =>
-          Option(vertex.valueOrElse(field.name.decoded, null))
-        case field => vertex.valueOrElse(field.name.decoded, null)
+          Option(vertex.valueOrElse(field.name.decodedName.toString, null))
+        case field => vertex.valueOrElse(field.name.decodedName.toString, null)
       }
 
       val constructorMirror = classMirror.reflectConstructor(constructor)

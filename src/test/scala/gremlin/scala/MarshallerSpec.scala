@@ -2,11 +2,11 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
 case class ExampleClass(s: String, i: Int, l: Long, o: Option[String])
 
-class MarshallerSpec extends FunSpec with ShouldMatchers {
+class MarshallerSpec extends FunSpec with Matchers {
   val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
 
   it("saves a case class as a vertex") {

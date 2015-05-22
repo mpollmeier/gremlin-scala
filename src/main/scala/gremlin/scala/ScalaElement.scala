@@ -4,6 +4,7 @@ import scala.collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.T
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
+import scala.language.postfixOps
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
