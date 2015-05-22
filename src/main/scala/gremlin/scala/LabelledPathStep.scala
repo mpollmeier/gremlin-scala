@@ -4,8 +4,8 @@ import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Path
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
+import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapStep
-import org.apache.tinkerpop.gremlin.process.traversal.Traverser
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import shapeless._
 import shapeless.ops.hlist._
@@ -17,7 +17,8 @@ class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends M
     TraverserRequirement.PATH_ACCESS
   )
 
-  override def map(traverser: Traverser.Admin[S]): Labels =
+  override def map(traverser: org.apache.tinkerpop.gremlin.process.traversal
+.Traverser.Admin[S]): Labels =
     toHList(toList(traverser.path))
 
   def toList(path: Path): List[Any] = {
