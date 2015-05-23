@@ -152,29 +152,26 @@ object Tests {
     override def get_g_V_hasXperson_name_markoX_age =
       GremlinScala(graph).V.has("person", "name", "marko").values[Integer]("age")
 
-    override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) = 
+    override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) =
       GremlinScala(graph).V(v1Id).outE.has("weight", Compare.inside, Seq(0.0d, 0.6d)).inV
   }
 
-  // class ScalaHasNotTest extends HasNotTest with StandardTest {
-  //
-  //   override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) =
-  //     GremlinScala(g).v(v1Id).get.hasNot(prop)
-  //
-  //   override def get_g_V_hasNotXprop(prop: String) = GremlinScala(g).V.hasNot(prop)
-  // }
-  //
-  // class ScalaBetweenTest extends BetweenTest with StandardTest {
-  //
-  //   override def get_g_VX1X_outE_betweenXweight_0_06X_inV(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.outE.between("weight", 0d, 0.6d).inV
-  // }
-  //
-  // class ScalaCoinTest extends CoinTest with StandardTest {
-  //   override def get_g_V_coinX1X = GremlinScala(g).V.coin(1.0d)
-  //   override def get_g_V_coinX0X = GremlinScala(g).V.coin(0.0d)
-  // }
-  //
+  class ScalaHasNotTest extends HasNotTest with StandardTest {
+    override def get_g_VX1X_hasNotXprop(v1Id: AnyRef, propertyKey: String) =
+      GremlinScala(graph).V(v1Id).hasNot(propertyKey)
+
+    override def get_g_V_hasNotXprop(propertyKey: String) =
+      GremlinScala(graph).V.hasNot(propertyKey)
+
+    override def get_g_V_hasNotXoutXcreatedXX =
+      GremlinScala(graph).V.hasNot(_.out("created")).values[String]("name")
+  }
+  
+  class ScalaCoinTest extends CoinTest with StandardTest {
+    override def get_g_V_coinX1X = GremlinScala(graph).V.coin(1.0d)
+    override def get_g_V_coinX0X = GremlinScala(graph).V.coin(0.0d)
+  }
+  
   // class ScalaRangeTest extends RangeTest with StandardTest {
   //
   //   override def get_g_v1_out_limitX2X(v1Id: AnyRef) =
@@ -534,10 +531,9 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaExceptTest],
       classOf[ScalaSimplePathTest],
       classOf[ScalaCyclicPathTest],
-      classOf[ScalaHasTest]
-    // classOf[ScalaHasNotTest]
-    // classOf[ScalaBetweenTest]
-    // classOf[ScalaCoinTest]
+      classOf[ScalaHasTest],
+      classOf[ScalaHasNotTest],
+    classOf[ScalaCoinTest]
     // classOf[ScalaRangeTest]
     // classOf[ScalaRetainTest]
     // classOf[ScalaBackTest]
