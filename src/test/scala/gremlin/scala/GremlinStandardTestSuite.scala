@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import java.lang.{ Long ⇒ JLong, Double => JDouble }
+import java.lang.{ Long ⇒ JLong, Double ⇒ JDouble }
 import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
 import scala.collection.JavaConversions._
 
@@ -30,7 +30,7 @@ object Tests {
       GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
 
     override def get_g_V_both_name_orderXa_bX_dedup =
-      GremlinScala(graph).V.both.values[String]("name").order.by { (a, b) => a < b }.dedup
+      GremlinScala(graph).V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup
 
     override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
       GremlinScala(graph).V.group()
@@ -84,15 +84,15 @@ object Tests {
 
     override def get_g_V_exceptXX = GremlinScala(graph).V.except(Nil)
 
-    override def get_g_VX1X_repeatXbothEXcreatedX_exceptXeX_aggregateXeX_otherVX_emit_path(v1Id: AnyRef) = 
-      GremlinScala(graph).V(v1Id).repeat{ 
+    override def get_g_VX1X_repeatXbothEXcreatedX_exceptXeX_aggregateXeX_otherVX_emit_path(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).repeat {
         _.bothE("created").exceptVar("e").aggregate("e").otherV
       }.emit.path
 
     override def get_g_VX1X_asXaX_outXcreatedX_inXcreatedX_exceptXaX_name(v1Id: AnyRef) =
       GremlinScala(graph).V(v1Id).as("a").out("created").in("created").exceptVar("a").values[String]("name")
   }
-  
+
   class ScalaSimplePathTest extends SimplePathTest with StandardTest {
     override def get_g_VX1X_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
       GremlinScala(graph).V(v1Id).out("created").in("created").simplePath
@@ -101,15 +101,14 @@ object Tests {
       GremlinScala(graph).V.repeat(_.both.simplePath).times(3).path
   }
 
-  // class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
-  //
-  //   override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath
-  //
-  //   override def get_g_v1_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").in("created").cyclicPath.path
-  // }
-  //
+  class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
+    override def get_g_VX1X_outXcreatedX_inXcreatedX_cyclicPath(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("created").in("created").cyclicPath
+
+    override def get_g_VX1X_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("created").in("created").cyclicPath.path
+  }
+  
   // class ScalaHasTest extends HasTest with StandardTest {
   //
   //   override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = GremlinScala(g).v(v1Id).get.has(key)
@@ -522,8 +521,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
       classOf[ScalaExceptTest],
-      classOf[ScalaSimplePathTest]
-    // classOf[ScalaCyclicPathTest]
+      classOf[ScalaSimplePathTest],
+      classOf[ScalaCyclicPathTest]
     // classOf[ScalaHasTest]
     // classOf[ScalaHasNotTest]
     // classOf[ScalaBetweenTest]
@@ -572,7 +571,7 @@ class TinkerGraphGraphProvider extends AbstractGraphProvider {
     ): Set[Class[_]]
 
   override def getBaseConfiguration(graphName: String, test: Class[_], testMethodName: String): JMap[String, AnyRef] =
-    Map("gremlin.graph" -> classOf[TinkerGraph].getName)
+    Map("gremlin.graph" → classOf[TinkerGraph].getName)
 
   override def clear(graph: Graph, configuration: Configuration): Unit =
     Option(graph) map { graph ⇒
