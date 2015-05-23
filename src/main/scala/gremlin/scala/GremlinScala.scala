@@ -58,7 +58,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def flatMapWithTraverser[A](fun: Traverser[End] ⇒ Iterable[A]) =
     GremlinScala[A, Labels](
-      traversal.flatMap[A]{ e: Traverser[End] ⇒
+      traversal.flatMap[A] { e: Traverser[End] ⇒
         fun(e).toIterator: JIterator[A]
       }
     )
@@ -82,7 +82,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def dedup() = GremlinScala[End, Labels](traversal.dedup())
 
-  def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))      
+  def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
   def except(someObject: End) = GremlinScala[End, Labels](traversal.except(someObject))
   def except(list: Iterable[End]) = GremlinScala[End, Labels](traversal.except(list))
@@ -124,15 +124,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.sideEffect(
       new JConsumer[Traverser[End]] {
         override def accept(t: Traverser[End]) = fun(t.get)
-      })
-    )
+      }
+    ))
 
   def sideEffectWithTraverser(fun: Traverser[End] ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
       new JConsumer[Traverser[End]] {
         override def accept(t: Traverser[End]) = fun(t)
-      })
-    )
+      }
+    ))
 
   def group[A, B]() = GremlinScala[JMap[A, B], Labels](traversal.group())
 
@@ -157,23 +157,24 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
 
-  def by(lessThan: (End, End) ⇒ Boolean) = 
+  def by(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
       override def compare(a: End, b: End) =
         if (lessThan(a, b)) -1
         else 0
     }))
 
-  def by(byTraversal: Traversal[_,_]) = GremlinScala[End, Labels](traversal.by(byTraversal))
+  def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
 
   def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
 
-  def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_,_]]) =
+  def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_, _]]) =
     GremlinScala[JMap[String, A], Labels](
       traversal.`match`(
         startLabel,
-        traversals map (_.traversal) : _*)
+        traversals map (_.traversal): _*
       )
+    )
 
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
 
@@ -185,17 +186,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def emit(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
 
-  def branch(fun: End ⇒ Iterable[String]) = 
-    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒ 
+  def branch(fun: End ⇒ Iterable[String]) =
+    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
       fun(t.get): JCollection[String]
     })
 
-  def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) = 
-    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒ 
+  def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) =
+    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
       fun(t): JCollection[String]
     })
 
-  def union(traversals: GremlinScala[End, _]*) = 
+  def union(traversals: GremlinScala[End, _]*) =
     GremlinScala[End, Labels](traversal.union(traversals map (_.traversal): _*))
 
   // repeats the provided anonymous traversal which starts at the current End
@@ -233,7 +234,7 @@ case class ScalaGraph(graph: Graph) {
     GremlinScala(graph.traversal.V(id)).headOption map ScalaVertex.apply
 
   // get edge by id
-  def e(id: AnyRef): Option[ScalaEdge] = 
+  def e(id: AnyRef): Option[ScalaEdge] =
     GremlinScala(graph.traversal.E(id)).headOption map ScalaEdge.apply
 
   // start traversal with all vertices 
@@ -248,7 +249,7 @@ case class ScalaGraph(graph: Graph) {
   def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
 
   // save an object's values into a new vertex
-  def save[A: TypeTag : ClassTag](cc: A): ScalaVertex = {
+  def save[A: TypeTag: ClassTag](cc: A): ScalaVertex = {
     val persistableType = Seq(
       typeOf[Option.type],
       typeOf[String],
@@ -264,19 +265,19 @@ case class ScalaGraph(graph: Graph) {
     val mirror = runtimeMirror(getClass.getClassLoader)
     val instanceMirror = mirror.reflect(cc)
 
-    val params = (typeOf[A].decls map (_.asTerm) filter (t => t.isParamAccessor && t.isGetter) map { term =>
+    val params = (typeOf[A].decls map (_.asTerm) filter (t ⇒ t.isParamAccessor && t.isGetter) map { term ⇒
       val termName = term.name.decodedName.toString
       val termType = term.typeSignature.typeSymbol.fullName
       if (!persistableType.contains(termType))
         throw new IllegalArgumentException(s"The field '$termName: $termType' is not persistable.")
 
       val fieldMirror = instanceMirror.reflectField(term)
-      termName -> (term.typeSignature.typeSymbol.fullName match {
-        case t if t == typeOf[Option.type].typeSymbol.fullName =>
+      termName → (term.typeSignature.typeSymbol.fullName match {
+        case t if t == typeOf[Option.type].typeSymbol.fullName ⇒
           fieldMirror.get.asInstanceOf[Option[Any]].orNull
-        case _ => fieldMirror.get
+        case _ ⇒ fieldMirror.get
       })
-    } filter { case (key, value) => key != "id" && value != null}).toMap + ("label" -> cc.getClass.getSimpleName)
+    } filter { case (key, value) ⇒ key != "id" && value != null }).toMap + ("label" → cc.getClass.getSimpleName)
 
     addVertex().setProperties(params)
   }
@@ -317,33 +318,55 @@ object GremlinScala {
 
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
+    def has(hasTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+      GremlinScala[End, Labels](
+        traversal.has(
+          hasTraversal(GremlinScala(__.start())).traversal
+        )
+      )
+
     /* there can e.g. be one of:
      * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
      * org.apache.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
      * org.apache.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
      */
-    def has(key: String, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(key, predicate, value))
+    def has(key: String, predicate: BiPredicate[_, _], value: Any) =
+      GremlinScala[End, Labels](traversal.has(key, predicate, value))
 
-    def has(key: String, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(key, predicate, asJavaCollection(value)))
+    def has(key: String, predicate: BiPredicate[_, _], value: Seq[_]) =
+      GremlinScala[End, Labels](traversal.has(key, predicate, toJavaList(value)))
 
-    def has(accessor: T, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
+    def has(accessor: T, predicate: BiPredicate[_, _], value: Any) =
+      GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
 
-    def has(accessor: T, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate, asJavaCollection(value)))
+    def has(accessor: T, predicate: BiPredicate[_, _], value: Seq[_]) =
+      GremlinScala[End, Labels](traversal.has(accessor, predicate, toJavaList(value)))
 
     def has(label: String, key: String, value: Any) =
       GremlinScala[End, Labels](traversal.has(label, key, value))
 
-    def has(label: String, key: String, value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, asJavaCollection(value)))
+    def has(label: String, key: String, value: Seq[_]) =
+      GremlinScala[End, Labels](traversal.has(label, key, toJavaList(value)))
 
-    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Any) = GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
+    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Any) =
+      GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
 
-    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Seq[_]) = GremlinScala[End, Labels](traversal.has(label, key, predicate, asJavaCollection(value)))
+    def has(label: String, key: String, predicate: BiPredicate[_, _], value: Seq[_]) =
+      GremlinScala[End, Labels](traversal.has(label, key, predicate, toJavaList(value)))
+
+    def hasId(ids: AnyRef*) = GremlinScala[End, Labels](traversal.hasId(ids: _*))
+
+    def hasLabel(labels: String*) = GremlinScala[End, Labels](traversal.hasLabel(labels: _*))
 
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 
-    def local[A](localTraversal: GremlinScala[A, _]) = GremlinScala[A, Labels](traversal.local(localTraversal.traversal))
+    def local[A](localTraversal: GremlinScala[A, _]) =
+      GremlinScala[A, Labels](traversal.local(localTraversal.traversal))
 
     def timeLimit(millis: Long) = GremlinScala[End, Labels](traversal.timeLimit(millis))
+
+    // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
+    protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])

@@ -108,43 +108,54 @@ object Tests {
     override def get_g_VX1X_outXcreatedX_inXcreatedX_cyclicPath_path(v1Id: AnyRef) =
       GremlinScala(graph).V(v1Id).out("created").in("created").cyclicPath.path
   }
-  
-  // class ScalaHasTest extends HasTest with StandardTest {
-  //
-  //   override def get_g_v1_hasXkeyX(v1Id: AnyRef, key: String) = GremlinScala(g).v(v1Id).get.has(key)
-  //
-  //   override def get_g_v1_hasXname_markoX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("name", "marko")
-  //
-  //   override def get_g_V_hasXname_markoX = GremlinScala(g).V.has("name", "marko")
-  //
-  //   override def get_g_V_hasXname_blahX = GremlinScala(g).V.has("name", "blah")
-  //
-  //   override def get_g_V_hasXblahX = GremlinScala(g).V.has("blah")
-  //
-  //   override def get_g_v1_hasXage_gt_30X(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.has("age", Compare.gt, 30)
-  //
-  //   override def get_g_v1_out_hasXid_2X(v1Id: AnyRef, v2Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.has(T.id, v2Id)
-  //
-  //   override def get_g_V_hasXage_gt_30X = GremlinScala(g).V.has("age", Compare.gt, 30)
-  //
-  //   override def get_g_E_hasXlabelXknowsX = GremlinScala(g).E.has(T.label, "knows")
-  //
-  //   override def get_g_e7_hasXlabelXknowsX(e7Id: AnyRef) = GremlinScala(g).e(e7Id).get.has(T.label, "knows")
-  //
-  //   override def get_g_V_hasXlabelXperson_software_blahX =
-  //     GremlinScala(g).V.has(T.label, Contains.within, Seq("person", "software"))
-  //
-  //   override def get_g_E_hasXlabelXuses_traversesX =
-  //     GremlinScala(g).E.has(T.label, Contains.within, List("uses", "traverses"))
-  //
-  //   override def get_g_V_hasXname_equalspredicate_markoX = GremlinScala(g).V.has("name", "marko")
-  //
-  //   override def get_g_V_hasXperson_name_markoX_age =
-  //     GremlinScala(g).V.has("person", "name", "marko").values[Integer]("age")
-  //
-  // }
-  //
+
+  class ScalaHasTest extends HasTest with StandardTest {
+    override def get_g_V_outXknowsX_hasXoutXcreatedXX_name =
+      GremlinScala(graph).V.out("knows").has(_.out("created")).values[String]("name")
+
+    override def get_g_VX1X_hasXkeyX(v1Id: AnyRef, key: String) =
+      GremlinScala(graph).V(v1Id).has(key)
+
+    override def get_g_VX1X_hasXname_markoX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).has("name", "marko")
+
+    override def get_g_V_hasXname_markoX =
+      GremlinScala(graph).V.has("name", "marko")
+
+    override def get_g_V_hasXname_blahX =
+      GremlinScala(graph).V.has("name", "blah")
+
+    override def get_g_V_hasXblahX =
+      GremlinScala(graph).V.has("blah")
+
+    override def get_g_VX1X_hasXage_gt_30X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).has("age", Compare.gt, 30)
+
+    override def get_g_VX1X_out_hasIdX2X(v1Id: AnyRef, v2Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.hasId(v2Id)
+
+    override def get_g_V_hasXage_gt_30X =
+      GremlinScala(graph).V.has("age", Compare.gt, 30)
+
+    override def get_g_EX7X_hasLabelXknowsX(e7Id: AnyRef) =
+      GremlinScala(graph).E(e7Id).hasLabel("knows")
+
+    override def get_g_E_hasLabelXknowsX =
+      GremlinScala(graph).E.hasLabel("knows")
+
+    override def get_g_E_hasLabelXuses_traversesX =
+      GremlinScala(graph).E.hasLabel("uses", "traverses")
+
+    override def get_g_V_hasLabelXperson_software_blahX =
+      GremlinScala(graph).V.hasLabel("person", "software", "blah")
+
+    override def get_g_V_hasXperson_name_markoX_age =
+      GremlinScala(graph).V.has("person", "name", "marko").values[Integer]("age")
+
+    override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) = 
+      GremlinScala(graph).V(v1Id).outE.has("weight", Compare.inside, Seq(0.0d, 0.6d)).inV
+  }
+
   // class ScalaHasNotTest extends HasNotTest with StandardTest {
   //
   //   override def get_g_v1_hasNotXprop(v1Id: AnyRef, prop: String) =
@@ -522,8 +533,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaFilterTest],
       classOf[ScalaExceptTest],
       classOf[ScalaSimplePathTest],
-      classOf[ScalaCyclicPathTest]
-    // classOf[ScalaHasTest]
+      classOf[ScalaCyclicPathTest],
+      classOf[ScalaHasTest]
     // classOf[ScalaHasNotTest]
     // classOf[ScalaBetweenTest]
     // classOf[ScalaCoinTest]
