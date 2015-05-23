@@ -528,7 +528,6 @@ import org.junit.runners.model.RunnerBuilder
 import org.junit.runner.RunWith
 import java.util.{ Map ⇒ JMap }
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-// import org.apache.tinkerpop.gremlin.tinkergraph.TinkerGraphGraphProvider //send a pr?
 import org.apache.tinkerpop.gremlin.structure.StructureStandardSuite
 import org.apache.commons.configuration.Configuration
 import java.io.File
