@@ -65,34 +65,33 @@ object Tests {
     override def get_g_E_filterXtrueX = GremlinScala(graph).E.filter(_ ⇒ true)
   }
 
-  // class ScalaExceptTest extends ExceptTest with StandardTest {
-  //
-  //   override def get_g_v1_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
-  //     val v2: Vertex = g.v(v2Id).get.vertex
-  //     GremlinScala(g).v(v1Id).get.out.except(v2)
-  //   }
-  //
-  //   override def get_g_v1_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.aggregate("x").out.exceptVar("x")
-  //
-  //   override def get_g_v1_outXcreatedX_inXcreatedX_exceptXg_v1X_name(v1Id: AnyRef) = {
-  //     val v1: Vertex = g.v(v1Id).get.vertex
-  //     GremlinScala(g).v(v1Id).get.out("created").in("created")
-  //       .except(v1).values[String]("name")
-  //   }
-  //
-  //   override def get_g_V_exceptXg_V_toListX =
-  //     GremlinScala(g).V.except(GremlinScala(g).V.toList)
-  //
-  //   override def get_g_V_exceptXX = GremlinScala(g).V.except(Nil)
-  //   //
-  //   // override def get_g_v1_asXxX_bothEXcreatedX_exceptXeX_aggregateXeX_otherV_jumpXx_true_trueX_path(v1Id: AnyRef) =
-  //   //   GremlinScala(g).v(v1Id).get.as("x")
-  //   //     .bothE("created").exceptVar("e").aggregate("e")
-  //   //     .otherV
-  //   //     .jump("x", _ ⇒ true, _ ⇒ true)
-  //   //     .path
-  // }
+  class ScalaExceptTest extends ExceptTest with StandardTest {
+    override def get_g_VX1X_out_exceptXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
+      val v2: Vertex = GremlinScala(graph).V(v2Id).head.vertex
+      GremlinScala(graph).V(v1Id).out.except(v2)
+    }
+
+    override def get_g_VX1X_out_aggregateXxX_out_exceptXxX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.aggregate("x").out.exceptVar("x")
+
+    override def get_g_VX1X_outXcreatedX_inXcreatedX_exceptXg_v1X_name(v1Id: AnyRef) = {
+      val v1: Vertex = GremlinScala(graph).V(v1Id).head.vertex
+      GremlinScala(graph).V(v1Id).out("created").in("created").except(v1).values[String]("name")
+    }
+
+    override def get_g_V_exceptXg_V_toListX =
+      GremlinScala(graph).V.except(GremlinScala(graph).V.toList)
+
+    override def get_g_V_exceptXX = GremlinScala(graph).V.except(Nil)
+
+    override def get_g_VX1X_repeatXbothEXcreatedX_exceptXeX_aggregateXeX_otherVX_emit_path(v1Id: AnyRef) = 
+      GremlinScala(graph).V(v1Id).repeat{ 
+        _.bothE("created").exceptVar("e").aggregate("e").otherV
+      }.emit.path
+
+    override def get_g_VX1X_asXaX_outXcreatedX_inXcreatedX_exceptXaX_name(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).as("a").out("created").in("created").exceptVar("a").values[String]("name")
+  }
   //
   // class ScalaSimplePathTest extends SimplePathTest with StandardTest {
   //
@@ -528,8 +527,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute - all are in ProcessStandardSuite
       classOf[ScalaDedupTest],
-      classOf[ScalaFilterTest]
-    // classOf[ScalaExceptTest],
+      classOf[ScalaFilterTest],
+      classOf[ScalaExceptTest]
     // classOf[ScalaSimplePathTest],
     // classOf[ScalaCyclicPathTest],
     // classOf[ScalaHasTest],
