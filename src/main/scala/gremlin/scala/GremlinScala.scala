@@ -203,11 +203,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // best combined with `times` or `until` step
   // e.g. gs.V(1).repeat(_.out).times(2)
   def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
-    GremlinScala[End, Labels](
-      traversal.repeat(
-        repeatTraversal(GremlinScala(__.start())).traversal
-      )
-    )
+    GremlinScala[End, Labels](traversal.repeat(repeatTraversal(start).traversal))
 
   def until(predicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(predicate))
@@ -215,6 +211,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def times(maxLoops: Int) = GremlinScala[End, Labels](traversal.times(maxLoops))
 
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
+
+
+  // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
+  protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
+
+  protected def start[A] = GremlinScala[A, HNil](__.start[A]())
 }
 
 case class ScalaGraph(graph: Graph) {
@@ -319,11 +321,7 @@ object GremlinScala {
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
     def has(hasTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
-      GremlinScala[End, Labels](
-        traversal.has(
-          hasTraversal(GremlinScala(__.start())).traversal
-        )
-      )
+      GremlinScala[End, Labels](traversal.has(hasTraversal(start).traversal))
 
     /* there can e.g. be one of:
      * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
@@ -361,19 +359,12 @@ object GremlinScala {
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 
     def hasNot(hasNotTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
-      GremlinScala[End, Labels](
-        traversal.hasNot(
-          hasNotTraversal(GremlinScala(__.start())).traversal
-        )
-      )
+      GremlinScala[End, Labels](traversal.hasNot(hasNotTraversal(start).traversal))
 
-    def local[A](localTraversal: GremlinScala[A, _]) =
-      GremlinScala[A, Labels](traversal.local(localTraversal.traversal))
+    def local[A](localTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
+      GremlinScala[A, Labels](traversal.local(localTraversal(start).traversal))
 
     def timeLimit(millis: Long) = GremlinScala[End, Labels](traversal.timeLimit(millis))
-
-    // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
-    protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
