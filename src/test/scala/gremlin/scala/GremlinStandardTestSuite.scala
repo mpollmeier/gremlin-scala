@@ -166,36 +166,45 @@ object Tests {
     override def get_g_V_hasNotXoutXcreatedXX =
       GremlinScala(graph).V.hasNot(_.out("created")).values[String]("name")
   }
-  
+
   class ScalaCoinTest extends CoinTest with StandardTest {
     override def get_g_V_coinX1X = GremlinScala(graph).V.coin(1.0d)
     override def get_g_V_coinX0X = GremlinScala(graph).V.coin(0.0d)
   }
+
+  class ScalaRangeTest extends RangeTest with StandardTest {
+    override def get_g_VX1X_out_limitX2X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.limit(2)
+
+    override def get_g_V_localXoutE_limitX1X_inVX_limitX3X =
+      GremlinScala(graph).V.local(_.outE.limit(1)).inV.limit(3)
+
+    override def get_g_VX1X_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("knows").outE("created").range(0, 1).inV
+
+    override def get_g_VX1X_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("knows").out("created").range(0, 1)
+
+    override def get_g_VX1X_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("created").in("created").range(1, 3)
+
+    override def get_g_VX1X_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("created").inE("created").range(1, 3).outV
+
+    override def get_g_V_repeatXbothX_timesX3X_rangeX5_11X =
+      GremlinScala(graph).V.repeat(_.both).times(3).range(5, 11)
+
+    override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_limitXlocal_1XX_asXwX_select_byXnameX_by =
+      GremlinScala(graph).V.hasLabel("software").as("s").local{
+        _.inE("created").values("weight").fold.limit(Scope.local, 1)
+      }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
+
+    override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_rangeXlocal_1_3XX_asXwX_select_byXnameX_by =
+      GremlinScala(graph).V.hasLabel("software").as("s").local{
+        _.inE("created").values("weight").fold.range(Scope.local, 1, 3)
+      }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
+  }
   
-  // class ScalaRangeTest extends RangeTest with StandardTest {
-  //
-  //   override def get_g_v1_out_limitX2X(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.limit(2)
-  //
-  //   // override def get_g_V_outE_localLimitX1X_inV_limitX3X =
-  //   //   GremlinScala(g).V.outE.localLimit(1).inV.limit(3)
-  //
-  //   override def get_g_v1_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("knows").outE("created").range(0, 1).inV
-  //
-  //   override def get_g_v1_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("knows").out("created").range(0, 1)
-  //
-  //   override def get_g_v1_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").in("created").range(1, 3)
-  //
-  //   override def get_g_v1_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").inE("created").range(1, 3).outV
-  //
-  //   // override def get_g_V_asXaX_both_jumpXa_3X_rangeX5_11X =
-  //   //   GremlinScala(g).V.as("a").both.jump("a", 3).range(5, 11)
-  // }
-  //
   // class ScalaRetainTest extends RetainTest with StandardTest {
   //
   //   override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
@@ -533,8 +542,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaCyclicPathTest],
       classOf[ScalaHasTest],
       classOf[ScalaHasNotTest],
-    classOf[ScalaCoinTest]
-    // classOf[ScalaRangeTest]
+      classOf[ScalaCoinTest],
+      classOf[ScalaRangeTest]
     // classOf[ScalaRetainTest]
     // classOf[ScalaBackTest]
     // classOf[ScalaMapTest]

@@ -11,6 +11,7 @@ import org.apache.tinkerpop.gremlin.process._
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.Path
+import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.apache.tinkerpop.gremlin.process.traversal.T
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal
 import org.apache.tinkerpop.gremlin.structure._
@@ -93,8 +94,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def coin(probability: Double) = GremlinScala[End, Labels](traversal.coin(probability))
 
   def range(low: Int, high: Int) = GremlinScala[End, Labels](traversal.range(low, high))
+  def range(scope: Scope, low: Int, high: Int) =
+    GremlinScala[End, Labels](traversal.range(scope, low, high))
 
   def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
+  def limit(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.limit(scope, limit))
 
   def retain(variable: String) = GremlinScala[End, Labels](traversal.retain(variable))
   def retainOne(retainObject: End) = GremlinScala[End, Labels](traversal.retain(retainObject))
