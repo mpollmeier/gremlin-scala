@@ -92,21 +92,14 @@ object Tests {
     override def get_g_VX1X_asXaX_outXcreatedX_inXcreatedX_exceptXaX_name(v1Id: AnyRef) =
       GremlinScala(graph).V(v1Id).as("a").out("created").in("created").exceptVar("a").values[String]("name")
   }
-  //
-  // class ScalaSimplePathTest extends SimplePathTest with StandardTest {
-  //
-  //   override def get_g_v1_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out("created").in("created").simplePath
+  
+  class ScalaSimplePathTest extends SimplePathTest with StandardTest {
+    override def get_g_VX1X_outXcreatedX_inXcreatedX_simplePath(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out("created").in("created").simplePath
 
-  // override def get_g_V_asXxX_both_simplePath_jumpXx_loops_lt_3X_path =
-  //   GremlinScala(g).V.as("x").both
-  //     .simplePath
-  //     .jump("x", _.loops < 3)
-  //     .path
-  //
-  // override def get_g_V_asXxX_both_simplePath_jumpXx_3X_path =
-  //   GremlinScala(g).V.as("x").both.simplePath.jump("x", 3).path
-  // }
+    override def get_g_V_repeatXboth_simplePathX_timesX3X_path =
+      GremlinScala(graph).V.repeat(_.both.simplePath).times(3).path
+  }
 
   // class ScalaCyclicPathTest extends CyclicPathTest with StandardTest {
   //
@@ -528,24 +521,24 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     Array( //testsToExecute - all are in ProcessStandardSuite
       classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
-      classOf[ScalaExceptTest]
-    // classOf[ScalaSimplePathTest],
-    // classOf[ScalaCyclicPathTest],
-    // classOf[ScalaHasTest],
-    // classOf[ScalaHasNotTest],
-    // classOf[ScalaBetweenTest],
-    // classOf[ScalaCoinTest],
-    // classOf[ScalaRangeTest],
-    // classOf[ScalaRetainTest],
-    // classOf[ScalaBackTest],
-    // classOf[ScalaMapTest],
-    // classOf[ScalaOrderTest],
-    // classOf[ScalaVertexTest],
-    // classOf[ScalaAggregateTest],
-    // classOf[ScalaCountTest],
-    // classOf[ScalaSideEffectTest],
-    // classOf[ScalaSideEffectCapTest],
-    // classOf[ScalaGroupCountTest],
+      classOf[ScalaExceptTest],
+      classOf[ScalaSimplePathTest]
+    // classOf[ScalaCyclicPathTest]
+    // classOf[ScalaHasTest]
+    // classOf[ScalaHasNotTest]
+    // classOf[ScalaBetweenTest]
+    // classOf[ScalaCoinTest]
+    // classOf[ScalaRangeTest]
+    // classOf[ScalaRetainTest]
+    // classOf[ScalaBackTest]
+    // classOf[ScalaMapTest]
+    // classOf[ScalaOrderTest]
+    // classOf[ScalaVertexTest]
+    // classOf[ScalaAggregateTest]
+    // classOf[ScalaCountTest]
+    // classOf[ScalaSideEffectTest]
+    // classOf[ScalaSideEffectCapTest]
+    // classOf[ScalaGroupCountTest]
     // classOf[ScalaGroupTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     ),
