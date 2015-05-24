@@ -195,26 +195,30 @@ object Tests {
       GremlinScala(graph).V.repeat(_.both).times(3).range(5, 11)
 
     override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_limitXlocal_1XX_asXwX_select_byXnameX_by =
-      GremlinScala(graph).V.hasLabel("software").as("s").local{
+      GremlinScala(graph).V.hasLabel("software").as("s").local {
         _.inE("created").values("weight").fold.limit(Scope.local, 1)
       }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
 
     override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_rangeXlocal_1_3XX_asXwX_select_byXnameX_by =
-      GremlinScala(graph).V.hasLabel("software").as("s").local{
+      GremlinScala(graph).V.hasLabel("software").as("s").local {
         _.inE("created").values("weight").fold.range(Scope.local, 1, 3)
       }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
   }
-  
-  // class ScalaRetainTest extends RetainTest with StandardTest {
-  //
-  //   override def get_g_v1_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) = {
-  //     val v2: Vertex = g.v(v2Id).get.vertex
-  //     GremlinScala(g).v(v1Id).get.out.retainOne(v2)
-  //   }
-  //
-  //   override def get_g_v1_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.aggregate("x").out.retain("x")
-  // }
+
+  class ScalaRetainTest extends RetainTest with StandardTest {
+    override def get_g_VX1X_out_retainXg_v2X(v1Id: AnyRef, v2Id: AnyRef) =
+      {
+        val v2: Vertex = GremlinScala(graph).V(v2Id).head.vertex
+        GremlinScala(graph).V(v1Id).out.retain(v2)
+      }
+
+    override def get_g_VX1X_out_aggregateXxX_out_retainXxX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.aggregate("x").out.retainVar("x")
+
+    override def get_g_VX1X_asXaX_outXcreatedX_inXcreatedX_retainXaX_name(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).as("a").out("created").in("created").retainVar("a").values[String]("name")
+
+  }
   //
   // class ScalaBackTest extends BackTest with StandardTest {
   //
@@ -542,8 +546,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaHasTest],
       classOf[ScalaHasNotTest],
       classOf[ScalaCoinTest],
-      classOf[ScalaRangeTest]
-    // classOf[ScalaRetainTest]
+      classOf[ScalaRangeTest],
+      classOf[ScalaRetainTest]
     // classOf[ScalaBackTest]
     // classOf[ScalaMapTest]
     // classOf[ScalaOrderTest]

@@ -85,7 +85,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
-  def except(someObject: End) = GremlinScala[End, Labels](traversal.except(someObject))
+  def except(a: End) = GremlinScala[End, Labels](traversal.except(a))
   def except(list: Iterable[End]) = GremlinScala[End, Labels](traversal.except(list))
   // not named `except` because type End could be String 
   def exceptVar(variable: String) = GremlinScala[End, Labels](traversal.except(variable))
@@ -100,9 +100,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
   def limit(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.limit(scope, limit))
 
-  def retain(variable: String) = GremlinScala[End, Labels](traversal.retain(variable))
-  def retainOne(retainObject: End) = GremlinScala[End, Labels](traversal.retain(retainObject))
-  def retainAll(retainCollection: Seq[End]) = GremlinScala[End, Labels](traversal.retain(retainCollection))
+  def retain(a: End) = GremlinScala[End, Labels](traversal.retain(a))
+  def retain(list: Iterable[End]) = GremlinScala[End, Labels](traversal.retain(list))
+  def retainVar(variable: String) = GremlinScala[End, Labels](traversal.retain(variable))
 
   // labels the current step and preserves the type - see `labelledPath` steps 
   def as(name: String)(implicit p: Prepend[Labels, End :: HNil]) = GremlinScala[End, p.Out](traversal.as(name))
