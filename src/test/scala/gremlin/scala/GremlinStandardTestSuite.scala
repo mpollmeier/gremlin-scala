@@ -219,62 +219,62 @@ object Tests {
   }
 
   class ScalaBackTest extends BackTest with StandardTest {
-        override def get_g_VX1X_asXhereX_out_backXhereX(v1Id: AnyRef) =
-          GremlinScala(graph).V(v1Id).as("here").out.back[Vertex]("here")
+    override def get_g_VX1X_asXhereX_out_backXhereX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).as("here").out.back[Vertex]("here")
 
-        override def get_g_VX4X_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) =
-          GremlinScala(graph).V(v4Id).out.as("here").has("lang", "java").back[Vertex]("here")
+    override def get_g_VX4X_out_asXhereX_hasXlang_javaX_backXhereX(v4Id: AnyRef) =
+      GremlinScala(graph).V(v4Id).out.as("here").has("lang", "java").back[Vertex]("here")
 
-        override def get_g_VX4X_out_asXhereX_hasXlang_javaX_backXhereX_name(v4Id: AnyRef) =
-          GremlinScala(graph).V(v4Id).out.as("here").has("lang", "java").back[Vertex]("here").values[String]("name")
+    override def get_g_VX4X_out_asXhereX_hasXlang_javaX_backXhereX_name(v4Id: AnyRef) =
+      GremlinScala(graph).V(v4Id).out.as("here").has("lang", "java").back[Vertex]("here").values[String]("name")
 
-        override def get_g_VX1X_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
-          GremlinScala(graph).V(v1Id).outE.as("here").inV.has("name", "vadas").back[Edge]("here")
+    override def get_g_VX1X_outE_asXhereX_inV_hasXname_vadasX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE.as("here").inV.has("name", "vadas").back[Edge]("here")
 
-        override def get_g_VX1X_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
-          GremlinScala(graph).V(v1Id).outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
+    override def get_g_VX1X_outEXknowsX_hasXweight_1X_asXhereX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE("knows").has("weight", 1.0d).as("here").inV.has("name", "josh").back[Edge]("here")
 
-        override def get_g_VX1X_outEXknowsX_asXhereX_hasXweight_1X_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
-          GremlinScala(graph).V(v1Id).outE("knows").as("here").has("weight", 1.0d).inV.has("name", "josh").back[Edge]("here")
+    override def get_g_VX1X_outEXknowsX_asXhereX_hasXweight_1X_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE("knows").as("here").has("weight", 1.0d).inV.has("name", "josh").back[Edge]("here")
 
-        override def get_g_VX1X_outEXknowsX_asXhereX_hasXweight_1X_asXfakeX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
-          GremlinScala(graph).V(v1Id).outE("knows").as("here").has("weight", 1.0d).as("fake").inV.has("name", "josh").back[Edge]("here")
+    override def get_g_VX1X_outEXknowsX_asXhereX_hasXweight_1X_asXfakeX_inV_hasXname_joshX_backXhereX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE("knows").as("here").has("weight", 1.0d).as("fake").inV.has("name", "josh").back[Edge]("here")
 
-        override def get_g_V_asXhereXout_name_backXhereX =
-          GremlinScala(graph).V.as("here").out.values("name").back[Vertex]("here")
+    override def get_g_V_asXhereXout_name_backXhereX =
+      GremlinScala(graph).V.as("here").out.values("name").back[Vertex]("here")
 
-        override def get_g_V_outXcreatedX_unionXasXprojectX_inXcreatedX_hasXname_markoX_backXprojectX__asXprojectX_inXcreatedX_inXknowsX_hasXname_markoX_backXprojectXX_groupCount_byXnameX = {
-          val otherTraversal1 = __.as("project").in("created").has("name", "marko").back[Vertex]("project")
-          val otherTraversal2 = __.as("project").in("created").in("knows").has("name", "marko").back[Vertex]("project")
-          GremlinScala(graph).V.out("created")
-            .union(otherTraversal1, otherTraversal2)
-            .groupCount.by("name").asInstanceOf[GremlinScala[JMap[String, JLong], HNil]] //TODO: remove cast
-        }
+    override def get_g_V_outXcreatedX_unionXasXprojectX_inXcreatedX_hasXname_markoX_backXprojectX__asXprojectX_inXcreatedX_inXknowsX_hasXname_markoX_backXprojectXX_groupCount_byXnameX = {
+      val otherTraversal1 = __.as("project").in("created").has("name", "marko").back[Vertex]("project")
+      val otherTraversal2 = __.as("project").in("created").in("knows").has("name", "marko").back[Vertex]("project")
+      GremlinScala(graph).V.out("created")
+        .union(otherTraversal1, otherTraversal2)
+        .groupCount.by("name").asInstanceOf[GremlinScala[JMap[String, JLong], HNil]] //TODO: remove cast
+    }
   }
 
-  // class ScalaMapTest extends MapTest with StandardTest {
+  class ScalaMapTest extends MapTest with StandardTest {
+    override def get_g_VX1X_mapXnameX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).map[String](_.value[String]("name"))
 
-  //   override def get_g_v1_mapXnameX(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.map(_.value[String]("name"))
+    override def get_g_VX1X_outE_label_mapXlengthX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE.label.map(_.length: Integer)
 
-  //   override def get_g_v1_outE_label_mapXlengthX(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.outE.label.map(_.length: Integer)
+    override def get_g_VX1X_out_mapXnameX_mapXlengthX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.map(_.value[String]("name")).map(_.toString.length: Integer)
 
-  //   override def get_g_v1_out_mapXnameX_mapXlengthX(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.map(_.value[String]("name")).map(_.toString.length: Integer)
+    override def get_g_V_asXaX_out_mapXa_nameX =
+      GremlinScala(graph).V.as("a").out.mapWithTraverser{ t: Traverser[Vertex] => 
+        t.path[Vertex]("a").value[String]("name")
+      }
 
-  //   override def get_g_V_asXaX_out_mapXa_nameX =
-  //     GremlinScala(g).V.as("a").out
-  //       .mapWithTraverser ( _.get.value[String]("name") )
-
-  //   override def get_g_V_asXaX_out_out_mapXa_name_it_nameX =
-  //     GremlinScala(g).V.as("a").out.out.mapWithTraverser { t: Traverser[Vertex] ⇒
-  //       val a = t.get
-  //       val aName = a.value[String]("name")
-  //       val vName = t.get.value[String]("name")
-  //       s"$aName$vName"
-  //     }
-  // }
+    override def get_g_V_asXaX_out_out_mapXa_name_it_nameX =
+      GremlinScala(graph).V.as("a").out.out.mapWithTraverser { t: Traverser[Vertex] ⇒
+        val a = t.path[Vertex]("a")
+        val aName = a.value[String]("name")
+        val vName = t.get.value[String]("name")
+        s"$aName$vName"
+      }
+  }
 
   // class ScalaOrderTest extends OrderTest with StandardTest {
   //   override def get_g_V_name_order = GremlinScala(g).V.values[String]("name").order
@@ -552,8 +552,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaCoinTest],
       classOf[ScalaRangeTest],
       classOf[ScalaRetainTest],
-    classOf[ScalaBackTest]
-    // classOf[ScalaMapTest]
+      classOf[ScalaBackTest],
+      classOf[ScalaMapTest]
     // classOf[ScalaOrderTest]
     // classOf[ScalaVertexTest]
     // classOf[ScalaAggregateTest]
