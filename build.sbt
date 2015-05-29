@@ -11,22 +11,18 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
     "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
-    "com.chuusai" % "shapeless" % "2.2.0" cross CrossVersion.fullMapped {
-      case "2.10.4" ⇒ "2.10.4"
-      case v if v.startsWith("2.11") ⇒ "2.11"
-      case v ⇒ v
-    },
-    "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % "test",
-    "junit" % "junit" % "4.12" % "test",
-    "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+    "com.chuusai" %% "shapeless" % "2.2.0",
+    "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
+    "junit" % "junit" % "4.12" % Test,
+    "org.scalatest" %% "scalatest" % "2.2.5" % Test
   )
 }
 
 scalacOptions ++= Seq(
-  "-Xfatal-warnings",
-  "-Xlint",
-  "-deprecation",
-  "-feature"
+  "-Xlint"
+  // "-Xfatal-warnings",
+  // "-feature"
+  // "-deprecation", //hard to handle when supporting multiple scala versions...
   //"-Xlog-implicits"
   //"-Ydebug"
 )

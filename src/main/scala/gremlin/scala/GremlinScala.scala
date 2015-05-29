@@ -271,7 +271,8 @@ case class ScalaGraph(graph: Graph) {
     val mirror = runtimeMirror(getClass.getClassLoader)
     val instanceMirror = mirror.reflect(cc)
 
-    val params = (typeOf[A].decls map (_.asTerm) filter (t ⇒ t.isParamAccessor && t.isGetter) map { term ⇒
+    // TODO: when we don't need to support scala 2.10 any more, change to: typeOf[A].declarations
+    val params = (typeOf[A].declarations map (_.asTerm) filter (t ⇒ t.isParamAccessor && t.isGetter) map { term ⇒
       val termName = term.name.decodedName.toString
       val termType = term.typeSignature.typeSymbol.fullName
       if (!persistableType.contains(termType))
