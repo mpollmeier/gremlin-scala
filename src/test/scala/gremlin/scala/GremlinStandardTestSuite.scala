@@ -2,6 +2,7 @@ package gremlin.scala
 
 import java.lang.{ Long ⇒ JLong, Double ⇒ JDouble }
 import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
+import org.apache.tinkerpop.gremlin.structure.Order
 import scala.collection.JavaConversions._
 
 import collection.mutable
@@ -276,17 +277,62 @@ object Tests {
       }
   }
 
-  // class ScalaOrderTest extends OrderTest with StandardTest {
-  //   override def get_g_V_name_order = GremlinScala(g).V.values[String]("name").order
+  class ScalaOrderTest extends OrderTest with StandardTest {
+        override def get_g_V_name_order = GremlinScala(graph).V.values[String]("name").order
 
-  //   // override def get_g_V_name_orderXabX = GremlinScala(g).V.values[String]("name").order.by{ case (a, b) ⇒ a > b }
+        override def get_g_V_name_order_byXa1_b1X_byXb2_a2X =
+          GremlinScala(graph).V.values[String]("name").order
+            .by(lessThan = { case (a, b) => a.substring(1, 2) > b.substring(1, 2) }) 
+            .by(lessThan = { case (a, b) => b.substring(2, 3) > b.substring(2, 3) }) 
 
-  //   // override def get_g_V_name_orderXa1_b1__b2_a2X =
-  //   //   GremlinScala(g).V.values[String]("name")
-  //   //     .order.by { case (a, b) ⇒ b.substring(2, 3) < a.substring(2, 3) }
-  //   //     .order.by { case (a, b) ⇒ a.substring(1, 2) < b.substring(1, 2) }
+        override def get_g_V_order_byXname_incrX_name =
+          GremlinScala(graph).V.order.by("name", Order.incr).values[String]("name")
 
-  // }
+        // override def get_g_V_order_byXnameX_name =
+        //   GremlinScala(graph).V.order.by("name", Order.incr).values("name")
+
+
+        // override def get_g_V_outE_order_byXweight_decrX_weight =
+        //   GremlinScala(graph).V.outE.order.by("weight", Order.decr).values("weight")
+
+
+        // override def get_g_V_order_byXname_a1_b1X_byXname_b2_a2X_name =
+        //   GremlinScala(graph).V.order.
+        //             by[String]("name", (a, b) -> a.substring(1, 2).compareTo(b.substring(1, 2))).
+        //             by[String]("name", (a, b) -> b.substring(2, 3).compareTo(a.substring(2, 3))).values("name")
+
+
+        // override def get_g_V_asXaX_outXcreatedX_asXbX_order_byXshuffleX_select =
+        //   GremlinScala(graph).V.as("a").out("created").as("b").order.by(Order.shuffle).select
+
+
+        // override def get_g_VX1X_hasXlabel_personX_mapXmapXint_ageXX_orderXlocalX_byXvalueDecrX_byXkeyIncrX(v1Id: AnyRef) =
+        //   GremlinScala(graph).V(v1Id).map(v -> =
+        //         final Map<Integer, Integer> map = new HashMap<>
+        //         map.put(1, (int) v.get.value("age"))
+        //         map.put(2, (int) v.get.value("age") * 2)
+        //         map.put(3, (int) v.get.value("age") * 3)
+        //         map.put(4, (int) v.get.value("age"))
+        //         return map
+        //     }).order(Scope.local).by(Order.valueDecr).by(Order.keyIncr)
+
+        // override def get_g_V_order_byXoutE_count__decrX =
+        //   GremlinScala(graph).V.order.by(outE.count, Order.decr)
+
+    //old stuff, remove
+    // override def get_g_V_name_order = GremlinScala(g).V.values[String]("name").order
+
+    // override def get_g_V_name_orderXabX = GremlinScala(g).V.values[String]("name").order.by{ case (a, b) ⇒ a > b }
+
+    // override def get_g_V_name_orderXabX = GremlinScala(g).V.values[String]("name").order.by{ case (a, b) ⇒ a > b }
+
+
+    // override def get_g_V_name_orderXa1_b1__b2_a2X =
+    //   GremlinScala(g).V.values[String]("name")
+    //     .order.by { case (a, b) ⇒ b.substring(2, 3) < a.substring(2, 3) }
+    //     .order.by { case (a, b) ⇒ a.substring(1, 2) < b.substring(1, 2) }
+
+  }
 
   // class ScalaSelectTest extends SelectTest with StandardTest {
 
@@ -553,8 +599,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaRangeTest],
       classOf[ScalaRetainTest],
       classOf[ScalaBackTest],
-      classOf[ScalaMapTest]
-    // classOf[ScalaOrderTest]
+      classOf[ScalaMapTest],
+    classOf[ScalaOrderTest]
     // classOf[ScalaVertexTest]
     // classOf[ScalaAggregateTest]
     // classOf[ScalaCountTest]
