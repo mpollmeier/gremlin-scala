@@ -77,6 +77,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[JMap[String, End], Labels](traversal.select(stepLabels: _*))
 
   def order() = GremlinScala[End, Labels](traversal.order())
+  def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope))
 
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
   def cyclicPath() = GremlinScala[End, Labels](traversal.cyclicPath())
@@ -161,6 +162,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
 
+  def by(elementPropertyKey: String, order: Order) = GremlinScala[End, Labels](traversal.by(elementPropertyKey, order))
+
   def by(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
       override def compare(a: End, b: End) =
@@ -168,9 +171,27 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         else 0
     }))
 
+  //TODO: rename to by (without P)
+  // type A is when the element property resolves to
+  // e.g. if the property "name" resolves to a String you gotta supply [String] there...
+  def byP[A](elementPropertyKey: String, lessThan: (A, A) ⇒ Boolean) =
+    GremlinScala[End, Labels](traversal.by(elementPropertyKey, new Comparator[A]() {
+      override def compare(a: A, b: A) =
+        if (lessThan(a, b)) -1
+        else 0
+    }))
+
   def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
 
   def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
+
+  //TODO: rename to by
+  def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
+    GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
+
+  //TODO: rename to by 
+  def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], order: Order) =
+    GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal, order))
 
   def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_, _]]) =
     GremlinScala[JMap[String, A], Labels](

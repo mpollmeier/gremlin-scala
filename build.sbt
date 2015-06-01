@@ -27,7 +27,7 @@ scalacOptions ++= Seq(
   //"-Ydebug"
 )
 // testOptions in Test += Tests.Argument("-oF") // full stack traces
-// incOptions := incOptions.value.withNameHashing(true) // doesn't work on travis ;(
+incOptions := incOptions.value.withNameHashing(true) // doesn't work on travis ;(
 
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal
