@@ -394,93 +394,119 @@ object Tests {
   //   // }
   // }
 
-  // class ScalaVertexTest extends VertexTest with StandardTest {
-  //   override def get_g_V = GremlinScala(g).V
-  //   override def get_g_v1_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out
-  //   override def get_g_v2_in(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.in
-  //   override def get_g_v4_both(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.both
+  class ScalaVertexTest extends VertexTest with StandardTest {
+        override def get_g_V = GremlinScala(graph).V
 
-  //   // override def get_g_v1_outEXknowsX_localLimitX1X_inV_name(v1Id: AnyRef) =
-  //   //   GremlinScala(g).v(v1Id).get.outE("knows").localLimit(1).inV.values[String]("name")
-  //   
-  //   // override def get_g_V_bothEXcreatedX_localLimitX1X_otherV_name =
-  //   //   GremlinScala(g).V.bothE("created").localLimit(1).inV.values[String]("name")
+        override def get_g_VX1X_out(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).out
 
-  //   override def get_g_E = GremlinScala(g).E
-  //   override def get_g_v1_outE(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE
-  //   override def get_g_v2_inE(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.inE
-  //   override def get_g_v4_bothE(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE
+        override def get_g_VX2X_in(v2Id: AnyRef) = GremlinScala(graph).V(v2Id).in
 
-  //   // override def get_g_v4_bothEX1_createdX_localLimitX1X(v4Id: AnyRef) =
-  //   //   GremlinScala(g).v(v4Id).get.bothE("created").localLimit(1)
+        override def get_g_VX4X_both(v4Id: AnyRef) = GremlinScala(graph).V(v4Id).both
 
-  //   override def get_g_v1_outE_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.inV
-  //   override def get_g_v2_inE_outV(v2Id: AnyRef) = GremlinScala(g).v(v2Id).get.inE.outV
-  //   override def get_g_V_outE_hasXweight_1X_outV = GremlinScala(g).V.outE.has("weight", 1.0d).outV
+        override def get_g_E = GremlinScala(graph).E
 
-  //   override def get_g_V_out_outE_inV_inE_inV_both_name =
-  //     GremlinScala(g).V.out.outE.inV.inE.inV.both.values[String]("name")
+        override def get_g_VX1X_outE(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE
 
-  //   override def get_g_v1_outEXknowsX_bothV_name(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.outE("knows").bothV.values[String]("name")
+        override def get_g_VX2X_inE(v2Id: AnyRef) = GremlinScala(graph).V(v2Id).inE
 
-  //   override def get_g_v1_outXknowsX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out("knows")
-  //   override def get_g_v1_outXknows_createdX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out("knows", "created")
-  //   override def get_g_v1_outEXknowsX_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE("knows").inV
-  //   override def get_g_v1_outEXknows_createdX_inV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE("knows", "created").inV
-  //   override def get_g_v1_outE_otherV(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.outE.otherV
-  //   override def get_g_v4_bothE_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.otherV
+        override def get_g_VX4X_bothE(v4Id: AnyRef) = GremlinScala(graph).V(v4Id).bothE
 
-  //   override def get_g_v4_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = GremlinScala(g).v(v4Id).get.bothE.has("weight", Compare.lt, 1d).otherV
+        override def get_g_VX4X_bothEXcreatedX(v4Id: AnyRef) = GremlinScala(graph).V(v4Id).bothE("created")
 
-  //   override def get_g_V_out_out = GremlinScala(g).V.out.out
-  //   override def get_g_v1_out_out_out(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.out.out.out
-  //   override def get_g_v1_to_XOUT_knowsX(v1Id: AnyRef) = GremlinScala(g).v(v1Id).get.to(Direction.OUT, "knows")
+        override def get_g_VX1X_outE_inV(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE.inV
 
-  //   // override def get_g_v4_bothEXknows_createdX_localLimitX1X(v4Id: AnyRef) =
-  //   //   GremlinScala(g).v(v4Id).get.bothE("knows", "created").localLimit(1)
+        override def get_g_VX2X_inE_outV(v2Id: AnyRef) = GremlinScala(graph).V(v2Id).inE.outV
 
-  //   override def get_g_v4_bothEXcreatedX(v4Id: AnyRef) =
-  //     GremlinScala(g).v(v4Id).get.bothE("created")
+        override def get_g_V_outE_hasXweight_1X_outV = GremlinScala(graph).V.outE.has("weight", 1.0d).outV
 
-  //   // override def get_g_V_inEXknowsX_localLimitX2X_outV_name =
-  //   //   GremlinScala(g).V.inE("knows").localLimit(2).outV.values[String]("name")
+        override def get_g_V_out_outE_inV_inE_inV_both_name = GremlinScala(graph).V.out.outE.inV.inE.inV.both.values[String]("name")
 
-  //   override def get_g_v1_out_name(v1Id: AnyRef) =
-  //     GremlinScala(g).v(v1Id).get.out.values[String]("name")
+        override def get_g_VX1X_outEXknowsX_bothV_name(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE("knows").bothV.values[String]("name")
 
-  //   // override def get_g_v4_bothE_localLimitX1X_otherV_name(v4Id: AnyRef) =
-  //   //   GremlinScala(g).v(v4Id).get.bothE.localLimit(1).otherV.values[String]("name")
-  //   
-  //   // override def get_g_v4_bothE_localLimitX2X_otherV_name(v4Id: AnyRef) =
-  //   //   GremlinScala(g).v(v4Id).get.bothE.localLimit(2).inV.values[String]("name")
-  // }
+        override def get_g_VX1X_outXknowsX(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).out("knows")
 
-  // class ScalaAggregateTest extends AggregateTest with StandardTest {
+        override def get_g_VX1X_outXknows_createdX(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).out("knows", "created")
 
-  //   override def get_g_V_name_aggregate =
-  //     GremlinScala(g).V.values[String]("name").aggregate
-  //       .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
+        override def get_g_VX1X_outEXknowsX_inV(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE("knows").inV
 
-  //   override def get_g_V_aggregateXnameX =
-  //     GremlinScala(g).V.aggregate.by { v: Vertex ⇒ v.value[String]("name") }
-  //       .traversal.asInstanceOf[Traversal[Vertex, JList[String]]]
+        override def get_g_VX1X_outEXknows_createdX_inV(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE("knows", "created").inV
 
-  //   override def get_g_V_out_aggregateXaX_path =
-  //     GremlinScala(g).V.out.aggregate("a").path
-  // }
+        override def get_g_VX1X_outE_otherV(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).outE.otherV
 
-  // class ScalaCountTest extends CountTest with StandardTest {
-  //   override def get_g_V_count = GremlinScala(g).V.count
-  //   override def get_g_V_out_count = GremlinScala(g).V.out.count
-  //   override def get_g_V_both_both_count = GremlinScala(g).V.both.both.count
-  //   override def get_g_V_filterXfalseX_count = GremlinScala(g).V.filter { _ ⇒ false }.count
-  //   // override def get_g_V_asXaX_out_jumpXa_loops_lt_3X_count =
-  //   //   GremlinScala(g).V.as("a").out.jump("a", _.loops < 3).count
-  // }
+        override def get_g_VX4X_bothE_otherV(v4Id: AnyRef) = GremlinScala(graph).V(v4Id).bothE.otherV
+
+        override def get_g_VX4X_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = GremlinScala(graph).V(v4Id).bothE.has("weight", Compare.lt, 1d).otherV
+
+        override def get_g_V_out_out = GremlinScala(graph).V.out.out
+
+        override def get_g_VX1X_out_out_out(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).out.out.out
+
+        override def get_g_VX1X_out_name(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).out.values[String]("name")
+
+        override def get_g_VX1X_to_XOUT_knowsX(v1Id: AnyRef) = GremlinScala(graph).V(v1Id).to(Direction.OUT, "knows")
+  }
+
+  class ScalaAggregateTest extends AggregateTest with StandardTest {
+    override def get_g_V_name_aggregateXxX_capXxX =
+      GremlinScala(graph).V.values("name").aggregate("x").cap("x")
+        .asInstanceOf[GremlinScala[JList[String], _]]
+
+    override def get_g_V_aggregateXxX_byXnameX_capXxX =
+      GremlinScala(graph).V.aggregate("x").by("name").cap("x")
+        .asInstanceOf[GremlinScala[JList[String], _]]
+
+    override def get_g_V_out_aggregateXaX_path =
+      GremlinScala(graph).V.out.aggregate("a").path
+  }
+
+  class ScalaCountTest extends CountTest with StandardTest {
+        override def get_g_V_count =
+          GremlinScala(graph).V.count
+
+        override def get_g_V_out_count =
+          GremlinScala(graph).V.out.count
+
+        override def get_g_V_both_both_count =
+          GremlinScala(graph).V.both.both.count
+
+        override def get_g_V_repeatXoutX_timesX3X_count =
+          GremlinScala(graph).V.repeat(_.out).times(3).count
+
+        override def get_g_V_repeatXoutX_timesX8X_count =
+          GremlinScala(graph).V.repeat(_.out).times(8).count
+
+        override def get_g_V_hasXnoX_count =
+          GremlinScala(graph).V.has("no").count
+
+        override def get_g_V_fold_countXlocalX =
+          GremlinScala(graph).V.fold.count(Scope.local)
+  }
 
   // class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
+        // override def get_g_VX1X_sideEffectXstore_aX_name(v1Id: AnyRef) =
+          // GremlinScala(graph).V(v1Id).withSideEffect("a", ArrayList::new).sideEffect(traverser -> =
+          //       traverser.sideEffects[List]("a").clear
+          //       traverser.sideEffects[List<Vertex>]("a").add(traverser.get)
+          //   }).values[String]("name")
 
+        // override def get_g_VX1X_out_sideEffectXincr_cX_name(v1Id: AnyRef) =
+        //   GremlinScala(graph).V(v1Id).withSideEffect("c",  -> =
+        //         final List<Integer> list = new ArrayList<>
+        //         list.add(0)
+        //         return list
+        //     }).out.sideEffect(traverser -> =
+        //         Integer temp = traverser.sideEffects[List<Integer>]("c").get(0)
+        //         traverser.sideEffects[List<Integer>]("c").clear
+        //         traverser.sideEffects[List<Integer>]("c").add(temp + 1)
+        //     }).values[String]("name")
+
+
+        // override def get_g_VX1X_out_sideEffectXX_name(v1Id: AnyRef) =
+        //   GremlinScala(graph).V(v1Id).out.sideEffect(traverser -> =
+        //     }).values[String]("name")
+
+
+    //old stuff:
   //   override def get_g_v1_sideEffectXstore_aX_name(v1Id: AnyRef) = {
   //     val a = new JArrayList[Vertex] //test is expecting a java arraylist..
   //     GremlinScala(g).v(v1Id).get.withSideEffect("a", a).sideEffect { traverser ⇒
@@ -624,10 +650,10 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaRangeTest],
       classOf[ScalaRetainTest],
       classOf[ScalaBackTest],
-      classOf[ScalaMapTest]
-    // classOf[ScalaVertexTest]
-    // classOf[ScalaAggregateTest]
-    // classOf[ScalaCountTest]
+      classOf[ScalaMapTest],
+    classOf[ScalaVertexTest],
+    classOf[ScalaAggregateTest],
+    classOf[ScalaCountTest]
     // classOf[ScalaSideEffectTest]
     // classOf[ScalaSideEffectCapTest]
     // classOf[ScalaGroupCountTest]
