@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import scala.collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.process.traversal.T
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
 import scala.language.postfixOps
@@ -93,8 +93,6 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
-
   def start() = GremlinScala[Vertex, HNil](__.__(vertex))
 }
 
@@ -116,8 +114,6 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     if (p.isPresent) p.remove
     this
   }
-
-  def withSideEffect[A](key: String, value: A) = start.withSideEffect(key, value)
 
   def start() = GremlinScala[Edge, HNil](__.__(edge))
 

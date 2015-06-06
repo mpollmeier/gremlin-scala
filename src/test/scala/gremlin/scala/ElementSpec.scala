@@ -2,8 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
-import org.apache.tinkerpop.gremlin.process.traversal.T
-
+import org.apache.tinkerpop.gremlin.structure.T
 
 class ElementSpec extends TestBase {
 

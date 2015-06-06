@@ -13,10 +13,7 @@ import scala.language.postfixOps
 
 class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends MapStep[S, Labels](traversal.asAdmin) with TraversalParent {
 
-  override def getRequirements = Set(
-    TraverserRequirement.PATH,
-    TraverserRequirement.PATH_ACCESS
-  )
+  override def getRequirements = Set(TraverserRequirement.PATH)
 
   override def map(traverser: org.apache.tinkerpop.gremlin.process.traversal
 .Traverser.Admin[S]): Labels =

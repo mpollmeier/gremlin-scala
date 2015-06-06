@@ -22,28 +22,29 @@ class FilterSpec extends TestBase {
     }
   }
 
-  describe("except") {
-    it("emits everything but a given object") {
-      v(1).out.except(v(2).vertex).values[String]("name")
-        .toSet should be(Set("lop", "josh"))
-    }
+  //TODO redo with where step
+  // describe("except") {
+  //   it("emits everything but a given object") {
+  //     v(1).out.except(v(2).vertex).values[String]("name")
+  //       .toSet should be(Set("lop", "josh"))
+  //   }
 
-    it("emits everything but an 'except' list") { 
-      v(1).out.except(List(v(2).vertex)).values[String]("name")
-        .toSet should be(Set("lop", "josh"))
-    }
+  //   it("emits everything but an 'except' list") { 
+  //     v(1).out.except(List(v(2).vertex)).values[String]("name")
+  //       .toSet should be(Set("lop", "josh"))
+  //   }
 
-    it("emits everything unless the vertex is in a given aggregate variable") {
-      v(1).out.aggregate("x")
-        .out.exceptVar("x")
-        .values[String]("name").toSet should be (Set("ripple"))
-    }
+  //   it("emits everything unless the vertex is in a given aggregate variable") {
+  //     v(1).out.aggregate("x")
+  //       .out.exceptVar("x")
+  //       .values[String]("name").toSet should be (Set("ripple"))
+  //   }
 
-    it("emits everything unless a property is in a given aggregate variable") {
-      v(1).out
-        .aggregate("x").by(_.value[String]("name"))
-        .out.values[String]("name").exceptVar("x")
-        .toSet should be (Set("ripple"))
-    }
-  }
+  //   it("emits everything unless a property is in a given aggregate variable") {
+  //     v(1).out
+  //       .aggregate("x").by(_.value[String]("name"))
+  //       .out.values[String]("name").exceptVar("x")
+  //       .toSet should be (Set("ripple"))
+  //   }
+  // }
 }
