@@ -4,18 +4,13 @@ import java.lang.{ Long ⇒ JLong, Double ⇒ JDouble }
 import java.util.{ List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, Collection ⇒ JCollection, Set ⇒ JSet }
 import scala.collection.JavaConversions._
 
-import collection.mutable
-import org.apache.tinkerpop.gremlin.process._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
 import org.apache.tinkerpop.gremlin.process.traversal.step.branch._
 import org.apache.tinkerpop.gremlin.process.traversal.step.map._
-import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
-import org.apache.tinkerpop.gremlin.structure.T
-import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.{ TinkerFactory, TinkerGraph }
 import shapeless._
 import shapeless.ops.hlist._
 import org.apache.tinkerpop.gremlin.process.traversal._
