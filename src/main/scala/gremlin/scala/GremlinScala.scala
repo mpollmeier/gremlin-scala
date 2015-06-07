@@ -11,6 +11,7 @@ import org.apache.tinkerpop.gremlin.process._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
+import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.Path
 import org.apache.tinkerpop.gremlin.process.traversal.Scope
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal
@@ -219,6 +220,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 
+  def is(value: AnyRef) = GremlinScala[End, Labels](traversal.is(value))
+
+  def is(predicate: P[End]) = GremlinScala[End, Labels](traversal.is(predicate))
 
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
@@ -328,7 +332,8 @@ object GremlinScala {
 
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
-    def has(key: String, propertyTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+    // A: type of the property value
+    def has[A, B](key: String, propertyTraversal: GremlinScala[A, HNil] ⇒ GremlinScala[B, _]) =
       GremlinScala[End, Labels](traversal.has(key, propertyTraversal(start).traversal))
 
     /* there can e.g. be one of:
