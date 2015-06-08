@@ -7,8 +7,8 @@ crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0.M9-incubating"
   Seq(
-    "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-    "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion,
+    "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
+    "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
     "com.chuusai" %% "shapeless" % "2.2.0",
