@@ -233,6 +233,19 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def is(predicate: P[End]) = GremlinScala[End, Labels](traversal.is(predicate))
 
+  def where(predicate: P[End]) = GremlinScala[End, Labels](traversal.where(predicate))
+
+  def where(scope: Scope, predicate: P[End]) = GremlinScala[End, Labels](traversal.where(scope, predicate))
+
+  def where(scope: Scope, startKey: String, predicate: P[End]) =
+    GremlinScala[End, Labels](traversal.where(scope, startKey, predicate))
+
+  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+    GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
+
+  def where(scope: Scope, whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+    GremlinScala[End, Labels](traversal.where(scope, whereTraversal(start).traversal))
+
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
 
