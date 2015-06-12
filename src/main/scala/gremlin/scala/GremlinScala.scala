@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import java.lang.{ Long ⇒ JLong }
+import java.lang.{ Long ⇒ JLong, Double => JDouble }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator }
 
@@ -98,6 +98,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def label() = GremlinScala[String, Labels](traversal.label())
 
+  def id() = GremlinScala[AnyRef, Labels](traversal.id())
+
   def identity() = GremlinScala[End, Labels](traversal.identity())
 
   def to(direction: Direction, edgeLabels: String*) =
@@ -182,6 +184,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
 
   def fold() = GremlinScala[JList[End], Labels](traversal.fold())
+
+  def sum() = GremlinScala[JDouble, Labels](traversal.sum())
+  def sum(scope: Scope) = GremlinScala[JDouble, Labels](traversal.sum(scope))
+
+  def max[A <: Number]() = GremlinScala[A, Labels](traversal.max())
+  def max[A <: Number](scope: Scope) = GremlinScala[A, Labels](traversal.max(scope))
+
+  def min[A <: Number]() = GremlinScala[A, Labels](traversal.min())
+  def min[A <: Number](scope: Scope) = GremlinScala[A, Labels](traversal.min(scope))
+
+  def mean() = GremlinScala[JDouble, Labels](traversal.mean())
+  def mean(scope: Scope) = GremlinScala[JDouble, Labels](traversal.mean(scope))
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 
