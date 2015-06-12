@@ -31,6 +31,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def cap(sideEffectKey: String, sideEffectKeys: String*) =
     GremlinScala[End, Labels](traversal.cap(sideEffectKey, sideEffectKeys: _*))
 
+  //TODO: rename to option?
+  // def optionTraversal[A](optionTraversal: GremlinScala[End, HNil] => GremlinScala[A, _]) =
+  //   GremlinScala[End, Labels](traversal.option(optionTraversal(start).traversal))
+  //   GremlinScala[End, Labels](traversal.option[A](optionTraversal(start).traversal))
+    // GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
+  // def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
+  //   GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
+
   def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
   }))
@@ -79,9 +87,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
   def cyclicPath() = GremlinScala[End, Labels](traversal.cyclicPath())
 
-  def dedup() = GremlinScala[End, Labels](traversal.dedup())
+  def sample(amount: Int) = GremlinScala[End, Labels](traversal.sample(amount))
+  def sample(scope: Scope, amount: Int) = GremlinScala[End, Labels](traversal.sample(scope, amount))
 
-  def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
+  def drop() = GremlinScala[End, Labels](traversal.drop())
+
+  def dedup() = GremlinScala[End, Labels](traversal.dedup())
 
   // keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all 
   def coin(probability: Double) = GremlinScala[End, Labels](traversal.coin(probability))
@@ -92,6 +103,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
   def limit(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.limit(scope, limit))
+
+  def tail() = GremlinScala[End, Labels](traversal.tail())
+  def tail(limit: Long) = GremlinScala[End, Labels](traversal.tail(limit))
+  def tail(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.tail(scope, limit))
 
   // labels the current step and preserves the type - see `labelledPath` steps 
   def as(name: String)(implicit p: Prepend[Labels, End :: HNil]) = GremlinScala[End, p.Out](traversal.as(name))
@@ -118,6 +133,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         override def accept(t: Traverser[End]) = fun(t)
       }
     ))
+
+  def subgraph(sideEffectKey: String) = GremlinScala[Edge, Labels](traversal.subgraph(sideEffectKey))
+
+  def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
   def group[A, B]() = GremlinScala[JMap[A, B], Labels](traversal.group())
 
@@ -334,6 +353,8 @@ object GremlinScala {
       GremlinScala[A, Labels](traversal.local(localTraversal(start).traversal))
 
     def timeLimit(millis: Long) = GremlinScala[End, Labels](traversal.timeLimit(millis))
+
+    def store(sideEffectKey: String) = GremlinScala[End, Labels](traversal.store(sideEffectKey))
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
