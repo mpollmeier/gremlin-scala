@@ -10,6 +10,14 @@ class FilterSpec extends TestBase {
       .values[String]("name").toSet should be(Set("josh", "peter"))
   }
 
+  it("has") {
+    gs.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
+  }
+
+  it("hasNot") {
+    gs.V.hasNot("age", 35).value[String]("name").toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+  }
+
   describe("dedup") {
     it("dedups") {
       v(1).out.in.dedup.toList should be(v(1).out.in.toSet.toList)
