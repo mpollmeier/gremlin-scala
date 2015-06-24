@@ -1,6 +1,6 @@
 language: scala
 after_script:
-- if [[ $TRAVIS_TEST_RESULT == 0 && "$TRAVIS_BRANCH" == "master" ]]; then sbt "publish";
+- if [[ $TRAVIS_TEST_RESULT == 0 && "$TRAVIS_BRANCH" == "master" ]]; then sbt "+publish";
   fi
 scala:
 - 2.10.5
