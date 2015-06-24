@@ -33,15 +33,13 @@ resolvers += "Apache public" at "https://repository.apache.org/content/groups/pu
 resolvers += Resolver.mavenLocal
 
 publishTo <<= version { (v: String) =>
-  val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+  val sonatype = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at sonatype + "content/repositories/snapshots")
+  else Some("releases" at sonatype + "service/local/staging/deploy/maven2")
 }
-
 publishMavenStyle := true
 publishArtifact in Test := false
 pomIncludeRepository := { _ ⇒ false }
-
 pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
   <licenses>
     <license>
@@ -61,6 +59,7 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
       <url>http://www.michaelpollmeier.com</url>
     </developer>
   </developers>;
+
 
 credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
 // credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
