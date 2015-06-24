@@ -32,10 +32,12 @@ incOptions := incOptions.value.withNameHashing(true) // doesn't work on travis ;
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal
 
-publishTo <<= version { (v: String) =>
+publishTo := {
   val sonatype = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at sonatype + "content/repositories/snapshots")
-  else Some("releases" at sonatype + "service/local/staging/deploy/maven2")
+  if (isSnapshot.value)
+    Some("snapshots" at sonatype + "content/repositories/snapshots")
+  else
+    Some("releases"  at sonatype + "service/local/staging/deploy/maven2")
 }
 publishMavenStyle := true
 publishArtifact in Test := false
