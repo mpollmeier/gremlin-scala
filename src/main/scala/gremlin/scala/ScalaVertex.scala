@@ -41,14 +41,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def bothE() = start.bothE()
   def bothE(labels: String*) = start.bothE(labels: _*)
 
-  def addEdge(label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
+  // if you want to specify the vertex id, just provide `T.id -> YourId` as a property
+  def addEdge(label: String,
+              inVertex: ScalaVertex,
+              properties: Map[String, Any] = Map.empty): ScalaEdge = {
     val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex))
-    e.setProperties(properties)
-    e
-  }
-
-  def addEdge(id: AnyRef, label: String, inVertex: ScalaVertex, properties: Map[String, Any]): ScalaEdge = {
-    val e = ScalaEdge(vertex.addEdge(label, inVertex.vertex, T.id, id))
     e.setProperties(properties)
     e
   }
