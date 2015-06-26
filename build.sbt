@@ -1,7 +1,7 @@
 name := "gremlin-scala"
 version := "3.0.0-SNAPSHOT"
 organization := "com.michaelpollmeier"
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
