@@ -56,5 +56,3 @@ pomExtra := (
       <url>http://www.michaelpollmeier.com</url>
     </developer>
   </developers>)
-
-// credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
