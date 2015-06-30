@@ -1,5 +1,5 @@
 name := "gremlin-scala"
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0.M9-incubating"
 organization := "com.michaelpollmeier"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
@@ -62,6 +62,4 @@ pomExtra := <url>https://github.com/mpollmeier/gremlin-scala</url>
     </developer>
   </developers>;
 
-
-credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
-// credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "mpollmeier", "o_o")
+// credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))
