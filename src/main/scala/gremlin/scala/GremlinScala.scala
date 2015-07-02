@@ -16,7 +16,7 @@ import shapeless.ops.hlist.Prepend
 import scala.language.existentials
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
-  def toSeq(): Seq[End] = traversal.toList.toSeq
+  def toStream(): Stream[End] = traversal.toStream
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
