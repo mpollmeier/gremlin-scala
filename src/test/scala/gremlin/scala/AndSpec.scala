@@ -45,4 +45,32 @@ class AndSpec extends TestBase {
     }
 
   }
+
+  describe("combination") {
+
+    it("returns a vertex given and and or conditions are met") {
+      val x = v(1)
+
+      x.or(
+        x.and(
+          x.out().has("name", "lop"),
+          x.out().has("name", "vadas")
+        ),
+        x.out().has("name", "foo") // unmet condition
+      ).values[String]("name").toSet should be(Set("marko"))
+    }
+
+    it("returns an empty set given and and or conditions aren't met") {
+      val x = v(1)
+
+      x.and(
+        x.or(
+          x.out().has("name", "lop"),
+          x.out().has("name", "vadas")
+        ),
+        x.out().has("name", "foo") // unmet condition
+      ).values[String]("name").toSet should be(Set())
+    }
+
+  }
 }
