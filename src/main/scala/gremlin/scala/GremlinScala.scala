@@ -351,6 +351,9 @@ object GremlinScala {
 
     def hasNot(key: String, value: Any) = GremlinScala[End, Labels](traversal.where(P.not(__.has[End](key, value))))
 
+    def and(traversals: GremlinScala[End, HNil]*) =
+      GremlinScala[End, Labels](traversal.and(traversals.map(_.traversal):_*))
+
     def local[A](localTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
       GremlinScala[A, Labels](traversal.local(localTraversal(start).traversal))
 

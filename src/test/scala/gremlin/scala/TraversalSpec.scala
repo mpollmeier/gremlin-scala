@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.scalatest.matchers.ShouldMatchers
 import shapeless.test.illTyped
 
 class TraversalSpec extends TestBase {
