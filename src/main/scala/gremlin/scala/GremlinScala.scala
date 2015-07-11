@@ -354,6 +354,9 @@ object GremlinScala {
     def and(traversals: GremlinScala[End, HNil]*) =
       GremlinScala[End, Labels](traversal.and(traversals.map(_.traversal):_*))
 
+    def or(traversals: GremlinScala[End, HNil]*) =
+      GremlinScala[End, Labels](traversal.or(traversals.map(_.traversal):_*))
+
     def local[A](localTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
       GremlinScala[A, Labels](traversal.local(localTraversal(start).traversal))
 
