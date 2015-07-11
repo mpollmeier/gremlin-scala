@@ -4,8 +4,6 @@ import java.lang.{ Long ⇒ JLong, Double => JDouble }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator }
 
-import gremlin.scala.GremlinScala
-
 import collection.JavaConversions._
 import collection.mutable
 import org.apache.tinkerpop.gremlin.process.traversal.Order
