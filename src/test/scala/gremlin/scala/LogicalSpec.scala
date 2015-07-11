@@ -1,6 +1,6 @@
 package gremlin.scala
 
-class AndSpec extends TestBase {
+class LogicalSpec extends TestBase {
 
   describe("and steps") {
 
