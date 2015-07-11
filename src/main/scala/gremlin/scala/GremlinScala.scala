@@ -4,6 +4,8 @@ import java.lang.{ Long ⇒ JLong, Double => JDouble }
 import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiPredicate, Supplier }
 import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator }
 
+import gremlin.scala.GremlinScala
+
 import collection.JavaConversions._
 import collection.mutable
 import org.apache.tinkerpop.gremlin.process.traversal.Order
@@ -351,11 +353,11 @@ object GremlinScala {
 
     def hasNot(key: String, value: Any) = GremlinScala[End, Labels](traversal.where(P.not(__.has[End](key, value))))
 
-    def and(traversals: GremlinScala[End, HNil]*) =
-      GremlinScala[End, Labels](traversal.and(traversals.map(_.traversal):_*))
+    def and(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[End, HNil])*) =
+      GremlinScala[End, Labels](traversal.and(traversals.map { _(start).traversal }: _*))
 
-    def or(traversals: GremlinScala[End, HNil]*) =
-      GremlinScala[End, Labels](traversal.or(traversals.map(_.traversal):_*))
+    def or(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[End, HNil])*) =
+      GremlinScala[End, Labels](traversal.or(traversals.map { _(start).traversal }: _*))
 
     def local[A](localTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
       GremlinScala[A, Labels](traversal.local(localTraversal(start).traversal))

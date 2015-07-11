@@ -8,8 +8,8 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.and(
-        x.out().has("name", "lop"),
-        x.out().has("name", "vadas")
+        _.out().has("name", "lop"),
+        _.out().has("name", "vadas")
       ).values[String]("name").toSet should be(Set("marko"))
     }
 
@@ -17,8 +17,8 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.and(
-        x.out().has("name", "lop"),
-        x.out().has("name", "foo") // unmet condition
+        _.out().has("name", "lop"),
+        _.out().has("name", "foo") // unmet condition
       ).values[String]("name").toSet should be(Set())
     }
 
@@ -30,8 +30,8 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.or(
-        x.out().has("name", "lop"),
-        x.out().has("name", "foo") // unmet condition
+        _.out().has("name", "lop"),
+        _.out().has("name", "foo") // unmet condition
       ).values[String]("name").toSet should be(Set("marko"))
     }
 
@@ -39,8 +39,8 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.or(
-        x.out().has("name", "bar"), // unmet condition
-        x.out().has("name", "foo") // unmet condition
+        _.out().has("name", "bar"), // unmet condition
+        _.out().has("name", "foo") // unmet condition
       ).values[String]("name").toSet should be(Set())
     }
 
@@ -52,11 +52,11 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.or(
-        x.and(
-          x.out().has("name", "lop"),
-          x.out().has("name", "vadas")
+        _.and(
+          _.out().has("name", "lop"),
+          _.out().has("name", "vadas")
         ),
-        x.out().has("name", "foo") // unmet condition
+        _.out().has("name", "foo") // unmet condition
       ).values[String]("name").toSet should be(Set("marko"))
     }
 
@@ -64,11 +64,11 @@ class LogicalSpec extends TestBase {
       val x = v(1)
 
       x.and(
-        x.or(
-          x.out().has("name", "lop"),
-          x.out().has("name", "vadas")
+        _.or(
+          _.out().has("name", "lop"),
+          _.out().has("name", "vadas")
         ),
-        x.out().has("name", "foo") // unmet condition
+        _.out().has("name", "foo") // unmet condition
       ).values[String]("name").toSet should be(Set())
     }
 
