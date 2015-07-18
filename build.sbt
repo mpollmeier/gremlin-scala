@@ -3,18 +3,18 @@ organization := "com.michaelpollmeier"
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 homepage := Some(url("https://github.com/mpollmeier/gremlin-scala"))
 
-version := "3.0.0-SNAPSHOT"
+version := "3.0.0-incubating"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
-  val gremlinVersion = "3.0.0.M9-incubating"
+  val gremlinVersion = "3.0.0-incubating"
   Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
-    "com.chuusai" %% "shapeless" % "2.2.0",
+    "com.chuusai" %% "shapeless" % "2.2.4",
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
     "junit" % "junit" % "4.12" % Test,
     "org.scalatest" %% "scalatest" % "2.2.5" % Test

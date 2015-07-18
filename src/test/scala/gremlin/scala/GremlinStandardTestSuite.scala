@@ -20,22 +20,28 @@ object Tests {
 
   class ScalaDedupTest extends DedupTest with StandardTest {
     override def get_g_V_both_dedup_name =
-      GremlinScala(graph).V.both.dedup.values[String]("name")
+      GremlinScala(graph).V.both.dedup().values[String]("name")
 
     override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
-      GremlinScala(graph).V.both.has(T.label, "software").dedup.by("lang").values[String]("name")
+      GremlinScala(graph).V.both.has(T.label, "software").dedup().by("lang").values[String]("name")
 
-    override def get_g_V_both_name_orderXa_bX_dedup =
-      GremlinScala(graph).V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup
+    override def get_g_V_both_name_order_byXa_bX_dedup_value =
+      GremlinScala(graph).V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup()
 
     override def get_g_V_both_both_name_dedup =
-      GremlinScala(graph).V.both.both.values[String]("name").dedup
+      GremlinScala(graph).V.both.both.values[String]("name").dedup()
 
     override def get_g_V_both_both_dedup =
-      GremlinScala(graph).V.both.both.dedup
+      GremlinScala(graph).V.both.both.dedup()
 
     override def get_g_V_both_both_dedup_byXlabelX =
-      GremlinScala(graph).V.both.both.dedup.by(T.label)
+      GremlinScala(graph).V.both.both.dedup().by(T.label)
+
+    override def get_g_V_asXaX_both_asXbX_dedupXa_bX_byXlabelX_selectXa_bX =
+      GremlinScala(graph).V.as("a").both.as("b").dedup("a", "b").by(T.label).select("a", "b")
+
+    override def get_g_V_asXaX_outXcreatedX_asXbX_inXcreatedX_asXcX_dedupXa_bX_path =
+      GremlinScala(graph).V.as("a").out("created").as("b").in("created").as("c").dedup("a", "b").path
 
     override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
       GremlinScala(graph).V.group()
@@ -579,11 +585,11 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest]
 
-      // classOf[ScalaHasTest]
+    // classOf[ScalaHasTest]
 
-      // classOf[ScalaRangeTest],
-      // classOf[ScalaMapTest],
-      // classOf[ScalaVertexTest],
+    // classOf[ScalaRangeTest],
+    // classOf[ScalaMapTest],
+    // classOf[ScalaVertexTest],
     // classOf[ScalaSideEffectTest]
     // classOf[ScalaSideEffectCapTest]
     // classOf[ScalaGroupCountTest]
@@ -625,8 +631,9 @@ class TinkerGraphGraphProvider extends AbstractGraphProvider {
     graphName: String,
     test: Class[_],
     testMethodName: String,
-    loadGraphWith: LoadGraphWith.GraphData): JMap[String, AnyRef] =
-      Map("gremlin.graph" → classOf[TinkerGraph].getName)
+    loadGraphWith: LoadGraphWith.GraphData
+  ): JMap[String, AnyRef] =
+    Map("gremlin.graph" → classOf[TinkerGraph].getName)
 
   override def clear(graph: Graph, configuration: Configuration): Unit =
     Option(graph) map { graph ⇒

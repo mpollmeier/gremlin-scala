@@ -7,6 +7,7 @@ import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCol
 import collection.JavaConversions._
 import collection.mutable
 import org.apache.tinkerpop.gremlin.process.traversal.Order
+import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
@@ -16,7 +17,7 @@ import shapeless.ops.hlist.Prepend
 import scala.language.existentials
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
-  def toStream(): Stream[End] = traversal.toStream
+  def toStream(): java.util.stream.Stream[End] = traversal.toStream
   def toList(): List[End] = traversal.toList.toList
   def toSet(): Set[End] = traversal.toList.toSet
   def head(): End = toList.head
@@ -74,12 +75,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec` 
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
-  def select() = GremlinScala[JMap[String, End], Labels](traversal.select())
+  def select[A, B](selectKey: String) = GremlinScala[B, Labels](traversal.select(selectKey))
 
-  def select[A, B](label: String) = GremlinScala[B, Labels](traversal.select(label))
+  def select[A, B](pop: Pop, selectKey: String) = GremlinScala[B, Labels](traversal.select(pop, selectKey))
 
-  def select(stepLabels: Seq[String]) =
-    GremlinScala[JMap[String, End], Labels](traversal.select(stepLabels: _*))
+  def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
+    GremlinScala[JMap[String, End], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
+
+  def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
+    GremlinScala[JMap[String, End], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
   def order() = GremlinScala[End, Labels](traversal.order())
   def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope))
@@ -92,7 +96,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def drop() = GremlinScala[End, Labels](traversal.drop())
 
-  def dedup() = GremlinScala[End, Labels](traversal.dedup())
+  def dedup(dedupLabels: String*) = GremlinScala[End, Labels](traversal.dedup(dedupLabels: _*))
+
+  def dedup(scope: Scope, dedupLabels: String*) = GremlinScala[End, Labels](traversal.dedup(scope, dedupLabels: _*))
 
   // keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all 
   def coin(probability: Double) = GremlinScala[End, Labels](traversal.coin(probability))
@@ -192,10 +198,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], order: Order) =
     GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal, order))
 
-  def `match`[A](startLabel: String, traversals: Seq[GremlinScala[_, _]]) =
+  def `match`[A](traversals: Seq[GremlinScala[_, _]]) =
     GremlinScala[JMap[String, A], Labels](
       traversal.`match`(
-        startLabel,
         traversals map (_.traversal): _*
       )
     )
@@ -252,18 +257,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def is(predicate: P[End]) = GremlinScala[End, Labels](traversal.is(predicate))
 
-  def where(predicate: P[End]) = GremlinScala[End, Labels](traversal.where(predicate))
+  def where(predicate: P[String]) = GremlinScala[End, Labels](traversal.where(predicate))
 
-  def where(scope: Scope, predicate: P[End]) = GremlinScala[End, Labels](traversal.where(scope, predicate))
-
-  def where(scope: Scope, startKey: String, predicate: P[End]) =
-    GremlinScala[End, Labels](traversal.where(scope, startKey, predicate))
+  def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
 
   def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
-
-  def where(scope: Scope, whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
-    GremlinScala[End, Labels](traversal.where(scope, whereTraversal(start).traversal))
 
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
@@ -349,7 +348,7 @@ object GremlinScala {
 
     def hasNot(key: String) = GremlinScala[End, Labels](traversal.hasNot(key))
 
-    def hasNot(key: String, value: Any) = GremlinScala[End, Labels](traversal.where(P.not(__.has[End](key, value))))
+    def hasNot(key: String, value: Any) = GremlinScala[End, Labels](traversal.not(__.has(key, value)))
 
     def and(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[End, _])*) =
       GremlinScala[End, Labels](traversal.and(traversals.map { _(start).traversal }: _*))
