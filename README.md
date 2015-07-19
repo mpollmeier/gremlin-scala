@@ -49,7 +49,7 @@ In comparison: Gremlin-Java and Gremlin-Groovy just return a `List[Any]` and you
 You can save and load case classes as a vertex - this is still experimental but pretty cool:
 
 ```scala
-  import com.tinkerpop.gemlin.scala._
+  import gremlin.scala._
   val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
   val gs = GremlinScala(graph)
   val v = gs.save(example)
