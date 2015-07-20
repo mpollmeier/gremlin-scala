@@ -9,11 +9,11 @@ Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-ex
 
 ## Benefits
 * Scala friendly function signatures, aiming to be close to the standard collection library
-* No need to worry about how to implement Java 8 functions - do you really want to create instances of `java.util.function.BiPredicate`?
+* You can use standard Scala functions instead of having to worry about how to implement `java.util.function.BiPredicate`
 * Nothing is hidden away, you can always easily access the Gremlin-Java objects if needed. Examples include accessing graph db specifics things like indexes, or using a step that hasn't been implemented in Gremlin-Scala yet
-* Only allocates additional instances if absolutely necessary
+* Minimal overhead - only allocates additional instances if absolutely necessary
 
-### Compiler helps to create only valid traversals
+### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
 
 ```scala
