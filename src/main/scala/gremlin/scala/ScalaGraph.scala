@@ -2,10 +2,11 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
+import scala.collection.JavaConverters._
 
 case class ScalaGraph(graph: Graph) {
-  import scala.reflect.ClassTag
-  import scala.reflect.runtime.universe._
 
   def addVertex() = ScalaVertex(graph.addVertex())
   def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
@@ -41,7 +42,7 @@ case class ScalaGraph(graph: Graph) {
 
   // save an object's values into a new vertex
   def save[A: TypeTag: ClassTag](cc: A): ScalaVertex = {
-    val persistableType = Seq(
+    val persistableTypes = Seq(
       typeOf[Option.type],
       typeOf[String],
       typeOf[Int],
@@ -50,7 +51,9 @@ case class ScalaGraph(graph: Graph) {
       typeOf[Long],
       typeOf[Short],
       typeOf[Char],
-      typeOf[Byte]
+      typeOf[Byte],
+      typeOf[Seq.type],
+      typeOf[Map.type]
     ) map (_.typeSymbol.fullName)
 
     val mirror = runtimeMirror(getClass.getClassLoader)
@@ -60,7 +63,7 @@ case class ScalaGraph(graph: Graph) {
     val params = (typeOf[A].declarations map (_.asTerm) filter (t ⇒ t.isParamAccessor && t.isGetter) map { term ⇒
       val termName = term.name.decodedName.toString
       val termType = term.typeSignature.typeSymbol.fullName
-      if (!persistableType.contains(termType))
+      if (!persistableTypes.contains(termType))
         throw new IllegalArgumentException(s"The field '$termName: $termType' is not persistable.")
 
       val fieldMirror = instanceMirror.reflectField(term)
