@@ -225,7 +225,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def emit() = GremlinScala[End, Labels](traversal.emit())
 
-  def emit(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
+  def emit(emitTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+    GremlinScala[End, Labels](traversal.emit(emitTraversal(start).traversal))
+
+  def emitWithTraverser(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
 
   def branch(fun: End ⇒ Iterable[String]) =
     GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
@@ -246,7 +249,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
     GremlinScala[End, Labels](traversal.repeat(repeatTraversal(start).traversal))
 
-  def until(predicate: Traverser[End] ⇒ Boolean) =
+  def until(untilTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+    GremlinScala[End, Labels](traversal.until(untilTraversal(start).traversal))
+
+  def untilWithTraverser(predicate: Traverser[End] ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.until(predicate))
 
   def times(maxLoops: Int) = GremlinScala[End, Labels](traversal.times(maxLoops))
