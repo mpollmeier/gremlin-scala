@@ -160,6 +160,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
 
+  def barrier() = GremlinScala[End, Labels](traversal.barrier())
+
+  def barrier(maxBarrierSize: Int) = GremlinScala[End, Labels](traversal.barrier(maxBarrierSize))
+
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by() = GremlinScala[End, Labels](traversal.by())
 
