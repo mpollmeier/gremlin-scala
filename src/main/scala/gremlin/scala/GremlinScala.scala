@@ -311,40 +311,21 @@ object GremlinScala {
 
     def has(key: String, value: Any) = GremlinScala[End, Labels](traversal.has(key, value))
 
+    def has(key: String, predicate: P[_]) = GremlinScala[End, Labels](traversal.has(key, predicate))
+
     def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
+
+    def has(accessor: T, predicate: P[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate))
 
     // A: type of the property value
     def has[A, B](key: String, propertyTraversal: GremlinScala[A, HNil] ⇒ GremlinScala[B, _]) =
       GremlinScala[End, Labels](traversal.has(key, propertyTraversal(start).traversal))
 
-    /* there can e.g. be one of:
-     * `(i: Int, s: String) ⇒ true` - there is an implicit conversion to BiPredicate in package.scala
-     * org.apache.tinkerpop.gremlin.structure.Compare.{eq, gt, gte, lt, lte, ...}
-     * org.apache.tinkerpop.gremlin.structure.Contains.{in, nin, ...}
-     */
-    // def has(key: String, predicate: BiPredicate[_, _], value: Any) =
-    //   GremlinScala[End, Labels](traversal.has(key, predicate, value))
-
-    // def has(key: String, predicate: BiPredicate[_, _], value: Seq[_]) =
-    //   GremlinScala[End, Labels](traversal.has(key, predicate, toJavaList(value)))
-
-    // def has(accessor: T, predicate: BiPredicate[_, _], value: Any) =
-    //   GremlinScala[End, Labels](traversal.has(accessor, predicate, value))
-
-    // def has(accessor: T, predicate: BiPredicate[_, _], value: Seq[_]) =
-    //   GremlinScala[End, Labels](traversal.has(accessor, predicate, toJavaList(value)))
-
     def has(label: String, key: String, value: Any) =
       GremlinScala[End, Labels](traversal.has(label, key, value))
 
-    // def has(label: String, key: String, value: Seq[_]) =
-    //   GremlinScala[End, Labels](traversal.has(label, key, toJavaList(value)))
-
-    // def has(label: String, key: String, predicate: BiPredicate[_, _], value: Any) =
-    //   GremlinScala[End, Labels](traversal.has(label, key, predicate, value))
-
-    // def has(label: String, key: String, predicate: BiPredicate[_, _], value: Seq[_]) =
-    //   GremlinScala[End, Labels](traversal.has(label, key, predicate, toJavaList(value)))
+    def has(label: String, key: String, predicate: P[_]) =
+      GremlinScala[End, Labels](traversal.has(label, key, predicate))
 
     def hasId(ids: AnyRef*) = GremlinScala[End, Labels](traversal.hasId(ids: _*))
 
