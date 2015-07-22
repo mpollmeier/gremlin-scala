@@ -32,13 +32,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def cap(sideEffectKey: String, sideEffectKeys: String*) =
     GremlinScala[End, Labels](traversal.cap(sideEffectKey, sideEffectKeys: _*))
 
-  //TODO: rename to option?
-  // def optionTraversal[A](optionTraversal: GremlinScala[End, HNil] => GremlinScala[A, _]) =
-  //   GremlinScala[End, Labels](traversal.option(optionTraversal(start).traversal))
-  //   GremlinScala[End, Labels](traversal.option[A](optionTraversal(start).traversal))
-    // GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
-  // def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
-  //   GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
+  def option[A](optionTraversal: GremlinScala[End, HNil] => GremlinScala[A, _]) = {
+    val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
+    GremlinScala[End, Labels](traversal.option(t))
+  }
+
+  def option[A, M](pickToken: M, optionTraversal: GremlinScala[End, HNil] => GremlinScala[A, _]) = {
+    val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
+    GremlinScala[End, Labels](traversal.option(pickToken, t))
+  }
 
   def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h.get)
