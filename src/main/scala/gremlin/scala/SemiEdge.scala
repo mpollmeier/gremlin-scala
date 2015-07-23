@@ -1,5 +1,5 @@
 package gremlin.scala
 
-case class SemiEdge(from: ScalaVertex, label: String) {
-  def ->(to: ScalaVertex) = from.addEdge(label, to)
+case class SemiEdge(from: Vertex, label: String) {
+  def ->(to: Vertex) = from.addEdge(label, to)
 }
