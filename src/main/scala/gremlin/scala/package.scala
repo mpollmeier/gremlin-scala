@@ -20,9 +20,13 @@ package object scala {
   type Traverser[A] = traversal.Traverser[A]
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
+  implicit def unwrap(v: ScalaVertex) = v.vertex
   implicit def wrap(e: Edge) = ScalaEdge(e)
+  implicit def unwrap(e: ScalaEdge) = e.edge
   implicit def wrap(g: Graph) = ScalaGraph(g)
-  implicit def wrap[A](traversal: GraphTraversal[_,A]) = GremlinScala[A, HNil](traversal)
+  implicit def unwrap(g: ScalaGraph) = g.graph
+  implicit def wrap[A](traversal: GraphTraversal[_, A]) = GremlinScala[A, HNil](traversal)
+  implicit def unwrap[A](traversal: GremlinScala[A, _]) = traversal.traversal
 
   implicit def toElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
     new GremlinElementSteps(gremlinScala)
