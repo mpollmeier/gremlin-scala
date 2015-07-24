@@ -26,7 +26,6 @@ package object scala {
   implicit def wrap(g: Graph) = ScalaGraph(g)
   implicit def unwrap(g: ScalaGraph) = g.graph
   implicit def wrap[A](traversal: GraphTraversal[_, A]) = GremlinScala[A, HNil](traversal)
-  implicit def unwrap[A](traversal: GremlinScala[A, _]) = traversal.traversal
 
   implicit def toElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
     new GremlinElementSteps(gremlinScala)
