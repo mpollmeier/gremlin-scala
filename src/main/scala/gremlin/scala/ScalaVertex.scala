@@ -7,6 +7,8 @@ import shapeless._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
+  def --(label: String) = SemiEdge(vertex, label)
+
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
     this
