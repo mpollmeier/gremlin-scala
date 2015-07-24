@@ -4,19 +4,16 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
-import scala.collection.JavaConverters._
 
 case class ScalaGraph(graph: Graph) {
 
-  def addVertex() = ScalaVertex(graph.addVertex())
-  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex()
+    val v = graph.addVertex()
     v.setProperties(properties)
     v
   }
   def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex(label)
+    val v = graph.addVertex(label)
     v.setProperties(properties)
     v
   }
@@ -74,6 +71,6 @@ case class ScalaGraph(graph: Graph) {
       })
     } filter { case (key, value) ⇒ key != "id" && value != null }).toMap + ("label" → cc.getClass.getSimpleName)
 
-    addVertex().setProperties(params)
+    graph.addVertex().setProperties(params)
   }
 }
