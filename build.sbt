@@ -10,26 +10,24 @@ version := "3.0.0-SNAPSHOT"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
-
-
-libraryDependencies <++= scalaVersion { scalaVersion =>
+libraryDependencies ++= {
   val gremlinVersion = "3.0.0-incubating"
-  Seq(
+  val deps = Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
-    "org.scala-lang" % "scala-reflect" % scalaVersion,
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
     "com.chuusai" %% "shapeless" % "2.2.4",
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
     "junit" % "junit" % "4.12" % Test,
     "org.scalatest" %% "scalatest" % "2.2.5" % Test
   )
+  if (scalaVersion.value.startsWith("2.10"))
+    deps :+ compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+  else
+    deps
 }
-libraryDependencies ++= (
 
-  if (scalaVersion.value.startsWith("2.10")) List(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
-  else Nil
-  )
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal
 
