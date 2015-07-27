@@ -1,3 +1,6 @@
+import sbt._
+import Keys._
+
 name := "gremlin-scala"
 organization := "com.michaelpollmeier"
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
@@ -6,6 +9,8 @@ homepage := Some(url("https://github.com/mpollmeier/gremlin-scala"))
 version := "3.0.0-SNAPSHOT"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
+
+
 
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-incubating"
@@ -20,6 +25,11 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.scalatest" %% "scalatest" % "2.2.5" % Test
   )
 }
+libraryDependencies ++= (
+
+  if (scalaVersion.value.startsWith("2.10")) List(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
+  else Nil
+  )
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
 resolvers += Resolver.mavenLocal
 
