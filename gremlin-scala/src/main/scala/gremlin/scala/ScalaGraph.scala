@@ -42,7 +42,7 @@ case class ScalaGraph(graph: Graph) {
 
   // save an object's values into a new vertex
   def save[A: TypeTag: ClassTag](cc: A): ScalaVertex =
-    addVertex().setProperties(MarshallingMacros.marshalling(cc))
+    addVertex().setProperties(MarshallingMacros.toMap(cc))
 //  {
 //    val persistableTypes = Seq(
 //      typeOf[Option.type],
