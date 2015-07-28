@@ -21,11 +21,16 @@ object MarshallingMacros {
   def toMapMacro[P: c.WeakTypeTag](c: Context)(cc: c.Tree) = {
     import c.universe._
     
-    val toMapParams = weakTypeOf[P].declarations.collect {
+    val tpe = weakTypeOf[P]
+    
+    val toMapParams = tpe.declarations.collect {
       case field: MethodSymbol if field.isCaseAccessor =>
         val name = field.name
         val decoded = name.decoded
-        q"$decoded -> $cc.$name"
+        val returnType = tpe.declaration(name).typeSignature
+        // http://www.scala-lang.org/api/2.10.4/index.html#scala.reflect.api.Types$TypeApi
+        val value = if (returnType == Product) toMapMacro(field) else q"$cc.$name"
+        q"$decoded -> $value"
     }
     
     q"Map(..$toMapParams)"
