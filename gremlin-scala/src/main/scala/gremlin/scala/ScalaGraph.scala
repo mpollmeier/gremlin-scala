@@ -41,7 +41,7 @@ case class ScalaGraph(graph: Graph) {
   def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
 
   // save an object's values into a new vertex
-  def save[A: TypeTag: ClassTag](cc: A): ScalaVertex =
+  def save[A <: Product](cc: A): ScalaVertex =
     addVertex().setProperties(MarshallingMacros.toMap(cc))
 //  {
 //    val persistableTypes = Seq(
