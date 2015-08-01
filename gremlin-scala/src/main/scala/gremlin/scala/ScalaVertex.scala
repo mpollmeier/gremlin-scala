@@ -9,6 +9,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def --(label: String) = SemiEdge(vertex, label)
 
+  def load[T: Mappable] = implicitly[Mappable[T]].fromMap(vertex.valueMap())
+
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
     this

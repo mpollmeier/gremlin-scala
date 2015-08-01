@@ -38,6 +38,6 @@ class MarshallerSpec extends FunSpec with Matchers {
 
     val v = gs.save(example)
 
-    v.start.load[ExampleClass].head shouldBe example
+    v.load[ExampleClass] shouldBe example
   }
 }

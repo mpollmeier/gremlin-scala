@@ -59,43 +59,8 @@ package object scala {
     { t: Traverser[A] ⇒ fun(t.get) }
 
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
-
-    case class Toto(t: Int)
-
+    
     // load a vertex values into a case class
-    def load[Toto] = gs.map[Toto] { vertex =>
-      MarshallingMacros.fromMap[Toto](vertex.valueMap())
-
-//      val mirror = runtimeMirror(getClass.getClassLoader)
-//      val classA = typeOf[A].typeSymbol.asClass
-//      val classMirror = mirror.reflectClass(classA)
-//      val constructor = typeOf[A].declaration(nme.CONSTRUCTOR).asMethod
-//
-//      val params = constructor.paramss.head map {
-//        case field if field.name.decodedName.toString == "id" => vertex.id.toString
-//        case field if field.typeSignature.typeSymbol.fullName == typeOf[Option.type].typeSymbol.fullName =>
-//          Option(vertex.valueOrElse(field.name.decoded.toString, null))
-//        case field => vertex.valueOrElse(field.name.decoded.toString, null)
-//      }
-//
-//      val constructorMirror = classMirror.reflectConstructor(constructor)
-//      constructorMirror(params: _*).asInstanceOf[A]
-
-      // TODO: when we don't need to support scala 2.10 any more, change to:
-      // val mirror = runtimeMirror(getClass.getClassLoader)
-      // val classA = typeOf[A].typeSymbol.asClass
-      // val classMirror = mirror.reflectClass(classA)
-      // val constructor = typeOf[A].decl(termNames.CONSTRUCTOR).asMethod
-
-      // val params = constructor.paramLists.head map {
-      //   case field if field.name.decodedName.toString == "id" => vertex.id.toString
-      //   case field if field.typeSignature.typeSymbol.fullName == typeOf[Option.type].typeSymbol.fullName =>
-      //     Option(vertex.valueOrElse(field.name.decodedName.toString, null))
-      //   case field => vertex.valueOrElse(field.name.decodedName.toString, null)
-      // }
-
-      // val constructorMirror = classMirror.reflectConstructor(constructor)
-      // constructorMirror(params: _*).asInstanceOf[A]
-    }
+    def load[T: Mappable] = gs map (_.load[T])
   }
 }
