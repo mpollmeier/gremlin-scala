@@ -18,10 +18,8 @@ class MarshallerSpec extends FunSpec with Matchers {
 
   it("saves a case class as a vertex") {
     val graph = TinkerGraph.open
-    val gs = GremlinScala(graph)
 
-    val v = gs.save(example)
-
+    val v = graph.addVertex(example)
     v.valueMap should contain ("s" → example.s)
     v.valueMap should contain ("i" → example.i)
     v.valueMap should contain ("l" → example.l)
@@ -29,15 +27,14 @@ class MarshallerSpec extends FunSpec with Matchers {
     v.valueMap should contain ("seq" → example.seq)
     v.valueMap should contain ("map" → example.map)
 
-    v shouldBe ScalaVertex(gs.V.toList.head)
+    v shouldBe ScalaVertex(graph.V.toList.head)
   }
 
   it("converts a Vertex into a case class") {
     val graph = TinkerGraph.open
-    val gs = GremlinScala(graph)
 
-    val v = gs.save(example)
+    val v = graph.addVertex(example)
 
-    v.load[ExampleClass] shouldBe example
+    v.toCC[ExampleClass] shouldBe example
   }
 }

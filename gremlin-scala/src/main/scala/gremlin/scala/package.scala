@@ -61,6 +61,6 @@ package object scala {
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
     
     // load a vertex values into a case class
-    def load[T: Mappable] = gs map (_.load[T])
+    def load[T: Mappable] = gs map (_.toCC[T])
   }
 }

@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
 
@@ -9,7 +8,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def --(label: String) = SemiEdge(vertex, label)
 
-  def load[T: Mappable] = implicitly[Mappable[T]].fromMap(vertex.valueMap())
+  def toCC[T: Mappable] = implicitly[Mappable[T]].fromMap(vertex.valueMap())
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)

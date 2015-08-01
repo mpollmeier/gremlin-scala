@@ -21,6 +21,10 @@ case class ScalaGraph(graph: Graph) {
     v
   }
 
+  // save an object's values into a new vertex
+  def addVertex[T: Mappable](cc: T): ScalaVertex =
+    addVertex().setProperties(implicitly[Mappable[T]].toMap(cc))
+
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
     GremlinScala(graph.traversal.V(id)).headOption map ScalaVertex.apply
@@ -39,9 +43,5 @@ case class ScalaGraph(graph: Graph) {
 
   // start traversal with some edges identified by given ids 
   def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
-
-  // save an object's values into a new vertex
-  def save[T: Mappable](cc: T): ScalaVertex =
-    addVertex().setProperties(implicitly[Mappable[T]].toMap(cc))
 
 }
