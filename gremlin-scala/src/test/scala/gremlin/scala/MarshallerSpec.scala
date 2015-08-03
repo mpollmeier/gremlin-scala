@@ -14,7 +14,7 @@ case class ExampleClass(@label s: String,
                         seq: Seq[String],
                         map: Map[String, String],
                         nested: NestedClass) {
-  def rendomDef = ???
+  def randomDef = ???
 }
 
 case class NestedClass(s: String)
