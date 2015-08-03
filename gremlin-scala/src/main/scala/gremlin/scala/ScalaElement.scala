@@ -34,7 +34,7 @@ trait ScalaElement[ElementType <: Element] {
   }
 
   def valueMap(): Map[String, Any] =
-    keys map { key ⇒ (key, getValue(key)) } toMap
+    keys.map { key ⇒ (key, getValue(key)) }.toMap
 
   def valueOrElse[A](key: String, default: ⇒ A): A = property[A](key).orElse(default)
 

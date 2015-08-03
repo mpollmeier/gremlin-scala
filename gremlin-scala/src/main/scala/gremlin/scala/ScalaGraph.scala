@@ -27,8 +27,8 @@ case class ScalaGraph(graph: Graph) {
    * @return
    */
   def addCC[T <: Product : Mappable](cc: T): ScalaVertex = {
-    println(implicitly[Mappable[T]].toMap(cc))
-    addVertex().setProperties(implicitly[Mappable[T]].toMap(cc))
+    val (label, valueMap) = implicitly[Mappable[T]].toMap(cc)
+    graph.addVertex(label, valueMap)
   }
 
   // get vertex by id
