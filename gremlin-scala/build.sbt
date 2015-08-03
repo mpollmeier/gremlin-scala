@@ -1,6 +1,6 @@
 name := "gremlin-scala"
 organization := "com.michaelpollmeier"
-licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 homepage := Some(url("https://github.com/mpollmeier/gremlin-scala"))
 
 version := "3.0.0-SNAPSHOT"
@@ -17,6 +17,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.chuusai" %% "shapeless" % "2.2.4",
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
     "junit" % "junit" % "4.12" % Test,
+    "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.9.0-M2",
     "org.scalatest" %% "scalatest" % "2.2.5" % Test
   )
 }
@@ -39,20 +40,20 @@ publishTo := {
   if (isSnapshot.value)
     Some("snapshots" at sonatype + "content/repositories/snapshots")
   else
-    Some("releases"  at sonatype + "service/local/staging/deploy/maven2")
+    Some("releases" at sonatype + "service/local/staging/deploy/maven2")
 }
 publishMavenStyle := true
 publishArtifact in Test := false
 pomIncludeRepository := { _ ⇒ false }
-pomExtra := (
+pomExtra :=
   <scm>
     <url>git@github.com:mpollmeier/gremlin-scala.git</url>
     <connection>scm:git:git@github.com:mpollmeier/gremlin-scala.git</connection>
   </scm>
-  <developers>
-    <developer>
-      <id>mpollmeier</id>
-      <name>Michael Pollmeier</name>
-      <url>http://www.michaelpollmeier.com</url>
-    </developer>
-  </developers>)
+    <developers>
+      <developer>
+        <id>mpollmeier</id>
+        <name>Michael Pollmeier</name>
+        <url>http://www.michaelpollmeier.com</url>
+      </developer>
+    </developers>

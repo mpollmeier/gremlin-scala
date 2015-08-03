@@ -1,6 +1,6 @@
 package gremlin
 
-import java.util.function.{ Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate }
+import java.util.function.{Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate}
 
 import gremlin.scala.GremlinScala._
 import org.apache.tinkerpop.gremlin.structure
@@ -20,11 +20,17 @@ package object scala {
   type Traverser[A] = traversal.Traverser[A]
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
+
   implicit def unwrap(v: ScalaVertex) = v.vertex
+
   implicit def wrap(e: Edge) = ScalaEdge(e)
+
   implicit def unwrap(e: ScalaEdge) = e.edge
+
   implicit def wrap(g: Graph) = ScalaGraph(g)
+
   implicit def unwrap(g: ScalaGraph) = g.graph
+
   implicit def wrap[A](traversal: GraphTraversal[_, A]) = GremlinScala[A, HNil](traversal)
 
   implicit def toElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels]) =
@@ -56,11 +62,12 @@ package object scala {
     }
 
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
-    { t: Traverser[A] ⇒ fun(t.get) }
+    (t: Traverser[A]) ⇒ fun(t.get)
 
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
-    
+
     // load a vertex values into a case class
-    def load[T: Mappable] = gs map (_.toCC[T])
+    def load[T <: Product : Mappable] = gs map (_.toCC[T])
   }
+
 }

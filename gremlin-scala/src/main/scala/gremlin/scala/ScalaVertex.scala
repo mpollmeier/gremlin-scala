@@ -8,7 +8,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def --(label: String) = SemiEdge(vertex, label)
 
-  def toCC[T: Mappable] = implicitly[Mappable[T]].fromMap(vertex.valueMap())
+  def toCC[T <: Product: Mappable] = implicitly[Mappable[T]].fromMap(vertex.valueMap())
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)

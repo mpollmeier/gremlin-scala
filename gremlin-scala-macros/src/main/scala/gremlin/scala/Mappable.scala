@@ -7,6 +7,7 @@ import scala.reflect.macros.blackbox.Context
 
 trait Mappable[T] {
   def toMap(t: T): Map[String, Any]
+
   def fromMap(map: Map[String, Any]): T
 }
 
@@ -21,11 +22,12 @@ object Mappable {
 
     val (toMapParams, fromMapParams) = tpe.declarations.collect {
       case field: MethodSymbol if field.isCaseAccessor =>
-      val name = field.name
-      val decoded = name.decoded
-      val returnType = tpe.declaration(name).typeSignature
+        val name = field.name
+        val decoded = name.decoded
+        val returnType = tpe.declaration(name).typeSignature
+        //if (returnType.baseClasses contains weakTypeOf[Product])
 
-      (q"$decoded -> t.$name", q"map($decoded).asInstanceOf[$returnType]")
+        (q"$decoded -> t.$name", q"map($decoded).asInstanceOf[$returnType]")
     }.unzip
 
     c.Expr[Mappable[T]] { q"""
@@ -33,6 +35,7 @@ object Mappable {
         def toMap(t: $tpe): Map[String, Any] = Map(..$toMapParams)
         def fromMap(map: Map[String, Any]): $tpe = $companion(..$fromMapParams)
       }
-    """ }
+    """
+    }
   }
 }

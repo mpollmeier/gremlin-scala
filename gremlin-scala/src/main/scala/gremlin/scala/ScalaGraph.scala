@@ -9,21 +9,32 @@ import scala.collection.JavaConverters._
 case class ScalaGraph(graph: Graph) {
 
   def addVertex() = ScalaVertex(graph.addVertex())
+
   def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
+
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
     val v = addVertex()
     v.setProperties(properties)
     v
   }
+
   def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
     val v = addVertex(label)
     v.setProperties(properties)
     v
   }
 
-  // save an object's values into a new vertex
-  def addVertex[T: Mappable](cc: T): ScalaVertex =
+  /**
+   * Save an object's values into a new vertex
+   *
+   * @param cc The case class to persist as a vertex
+   * @tparam T
+   * @return
+   */
+  def addCC[T <: Product : Mappable](cc: T): ScalaVertex = {
+    println(implicitly[Mappable[T]].toMap(cc))
     addVertex().setProperties(implicitly[Mappable[T]].toMap(cc))
+  }
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
@@ -35,7 +46,8 @@ case class ScalaGraph(graph: Graph) {
 
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
-  // start traversal with all edges 
+
+  // start traversal with all edges
   def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
 
   // start traversal with some vertices identified by given ids 
