@@ -7,7 +7,7 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
 
-case class ExampleClass(@Label s: String,
+case class ExampleClass(@label1 s: String,
                         i: Int,
                         l: Long,
                         o: Option[String],

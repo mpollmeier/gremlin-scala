@@ -2,4 +2,4 @@ package gremlin.scala
 
 import scala.annotation.StaticAnnotation
 
-class Label extends StaticAnnotation
+class label1 extends StaticAnnotation
