@@ -27,7 +27,7 @@ object Mappable {
         val decoded = name.decoded
         val returnType = tpe.declaration(name).typeSignature
         //if (returnType.baseClasses contains weakTypeOf[Product])
-        if (field.annotations contains weakTypeOf[label1]) {
+        if (field.annotations contains weakTypeOf[label]) {
           assert(returnType == weakTypeOf[String], "Bonjour") //TODO
           (q"t.$name",
             toMapParams,
