@@ -92,70 +92,94 @@ object Tests {
       GremlinScala(graph).V(v1Id).out("created").in("created").cyclicPath.path
   }
 
-  // class ScalaHasTest extends HasTest with StandardTest {
-  //   override def get_g_EX11X_outV_outE_hasXid_10X(e11Id: AnyRef, e8Id: AnyRef) =
-  //   {
-  //     def a = GremlinScala(graph).E(e11Id).outV.outE.has(T.id, e8Id)
+  class ScalaHasTest extends HasTest with StandardTest {
+    override def get_g_EX11X_outV_outE_hasXid_10X(e11Id: AnyRef, e8Id: AnyRef) =
+    {
+      def a = GremlinScala(graph).E(e11Id).outV.outE.has(T.id, e8Id)
 
-  //     println("XXXXXXXXXXXXX")
-  //     println(e8Id)
-  //     println(GS(graph).E(e8Id).toList)
-  //     a.toList foreach println
-  //     println("XXXXXXXXXXXXX")
+      // println("XXXXXXXXXXXXX")
+      // println(e8Id)
+      // println(GS(graph).E(e8Id).toList)
+      // a.toList foreach println
+      // println("XXXXXXXXXXXXX")
 
-  //     a
-  //   }
+      a
+    }
 
-  //   override def get_g_V_outXcreatedX_hasXname__mapXlengthX_isXgtX3XXX_name =
-  //     GremlinScala(graph).V.out("created")
-  //       .has[String, Int]("name", _.map(_.length).is(P.gt(3)))
-  //       .values[String]("name")
+    override def get_g_V_outXcreatedX_hasXname__mapXlengthX_isXgtX3XXX_name =
+      GremlinScala(graph).V.out("created")
+        .has[String, Int]("name", _.map(_.length).is(P.gt(3)))
+        .values[String]("name")
 
-  //   override def get_g_VX1X_hasXkeyX(v1Id: AnyRef, key: String) =
-  //     GremlinScala(graph).V(v1Id).has(key)
+    override def get_g_VX1X_hasXkeyX(v1Id: AnyRef, key: String) =
+      GremlinScala(graph).V(v1Id).has(key)
 
-  //   override def get_g_VX1X_hasXname_markoX(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).has("name", "marko")
+    override def get_g_VX1X_hasXname_markoX(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).has("name", "marko")
 
-  //   override def get_g_V_hasXname_markoX =
-  //     GremlinScala(graph).V.has("name", "marko")
+    override def get_g_V_hasXname_markoX =
+      GremlinScala(graph).V.has("name", "marko")
 
-  //   override def get_g_V_hasXname_blahX =
-  //     GremlinScala(graph).V.has("name", "blah")
+    override def get_g_V_hasXname_blahX =
+      GremlinScala(graph).V.has("name", "blah")
 
-  //   override def get_g_V_hasXblahX =
-  //     GremlinScala(graph).V.has("blah")
+    override def get_g_V_hasXblahX =
+      GremlinScala(graph).V.has("blah")
 
-  //   override def get_g_VX1X_hasXage_gt_30X(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).has("age", P.gt(30))
+    override def get_g_VX1X_hasXage_gt_30X(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).has("age", P.gt(30))
 
-  //   override def get_g_VX1X_out_hasIdX2X(v1Id: AnyRef, v2Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out.hasId(v2Id)
+    override def get_g_VX1X_out_hasIdX2X(v1Id: AnyRef, v2Id: AnyRef) =
+    {
+      def a = GremlinScala(graph).V(v1Id).out.hasId(v2Id)
+      // println("XXXXXXXXXXXXX")
+      // println(a.toList)
+      // println("XXXXXXXXXXXXXY")
+      a
+    }
 
-  //   override def get_g_VX1X_out_hasIdX2_3X(v1Id: AnyRef, v2Id: AnyRef, v3Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out.hasId(v2Id, v3Id)
+    override def get_g_VX1X_out_hasIdX2_3X(v1Id: AnyRef, v2Id: AnyRef, v3Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.hasId(v2Id, v3Id)
 
-  //   override def get_g_V_hasXage_gt_30X =
-  //     GremlinScala(graph).V.has("age", P.gt(30))
+    override def get_g_V_hasXage_gt_30X =
+    {
+      def a = GremlinScala(graph).V.has("age", P.gt(30))
+      // def b = g.V().has("age", P.gt(30))
+      // def b: GraphTraversal[Vertex, Vertex] = g.V().has("age", P.gt(30))
+      // println("XXXXXXXXXXXXXXXXXX")
+      // println(b.toList)
+      // println("YYYYYYYYYYYYYYYY")
+      // b
+      a
+    }
 
-  //   override def get_g_EX7X_hasLabelXknowsX(e7Id: AnyRef) =
-  //     GremlinScala(graph).E(e7Id).hasLabel("knows")
+    override def get_g_EX7X_hasLabelXknowsX(e7Id: AnyRef) =
+      GremlinScala(graph).E(e7Id).hasLabel("knows")
 
-  //   override def get_g_E_hasLabelXknowsX =
-  //     GremlinScala(graph).E.hasLabel("knows")
+    override def get_g_E_hasLabelXknowsX =
+      GremlinScala(graph).E.hasLabel("knows")
 
-  //   override def get_g_E_hasLabelXuses_traversesX =
-  //     GremlinScala(graph).E.hasLabel("uses", "traverses")
+    override def get_g_E_hasLabelXuses_traversesX =
+      GremlinScala(graph).E.hasLabel("uses", "traverses")
 
-  //   override def get_g_V_hasLabelXperson_software_blahX =
-  //     GremlinScala(graph).V.hasLabel("person", "software", "blah")
+    override def get_g_V_hasLabelXperson_software_blahX =
+      GremlinScala(graph).V.hasLabel("person", "software", "blah")
 
-  //   override def get_g_V_hasXperson_name_markoX_age =
-  //     GremlinScala(graph).V.has("person", "name", "marko").values[Integer]("age")
+    override def get_g_V_hasXperson_name_markoX_age =
+      GremlinScala(graph).V.has("person", "name", "marko").values[Integer]("age")
 
-  //   override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).outE.has("weight", P.inside(0.0d, 0.6d)).inV
-  // }
+    override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).outE.has("weight", P.inside(0.0d, 0.6d)).inV
+
+    override def get_g_VX1X_out_hasXid_lt_3X(v1Id: AnyRef, v3Id: AnyRef) =
+      GremlinScala(graph).V(v1Id).out.has(T.id, P.lt(v3Id))
+
+    override def get_g_V_hasXage_isXgt_30XX =
+      GremlinScala(graph).V.has("age", __.is(P.gt(30)))
+
+    override def get_g_V_hasXlocationX =
+      GremlinScala(graph).V.has("location")
+  }
 
   class ScalaCoinTest extends CoinTest with StandardTest {
     override def get_g_V_coinX1X = GremlinScala(graph).V.coin(1.0d)
@@ -584,9 +608,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaCoinTest],
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest]
-
-    // classOf[ScalaHasTest]
-
+    // classOf[ScalaHasTest] //three tests don't work for some reason...
     // classOf[ScalaRangeTest],
     // classOf[ScalaMapTest],
     // classOf[ScalaVertexTest],
