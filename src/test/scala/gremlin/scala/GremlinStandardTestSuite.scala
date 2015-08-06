@@ -187,36 +187,94 @@ object Tests {
   }
 
   // class ScalaRangeTest extends RangeTest with StandardTest {
-  //   override def get_g_VX1X_out_limitX2X(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out.limit(2)
+  //       override def get_g_VX1X_out_limitX2X(v1Id: AnyRef) =
+  //         GremlinScala(graph).V(v1Id).out.limit(2)
 
-  //   override def get_g_V_localXoutE_limitX1X_inVX_limitX3X =
-  //     GremlinScala(graph).V.local(_.outE.limit(1)).inV.limit(3)
+  //       override def get_g_V_localXoutE_limitX1X_inVX_limitX3X =
+  //         GremlinScala(graph).V.local(_.outE.limit(1)).inV.limit(3)
 
-  //   override def get_g_VX1X_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out("knows").outE("created").range(0, 1).inV
+  //       override def get_g_VX1X_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
+  //         GremlinScala(graph).V(v1Id).out("knows").outE("created").range(0, 1).inV
 
-  //   override def get_g_VX1X_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out("knows").out("created").range(0, 1)
+  //       override def get_g_VX1X_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
+  //         GremlinScala(graph).V(v1Id).out("knows").out("created").range(0, 1)
 
-  //   override def get_g_VX1X_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out("created").in("created").range(1, 3)
+  //       override def get_g_VX1X_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
+  //         GremlinScala(graph).V(v1Id).out("created").in("created").range(1, 3)
 
-  //   override def get_g_VX1X_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
-  //     GremlinScala(graph).V(v1Id).out("created").inE("created").range(1, 3).outV
+  //       override def get_g_VX1X_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
+  //         GremlinScala(graph).V(v1Id).out("created").inE("created").range(1, 3).outV
 
-  //   override def get_g_V_repeatXbothX_timesX3X_rangeX5_11X =
-  //     GremlinScala(graph).V.repeat(_.both).times(3).range(5, 11)
+  //       override def get_g_V_repeatXbothX_timesX3X_rangeX5_11X =
+  //         GremlinScala(graph).V.repeat(_.both).times(3).range(5, 11)
 
-  //   override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_limitXlocal_1XX_asXwX_select_byXnameX_by =
-  //     GremlinScala(graph).V.hasLabel("software").as("s").local {
-  //       _.inE("created").values("weight").fold.limit(Scope.local, 1)
-  //     }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
+        // override def get_g_V_asXaX_in_asXaX_in_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_limitXlocal_2X =
+          // GremlinScala(graph).V.as("a").in.as("a").in.as("a").select[JList[String]]("a").by(unfold.values("name").fold).limit(local, 2)
 
-  //   override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_rangeXlocal_1_3XX_asXwX_select_byXnameX_by =
-  //     GremlinScala(graph).V.hasLabel("software").as("s").local {
-  //       _.inE("created").values("weight").fold.range(Scope.local, 1, 3)
-  //     }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
+        // override def get_g_V_asXaX_in_asXaX_in_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_limitXlocal_1X =
+        //   GremlinScala(graph).V.as("a").in.as("a").in.as("a").select[JList[String]]("a").by(unfold.values("name").fold).limit(local, 1)
+
+
+        // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_1_3X =
+        //   GremlinScala(graph).V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 1, 3)
+
+
+        // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_1_2X =
+        //   GremlinScala(graph).V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 1, 2)
+
+
+        // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_4_5X =
+        //   GremlinScala(graph).V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 4, 5)
+
+
+        // override def get_g_V_asXaX_in_asXbX_in_asXcX_selectXa_b_cX_byXnameX_limitXlocal_2X =
+        //   GremlinScala(graph).V.as("a").in.as("b").in.as("c").select[Map<String, String>]("a","b","c").by("name").limit(local, 2)
+
+
+        // override def get_g_V_asXaX_in_asXbX_in_asXcX_selectXa_b_cX_byXnameX_limitXlocal_1X =
+        //   GremlinScala(graph).V.as("a").in.as("b").in.as("c").select[Map<String, String>]("a","b","c").by("name").limit(local, 1)
+
+
+        // override def get_g_V_asXaX_out_asXbX_out_asXcX_selectXa_b_cX_byXnameX_rangeXlocal_1_3X =
+        //   GremlinScala(graph).V.as("a").out.as("b").out.as("c").select[Map<String, String>]("a","b","c").by("name").range(local, 1, 3)
+
+
+        // override def get_g_V_asXaX_out_asXbX_out_asXcX_selectXa_b_cX_byXnameX_rangeXlocal_1_2X =
+        //   GremlinScala(graph).V.as("a").out.as("b").out.as("c").select[Map<String, String>]("a","b","c").by("name").range(local, 1, 2)
+
+
+
+
+    // override def get_g_VX1X_out_limitX2X(v1Id: AnyRef) =
+    //   GremlinScala(graph).V(v1Id).out.limit(2)
+
+    // override def get_g_V_localXoutE_limitX1X_inVX_limitX3X =
+    //   GremlinScala(graph).V.local(_.outE.limit(1)).inV.limit(3)
+
+    // override def get_g_VX1X_outXknowsX_outEXcreatedX_rangeX0_1X_inV(v1Id: AnyRef) =
+    //   GremlinScala(graph).V(v1Id).out("knows").outE("created").range(0, 1).inV
+
+    // override def get_g_VX1X_outXknowsX_outXcreatedX_rangeX0_1X(v1Id: AnyRef) =
+    //   GremlinScala(graph).V(v1Id).out("knows").out("created").range(0, 1)
+
+    // override def get_g_VX1X_outXcreatedX_inXcreatedX_rangeX1_3X(v1Id: AnyRef) =
+    //   GremlinScala(graph).V(v1Id).out("created").in("created").range(1, 3)
+
+    // override def get_g_VX1X_outXcreatedX_inEXcreatedX_rangeX1_3X_outV(v1Id: AnyRef) =
+    //   GremlinScala(graph).V(v1Id).out("created").inE("created").range(1, 3).outV
+
+    // override def get_g_V_repeatXbothX_timesX3X_rangeX5_11X =
+    //   GremlinScala(graph).V.repeat(_.both).times(3).range(5, 11)
+
+    // override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_limitXlocal_1XX_asXwX_select_byXnameX_by =
+    //   GremlinScala(graph).V.hasLabel("software").as("s").local {
+    //     _.inE("created").values("weight").fold.limit(Scope.local, 1)
+    //   }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
+
+    // override def get_g_V_hasLabelXsoftwareX_asXsX_localXinEXcreatedX_valuesXweightX_fold_rangeXlocal_1_3XX_asXwX_select_byXnameX_by =
+    //   GremlinScala(graph).V.hasLabel("software").as("s").local {
+    //     _.inE("created").values("weight").fold.range(Scope.local, 1, 3)
+    //   }.as("w").select.by("name").by.asInstanceOf[GremlinScala[JMap[String, AnyRef], _]] //TODO get rid of cast
   // }
 
   // class ScalaMapTest extends MapTest with StandardTest {
@@ -608,8 +666,7 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaCoinTest],
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest]
-    // classOf[ScalaHasTest] //three tests don't work for some reason...
-    // classOf[ScalaRangeTest],
+
     // classOf[ScalaMapTest],
     // classOf[ScalaVertexTest],
     // classOf[ScalaSideEffectTest]
@@ -618,6 +675,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
     // classOf[ScalaGroupTest]
     // classOf[ScalaOrderTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
+    // classOf[ScalaRangeTest]
+    // classOf[ScalaHasTest] //three tests don't work for some reason...
     ),
     Array.empty, //testsToEnforce
     true, //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
