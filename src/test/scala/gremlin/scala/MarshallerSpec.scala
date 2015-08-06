@@ -25,7 +25,7 @@ class MarshallerSpec extends FunSpec with Matchers {
     val graph = TinkerGraph.open
     val gs = GremlinScala(graph)
 
-    val v = gs.save(example)
+    val v: ScalaVertex = gs.save(example)
 
     v.valueMap should contain ("s" → example.s)
     v.valueMap should contain ("i" → example.i)
@@ -41,8 +41,8 @@ class MarshallerSpec extends FunSpec with Matchers {
     val graph = TinkerGraph.open
     val gs = GremlinScala(graph)
 
-    val v = gs.save(example)
-    val v2 = v.load[ExampleClass]
+    val v: ScalaVertex = gs.save(example)
+    val v2: Option[ExampleClass] = v.load[ExampleClass]
     example shouldBe v2.get
   }
 
@@ -50,7 +50,7 @@ class MarshallerSpec extends FunSpec with Matchers {
     val graph = TinkerGraph.open
     val gs = GremlinScala(graph)
 
-    val v = gs.save(jack)
+    val v: ScalaVertex = gs.save(jack)
     v.valueMap should contain ("name" → jack.name)
     v.valueMap should contain ("age" → jack.age)
     v.valueMap should contain ("address" → Map("street" -> "Jefferson", "zip" ->11111))
@@ -60,9 +60,8 @@ class MarshallerSpec extends FunSpec with Matchers {
     val graph = TinkerGraph.open
     val gs = GremlinScala(graph)
 
-    val v = gs.save(jack)
+    val v: ScalaVertex = gs.save(jack)
 
     v.load[Person].get shouldBe jack
-
   }
 }

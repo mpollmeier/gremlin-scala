@@ -1,10 +1,5 @@
 package gremlin.scala
 
-/**
- * Created by Omid on 7/26/2015.
- */
-
-
 import shapeless._, labelled.{ FieldType, field },record._
 
 trait FromMap[L <: HList] {

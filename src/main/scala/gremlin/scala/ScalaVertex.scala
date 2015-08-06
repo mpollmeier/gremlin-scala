@@ -54,8 +54,6 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def start() = GremlinScala[Vertex, HNil](__.__(vertex))
 
-  def load[A](implicit fm:CcFromMapRec[A]):Option[A] = {
-    val mp = vertex.valueMap()
-    fm(mp)
-  }
+  def load[A](implicit fromMap:CcFromMapRec[A]):Option[A] =
+    fromMap(vertex.valueMap)
 }
