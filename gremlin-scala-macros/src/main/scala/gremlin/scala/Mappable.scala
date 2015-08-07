@@ -21,7 +21,7 @@ object Mappable {
     val companion = tpe.typeSymbol.companionSymbol
 
     val (labelParam, toMapParams, fromMapParams) = tpe.declarations
-      .foldLeft((q""""aLabel"""", Seq.empty[Tree], Seq.empty[Tree])) {
+      .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"""t.getClass.getName""", Seq.empty, Seq.empty)) {
       case ((labelParam, toMapParams, fromMapParams), field: MethodSymbol) if field.isCaseAccessor =>
         val name = field.name
         val decoded = name.decoded
