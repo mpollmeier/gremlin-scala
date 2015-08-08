@@ -278,6 +278,7 @@ object Tests {
   // }
 
   // class ScalaMapTest extends MapTest with StandardTest {
+
   //   override def get_g_VX1X_mapXnameX(v1Id: AnyRef) =
   //     GremlinScala(graph).V(v1Id).map[String](_.value[String]("name"))
 
@@ -287,18 +288,20 @@ object Tests {
   //   override def get_g_VX1X_out_mapXnameX_mapXlengthX(v1Id: AnyRef) =
   //     GremlinScala(graph).V(v1Id).out.map(_.value[String]("name")).map(_.toString.length: Integer)
 
-  //   override def get_g_V_asXaX_out_mapXa_nameX =
-  //     GremlinScala(graph).V.as("a").out.mapWithTraverser { t: Traverser[Vertex] ⇒
-  //       t.path[Vertex]("a").value[String]("name")
-  //     }
+  //       override def get_g_withPath_V_asXaX_out_mapXa_nameX =
+  //           GremlinScala(graph).withPath.V.as("a").out.mapWithTraverser { t: Traverser[Vertex] ⇒
+  //             t.path[Vertex]("a").value[String]("name")
+  //           }
+  //   // return g.withPath().V().as("a").out().<String>map(v -> v.<Vertex>path("a").value("name"));
 
-  //   override def get_g_V_asXaX_out_out_mapXa_name_it_nameX =
-  //     GremlinScala(graph).V.as("a").out.out.mapWithTraverser { t: Traverser[Vertex] ⇒
-  //       val a = t.path[Vertex]("a")
-  //       val aName = a.value[String]("name")
-  //       val vName = t.get.value[String]("name")
-  //       s"$aName$vName"
-  //     }
+  //       override def get_g_withPath_V_asXaX_out_out_mapXa_name_it_nameX =
+  //           GremlinScala(graph).V.as("a").out.out.mapWithTraverser { t: Traverser[Vertex] ⇒
+  //             val a = t.path[Vertex]("a")
+  //             val aName = a.value[String]("name")
+  //             val vName = t.get.value[String]("name")
+  //             s"$aName$vName"
+  //           }
+  //       //   GremlinScala(graph).withPath.V.as("a").out.out.map(v -> v.value[Vertex>path("a").<String>value("name") + v.get.<String]("name"))
   // }
 
   // class ScalaOrderTest extends OrderTest with StandardTest {
@@ -667,13 +670,15 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest]
 
-    // classOf[ScalaMapTest],
+    // classOf[ScalaOrderTest]
+
+    // classOf[ScalaMapTest]
+
     // classOf[ScalaVertexTest],
     // classOf[ScalaSideEffectTest]
     // classOf[ScalaSideEffectCapTest]
     // classOf[ScalaGroupCountTest]
     // classOf[ScalaGroupTest]
-    // classOf[ScalaOrderTest]
     // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
     // classOf[ScalaRangeTest]
     // classOf[ScalaHasTest] //three tests don't work for some reason...
