@@ -7,8 +7,6 @@ version := "3.0.0-SNAPSHOT"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
-
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-incubating"
   Seq(
@@ -16,7 +14,7 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.scala-lang" % "scala-reflect" % scalaVersion,
     "com.novocode" % "junit-interface" % "0.11" % "test->default",
-    "com.chuusai" %% "shapeless" % "2.2.4",
+    "com.chuusai" %% "shapeless" % "2.2.5",
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
     "junit" % "junit" % "4.12" % Test,
     "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.9.0-M2",
