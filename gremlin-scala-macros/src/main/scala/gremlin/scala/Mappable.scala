@@ -25,25 +25,20 @@ object Mappable {
       case ((labelParam, toMapParams, fromMapParams), field: MethodSymbol) if field.isCaseAccessor =>
         val name = field.name
         val decoded = name.decoded
-        val returnType = tpe.declaration(name).typeSignature
-        val annotations = field.annotations
-        println("===annotations= " + annotations)
-        println("===all= " + decoded + " Annotations:" + annotations)
-        if (field.annotations contains weakTypeOf[label]) {
-          assert(returnType == weakTypeOf[String], "Bonjour") //TODO
-          println("===label=")
+        val returnType = tpe.declaration(name).typeSignature.resultType
+
+        if (field.annotations map (_.tpe) contains weakTypeOf[label]) {
+          assert(returnType =:= weakTypeOf[String], "The label should be of type String")
           (q"t.$name",
             toMapParams,
             fromMapParams :+ q"label")
         } else {
-          println("===params= " + decoded)
           (labelParam,
             toMapParams :+ q"$decoded -> t.$name",
             fromMapParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
         }
       case (params, _) => params
     }
-    println(toMapParams)
 
     c.Expr[Mappable[T]] { q"""
       new Mappable[$tpe] {

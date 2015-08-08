@@ -7,13 +7,19 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
 
-case class ExampleClass(@label s: String,
-                        i: Int,
-                        l: Long,
-                        o: Option[String],
-                        seq: Seq[String],
-                        map: Map[String, String],
-                        nested: NestedClass) {
+case class ClassExampleWithWrongLabel(s: String,
+                                      @label i: Int)
+
+case class ClassExampleWithoutLabel(s: String,
+                                    i: Int)
+
+case class ClassExampleWithLabel(@label s: String,
+                                 i: Int,
+                                 l: Long,
+                                 o: Option[String],
+                                 seq: Seq[String],
+                                 map: Map[String, String],
+                                 nested: NestedClass) {
   def randomDef = ???
 }
 
@@ -22,7 +28,7 @@ case class NestedClass(s: String)
 class NoneCaseClass(s: String)
 
 class MarshallerSpec extends FunSpec with Matchers {
-  val example = ExampleClass(
+  val example = ClassExampleWithLabel(
     "some string",
     Int.MaxValue,
     Long.MaxValue,
@@ -32,12 +38,12 @@ class MarshallerSpec extends FunSpec with Matchers {
     NestedClass("nested")
   )
 
-  it("saves a case class as a vertex") {
+  it("saves a case class as a vertex with a @label annotation") {
     val graph = TinkerGraph.open
     val v = graph.addCC(example)
 
     val vl = graph.V(v.id).head()
-    vl.valueMap should contain("s" → example.s)
+    vl.label shouldBe example.s
     vl.valueMap should contain("i" → example.i)
     vl.valueMap should contain("l" → example.l)
     vl.valueMap should contain("o" → example.o)
@@ -50,7 +56,18 @@ class MarshallerSpec extends FunSpec with Matchers {
     val graph = TinkerGraph.open
 
     val v = graph.addCC(example)
-    v.toCC[ExampleClass] shouldBe example
+    v.toCC[ClassExampleWithLabel] shouldBe example
+  }
+
+  it("saves a case class as a vertex") {
+    val graph = TinkerGraph.open
+    val cc = ClassExampleWithoutLabel("text", 12)
+    val v = graph.addCC(cc)
+
+    val vl = graph.V(v.id).head()
+    vl.label shouldBe "ClassExampleWithoutLabel"
+    vl.valueMap should contain("s" → cc.s)
+    vl.valueMap should contain("i" → cc.i)
   }
 
   it("can't persist a none product type (none case class or tuple)") {
@@ -58,6 +75,15 @@ class MarshallerSpec extends FunSpec with Matchers {
       """
         val graph = TinkerGraph.open
         graph.addCC(new NoneCaseClass("test"))
+      """
+    }
+  }
+
+  it("can't add a @label annotation on a none String attribute") {
+    illTyped {
+      """
+        val graph = TinkerGraph.open
+        graph.addCC(ClassExampleWithWrongLabel("test", 42))
       """
     }
   }
