@@ -8,19 +8,19 @@ import org.scalatest.Matchers
 class ArrowSyntaxSpec extends FunSpec with Matchers {
 
   it("add edge with syntax sugar") {
-    val graph: Graph = TinkerGraph.open
+    val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
     val e = paris -- "eurostar" -> london
 
-    e.inVertex shouldBe london
-    e.outVertex shouldBe paris
+    e.asJava.inVertex shouldBe london.asJava
+    e.asJava.outVertex shouldBe paris.asJava
   }
 
-  it("") {
-    val graph: Graph = TinkerGraph.open
+  it("add edge with case class") {
+    val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
@@ -35,7 +35,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       NestedClass("nested")
     ) -> london
 
-    e.inVertex shouldBe london
-    e.outVertex shouldBe paris
+    e.asJava.inVertex shouldBe london.asJava
+    e.asJava.outVertex shouldBe paris.asJava
   }
 }

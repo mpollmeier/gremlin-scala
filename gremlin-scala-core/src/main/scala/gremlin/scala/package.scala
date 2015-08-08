@@ -2,7 +2,6 @@ package gremlin
 
 import java.util.function.{Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate}
 
-import gremlin.scala.GremlinScala._
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -17,11 +16,11 @@ package object scala {
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
 
-  implicit class GraphAsScala(g: Graph) {
+  implicit class GraphAsScala[T <: Graph](g: T) {
     def asScala = ScalaGraph(g)
   }
 
-  implicit class GraphAsJava(g: ScalaGraph) {
+  implicit class GraphAsJava[T <: structure.Graph](g: ScalaGraph[T]) {
     def asJava = g.graph
   }
 
@@ -43,15 +42,9 @@ package object scala {
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
 
-  implicit def unwrap(v: ScalaVertex) = v.vertex
-
   implicit def wrap(e: Edge) = ScalaEdge(e)
 
-  implicit def unwrap(e: ScalaEdge) = e.edge
-
   implicit def wrap(g: Graph) = ScalaGraph(g)
-
-  implicit def unwrap(g: ScalaGraph) = g.graph
 
   implicit def wrap[A](traversal: GraphTraversal[_, A]) = GremlinScala[A, HNil](traversal)
 
@@ -65,9 +58,9 @@ package object scala {
     new GremlinEdgeSteps(gremlinScala)
 
   //TODO make vertexSteps extend elementSteps and return VertexSteps here
-  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex, HNil] = v.start
+  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex, HNil] = v.start()
 
-  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[Edge, HNil] = e.start
+  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[Edge, HNil] = e.start()
 
   implicit def toJavaFunction[A, B](f: Function1[A, B]) = new JFunction[A, B] {
     override def apply(a: A): B = f(a)

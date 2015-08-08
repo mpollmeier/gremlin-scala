@@ -58,11 +58,12 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def --(label: String, properties: Map[String, Any] = Map.empty) = SemiEdge(vertex, label, properties)
+  def --(label: String, properties: Map[String, Any] = Map.empty) =
+    SemiEdge(this, label, properties)
 
   def --[T <: Product: Mappable](cc: T) = {
     val (label, properties) = implicitly[Mappable[T]].toMap(cc)
-    SemiEdge(vertex, label, properties)
+    SemiEdge(this, label, properties)
   }
 
   def start() = GremlinScala[Vertex, HNil](__.__(vertex))

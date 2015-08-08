@@ -75,7 +75,7 @@ class ElementSpec extends TestBase {
 
     it("uses the right hashCodes") {
       v(1).hashCode should be(v(1).hashCode)
-      v(1).hashCode should not be (v(2).hashCode)
+      v(1).hashCode should not be v(2).hashCode
 
       Set(v(1)) contains v(1) shouldBe true
       Set(v(1)) contains v(2) shouldBe false
@@ -85,14 +85,14 @@ class ElementSpec extends TestBase {
   describe("adding and removing elements") {
 
     it("adds a vertex") {
-      val graph: Graph = TinkerGraph.open
+      val graph = TinkerGraph.open.asScala
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
       v2.setProperty("testkey", "testValue")
 
-      graph.v(v1.id) should be(Some(ScalaVertex(v1)))
-      graph.v(v2.id).get.property[String]("testkey").value should be("testValue")
-      graph.V.toList().size should be(2)
+      graph.v(v1.id) shouldBe Some(v1)
+      graph.v(v2.id).get.property[String]("testkey").value shouldBe "testValue"
+      graph.V.toList() should have size 2
     }
 
     it("adds a vertex with a given label") {
@@ -112,31 +112,30 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.addEdge("testLabel", v2, Map.empty)
+      val e = v1.addEdge("testLabel", v2)
       e.label shouldBe "testLabel"
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
 
     it("adds an edge with additional properties") {
-      val gs: ScalaGraph = TinkerGraph.open.asScala
-      val v1 = gs.addVertex()
-      val v2 = gs.addVertex()
+      val graph = TinkerGraph.open.asScala
+      val v1 = graph.addVertex()
+      val v2 = graph.addVertex()
 
       val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
-      e.label should be("testLabel")
-      e.propertyMap("testKey") should be(Map("testKey" -> "testValue"))
+      e.label shouldBe "testLabel"
+      e.propertyMap("testKey") shouldBe Map("testKey" -> "testValue")
       v1.outE().head should be(e.edge)
-      v1.out("testLabel").head should be(v2.vertex)
+      v1.out("testLabel").head shouldBe v2.vertex
     }
 
     it("removes elements") {
-      val gs: ScalaGraph = TinkerGraph.open.asScala
-      val v = gs.addVertex()
+      val graph = TinkerGraph.open.asScala
+      val v = graph.addVertex()
       v.remove()
-      gs.V.toList().size should be(0)
+      graph.V.toList() shouldBe empty
     }
-
   }
 }
 

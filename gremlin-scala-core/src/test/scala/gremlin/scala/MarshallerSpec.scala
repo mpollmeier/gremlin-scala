@@ -39,8 +39,8 @@ class MarshallerSpec extends FunSpec with Matchers {
   )
 
   it("saves a case class as a vertex with a @label annotation") {
-    val graph = TinkerGraph.open
-    val v = graph.addCC(example)
+    val graph = TinkerGraph.open.asScala
+    val v = graph.addVertex(example)
 
     val vl = graph.V(v.id).head()
     vl.label shouldBe example.s
@@ -53,16 +53,16 @@ class MarshallerSpec extends FunSpec with Matchers {
   }
 
   it("converts a Vertex into a case class") {
-    val graph = TinkerGraph.open
+    val graph = TinkerGraph.open.asScala
 
-    val v = graph.addCC(example)
+    val v = graph.addVertex(example)
     v.toCC[ClassExampleWithLabel] shouldBe example
   }
 
   it("saves a case class as a vertex") {
-    val graph = TinkerGraph.open
+    val graph = TinkerGraph.open.asScala
     val cc = ClassExampleWithoutLabel("text", 12)
-    val v = graph.addCC(cc)
+    val v = graph.addVertex(cc)
 
     val vl = graph.V(v.id).head()
     vl.label shouldBe "ClassExampleWithoutLabel"
@@ -73,8 +73,8 @@ class MarshallerSpec extends FunSpec with Matchers {
   it("can't persist a none product type (none case class or tuple)") {
     illTyped {
       """
-        val graph = TinkerGraph.open
-        graph.addCC(new NoneCaseClass("test"))
+        val graph = TinkerGraph.open.asScala
+        graph.addVertex(new NoneCaseClass("test"))
       """
     }
   }
@@ -82,8 +82,8 @@ class MarshallerSpec extends FunSpec with Matchers {
   it("can't add a @label annotation on a none String attribute") {
     illTyped {
       """
-        val graph = TinkerGraph.open
-        graph.addCC(ClassExampleWithWrongLabel("test", 42))
+        val graph = TinkerGraph.open.asScala
+        graph.addVertex(ClassExampleWithWrongLabel("test", 42))
       """
     }
   }

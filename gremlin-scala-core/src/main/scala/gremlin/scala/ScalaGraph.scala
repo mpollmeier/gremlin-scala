@@ -5,7 +5,7 @@ import shapeless._
 import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 
-case class ScalaGraph(graph: Graph) {
+case class ScalaGraph[T <: Graph](graph: T) {
 
   def addVertex() = ScalaVertex(graph.addVertex())
 
@@ -30,7 +30,7 @@ case class ScalaGraph(graph: Graph) {
    * @tparam T
    * @return
    */
-  def addCC[T <: Product : Mappable](cc: T): ScalaVertex = {
+  def addVertex[T <: Product : Mappable](cc: T): ScalaVertex = {
     val (label, properties) = implicitly[Mappable[T]].toMap(cc)
     addVertex(label, properties)
   }
