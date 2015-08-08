@@ -5,17 +5,17 @@ import org.scalatest.matchers.ShouldMatchers
 class FilterSpec extends TestBase {
 
   it("filters") {
-    gs.V
+    graph.V
       .filter { _.valueOrElse("age", default = 0) > 30 }
       .values[String]("name").toSet should be(Set("josh", "peter"))
   }
 
   it("has") {
-    gs.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
+    graph.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
   }
 
   it("hasNot") {
-    gs.V.hasNot("age", 35).value[String]("name").toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+    graph.V.hasNot("age", 35).value[String]("name").toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
   }
 
   describe("dedup") {

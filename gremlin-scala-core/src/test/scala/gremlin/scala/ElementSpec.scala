@@ -77,67 +77,66 @@ class ElementSpec extends TestBase {
       v(1).hashCode should be(v(1).hashCode)
       v(1).hashCode should not be (v(2).hashCode)
 
-      Set(v(1)) contains (v(1)) should be(true)
-      Set(v(1)) contains (v(2)) should be(false)
+      Set(v(1)) contains v(1) shouldBe true
+      Set(v(1)) contains v(2) shouldBe false
     }
   }
 
   describe("adding and removing elements") {
 
     it("adds a vertex") {
-      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
-      val v1 = gs.addVertex()
-      val v2 = gs.addVertex()
+      val graph: Graph = TinkerGraph.open
+      val v1 = graph.addVertex()
+      val v2 = graph.addVertex()
       v2.setProperty("testkey", "testValue")
 
-      gs.v(v1.id) should be(Some(v1))
-      gs.v(v2.id).get.property[String]("testkey").value should be("testValue")
-      gs.V.toList.size should be(2)
+      graph.v(v1.id) should be(Some(ScalaVertex(v1)))
+      graph.v(v2.id).get.property[String]("testkey").value should be("testValue")
+      graph.V.toList().size should be(2)
     }
 
     it("adds a vertex with a given label") {
-      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
+      val graph = TinkerGraph.open.asScala
       val label1 = "label1"
       val label2 = "label2"
-      val v1 = gs.addVertex(label1)
-      val v2 = gs.addVertex(label2, Map("testkey" → "testValue"))
+      val v1 = graph.addVertex(label1)
+      val v2 = graph.addVertex(label2, Map("testkey" → "testValue"))
 
-      gs.V.has(T.label, label1).head shouldBe v1.vertex
-      gs.V.has(T.label, label2).head shouldBe v2.vertex
-      gs.V.has(T.label, label2).head.value[String]("testkey") shouldBe "testValue"
+      graph.V.has(T.label, label1).head() shouldBe v1.vertex
+      graph.V.has(T.label, label2).head() shouldBe v2.vertex
+      graph.V.has(T.label, label2).head().value[String]("testkey") shouldBe "testValue"
     }
 
     it("adds an edge") {
-      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
-      val v1 = gs.addVertex()
-      val v2 = gs.addVertex()
+      val graph = TinkerGraph.open.asScala
+      val v1 = graph.addVertex()
+      val v2 = graph.addVertex()
 
       val e = v1.addEdge("testLabel", v2, Map.empty)
-      e.label should be("testLabel")
-      v1.outE.head should be(e.edge)
-      v1.out("testLabel").head should be(v2.vertex)
+      e.label shouldBe "testLabel"
+      v1.outE().head shouldBe e.edge
+      v1.out("testLabel").head shouldBe v2.vertex
     }
 
     it("adds an edge with additional properties") {
-      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
+      val gs: ScalaGraph = TinkerGraph.open.asScala
       val v1 = gs.addVertex()
       val v2 = gs.addVertex()
 
       val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
       e.label should be("testLabel")
       e.propertyMap("testKey") should be(Map("testKey" -> "testValue"))
-      v1.outE.head should be(e.edge)
+      v1.outE().head should be(e.edge)
       v1.out("testLabel").head should be(v2.vertex)
     }
 
     it("removes elements") {
-      val gs: ScalaGraph = GremlinScala(TinkerGraph.open)
+      val gs: ScalaGraph = TinkerGraph.open.asScala
       val v = gs.addVertex()
       v.remove()
-      gs.V.toList.size should be(0)
+      gs.V.toList().size should be(0)
     }
 
   }
-
 }
 

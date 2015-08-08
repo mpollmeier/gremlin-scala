@@ -18,9 +18,11 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   def removeProperty(key: String): ScalaEdge = {
     val p = property(key)
-    if (p.isPresent) p.remove
+    if (p.isPresent) p.remove()
     this
   }
+
+  def toCC[T <: Product: Mappable] = implicitly[Mappable[T]].fromMap(edge.label, edge.valueMap())
 
   def start() = GremlinScala[Edge, HNil](__.__(edge))
 

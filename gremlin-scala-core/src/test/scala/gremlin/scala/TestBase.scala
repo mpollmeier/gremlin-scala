@@ -6,10 +6,9 @@ import org.scalatest.Matchers
 import org.scalatest.FunSpec
 
 trait TestGraph {
-  val graph = TinkerFactory.createClassic()
-  def gs = GremlinScala(graph)
-  def v(i: Int) = gs.v(i:Integer).get
-  def e(i: Int) = gs.e(i:Integer).get
+  val graph = TinkerFactory.createClassic().asScala
+  def v(i: Int) = graph.v(i:Integer).get
+  def e(i: Int) = graph.e(i:Integer).get
 
   def print(gs: GremlinScala[_,_]) = println(gs.toList)
 }

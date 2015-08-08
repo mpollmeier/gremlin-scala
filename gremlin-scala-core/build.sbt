@@ -7,9 +7,11 @@ version := "3.0.0-SNAPSHOT"
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.10.5", scalaVersion.value)
 
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+
 libraryDependencies <++= scalaVersion { scalaVersion =>
   val gremlinVersion = "3.0.0-incubating"
-  val deps = Seq(
+  Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
     "org.scala-lang" % "scala-reflect" % scalaVersion,
@@ -20,12 +22,8 @@ libraryDependencies <++= scalaVersion { scalaVersion =>
     "com.thinkaurelius.titan" % "titan-berkeleyje" % "0.9.0-M2",
     "org.scalatest" %% "scalatest" % "2.2.5" % Test
   )
-  if (scalaVersion.value.startsWith("2.10"))
-    deps :+ compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
-  else deps
 }
 resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/"
-resolvers += Resolver.mavenLocal
 
 scalacOptions ++= Seq(
   "-Xlint"

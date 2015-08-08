@@ -7,9 +7,7 @@ import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
-import shapeless.ops.hlist._
 import _root_.scala.language.implicitConversions
-import _root_.scala.reflect.runtime.universe._
 
 package object scala {
   type Vertex = structure.Vertex
@@ -18,6 +16,30 @@ package object scala {
   type Graph = structure.Graph
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
+
+  implicit class GraphAsScala(g: Graph) {
+    def asScala = ScalaGraph(g)
+  }
+
+  implicit class GraphAsJava(g: ScalaGraph) {
+    def asJava = g.graph
+  }
+
+  implicit class EdgeAsScala(e: Edge) {
+    def asScala = ScalaEdge(e)
+  }
+
+  implicit class EdgeAsJava(e: ScalaEdge) {
+    def asJava = e.edge
+  }
+
+  implicit class VertexAsScala(e: Vertex) {
+    def asScala = ScalaVertex(e)
+  }
+
+  implicit class VertexAsJava(v: ScalaVertex) {
+    def asJava = v.vertex
+  }
 
   implicit def wrap(v: Vertex) = ScalaVertex(v)
 
@@ -66,8 +88,17 @@ package object scala {
 
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
 
-    // load a vertex values into a case class
-    def load[T <: Product : Mappable] = gs map (_.toCC[T])
+    /**
+     * Load a vertex values into a case class
+     */
+    def toCC[T <: Product : Mappable] = gs map (_.toCC[T])
   }
 
+  implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
+
+    /**
+     * Load a edge values into a case class
+     */
+    def toCC[T <: Product : Mappable] = gs map (_.toCC[T])
+  }
 }

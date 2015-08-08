@@ -7,14 +7,18 @@ import scala.reflect.runtime.universe._
 
 case class ScalaGraph(graph: Graph) {
 
+  def addVertex() = ScalaVertex(graph.addVertex())
+
+  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
+
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    val v = graph.addVertex()
+    val v = addVertex()
     v.setProperties(properties)
     v
   }
 
   def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
-    val v = graph.addVertex(label)
+    val v = addVertex(label)
     v.setProperties(properties)
     v
   }
@@ -27,17 +31,17 @@ case class ScalaGraph(graph: Graph) {
    * @return
    */
   def addCC[T <: Product : Mappable](cc: T): ScalaVertex = {
-    val (label, valueMap) = implicitly[Mappable[T]].toMap(cc)
-    ScalaGraph(graph).addVertex(label, valueMap)
+    val (label, properties) = implicitly[Mappable[T]].toMap(cc)
+    addVertex(label, properties)
   }
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
-    GremlinScala(graph.traversal.V(id)).headOption map ScalaVertex.apply
+    graph.traversal.V(id).headOption map ScalaVertex.apply
 
   // get edge by id
   def e(id: AnyRef): Option[ScalaEdge] =
-    GremlinScala(graph.traversal.E(id)).headOption map ScalaEdge.apply
+    graph.traversal.E(id).headOption map ScalaEdge.apply
 
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
