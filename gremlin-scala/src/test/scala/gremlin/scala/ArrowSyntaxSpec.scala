@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import gremlin.scala.ClassExampleWithLabel
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
