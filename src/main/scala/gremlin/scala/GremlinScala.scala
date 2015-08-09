@@ -358,7 +358,7 @@ object GremlinScala {
   }
 
   class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
-      extends GremlinScala[End, Labels](gremlinScala.traversal) {
+      extends GremlinElementSteps[End, Labels](gremlinScala) {
 
     def out() = GremlinScala[Vertex, Labels](traversal.out())
     def out(labels: String*) = GremlinScala[Vertex, Labels](traversal.out(labels: _*))
@@ -380,7 +380,7 @@ object GremlinScala {
   }
 
   class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
-      extends GremlinScala[End, Labels](gremlinScala.traversal) {
+      extends GremlinElementSteps[End, Labels](gremlinScala) {
 
     def inV = GremlinScala[Vertex, Labels](traversal.inV)
 
