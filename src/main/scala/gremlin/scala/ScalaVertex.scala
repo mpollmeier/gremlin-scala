@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
 
@@ -8,6 +7,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
   def --(label: String, properties: (String, Any)*) = SemiEdge(vertex, label, properties.toMap)
+
+  def <-->(label: String, properties: (String, Any)*) = BiDirectionalEdge(vertex, label, properties.toMap)
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
