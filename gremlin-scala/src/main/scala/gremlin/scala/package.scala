@@ -16,18 +16,6 @@ package object scala {
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
 
-  implicit class SemiEdgeFunctions(label: String) {
-    def ---(from: ScalaVertex) = SemiEdge(from, label)
-
-    def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
-  }
-
-  implicit class SemiEdgePropertyFunctions(labelProperties: (String, Map[String, Any])) {
-    val (label, properties) = labelProperties
-
-    def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
-  }
-
   implicit class GraphAsScala[G <: Graph](g: G) {
     def asScala = ScalaGraph(g)
   }
@@ -91,20 +79,39 @@ package object scala {
   implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
     (t: Traverser[A]) ⇒ fun(t.get)
 
+  // Marshalling implicits
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
-
     /**
      * Load a vertex values into a case class
      */
-    def toCC[T <: Product : Mappable] = gs map (_.toCC[T])
+    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
-
     /**
      * Load a edge values into a case class
      */
-    def toCC[T <: Product : Mappable] = gs map (_.toCC[T])
+    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
+  }
+
+  // Arrow syntax implicits
+  implicit class SemiEdgeFunctions(label: String) {
+    def ---(from: ScalaVertex) = SemiEdge(from, label)
+
+    def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
+  }
+
+  implicit class SemiEdgePropertiesFunctions(labelProperties: (String, Map[String, Any])) {
+    private val (label, properties) = labelProperties
+
+    def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
+  }
+
+  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
+    def ---(from: ScalaVertex) = {
+      val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiEdge(from, label, properties)
+    }
   }
 
 }

@@ -8,38 +8,38 @@ class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
-      v(1).keys should be(Set("name", "age"))
+      v(1).keys shouldBe Set("name", "age")
       v(1).property[String]("name").value should be("marko")
-      v(1).property[String]("doesnt exit").isPresent should be(false)
-      v(1).propertyMap() should be(Map("name" -> "marko", "age" -> 29))
-      v(1).propertyMap("name", "age") should be(Map("name" -> "marko", "age" -> 29))
-      v(1).properties("name", "age") should have length (2)
-      v(1).properties() should have length (2)
+      v(1).property[String]("doesnt exit").isPresent shouldBe false
+      v(1).propertyMap() shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).propertyMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).properties("name", "age") should have length 2
+      v(1).properties() should have length 2
 
-      e(7).keys should be(Set("weight"))
-      e(7).property[Float]("weight").value should be(0.5)
-      e(7).property[Float]("doesnt exit").isPresent should be(false)
-      e(7).propertyMap("weight") should be(Map("weight" -> 0.5))
+      e(7).keys shouldBe Set("weight")
+      e(7).property[Float]("weight").value shouldBe 0.5
+      e(7).property[Float]("doesnt exit").isPresent shouldBe false
+      e(7).propertyMap("weight") shouldBe Map("weight" -> 0.5)
     }
 
     it("sets a property") {
       v(1).setProperty("vertexProperty", "updated")
-      v(1).property[String]("vertexProperty").value should be("updated")
+      v(1).property[String]("vertexProperty").value shouldBe "updated"
 
       e(7).setProperty("edgeProperty", "updated")
-      e(7).property[String]("edgeProperty").value should be("updated")
+      e(7).property[String]("edgeProperty").value shouldBe "updated"
     }
 
     it("removes a property") {
       v(1).setProperty("vertexProperty1", "updated")
       v(1).removeProperty("vertexProperty1")
       v(1).removeProperty("doesnt exist")
-      v(1).property[String]("vertexProperty1").isPresent should be(false)
+      v(1).property[String]("vertexProperty1").isPresent shouldBe false
 
       e(7).setProperty("edgeProperty", "updated")
       e(7).removeProperty("edgeProperty")
       e(7).removeProperty("doesnt exist")
-      e(7).property[String]("edgeProperty").isPresent should be(false)
+      e(7).property[String]("edgeProperty").isPresent shouldBe false
     }
   }
 
@@ -52,8 +52,8 @@ class ElementSpec extends TestBase {
     }
 
     it("falls back to default value if value doesnt exist") {
-      v(1).valueOrElse("doesnt exist", "blub") should be("blub")
-      e(7).valueOrElse("doesnt exist", 0.8) should be(0.8)
+      v(1).valueOrElse("doesnt exist", "blub") shouldBe "blub"
+      e(7).valueOrElse("doesnt exist", 0.8) shouldBe 0.8
     }
 
     it("returns None if it doesn't exist") {
@@ -64,17 +64,17 @@ class ElementSpec extends TestBase {
 
   describe("id, equality and hashCode") {
     it("has an id") {
-      v(1).id should be(1)
-      e(7).id should be(7)
+      v(1).id shouldBe 1
+      e(7).id shouldBe 7
     }
 
     it("equals") {
-      v(1) == v(1) should be(true)
-      v(1) == v(2) should be(false)
+      v(1) == v(1) shouldBe true
+      v(1) == v(2) shouldBe false
     }
 
     it("uses the right hashCodes") {
-      v(1).hashCode should be(v(1).hashCode)
+      v(1).hashCode shouldBe v(1).hashCode
       v(1).hashCode should not be v(2).hashCode
 
       Set(v(1)) contains v(1) shouldBe true

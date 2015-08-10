@@ -1,21 +1,20 @@
 package gremlin.scala
 
 import scala.language.experimental.macros
-import scala.reflect.ClassTag
 import scala.reflect.macros.blackbox.Context
 
 
-trait Mappable[T] {
-  def toMap(t: T): (String, Map[String, Any])
+trait Marshallable[T] {
+  def fromCC(t: T): (String, Map[String, Any])
 
-  def fromMap(label: String, valueMap: Map[String, Any]): T
+  def toCC(label: String, valueMap: Map[String, Any]): T
 }
 
-object Mappable {
-  implicit def materializeMappable[T]: Mappable[T] =
+object Marshallable {
+  implicit def materializeMappable[T]: Marshallable[T] =
   macro materializeMappableImpl[T]
 
-  def materializeMappableImpl[T: c.WeakTypeTag](c: Context): c.Expr[Mappable[T]] = {
+  def materializeMappableImpl[T: c.WeakTypeTag](c: Context): c.Expr[Marshallable[T]] = {
     import c.universe._
     val tpe = weakTypeOf[T]
     val companion = tpe.typeSymbol.companionSymbol
@@ -40,10 +39,10 @@ object Mappable {
       case (params, _) => params
     }
 
-    c.Expr[Mappable[T]] { q"""
-      new Mappable[$tpe] {
-        def toMap(t: $tpe): (String, Map[String, Any]) = ($labelParam, Map(..$toMapParams))
-        def fromMap(label: String, valueMap: Map[String, Any]): $tpe = $companion(..$fromMapParams)
+    c.Expr[Marshallable[T]] { q"""
+      new Marshallable[$tpe] {
+        def fromCC(t: $tpe): (String, Map[String, Any]) = ($labelParam, Map(..$toMapParams))
+        def toCC(label: String, valueMap: Map[String, Any]): $tpe = $companion(..$fromMapParams)
       }
     """
     }

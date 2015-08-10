@@ -6,7 +6,7 @@ import shapeless._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  def toCC[T <: Product: Mappable] = implicitly[Mappable[T]].fromMap(vertex.label, vertex.valueMap())
+  def toCC[T <: Product: Marshallable] = implicitly[Marshallable[T]].toCC(vertex.label, vertex.valueMap())
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
@@ -42,7 +42,6 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def bothE() = start().bothE()
   def bothE(labels: String*) = start().bothE(labels: _*)
 
-  // if you want to specify the vertex id, just provide `T.id -> YourId` as a property
   def addEdge(label: String,
               inVertex: ScalaVertex,
               properties: Map[String, Any] = Map.empty): ScalaEdge = {
@@ -51,8 +50,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def addEdge[T <: Product: Mappable](inVertex: ScalaVertex, cc: T): ScalaEdge = {
-    val (label, properties) = implicitly[Mappable[T]].toMap(cc)
+  def addEdge[T <: Product: Marshallable](inVertex: ScalaVertex, cc: T): ScalaEdge = {
+    val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
     val e = vertex.addEdge(label, inVertex.vertex).asScala
     e.setProperties(properties)
     e
@@ -65,11 +64,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     de.right.addEdge(de.label, this, de.properties)
     )
 
-  def ---(label: String, properties: (String, Any)*) =
+  def ---(label: String, properties: Map[String, Any] = Map.empty) =
     SemiEdge(this, label, properties.toMap)
 
-  def ---[T <: Product: Mappable](cc: T) = {
-    val (label, properties) = implicitly[Mappable[T]].toMap(cc)
+  def ---[T <: Product: Marshallable](cc: T) = {
+    val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
     SemiEdge(this, label, properties)
   }
 

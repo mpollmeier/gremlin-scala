@@ -1,8 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.scalatest.{FunSpec, Matchers}
 
 class ArrowSyntaxSpec extends FunSpec with Matchers {
 
@@ -59,7 +58,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
+    val e = paris --- ("eurostar", Map("type" -> "WDiEdge", "weight" -> 2)) --> london
 
     e.asJava.inVertex shouldBe london.asJava
     e.asJava.outVertex shouldBe paris.asJava

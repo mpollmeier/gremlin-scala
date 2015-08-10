@@ -28,8 +28,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
    * @tparam T
    * @return
    */
-  def addVertex[T <: Product : Mappable](cc: T): ScalaVertex = {
-    val (label, properties) = implicitly[Mappable[T]].toMap(cc)
+  def addVertex[T <: Product : Marshallable](cc: T): ScalaVertex = {
+    val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
     addVertex(label, properties)
   }
 
