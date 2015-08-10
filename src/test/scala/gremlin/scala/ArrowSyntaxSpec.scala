@@ -13,10 +13,10 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris -- "eurostar" -> london
+    val e = paris -- "eurostar" --> london
 
-    e.inVertex shouldBe london
     e.outVertex shouldBe paris
+    e.inVertex shouldBe london
   }
 
   it("add edge with properties using syntax sugar") {
@@ -25,10 +25,10 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris -- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) -> london
+    val e = paris -- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
 
-    e.inVertex shouldBe london
     e.outVertex shouldBe paris
+    e.inVertex shouldBe london
     e.value("type") shouldBe Some("WDiEdge")
     e.value("weight") shouldBe Some(2)
   }
@@ -39,18 +39,13 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val jupiter = graph.addVertex("jupiter")
     val neptune = graph.addVertex("neptune")
 
-    val gs: GremlinScala[Edge, HNil] = jupiter -- "brother" <-> neptune
-    val edges = gs.toList()
-    edges.size shouldBe 2
-
-    val e0: ScalaEdge = edges.head
-    val e1: ScalaEdge = edges.tail.head
-
-    e0.inVertex shouldBe neptune
-    e1.inVertex shouldBe jupiter
+    val (e0, e1) = jupiter <--> "brother" <--> neptune
 
     e0.outVertex shouldBe jupiter
+    e0.inVertex shouldBe neptune
+
     e1.outVertex shouldBe neptune
+    e1.inVertex shouldBe jupiter
   }
 
   it("should support bidirectional connections with properties") {
@@ -59,11 +54,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val jupiter = graph.addVertex("jupiter")
     val neptune = graph.addVertex("neptune")
 
-    val gs: GremlinScala[Edge, HNil] = jupiter -- ("brother", "type" -> "WDiEdge", "weight" -> 2) <-> neptune
-    val edges = gs.toList()
-
-    val e0: ScalaEdge = edges.head
-    val e1: ScalaEdge = edges.tail.head
+    val (e0, e1) = jupiter <--> ("brother", "type" -> "WDiEdge", "weight" -> 2) <--> neptune
 
     e0.value("type") shouldBe Some("WDiEdge")
     e0.value("weight") shouldBe Some(2)
