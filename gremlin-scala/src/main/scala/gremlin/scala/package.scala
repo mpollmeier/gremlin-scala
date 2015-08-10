@@ -16,7 +16,19 @@ package object scala {
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
 
-  implicit class GraphAsScala[T <: Graph](g: T) {
+  implicit class SemiEdgeFunctions(label: String) {
+    def ---(from: ScalaVertex) = SemiEdge(from, label)
+
+    def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
+  }
+
+  implicit class SemiEdgePropertyFunctions(labelProperties: (String, Map[String, Any])) {
+    val (label, properties) = labelProperties
+
+    def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
+  }
+
+  implicit class GraphAsScala[G <: Graph](g: G) {
     def asScala = ScalaGraph(g)
   }
 
@@ -94,4 +106,5 @@ package object scala {
      */
     def toCC[T <: Product : Mappable] = gs map (_.toCC[T])
   }
+
 }

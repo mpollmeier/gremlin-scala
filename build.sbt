@@ -5,6 +5,7 @@ val commonSettings = Seq(
   version := "3.0.0-SNAPSHOT",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", scalaVersion.value),
+  //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full),
   publishTo := {
     val sonatype = "https://oss.sonatype.org/"
     if (isSnapshot.value)

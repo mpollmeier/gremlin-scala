@@ -58,10 +58,17 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     e
   }
 
-  def --(label: String, properties: Map[String, Any] = Map.empty) =
-    SemiEdge(this, label, properties)
+  def <--(se: SemiEdge) = se.from.addEdge(se.label, this, se.properties)
 
-  def --[T <: Product: Mappable](cc: T) = {
+  def <--(de: SemiDoubleEdge) = (
+    this.addEdge(de.label, de.right, de.properties),
+    de.right.addEdge(de.label, this, de.properties)
+    )
+
+  def ---(label: String, properties: (String, Any)*) =
+    SemiEdge(this, label, properties.toMap)
+
+  def ---[T <: Product: Mappable](cc: T) = {
     val (label, properties) = implicitly[Mappable[T]].toMap(cc)
     SemiEdge(this, label, properties)
   }

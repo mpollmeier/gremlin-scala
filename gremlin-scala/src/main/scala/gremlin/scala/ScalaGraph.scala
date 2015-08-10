@@ -2,10 +2,8 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import shapeless._
-import scala.reflect.ClassTag
-import scala.reflect.runtime.universe._
 
-case class ScalaGraph[T <: Graph](graph: T) {
+case class ScalaGraph[G <: Graph](graph: G) {
 
   def addVertex() = ScalaVertex(graph.addVertex())
 
