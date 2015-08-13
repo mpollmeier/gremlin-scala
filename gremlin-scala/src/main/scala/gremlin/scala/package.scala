@@ -114,4 +114,8 @@ package object scala {
     }
   }
 
+  implicit class ScalaGraphVertexFunctions[T <: structure.Graph](g: ScalaGraph[T]) {
+    def ++(label: String, properties: (String, Any)*): ScalaVertex = g.addVertex(label, properties.toMap)
+  }
+
 }
