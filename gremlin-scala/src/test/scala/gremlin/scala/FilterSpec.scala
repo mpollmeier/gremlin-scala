@@ -1,5 +1,7 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
 
 class FilterSpec extends TestBase {
@@ -12,6 +14,33 @@ class FilterSpec extends TestBase {
 
   it("has") {
     graph.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
+  }
+
+  it("has - sugar") {
+    val person = "person"
+    val software = "software"
+    val blueprints = "name" -> "blueprints"
+    val gremlin = "name" -> "gremlin"
+    val gremlinScala = "name" -> "gremlin-scala"
+    val mpollmeier = "name" -> "mpollmeier"
+    val _2010 = "created" -> 2010
+    val _2009 = "created" -> 2009
+    val dependsOn = "dependsOn"
+    val createdBy = "createdBy"
+
+    val g = TinkerGraph.open.asScala
+    g ++ (software, blueprints, _2010)
+    g.V.has(blueprints).head <-- dependsOn --- (g ++ (software, gremlin, _2009))
+    g.V.has(gremlin).head <-- dependsOn --- (g ++ (software, gremlinScala))
+    g.V.has(gremlinScala).head <-- createdBy --- (g ++ (person, mpollmeier))
+
+    g.V.toList().size shouldBe 4
+    g.V.has(T.label, software).toList().size shouldBe 3
+    g.V.has(T.label, person).toList().size shouldBe 1
+
+    g.E.toList().size shouldBe 3
+    g.E.has(T.label, dependsOn).toList().size shouldBe 2
+    g.E.has(T.label, createdBy).toList().size shouldBe 1
   }
 
   it("hasNot") {
