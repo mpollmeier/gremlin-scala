@@ -20,9 +20,9 @@ class FilterSpec extends TestBase {
 
     val g = TinkerGraph.open.asScala
     g + ("software", Map(name("blueprints"), created(2010)))
-    g.V.hasKey("blueprints").head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
-    g.V.hasKey("gremlin").head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
-    g.V.hasKey("gremlinScala").head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
+    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
+    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
+    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3
