@@ -1,8 +1,6 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.matchers.ShouldMatchers
 
 class FilterSpec extends TestBase {
 
@@ -17,30 +15,22 @@ class FilterSpec extends TestBase {
   }
 
   it("has - sugar") {
-    val person = "person"
-    val software = "software"
-    val blueprints = "name" -> "blueprints"
-    val gremlin = "name" -> "gremlin"
-    val gremlinScala = "name" -> "gremlin-scala"
-    val mpollmeier = "name" -> "mpollmeier"
-    val _2010 = "created" -> 2010
-    val _2009 = "created" -> 2009
-    val dependsOn = "dependsOn"
-    val createdBy = "createdBy"
+    def name(n: String) = "name" -> n
+    def created(n: Int) = "created" -> n
 
     val g = TinkerGraph.open.asScala
-    g + (software, blueprints, _2010)
-    g.V.has(blueprints).head <-- dependsOn --- (g + (software, gremlin, _2009))
-    g.V.has(gremlin).head <-- dependsOn --- (g + (software, gremlinScala))
-    g.V.has(gremlinScala).head <-- createdBy --- (g + (person, mpollmeier))
+    g + ("software", Map(name("blueprints"), created(2010)))
+    g.V.hasKey("blueprints").head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
+    g.V.hasKey("gremlin").head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
+    g.V.hasKey("gremlinScala").head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
 
     g.V.toList().size shouldBe 4
-    g.V.has(T.label, software).toList().size shouldBe 3
-    g.V.has(T.label, person).toList().size shouldBe 1
+    g.V.hasLabel("software").toList().size shouldBe 3
+    g.V.hasLabel("person").toList().size shouldBe 1
 
     g.E.toList().size shouldBe 3
-    g.E.has(T.label, dependsOn).toList().size shouldBe 2
-    g.E.has(T.label, createdBy).toList().size shouldBe 1
+    g.E.hasLabel("dependsOn").toList().size shouldBe 2
+    g.E.hasLabel("createdBy").toList().size shouldBe 1
   }
 
   it("hasNot") {
