@@ -29,10 +29,10 @@ class FilterSpec extends TestBase {
     val createdBy = "createdBy"
 
     val g = TinkerGraph.open.asScala
-    g ++ (software, blueprints, _2010)
-    g.V.has(blueprints).head <-- dependsOn --- (g ++ (software, gremlin, _2009))
-    g.V.has(gremlin).head <-- dependsOn --- (g ++ (software, gremlinScala))
-    g.V.has(gremlinScala).head <-- createdBy --- (g ++ (person, mpollmeier))
+    g + (software, blueprints, _2010)
+    g.V.has(blueprints).head <-- dependsOn --- (g + (software, gremlin, _2009))
+    g.V.has(gremlin).head <-- dependsOn --- (g + (software, gremlinScala))
+    g.V.has(gremlinScala).head <-- createdBy --- (g + (person, mpollmeier))
 
     g.V.toList().size shouldBe 4
     g.V.has(T.label, software).toList().size shouldBe 3

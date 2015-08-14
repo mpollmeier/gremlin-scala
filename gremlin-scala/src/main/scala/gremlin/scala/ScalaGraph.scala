@@ -33,6 +33,10 @@ case class ScalaGraph[G <: Graph](graph: G) {
     addVertex(label, properties)
   }
 
+  def +(label: String, properties: (String, Any)*): ScalaVertex = addVertex(label, properties.toMap)
+
+  def +(properties: (String, Any)*): ScalaVertex = addVertex(properties.toMap)
+
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
     graph.traversal.V(id).headOption map ScalaVertex.apply

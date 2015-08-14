@@ -111,8 +111,8 @@ class ElementSpec extends TestBase {
       val graph = TinkerGraph.open.asScala
       val label1 = "label1"
       val label2 = "label2"
-      val v1 = graph ++ label1
-      val v2 = graph ++ (label2, "testkey" -> "testValue")
+      val v1 = graph + label1
+      val v2 = graph + (label2, "testkey" -> "testValue")
 
       graph.V.has(T.label, label1).head() shouldBe v1.vertex
       graph.V.has(T.label, label2).head() shouldBe v2.vertex
@@ -124,7 +124,7 @@ class ElementSpec extends TestBase {
       val label1 = "label1"
       val label2 = "label2"
       val testLabel = "testLabel"
-      (g ++ label1) --- testLabel --> (g ++ (label2, "testkey" -> "testValue"))
+      (g + label1) --- testLabel --> (g + (label2, "testkey" -> "testValue"))
 
       g.V.has(T.label, label1).head().label() shouldBe label1
       g.V.has(T.label, label2).head().label() shouldBe label2
