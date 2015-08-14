@@ -8,7 +8,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
 import org.apache.tinkerpop.gremlin.process.traversal.step.map._
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
-import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.{Direction, T}
 
 import scala.collection.JavaConversions._
 
@@ -409,57 +409,59 @@ object Tests {
   //   // }
   // }
 
-  // class ScalaVertexTest extends VertexTest with StandardTest {
-  //   override def get_g_V = graph.asScala.V
+  class ScalaVertexTest extends VertexTest with StandardTest {
+    override def get_g_V = graph.asScala.V
 
-  //   override def get_g_VX1X_out(v1Id: AnyRef) = graph.asScala.V(v1Id).out
+    override def get_g_VX1X_out(v1Id: AnyRef) = graph.asScala.V(v1Id).out
 
-  //   override def get_g_VX2X_in(v2Id: AnyRef) = graph.asScala.V(v2Id).in
+    override def get_g_VX2X_in(v2Id: AnyRef) = graph.asScala.V(v2Id).in
 
-  //   override def get_g_VX4X_both(v4Id: AnyRef) = graph.asScala.V(v4Id).both
+    override def get_g_VX4X_both(v4Id: AnyRef) = graph.asScala.V(v4Id).both
 
-  //   override def get_g_E = graph.asScala.E
+    override def get_g_E = graph.asScala.E
 
-  //   override def get_g_VX1X_outE(v1Id: AnyRef) = graph.asScala.V(v1Id).outE
+    override def get_g_VX1X_outE(v1Id: AnyRef) = graph.asScala.V(v1Id).outE
 
-  //   override def get_g_VX2X_inE(v2Id: AnyRef) = graph.asScala.V(v2Id).inE
+    override def get_g_VX2X_inE(v2Id: AnyRef) = graph.asScala.V(v2Id).inE
 
-  //   override def get_g_VX4X_bothE(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE
+    override def get_g_VX4X_bothE(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE
 
-  //   override def get_g_VX4X_bothEXcreatedX(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE("created")
+    override def get_g_VX4X_bothEXcreatedX(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE("created")
 
-  //   override def get_g_VX1X_outE_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE.inV
+    override def get_g_VX1X_outE_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE.inV
 
-  //   override def get_g_VX2X_inE_outV(v2Id: AnyRef) = graph.asScala.V(v2Id).inE.outV
+    override def get_g_VX2X_inE_outV(v2Id: AnyRef) = graph.asScala.V(v2Id).inE.outV
 
-  //   override def get_g_V_outE_hasXweight_1X_outV = graph.asScala.V.outE.has("weight", 1.0d).outV
+    override def get_g_V_outE_hasXweight_1X_outV = graph.asScala.V.outE.has("weight", 1.0d).outV
 
-  //   override def get_g_V_out_outE_inV_inE_inV_both_name = graph.asScala.V.out.outE.inV.inE.inV.both.values[String]("name")
+    override def get_g_V_out_outE_inV_inE_inV_both_name = graph.asScala.V.out.outE.inV.inE.inV.both.values[String]("name")
 
-  //   override def get_g_VX1X_outEXknowsX_bothV_name(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows").bothV.values[String]("name")
+    override def get_g_VX1X_outEXknowsX_bothV_name(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows").bothV.values[String]("name")
 
-  //   override def get_g_VX1X_outXknowsX(v1Id: AnyRef) = graph.asScala.V(v1Id).out("knows")
+    override def get_g_VX1X_outXknowsX(v1Id: AnyRef) = graph.asScala.V(v1Id).out("knows")
 
-  //   override def get_g_VX1X_outXknows_createdX(v1Id: AnyRef) = graph.asScala.V(v1Id).out("knows", "created")
+    override def get_g_VX1X_outXknows_createdX(v1Id: AnyRef) = graph.asScala.V(v1Id).out("knows", "created")
 
-  //   override def get_g_VX1X_outEXknowsX_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows").inV
+    override def get_g_VX1X_outEXknowsX_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows").inV
 
-  //   override def get_g_VX1X_outEXknows_createdX_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows", "created").inV
+    override def get_g_VX1X_outEXknows_createdX_inV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE("knows", "created").inV
 
-  //   override def get_g_VX1X_outE_otherV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE.otherV
+    override def get_g_VX1X_outE_otherV(v1Id: AnyRef) = graph.asScala.V(v1Id).outE.otherV
 
-  //   override def get_g_VX4X_bothE_otherV(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE.otherV
+    override def get_g_VX4X_bothE_otherV(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE.otherV
 
-  //   // override def get_g_VX4X_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE.has("weight", Compare.lt, 1d).otherV
+    override def get_g_VX4X_bothE_hasXweight_lt_1X_otherV(v4Id: AnyRef) = graph.asScala.V(v4Id).bothE.has("weight", P.lt(1d)).otherV
 
-  //   override def get_g_V_out_out = graph.asScala.V.out.out
+    override def get_g_V_out_out = graph.asScala.V.out.out
 
-  //   override def get_g_VX1X_out_out_out(v1Id: AnyRef) = graph.asScala.V(v1Id).out.out.out
+    override def get_g_VX1X_out_out_out(v1Id: AnyRef) = graph.asScala.V(v1Id).out.out.out
 
-  //   override def get_g_VX1X_out_name(v1Id: AnyRef) = graph.asScala.V(v1Id).out.values[String]("name")
+    override def get_g_VX1X_out_name(v1Id: AnyRef) = graph.asScala.V(v1Id).out.values[String]("name")
 
-  //   override def get_g_VX1X_to_XOUT_knowsX(v1Id: AnyRef) = graph.asScala.V(v1Id).to(Direction.OUT, "knows")
-  // }
+    override def get_g_VX1X_to_XOUT_knowsX(v1Id: AnyRef) = graph.asScala.V(v1Id).to(Direction.OUT, "knows")
+
+    override def get_g_EX11X(e11Id: AnyRef): Traversal[Edge, Edge] = graph.asScala.E(e11Id)
+  }
 
   class ScalaAggregateTest extends AggregateTest with StandardTest {
     override def get_g_V_name_aggregateXxX_capXxX =
@@ -593,7 +595,7 @@ object Tests {
   //   // override def get_g_V_groupByXnameX =
   //   //   GremlinScala(g).V.groupBy(_.value[String]("name"))
   //   //     .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JCollection[Vertex]]]]
-  //   
+  //
   //   // override def get_g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX =
   //   //   GremlinScala(g).V.has("lang").groupBy(
   //   //     sideEffectKey = "a",
@@ -602,14 +604,14 @@ object Tests {
   //   //   ).out.cap("a")
   //   //     .traversal
   //   //     .asInstanceOf[Traversal[Vertex, JMap[String, JCollection[String]]]] //only for Scala 2.10...
-  //   
+  //
   //   // override def get_g_V_hasXlangX_groupByXlang_1_sizeX =
   //   //   GremlinScala(g).V.has("lang").groupBy(
   //   //     keyFunction = _.value[String]("lang"),
   //   //     valueFunction = _ ⇒ 1,
   //   //     reduceFunction = { c: JCollection[_] ⇒ c.size }
   //   //   ).traversal.asInstanceOf[Traversal[Vertex, JMap[String, Integer]]]
-  //   
+  //
   //   // override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX =
   //   //   GremlinScala(g).V.as("x").out
   //   //     .groupBy(
@@ -620,7 +622,7 @@ object Tests {
   //   //     ).jump("x", 2).cap("a")
   //   //     .traversal
   //   //     .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
-  //   
+  //
   //   // override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
   //   //   GremlinScala(g).V.as("x").out
   //   //     .groupBy(
