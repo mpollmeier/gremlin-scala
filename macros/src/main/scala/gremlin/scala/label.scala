@@ -1,6 +1,7 @@
 package gremlin.scala
 
-import scala.annotation.{compileTimeOnly, StaticAnnotation}
-import scala.annotation.meta._
+import scala.annotation.StaticAnnotation
+import scala.annotation.meta.{beanGetter, beanSetter, getter, setter}
 
-class label(val label: String = "") extends StaticAnnotation
+@getter @setter @beanGetter @beanSetter
+class label extends StaticAnnotation
