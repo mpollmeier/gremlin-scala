@@ -55,7 +55,7 @@ val commonSettings = Seq(
       </developers>
 )
 
-lazy val gremlinScala = project.in(file("gremlin-scala"))
+lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
   .dependsOn(macros)
 
