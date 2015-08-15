@@ -1,25 +1,25 @@
 package gremlin.scala
 
-import com.thinkaurelius.titan.core.{TitanFactory, TitanGraph}
-import com.thinkaurelius.titan.example.GraphOfTheGodsFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
 
-case class ClassExampleWithWrongLabel(s: String,
-                                      @label i: Int)
 
-case class ClassExampleWithoutLabel(s: String,
-                                    i: Int)
+case class CCWithoutLabelOrId(s: String,
+                              i: Int)
 
-case class ClassExampleWithLabel(@label s: String,
-                                 i: Int,
-                                 l: Long,
-                                 o: Option[String],
-                                 seq: Seq[String],
-                                 map: Map[String, String],
-                                 nested: NestedClass) {
+case class CCWithOptionId(s: String,
+                          @id id: Option[Int])
+
+@label("the label")
+case class CCWithLabelAndId(s: String,
+                            @id id: Int,
+                            l: Long,
+                            o: Option[String],
+                            seq: Seq[String],
+                            map: Map[String, String],
+                            nested: NestedClass) {
   def randomDef = ???
 }
 
@@ -28,7 +28,7 @@ case class NestedClass(s: String)
 class NoneCaseClass(s: String)
 
 class MarshallerSpec extends FunSpec with Matchers {
-  val example = ClassExampleWithLabel(
+  val example = CCWithLabelAndId(
     "some string",
     Int.MaxValue,
     Long.MaxValue,
@@ -38,13 +38,14 @@ class MarshallerSpec extends FunSpec with Matchers {
     NestedClass("nested")
   )
 
-  it("saves a case class as a vertex with a @label annotation") {
+  it("saves a case class as a vertex with a @label and @id annotation") {
     val graph = TinkerGraph.open.asScala
     val v = graph.addVertex(example)
 
     val vl = graph.V(v.id).head()
-    vl.label shouldBe example.s
-    vl.valueMap should contain("i" → example.i)
+    vl.label shouldBe "the label"
+    vl.id shouldBe example.id
+    vl.valueMap should contain("s" → example.s)
     vl.valueMap should contain("l" → example.l)
     vl.valueMap should contain("o" → example.o)
     vl.valueMap should contain("seq" → example.seq)
@@ -52,20 +53,39 @@ class MarshallerSpec extends FunSpec with Matchers {
     vl.valueMap should contain("nested" → example.nested)
   }
 
-  it("converts a Vertex into a case class") {
+  it("load a vertex into a case class") {
     val graph = TinkerGraph.open.asScala
 
     val v = graph.addVertex(example)
-    v.toCC[ClassExampleWithLabel] shouldBe example
+    v.toCC[CCWithLabelAndId] shouldBe example
   }
 
-  it("saves a case class as a vertex") {
+  it("saves a case class with Option @id annotation") {
     val graph = TinkerGraph.open.asScala
-    val cc = ClassExampleWithoutLabel("text", 12)
+    val cc = CCWithOptionId("text", Some(12))
     val v = graph.addVertex(cc)
 
     val vl = graph.V(v.id).head()
-    vl.label shouldBe "ClassExampleWithoutLabel"
+    vl.label shouldBe cc.getClass.getSimpleName
+    vl.id shouldBe cc.id.get
+    vl.valueMap should contain("s" → cc.s)
+  }
+
+  it("load a vertex into a case class with Option @id annotation") {
+    val graph = TinkerGraph.open.asScala
+    val cc = CCWithOptionId("text", Some(12))
+    val v = graph.addVertex(cc)
+
+    v.toCC[CCWithOptionId] shouldBe cc
+  }
+
+  it("saves a case class without annotation as a vertex") {
+    val graph = TinkerGraph.open.asScala
+    val cc = CCWithoutLabelOrId("text", 12)
+    val v = graph.addVertex(cc)
+
+    val vl = graph.V(v.id).head()
+    vl.label shouldBe cc.getClass.getSimpleName
     vl.valueMap should contain("s" → cc.s)
     vl.valueMap should contain("i" → cc.i)
   }
@@ -75,15 +95,6 @@ class MarshallerSpec extends FunSpec with Matchers {
       """
         val graph = TinkerGraph.open.asScala
         graph.addVertex(new NoneCaseClass("test"))
-      """
-    }
-  }
-
-  it("can't add a @label annotation on a none String attribute") {
-    illTyped {
-      """
-        val graph = TinkerGraph.open.asScala
-        graph.addVertex(ClassExampleWithWrongLabel("test", 42))
       """
     }
   }
