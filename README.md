@@ -58,11 +58,11 @@ Thanks to <a href="https://github.com/joan38">joan38</a> for <a href="https://gi
 ## Help - it's open source!
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)
-* port over more TP3 steps - see [TP3 testsuite](https://github.com/apache/incubator-tinkerpop/tree/master/gremlin-test/src/main/java/org/apache/tinkerpop/gremlin/process/graph/traversal/step) and [Gremlin-Scala StandardTests](https://github.com/mpollmeier/gremlin-scala/blob/master/src/test/scala/gremlin/scala/GremlinStandardTestSuite.scala)
+* port over more TP3 steps - see [TP3 testsuite](https://github.com/apache/incubator-tinkerpop/tree/master/gremlin-test/src/main/java/org/apache/tinkerpop/gremlin/process/traversal/step) and [Gremlin-Scala StandardTests](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/GremlinStandardTestSuite.scala)
 * fill this readme and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
 ## Further reading
-For more information about Gremlin see the [Gremlin docs](http://www.tinkerpop.com/docs/current/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
+For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/docs/3.0.0-incubating/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
 Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
 
 Random links:
