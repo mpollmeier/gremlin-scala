@@ -6,7 +6,7 @@ class TraversalSpec extends TestBase {
 
   describe("vertex steps") {
     it("gets all vertices") {
-      gs.V.toList should have size (6)
+      graph.V.toList should have size 6
       //graph.V.path.toList foreach {_: Vertex :: HNil ⇒ [> compiles <] }
     }
 
@@ -66,7 +66,7 @@ class TraversalSpec extends TestBase {
 
   describe("edge steps") {
     it("gets all edges") {
-      gs.E.toList should have size (6)
+      graph.E.toList should have size 6
     }
     
     it("follows in vertex") {
@@ -91,40 +91,40 @@ class TraversalSpec extends TestBase {
 
     describe("head") {
       it("gets the first element") {
-        gs.V.values[String]("name").head shouldBe "marko"
+        graph.V.values[String]("name").head shouldBe "marko"
       }
 
       it("throws an exception if there is no result") {
         intercept[NoSuchElementException] {
-          gs.V.filter(_ ⇒ false).values[String]("name").head
+          graph.V.filter(_ ⇒ false).values[String]("name").head
         }
       }
     }
 
     describe("headOption") {
       it("gets the first element") {
-        gs.V.values[String]("name").headOption shouldBe Some("marko")
+        graph.V.values[String]("name").headOption shouldBe Some("marko")
       }
 
       it("returns None if there is no result") {
-        gs.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
+        graph.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
       }
     }
 
     describe("value") {
       it("gets values") {
-        gs.V.values[Int]("age").toSet shouldBe Set(27, 29, 32, 35)
+        graph.V.values[Int]("age").toSet shouldBe Set(27, 29, 32, 35)
       }
     }
 
     describe("order") {
       it("sorts by natural order") {
-        gs.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
+        graph.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
       }
 
       it("sorts by provided comparator") {
-        gs.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
-        gs.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
+        graph.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
+        graph.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
       }
     }
   }

@@ -16,11 +16,20 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     this
   }
 
-  def removeProperty(key: String): ScalaEdge = {
-    val p = property(key)
-    if (p.isPresent) p.remove
+  def setProperties[T <: Product : Marshallable](cc: T): ScalaEdge = {
+    val (_, _, properties) = implicitly[Marshallable[T]].fromCC(cc)
+    setProperties(properties)
     this
   }
+
+  def removeProperty(key: String): ScalaEdge = {
+    val p = property(key)
+    if (p.isPresent) p.remove()
+    this
+  }
+
+  def toCC[T <: Product: Marshallable] =
+    implicitly[Marshallable[T]].toCC(edge.id, edge.valueMap())
 
   def start() = GremlinScala[Edge, HNil](__.__(edge))
 
