@@ -107,10 +107,16 @@ package object scala {
     def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
   }
 
-//  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
-//    def ---(from: ScalaVertex) = {
-//      val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-//      SemiEdge(from, label, properties)
-//    }
-//  }
+  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
+    def ---(from: ScalaVertex) = {
+      val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiEdge(from, label, properties)
+    }
+  }
+  
+  implicit class ScalaGraphVertexFunctions[T <: structure.Graph](g: ScalaGraph[T]) {
+    def ++(label: String, properties: (String, Any)*): ScalaVertex = g.addVertex(label, properties.toMap)
+
+    def ++(properties: (String, Any)*): ScalaVertex = g.addVertex(properties.toMap)
+  }
 }

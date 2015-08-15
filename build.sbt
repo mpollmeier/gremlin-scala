@@ -6,7 +6,6 @@ val commonSettings = Seq(
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
   version := "3.0.0-SNAPSHOT",
   scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", scalaVersion.value),
 
   libraryDependencies <++= scalaVersion { scalaVersion =>
     val gremlinVersion = "3.0.0-incubating"
