@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 class FilterSpec extends TestBase {
@@ -17,12 +18,13 @@ class FilterSpec extends TestBase {
   it("has - sugar") {
     def name(n: String) = "name" -> n
     def created(n: Int) = "created" -> n
+    def label(n: String) = T.label.getAccessor -> n
 
     val g = TinkerGraph.open.asScala
-    g + ("software", Map(name("blueprints"), created(2010)))
-    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
-    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
-    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
+    g + Map(label("software"), name("blueprints"), created(2010))
+    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + Map(label("software"), name("gremlin"), created(2009)))
+    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + Map(label("software"), name("gremlinScala")))
+    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + Map(label("person"), name("mpollmeier")))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3

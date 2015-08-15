@@ -6,21 +6,24 @@ import shapeless._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
-  def addVertex() = ScalaVertex(graph.addVertex())
+  def addVertex(): ScalaVertex = graph.addVertex()
 
-  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
+  def addVertex(label: String): ScalaVertex = graph.addVertex(label)
 
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex()
-    v.setProperties(properties)
-    v
+    graph.addVertex(properties.toSeq.flatMap { p =>
+      val label = T.label.getAccessor
+      val id = T.id.getAccessor
+      p._1 match {
+        case `label` => Seq(T.label, p._2.asInstanceOf[AnyRef])
+        case `id` => Seq(T.id, p._2.asInstanceOf[AnyRef])
+        case _ => Seq(p._1, p._2.asInstanceOf[AnyRef])
+      }
+    }: _*)
   }
 
-  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex(label)
-    v.setProperties(properties)
-    v
-  }
+  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex =
+    addVertex(label).setProperties(properties)
 
   /**
    * Save an object's values into a new vertex
