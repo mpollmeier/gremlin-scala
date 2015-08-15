@@ -11,3 +11,11 @@ env:
   global:
   - SONATYPE_USER=mpollmeier
   - secure: ckc8wVBi9QhJErs1MxTukyCVRx76vEaoLEnIjfIUPTMg7qX6NAXTNsPbY6FmI3c2+sL2ljKFyQt5PwIXACQVetkOkmdNYoBDE8njhvIQ21ITupsTSkxDd+bMiUft1r2jhmZYQwXnGIHeX0Pml44eVTci3r8WFt0XZpdCUzE9mxw=
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/5c1169757f20f9d27973
+    on_success: change
+    on_failure: always
+    on_start: never   
+
