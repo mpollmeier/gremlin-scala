@@ -1,6 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.structure.T
 import shapeless._
 
 case class ScalaGraph[G <: Graph](graph: G) {
@@ -25,12 +26,14 @@ case class ScalaGraph[G <: Graph](graph: G) {
    * Save an object's values into a new vertex
    *
    * @param cc The case class to persist as a vertex
-   * @tparam T
+   * @tparam P
    * @return
    */
-  def addVertex[T <: Product : Marshallable](cc: T): ScalaVertex = {
-    val (label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-    addVertex(label, properties)
+  def addVertex[P <: Product : Marshallable](cc: P): ScalaVertex = {
+    val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
+    val idParam = id.toSeq flatMap (List(T.id, _))
+    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    graph.addVertex(idParam ++ (T.label +: label +: params): _*)
   }
 
   // get vertex by id
