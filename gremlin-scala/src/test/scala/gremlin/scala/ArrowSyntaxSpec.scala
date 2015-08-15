@@ -23,7 +23,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- CCWithLabelAndId(
+    val e = paris --- ClassExampleWithLabel(
       "some string",
       Int.MaxValue,
       Long.MaxValue,
