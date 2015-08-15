@@ -12,8 +12,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
     graph.addVertex(properties.toSeq.flatMap { p =>
-      val label = T.label.getAccessor
-      val id = T.id.getAccessor
+      val label = T.label.name
+      val id = T.id.name
       p._1 match {
         case `label` => Seq(T.label, p._2.asInstanceOf[AnyRef])
         case `id` => Seq(T.id, p._2.asInstanceOf[AnyRef])

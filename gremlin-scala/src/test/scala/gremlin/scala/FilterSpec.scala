@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 class FilterSpec extends TestBase {
@@ -18,7 +17,7 @@ class FilterSpec extends TestBase {
   it("has - sugar") {
     def name(n: String) = "name" -> n
     def created(n: Int) = "created" -> n
-    def label(n: String) = T.label.getAccessor -> n
+    def label(n: String) = "label" -> n
 
     val g = TinkerGraph.open.asScala
     g + Map(label("software"), name("blueprints"), created(2010))
