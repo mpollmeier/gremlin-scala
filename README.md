@@ -17,8 +17,9 @@ Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-ex
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
 
 ```scala
-GremlinScala(graph).V.outE.outE //does _not_ compile
-GremlinScala(graph).V.outE.inV  //compiles
+val graph = TinkerGraph.open.asScala
+graph.V.outE.outE //does _not_ compile
+graph.V.outE.inV  //compiles
 ```
 
 In standard Gremlin there's nothing stopping you to create the first traversal - it will explode at runtime, as
@@ -29,7 +30,8 @@ Gremlin-Scala has support for full type safety in a traversal. You can label any
 For example:
 
 ```scala
-GremlinScala(graph).V.as("a")
+val graph = TinkerFactory.createModern.asScala
+graph.V.as("a")
   .out.as("b")
   .value[String]("name").as("c")
   .labelledPath
@@ -45,7 +47,7 @@ You can save and load case classes as a vertex - this is still experimental but 
 ```scala
   import gremlin.scala._
   val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
-  val gs = GremlinScala(graph)
+  val gs = TinkerGraph.open.asScala
   val v = gs.save(example)
   v.start.load[ExampleClass].head shouldBe example
 ```
