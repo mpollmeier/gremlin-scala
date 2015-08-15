@@ -323,6 +323,8 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def has(key: String, value: Any) = GremlinScala[End, Labels](traversal.has(key, value))
 
+  def has(p: (String, Any)) = GremlinScala[End, Labels](traversal.has(p._1, p._2))
+
   def has(key: String, predicate: P[_]) = GremlinScala[End, Labels](traversal.has(key, predicate))
 
   def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))

@@ -111,12 +111,13 @@ class ElementSpec extends TestBase {
       val graph = TinkerGraph.open.asScala
       val label1 = "label1"
       val label2 = "label2"
-      val v1 = graph ++ label1
-      val v2 = graph ++ (label2, "testkey" -> "testValue")
 
-      graph.V.has(T.label, label1).head() shouldBe v1.vertex
-      graph.V.has(T.label, label2).head() shouldBe v2.vertex
-      graph.V.has(T.label, label2).head().value[String]("testkey") shouldBe "testValue"
+      val v1 = graph + label1
+      val v2 = graph + (label2, Map("testkey" -> "testValue"))
+
+      graph.V.hasLabel(label1).head() shouldBe v1.vertex
+      graph.V.hasLabel(label2).head() shouldBe v2.vertex
+      graph.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
     }
 
     it("adds a vertex and edges with a given label with syntactic sugar") {
@@ -124,13 +125,13 @@ class ElementSpec extends TestBase {
       val label1 = "label1"
       val label2 = "label2"
       val testLabel = "testLabel"
-      (g ++ label1) --- testLabel --> (g ++ (label2, "testkey" -> "testValue"))
+      (g + label1) --- testLabel --> (g + (label2, Map("testkey" -> "testValue")))
 
-      g.V.has(T.label, label1).head().label() shouldBe label1
-      g.V.has(T.label, label2).head().label() shouldBe label2
-      g.V.has(T.label, label2).head().value[String]("testkey") shouldBe "testValue"
-      g.V.has(T.label, label1).head().outE().head().label() shouldBe testLabel
-      g.V.has(T.label, label1).head().out(testLabel).head().label() shouldBe label2
+      g.V.hasLabel(label1).head().label() shouldBe label1
+      g.V.hasLabel(label2).head().label() shouldBe label2
+      g.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
+      g.V.hasLabel(label1).head().outE().head().label() shouldBe testLabel
+      g.V.hasLabel(label1).head().out(testLabel).head().label() shouldBe label2
     }
 
     it("adds an edge") {

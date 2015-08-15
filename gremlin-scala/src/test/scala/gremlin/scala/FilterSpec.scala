@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import org.scalatest.matchers.ShouldMatchers
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
 class FilterSpec extends TestBase {
 
@@ -12,6 +12,25 @@ class FilterSpec extends TestBase {
 
   it("has") {
     graph.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
+  }
+
+  it("has - sugar") {
+    def name(n: String) = "name" -> n
+    def created(n: Int) = "created" -> n
+
+    val g = TinkerGraph.open.asScala
+    g + ("software", Map(name("blueprints"), created(2010)))
+    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
+    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
+    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
+
+    g.V.toList().size shouldBe 4
+    g.V.hasLabel("software").toList().size shouldBe 3
+    g.V.hasLabel("person").toList().size shouldBe 1
+
+    g.E.toList().size shouldBe 3
+    g.E.hasLabel("dependsOn").toList().size shouldBe 2
+    g.E.hasLabel("createdBy").toList().size shouldBe 1
   }
 
   it("hasNot") {

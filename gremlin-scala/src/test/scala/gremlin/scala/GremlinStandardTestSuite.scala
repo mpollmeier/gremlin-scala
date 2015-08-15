@@ -593,7 +593,7 @@ object Tests {
   //   // override def get_g_V_groupByXnameX =
   //   //   GremlinScala(g).V.groupBy(_.value[String]("name"))
   //   //     .traversal.asInstanceOf[Traversal[Vertex, JMap[String, JCollection[Vertex]]]]
-  //   
+  //
   //   // override def get_g_V_hasXlangX_groupByXa_lang_nameX_out_capXaX =
   //   //   GremlinScala(g).V.has("lang").groupBy(
   //   //     sideEffectKey = "a",
@@ -602,14 +602,14 @@ object Tests {
   //   //   ).out.cap("a")
   //   //     .traversal
   //   //     .asInstanceOf[Traversal[Vertex, JMap[String, JCollection[String]]]] //only for Scala 2.10...
-  //   
+  //
   //   // override def get_g_V_hasXlangX_groupByXlang_1_sizeX =
   //   //   GremlinScala(g).V.has("lang").groupBy(
   //   //     keyFunction = _.value[String]("lang"),
   //   //     valueFunction = _ ⇒ 1,
   //   //     reduceFunction = { c: JCollection[_] ⇒ c.size }
   //   //   ).traversal.asInstanceOf[Traversal[Vertex, JMap[String, Integer]]]
-  //   
+  //
   //   // override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_2X_capXaX =
   //   //   GremlinScala(g).V.as("x").out
   //   //     .groupBy(
@@ -620,7 +620,7 @@ object Tests {
   //   //     ).jump("x", 2).cap("a")
   //   //     .traversal
   //   //     .asInstanceOf[Traversal[Vertex, JMap[String, Integer]]] //only for Scala 2.10...
-  //   
+  //
   //   // override def get_g_V_asXxX_out_groupByXa_name_sizeX_jumpXx_loops_lt_2X_capXaX =
   //   //   GremlinScala(g).V.as("x").out
   //   //     .groupBy(
