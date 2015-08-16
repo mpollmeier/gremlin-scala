@@ -15,17 +15,21 @@ object schema {
     def apply(n: Any): (String, Any) = key -> n
   }
 
-  class Key[A](override val key: String) extends Atom(key)
+  case class Key[A](override val key: String) extends Atom(key)
 
   object Label extends Atom(T.label.name)
 
   object Id extends Atom(T.id.name)
 
   object Atom {
-    def apply(p: (String, Any)) = p._1 match {
-      case "label" => Label
-      case "id" => Id
-      case a: String => new Key(a)
+    def apply(p: (String, Any)) = {
+      val label = T.label.name
+      val id = T.id.name
+      p._1 match {
+        case `label` => Label
+        case `id` => Id
+        case a: String => Key(a)
+      }
     }
   }
 
