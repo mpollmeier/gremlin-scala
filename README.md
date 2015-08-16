@@ -21,7 +21,7 @@ Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-ex
 >
 ```
 * Next, change to the gremlin-scala project by typing `project gremlin-scala`
-* Finally, to test out the API in a REPL type `console`
+* Finally, to test out the API in a REPL type `console` 
 
 ## Benefits
 * Scala friendly function signatures, aiming to be close to the standard collection library
