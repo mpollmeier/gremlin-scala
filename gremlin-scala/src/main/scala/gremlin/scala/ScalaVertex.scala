@@ -75,6 +75,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def ---(label: String, properties: Map[String, Any] = Map.empty) =
     SemiEdge(this, label, properties.toMap)
 
+  def ---(properties: Map[String, Any]) =
+    SemiEdge(this, properties("label").asInstanceOf[String], properties.toMap)
+
   def ---[P <: Product : Marshallable](cc: P) = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     SemiEdge(this, label, properties)
