@@ -9,6 +9,20 @@ A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Sca
 ### Getting started
 Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-examples) and start with a working example for the graph database of your choice.
 
+### Using Scala Console within SBT
+* From the root directory where you cloned the project type `sbt` to start an SBT session
+* Typing `projects` shows the following project structure where `*root` is the current project 
+```
+> projects
+[info] In file:/Users/daniel/IdeaProjects/gremlin-scala/
+[info]     gremlin-scala
+[info]     macros
+[info]   * root
+>
+```
+* Next, change to the gremlin-scala project by typing `project gremlin-scala`
+* Finally, to test out the API in a REPL type `console`
+
 ## Benefits
 * Scala friendly function signatures, aiming to be close to the standard collection library
 * You can use standard Scala functions instead of having to worry about how to implement `java.util.function.BiPredicate`
