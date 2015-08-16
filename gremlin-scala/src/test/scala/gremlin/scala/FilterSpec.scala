@@ -32,6 +32,8 @@ class FilterSpec extends TestBase {
     g.E.toList().size shouldBe 3
     g.E.hasLabel("dependsOn").toList().size shouldBe 2
     g.E.hasLabel("createdBy").toList().size shouldBe 1
+
+    g.asJava.close()
   }
 
   it("hasNot") {

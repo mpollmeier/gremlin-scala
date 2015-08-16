@@ -118,6 +118,8 @@ class ElementSpec extends TestBase {
       graph.V.hasLabel(label1).head() shouldBe v1.vertex
       graph.V.hasLabel(label2).head() shouldBe v2.vertex
       graph.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
+
+      graph.asJava.close()
     }
 
     it("adds a vertex and edges with a given label with syntactic sugar") {
@@ -132,6 +134,8 @@ class ElementSpec extends TestBase {
       g.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
       g.V.hasLabel(label1).head().outE().head().label() shouldBe testLabel
       g.V.hasLabel(label1).head().out(testLabel).head().label() shouldBe label2
+
+      graph.asJava.close()
     }
 
     it("adds an edge") {

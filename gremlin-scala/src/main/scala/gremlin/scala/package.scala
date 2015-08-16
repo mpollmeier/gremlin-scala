@@ -107,6 +107,10 @@ package object scala {
     def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
   }
 
+  implicit class SemiEdgeMapFunctions(properties: Map[String, Any]) {
+    def ---(from: ScalaVertex) = SemiEdge(from, properties("label").asInstanceOf[String], properties - "label")
+  }
+
   implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
     def ---(from: ScalaVertex) = {
       val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
