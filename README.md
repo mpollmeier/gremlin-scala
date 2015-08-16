@@ -14,7 +14,7 @@ Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-ex
 * Typing `projects` shows the following project structure where `*root` is the current project 
 ```
 > projects
-[info] In file:/Users/daniel/IdeaProjects/gremlin-scala/
+[info] In file:/Projects/gremlin-scala/
 [info]     gremlin-scala
 [info]     macros
 [info]   * root
