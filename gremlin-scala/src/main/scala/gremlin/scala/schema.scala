@@ -19,19 +19,7 @@ object schema {
 
   object Label extends Atom(T.label.name)
 
-  object Id extends Atom(T.id.name)
-
-  object Atom {
-    def apply(p: (String, Any)) = {
-      val label = T.label.name
-      val id = T.id.name
-      p._1 match {
-        case `label` => Label
-        case `id` => Id
-        case a: String => Key(a)
-      }
-    }
-  }
+  object ID extends Atom(T.id.name)
 
   implicit class AtomValue(p: (String, Any)) {
     def value[A] = p._2.asInstanceOf[A]

@@ -53,9 +53,16 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def addEdge(label: String,
               inVertex: ScalaVertex,
               properties: Map[String, Any] = Map.empty): ScalaEdge = {
-    val e = vertex.addEdge(label, inVertex.vertex).asScala
-    e.setProperties(properties)
-    e
+    vertex.addEdge(label, inVertex.vertex, properties.toSeq.flatMap {
+      case (k, v) =>
+        val label = T.label.name
+        val id = T.id.name
+        k match {
+          case `label` => Seq(T.label, v.asInstanceOf[AnyRef])
+          case `id` => Seq(T.id, v.asInstanceOf[AnyRef])
+          case _ => Seq(k, v.asInstanceOf[AnyRef])
+        }
+    }: _*)
   }
 
   def addEdge[P <: Product : Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
@@ -76,7 +83,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     SemiEdge(this, label, properties.toMap)
 
   def ---(properties: Map[String, Any]) =
-    SemiEdge(this, properties("label").asInstanceOf[String], properties.toMap)
+    SemiEdge(this, properties("label").asInstanceOf[String], properties)
 
   def ---[P <: Product : Marshallable](cc: P) = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)

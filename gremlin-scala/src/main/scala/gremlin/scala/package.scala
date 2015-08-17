@@ -5,6 +5,7 @@ import java.util.function.{Function ⇒ JFunction, Predicate ⇒ JPredicate, BiP
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.structure
 import shapeless._
 import _root_.scala.language.implicitConversions
 
@@ -108,7 +109,7 @@ package object scala {
   }
 
   implicit class SemiEdgeMapFunctions(properties: Map[String, Any]) {
-    def ---(from: ScalaVertex) = SemiEdge(from, properties("label").asInstanceOf[String], properties - "label")
+    def ---(from: ScalaVertex) = SemiEdge(from, properties("label").asInstanceOf[String], properties)
   }
 
   implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
@@ -116,11 +117,5 @@ package object scala {
       val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
       SemiEdge(from, label, properties)
     }
-  }
-  
-  implicit class ScalaGraphVertexFunctions[T <: structure.Graph](g: ScalaGraph[T]) {
-    def ++(label: String, properties: (String, Any)*): ScalaVertex = g.addVertex(label, properties.toMap)
-
-    def ++(properties: (String, Any)*): ScalaVertex = g.addVertex(properties.toMap)
   }
 }

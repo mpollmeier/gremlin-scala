@@ -10,10 +10,10 @@ class SchemaSpec extends FunSpec with Matchers{
   describe("a schema defines a sequence of Atoms that apply a value to build a Tuple2 and") {
     it("has important default atoms") {
       Label("software") shouldBe "label" -> "software"
-      Id(1) shouldBe "id" -> 1
+      ID(1) shouldBe "id" -> 1
 
       Label("software") shouldBe Label.key -> "software"
-      Id(1) shouldBe Id.key -> 1
+      ID(1) shouldBe ID.key -> 1
     }
 
     it("has extension points to add new Atom definitions") {

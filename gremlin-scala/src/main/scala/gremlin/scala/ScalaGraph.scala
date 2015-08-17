@@ -11,13 +11,14 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def addVertex(label: String): ScalaVertex = graph.addVertex(label)
 
   def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    graph.addVertex(properties.toSeq.flatMap { p =>
+    graph.addVertex(properties.toSeq.flatMap {
+      case (k, v) =>
       val label = T.label.name
       val id = T.id.name
-      p._1 match {
-        case `label` => Seq(T.label, p._2.asInstanceOf[AnyRef])
-        case `id` => Seq(T.id, p._2.asInstanceOf[AnyRef])
-        case _ => Seq(p._1, p._2.asInstanceOf[AnyRef])
+      k match {
+        case `label` => Seq(T.label, v.asInstanceOf[AnyRef])
+        case `id` => Seq(T.id, v.asInstanceOf[AnyRef])
+        case _ => Seq(k, v.asInstanceOf[AnyRef])
       }
     }: _*)
   }
