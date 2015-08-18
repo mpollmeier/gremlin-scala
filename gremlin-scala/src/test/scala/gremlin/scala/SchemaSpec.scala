@@ -64,10 +64,10 @@ class SchemaSpec extends FunSpec with Matchers{
     it("add bidirectional edge with syntax sugar") {
       val g = TinkerGraph.open.asScala
 
-      val paris = g + Paris.value[String]
-      val london = g + London.value[String]
+      val paris = g + Paris.value
+      val london = g + London.value
 
-      val (edgeParisToLondon, edgeLondonToParis) = paris <-- EuroStar.value[String] --> london
+      val (edgeParisToLondon, edgeLondonToParis) = paris <-- EuroStar.value --> london
 
       edgeParisToLondon.asJava.inVertex shouldBe london.asJava
       edgeParisToLondon.asJava.outVertex shouldBe paris.asJava
@@ -79,10 +79,10 @@ class SchemaSpec extends FunSpec with Matchers{
     it("add edge with properties using syntax sugar") {
       val g = TinkerGraph.open.asScala
 
-      val paris = g + Paris.value[String]
-      val london = g + London.value[String]
+      val paris = g + Paris.value
+      val london = g + London.value
 
-      val e = paris --- Map(EuroStar, Type("WDiEdge"), Weight(2)) --> london
+      val e = paris --- (EuroStar, Type("WDiEdge"), Weight(2)) --> london
 
       e.asJava.inVertex shouldBe london.asJava
       e.asJava.outVertex shouldBe paris.asJava
@@ -93,10 +93,10 @@ class SchemaSpec extends FunSpec with Matchers{
     it("to add left edge using syntax sugar") {
       val g = TinkerGraph.open.asScala
 
-      val paris = g + Paris.value[String]
-      val london = g + London.value[String]
+      val paris = g + Paris.value
+      val london = g + London.value
 
-      val e = paris <-- Map(EuroStar, Type("WDiEdge"), Weight(2)) --- london
+      val e = paris <-- (EuroStar, Type("WDiEdge"), Weight(2)) --- london
 
       e.asJava.inVertex shouldBe paris.asJava
       e.asJava.outVertex shouldBe london.asJava

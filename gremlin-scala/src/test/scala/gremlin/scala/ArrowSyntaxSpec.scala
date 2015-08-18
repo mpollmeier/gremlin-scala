@@ -58,7 +58,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- ("eurostar", Map("type" -> "WDiEdge", "weight" -> 2)) --> london
+    val e = paris --- ("label" -> "eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
 
     e.asJava.inVertex shouldBe london.asJava
     e.asJava.outVertex shouldBe paris.asJava
@@ -72,11 +72,10 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris <-- ("eurostar", Map("type" -> "WDiEdge", "weight" -> 2)) --- london
+    val e = paris <-- ("label" -> "eurostar", "type" -> "WDiEdge") --- london
 
     e.asJava.inVertex shouldBe paris.asJava
     e.asJava.outVertex shouldBe london.asJava
     e.value("type") shouldBe Some("WDiEdge")
-    e.value("weight") shouldBe Some(2)
   }
 }

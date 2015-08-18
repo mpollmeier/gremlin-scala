@@ -97,25 +97,16 @@ package object scala {
 
   // Arrow syntax implicits
   implicit class SemiEdgeFunctions(label: String) {
-    def ---(from: ScalaVertex) = SemiEdge(from, label)
+    def ---(from: ScalaVertex) = SemiEdge(from, Map("label" -> label))
 
-    def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
+    def -->(right: ScalaVertex) = SemiDoubleEdge(right, Map("label" -> label))
   }
 
-  implicit class SemiEdgePropertiesFunctions(labelProperties: (String, Map[String, Any])) {
-    private val (label, properties) = labelProperties
-
-    def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
-  }
-
-  implicit class SemiEdgeMapFunctions(properties: Map[String, Any]) {
-    def ---(from: ScalaVertex) = SemiEdge(from, properties("label").asInstanceOf[String], properties)
-  }
-
-  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
-    def ---(from: ScalaVertex) = {
-      val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiEdge(from, label, properties)
-    }
+  implicit class SemiEdgeProductFunctions(p: Product) {
+    def ---(from: ScalaVertex) = SemiEdge(from, p.productIterator.foldLeft(Map[String, Any]()) {
+      (m, a) => a match {
+        case (k, v) => m.updated(k.asInstanceOf[String], v)
+      }
+    })
   }
 }
