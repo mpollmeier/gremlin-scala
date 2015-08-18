@@ -12,6 +12,13 @@ case class CCWithoutLabelOrId(s: String,
 case class CCWithOptionId(s: String,
                           @id id: Option[Int])
 
+case class CCWithLabel(s: String,
+                       l: Long,
+                       o: Option[String],
+                       seq: Seq[String],
+                       map: Map[String, String],
+                       nested: NestedClass)
+
 @label("the label")
 case class CCWithLabelAndId(s: String,
                             @id id: Int,

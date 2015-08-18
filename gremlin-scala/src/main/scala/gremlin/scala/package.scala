@@ -1,13 +1,16 @@
 package gremlin
 
-import java.util.function.{Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate}
+import java.util.function.{BiPredicate, Function => JFunction, Predicate => JPredicate}
 
-import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
 import shapeless._
+
 import _root_.scala.language.implicitConversions
+import _root_.scala.reflect.runtime.universe._
+import _root_.scala.reflect.macros.blackbox
+
 
 package object scala {
   type Vertex = structure.Vertex
@@ -112,4 +115,13 @@ package object scala {
 
     def ---(from: ScalaVertex) = SemiEdge(from, properties)
   }
+
+/*
+  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
+    def ---(from: ScalaVertex) = {
+      val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiEdge(from, properties.updated("label", label))
+    }
+  }
+*/
 }
