@@ -46,10 +46,10 @@ class SchemaSpec extends FunSpec with Matchers{
     it("to create a Vertex in a Graph") {
       val g = TinkerGraph.open.asScala
 
-      val v0 = g + Map(Name("blueprints"), Software, Created(2010))
-      val v1 = g + Map(Created(2009), Name("gremlin"), Software)
-      val v2 = g + Map(Software, Name("gremlinScala"))
-      val v3 = g + Map(Name("mpollmeier"), Person)
+      val v0 = g + (Name("blueprints"), Software, Created(2010))
+      val v1 = g + (Created(2009), Name("gremlin"), Software)
+      val v2 = g + (Software, Name("gremlinScala"))
+      val v3 = g + (Name("mpollmeier"), Person)
 
       g.V.toList().size shouldBe 4
       g.V.hasLabel(Software.value).toList().size shouldBe 3

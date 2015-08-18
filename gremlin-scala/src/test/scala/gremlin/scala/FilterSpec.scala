@@ -20,10 +20,10 @@ class FilterSpec extends TestBase {
     def label(n: String) = "label" -> n
 
     val g = TinkerGraph.open.asScala
-    g + Map(label("software"), name("blueprints"), created(2010))
-    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + Map(label("software"), name("gremlin"), created(2009)))
-    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + Map(label("software"), name("gremlinScala")))
-    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + Map(label("person"), name("mpollmeier")))
+    g + (label("software"), name("blueprints"), created(2010))
+    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + (label("software"), name("gremlin"), created(2009)))
+    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + (label("software"), name("gremlinScala")))
+    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + (label("person"), name("mpollmeier")))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3

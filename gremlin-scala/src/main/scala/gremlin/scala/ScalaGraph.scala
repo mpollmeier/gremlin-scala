@@ -42,9 +42,7 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def +(label: String): ScalaVertex = addVertex(label)
 
-  def +(properties: Map[String, Any]): ScalaVertex = addVertex(properties)
-
-  def +(label: String, properties: Map[String, Any]): ScalaVertex = addVertex(label, properties)
+  def +(properties: (String, Any)*): ScalaVertex = addVertex(properties.toMap)
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
