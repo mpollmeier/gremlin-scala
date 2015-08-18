@@ -96,12 +96,10 @@ class SchemaSpec extends FunSpec with Matchers{
       val paris = g + Paris.value
       val london = g + London.value
 
-      val e = paris <-- (EuroStar, Type("WDiEdge"), Weight(2)) --- london
+      val e = paris <-- EuroStar --- london
 
       e.asJava.inVertex shouldBe paris.asJava
       e.asJava.outVertex shouldBe london.asJava
-      e.value(Type.key) shouldBe Some("WDiEdge")
-      e.value(Weight.key) shouldBe Some(2)
 
       g.asJava.close()
     }

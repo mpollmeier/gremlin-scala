@@ -103,10 +103,13 @@ package object scala {
   }
 
   implicit class SemiEdgeProductFunctions(p: Product) {
-    def ---(from: ScalaVertex) = SemiEdge(from, p.productIterator.foldLeft(Map[String, Any]()) {
+    lazy val properties = p.productIterator.foldLeft(Map[String, Any]()) {
       (m, a) => a match {
         case (k, v) => m.updated(k.asInstanceOf[String], v)
+        case b: String => m.updated(b, p.productElement(1))
       }
-    })
+    }
+
+    def ---(from: ScalaVertex) = SemiEdge(from, properties)
   }
 }
