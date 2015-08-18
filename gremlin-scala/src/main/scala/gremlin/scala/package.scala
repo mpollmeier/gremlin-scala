@@ -9,7 +9,6 @@ import shapeless._
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.reflect.runtime.universe._
-import _root_.scala.reflect.macros.blackbox
 
 
 package object scala {
@@ -105,6 +104,32 @@ package object scala {
     def -->(right: ScalaVertex) = SemiDoubleEdge(right, Map("label" -> label))
   }
 
+  // not sure the best way to implement this!!!
+  implicit class SemiEdgeProductFunctions[A <: Product](p: A)(implicit tag: TypeTag[A]) {
+    // could we do something with the type tag determine what to do?
+    /*
+      (p: A) could be:
+        (String, Any) = Tuple2
+        ((String, Any), (String, Any)) = Tuple2
+        case class which is also a Product
+    */
+    lazy val properties =
+      if(p.isInstanceOf[(_, _)]) {
+        if(p.productElement(0).isInstanceOf[(_, _)])
+          p.productIterator.foldLeft(Map.empty[String, Any]) {
+            (m, a) => a match {
+              case (k,v) => m.updated(k.asInstanceOf[String], v)
+            }
+          }
+        else Map(p.asInstanceOf[(String, Any)])
+      }
+      else ??? // this is the case class
+
+    def ---(from: ScalaVertex) = SemiEdge(from, properties)
+  }
+
+/*
+  // This is not best because if the Product is a
   implicit class SemiEdgeProductFunctions(p: Product) {
     lazy val properties = p.productIterator.foldLeft(Map[String, Any]()) {
       (m, a) => a match {
@@ -115,6 +140,7 @@ package object scala {
 
     def ---(from: ScalaVertex) = SemiEdge(from, properties)
   }
+*/
 
 /*
   implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
