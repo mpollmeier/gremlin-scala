@@ -90,13 +90,41 @@ class SchemaSpec extends FunSpec with Matchers{
       e.value(Weight.key) shouldBe Some(2)
     }
 
-    it("to add left edge using syntax sugar") {
+    it("to add left edge using syntax sugar with just Label") {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris.value
       val london = g + London.value
 
       val e = paris <-- EuroStar --- london
+
+      e.asJava.inVertex shouldBe paris.asJava
+      e.asJava.outVertex shouldBe london.asJava
+
+      g.asJava.close()
+    }
+
+    it("to add left edge using syntax sugar with Label and Name") {
+      val g = TinkerGraph.open.asScala
+
+      val paris = g + Paris.value
+      val london = g + London.value
+
+      val e = paris <-- (EuroStar, Name("test")) --- london
+
+      e.asJava.inVertex shouldBe paris.asJava
+      e.asJava.outVertex shouldBe london.asJava
+
+      g.asJava.close()
+    }
+
+    it("to add left edge using syntax sugar with Label, Weight and Name") {
+      val g = TinkerGraph.open.asScala
+
+      val paris = g + Paris.value
+      val london = g + London.value
+
+      val e = paris <-- (EuroStar, Weight(99), Name("test")) --- london
 
       e.asJava.inVertex shouldBe paris.asJava
       e.asJava.outVertex shouldBe london.asJava

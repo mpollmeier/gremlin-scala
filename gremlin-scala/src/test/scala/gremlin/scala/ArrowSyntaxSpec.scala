@@ -37,7 +37,6 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.asJava.outVertex shouldBe paris.asJava
   }
 
-/*
   it("add bidirectional edge with case class") {
     val graph = TinkerGraph.open.asScala
 
@@ -59,7 +58,6 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e1.asJava.inVertex shouldBe paris.asJava
     e1.asJava.outVertex shouldBe london.asJava
   }
-*/
 
   ignore("add left edge with case class") {
     val graph = TinkerGraph.open.asScala

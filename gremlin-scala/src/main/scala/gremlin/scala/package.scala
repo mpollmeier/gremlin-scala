@@ -104,50 +104,30 @@ package object scala {
     def -->(right: ScalaVertex) = SemiDoubleEdge(right, Map("label" -> label))
   }
 
-  // not sure the best way to implement this!!!
   implicit class SemiEdgeProductFunctions[A <: Product](p: A)(implicit tag: TypeTag[A]) {
-    // could we do something with the type tag determine what to do?
-    /*
-      (p: A) could be:
-        (String, Any) = Tuple2
-        ((String, Any), (String, Any)) = Tuple2
-        case class which is also a Product
-    */
-    lazy val properties =
-      if(p.isInstanceOf[(_, _)]) {
-        if(p.productElement(0).isInstanceOf[(_, _)])
-          p.productIterator.foldLeft(Map.empty[String, Any]) {
-            (m, a) => a match {
-              case (k,v) => m.updated(k.asInstanceOf[String], v)
-            }
-          }
-        else Map(p.asInstanceOf[(String, Any)])
+    private val tupleName = "Tuple" + p.productArity
+    private lazy val properties = tag.tpe.typeSymbol.name.toString match {
+      case `tupleName` if p.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String") =>
+        Map(p.asInstanceOf[(String, Any)])
+      case `tupleName` => p.productIterator.foldLeft(Map.empty[String, Any]) {
+        (m, a) => a match {
+          case (k,v) => m.updated(k.asInstanceOf[String], v)
+        }
       }
-      else ??? // this is the case class
-
-    def ---(from: ScalaVertex) = SemiEdge(from, properties)
-  }
-
-/*
-  // This is not best because if the Product is a
-  implicit class SemiEdgeProductFunctions(p: Product) {
-    lazy val properties = p.productIterator.foldLeft(Map[String, Any]()) {
-      (m, a) => a match {
-        case (k, v) => m.updated(k.asInstanceOf[String], v)
-        case b: String => m.updated(b, p.productElement(1))
-      }
+      case _ =>
+        // This is most likely a case class - but the following does not work
+//        val (_, label, props) = implicitly[Marshallable[A]].fromCC(p)
+//        props.updated("label", label)
+        ???
     }
 
     def ---(from: ScalaVertex) = SemiEdge(from, properties)
   }
-*/
 
-/*
   implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
-    def ---(from: ScalaVertex) = {
-      val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiEdge(from, properties.updated("label", label))
+    def -->(from: ScalaVertex) = {
+      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiDoubleEdge(from, properties.updated("label", label))
     }
   }
-*/
 }
