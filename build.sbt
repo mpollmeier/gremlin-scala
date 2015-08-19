@@ -15,6 +15,7 @@ val commonSettings = Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion,
       "com.novocode" % "junit-interface" % "0.11" % "test->default",
       "com.chuusai" %% "shapeless" % "2.2.5",
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.4", //just specified to eliminate sbt warnings
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
       "junit" % "junit" % "4.12" % Test,
       "org.scalatest" %% "scalatest" % "2.2.5" % Test
