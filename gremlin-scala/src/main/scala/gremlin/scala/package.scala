@@ -1,6 +1,6 @@
 package gremlin
 
-import java.util.function.{BiPredicate, Function => JFunction, Predicate => JPredicate}
+import java.util.function.{ BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate }
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -9,7 +9,6 @@ import shapeless._
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.reflect.runtime.universe._
-
 
 package object scala {
   type Vertex = structure.Vertex
@@ -87,47 +86,46 @@ package object scala {
     /**
      * Load a vertex values into a case class
      */
-    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
      * Load a edge values into a case class
      */
-    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
   }
 
   // Arrow syntax implicits
   implicit class SemiEdgeFunctions(label: String) {
-    def ---(from: ScalaVertex) = SemiEdge(from, Map("label" -> label))
+    def ---(from: ScalaVertex) = SemiEdge(from, label)
 
-    def -->(right: ScalaVertex) = SemiDoubleEdge(right, Map("label" -> label))
+    def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
   }
 
-  implicit class SemiEdgeProductFunctions[A <: Product](p: A)(implicit tag: TypeTag[A]) {
-    private val tupleName = "Tuple" + p.productArity
-    private lazy val properties = tag.tpe.typeSymbol.name.toString match {
-      case `tupleName` if p.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String") =>
-        Map(p.asInstanceOf[(String, Any)])
-      case `tupleName` => p.productIterator.foldLeft(Map.empty[String, Any]) {
-        (m, a) => a match {
-          case (k,v) => m.updated(k.asInstanceOf[String], v)
+  implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A))(implicit tag: TypeTag[A]) {
+    private val label = t._1
+    private lazy val properties =
+      if (t._2.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String"))
+        Map(t._2.asInstanceOf[(String, Any)])
+      else t._2.productIterator.foldLeft(Map.empty[String, Any]) { (m, a) ⇒
+        a match {
+          case (k, v) ⇒ m.updated(k.asInstanceOf[String], v)
         }
       }
-      case _ =>
-        // This is most likely a case class - but the following does not work
-//        val (_, label, props) = implicitly[Marshallable[A]].fromCC(p)
-//        props.updated("label", label)
-        ???
-    }
 
-    def ---(from: ScalaVertex) = SemiEdge(from, properties)
+    def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
   }
 
-  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
+  implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
+    def ---(from: ScalaVertex) = {
+      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiEdge(from, label, properties)
+    }
+
     def -->(from: ScalaVertex) = {
       val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiDoubleEdge(from, properties.updated("label", label))
+      SemiDoubleEdge(from, label, properties)
     }
   }
 }

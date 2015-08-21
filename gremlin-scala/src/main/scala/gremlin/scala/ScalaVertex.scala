@@ -77,13 +77,13 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def <--(de: SemiDoubleEdge): (ScalaEdge, ScalaEdge) =
     addEdge(de.label, de.right, de.properties) -> de.right.addEdge(de.label, this, de.properties)
 
-  def ---(label: String) = SemiEdge(this, Map("label" -> label))
+  def ---(label: String) = SemiEdge(this, label)
 
-  def ---(properties: (String, Any)*) = SemiEdge(this, properties.toMap)
+  def ---(label: String, properties: (String, Any)*) = SemiEdge(this, label, properties.toMap)
 
   def ---[P <: Product : Marshallable](cc: P) = {
     val (_, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
-    SemiEdge(this, properties.updated("label", label))
+    SemiEdge(this, label, properties)
   }
 
   def start() = GremlinScala[Vertex, HNil](__.__(vertex))

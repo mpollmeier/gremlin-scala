@@ -59,7 +59,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e1.asJava.outVertex shouldBe london.asJava
   }
 
-  ignore("add left edge with case class") {
+  it("add left edge with case class") {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -100,7 +100,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- ("label" -> "eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
+    val e = paris --- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
 
     e.asJava.inVertex shouldBe london.asJava
     e.asJava.outVertex shouldBe paris.asJava
@@ -114,7 +114,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris <-- ("label" -> "eurostar", "type" -> "WDiEdge") --- london
+    val e = paris <-- ("eurostar", "type" -> "WDiEdge") --- london
 
     e.asJava.inVertex shouldBe paris.asJava
     e.asJava.outVertex shouldBe london.asJava

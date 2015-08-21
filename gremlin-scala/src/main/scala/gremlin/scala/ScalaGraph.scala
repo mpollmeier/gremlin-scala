@@ -10,17 +10,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def addVertex(label: String): ScalaVertex = graph.addVertex(label)
 
-  def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    graph.addVertex(properties.toSeq.flatMap {
-      case (k, v) =>
-      val label = T.label.name
-      val id = T.id.name
-      k match {
-        case `label` => Seq(T.label, v.asInstanceOf[AnyRef])
-        case `id` => Seq(T.id, v.asInstanceOf[AnyRef])
-        case _ => Seq(k, v.asInstanceOf[AnyRef])
-      }
-    }: _*)
+  def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {
+    graph.addVertex(label).setProperties(properties.toMap)
   }
 
   def addVertex(label: String, properties: Map[String, Any]): ScalaVertex =
@@ -33,16 +24,16 @@ case class ScalaGraph[G <: Graph](graph: G) {
    * @tparam P
    * @return
    */
-  def addVertex[P <: Product : Marshallable](cc: P): ScalaVertex = {
+  def addVertex[P <: Product: Marshallable](cc: P): ScalaVertex = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ (T.label +: label +: params): _*)
   }
 
   def +(label: String): ScalaVertex = addVertex(label)
 
-  def +(properties: (String, Any)*): ScalaVertex = addVertex(properties.toMap)
+  def +(label: String, properties: (String, Any)*): ScalaVertex = addVertex(label, properties.toMap)
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =

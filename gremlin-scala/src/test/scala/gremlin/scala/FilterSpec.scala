@@ -17,7 +17,7 @@ class FilterSpec extends TestBase {
   it("has - sugar") {
     def name(n: String) = "name" -> n
     def created(n: Int) = "created" -> n
-    def label(n: String) = "label" -> n
+    def label(n: String) = n
 
     val g = TinkerGraph.open.asScala
     g + (label("software"), name("blueprints"), created(2010))
