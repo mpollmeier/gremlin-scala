@@ -53,16 +53,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def addEdge(label: String,
               inVertex: ScalaVertex,
               properties: Map[String, Any] = Map.empty): ScalaEdge = {
-    vertex.addEdge(label, inVertex.vertex, properties.toSeq.flatMap {
-      case (k, v) =>
-        val label = T.label.name
-        val id = T.id.name
-        k match {
-          case `label` => Seq(T.label, v.asInstanceOf[AnyRef])
-          case `id` => Seq(T.id, v.asInstanceOf[AnyRef])
-          case _ => Seq(k, v.asInstanceOf[AnyRef])
-        }
-    }: _*)
+    vertex.addEdge(label, inVertex.vertex).asScala.setProperties(properties)
   }
 
   def addEdge[P <: Product : Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
