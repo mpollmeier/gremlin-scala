@@ -4,31 +4,32 @@ import java.time.LocalDateTime
 
 import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
+import collection.JavaConversions._
 
-class SchemaSpec extends FunSpec with Matchers{
+class SchemaSpec extends FunSpec with Matchers {
   describe("a schema defines a sequence of Atoms that apply a value to build a Tuple2 and") {
     it("has important default atoms") {
-      Label("software") shouldBe "label" -> "software"
-      ID(1) shouldBe "id" -> 1
+      Label("software") shouldBe "label" → "software"
+      ID(1) shouldBe "id" → 1
 
-      Label("software") shouldBe Label.key -> "software"
-      ID(1) shouldBe ID.key -> 1
+      Label("software") shouldBe Label.key → "software"
+      ID(1) shouldBe ID.key → 1
     }
 
     it("has extension points to add new Atom definitions") {
       object Created extends Key[LocalDateTime]("created")
       val now = LocalDateTime.now()
-      Created(now) shouldBe "created" -> now
-      Created(now) shouldBe Created.key -> now
+      Created(now) shouldBe "created" → now
+      Created(now) shouldBe Created.key → now
 
       object Name extends Key[String]("name")
-      Name("Daniel") shouldBe "name" -> "Daniel"
-      Name("Daniel") shouldBe Name.key -> "Daniel"
+      Name("Daniel") shouldBe "name" → "Daniel"
+      Name("Daniel") shouldBe Name.key → "Daniel"
 
       val Software = Label("software")
-      Software shouldBe Label.key -> "software"
-      Software shouldBe Label.key -> Software.value
+      Software shouldBe Label.key → "software"
+      Software shouldBe Label.key → Software.value
     }
   }
 
