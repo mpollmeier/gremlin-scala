@@ -9,16 +9,63 @@ A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Sca
 ### Getting started
 Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-examples) and start with a working example for the graph database of your choice.
 
+### Using Scala Console within SBT
+* From the root directory where you cloned the project type `sbt` to start an SBT session
+* Typing `projects` shows the following project structure where `*root` is the current project 
+```
+> projects
+[info] In file:/Projects/gremlin-scala/
+[info]     gremlin-scala
+[info]     macros
+[info]   * root
+>
+```
+* Next, change to the gremlin-scala project by typing `project gremlin-scala`
+* Finally, to test out the API in a REPL type `console` 
+
 ## Benefits
 * Scala friendly function signatures, aiming to be close to the standard collection library
+* Nicer DSL e.g. to create vertices and edges
 * You can use standard Scala functions instead of having to worry about how to implement `java.util.function.BiPredicate`
 * Nothing is hidden away, you can always easily access the Gremlin-Java objects if needed. Examples include accessing graph db specifics things like indexes, or using a step that hasn't been implemented in Gremlin-Scala yet
 * Minimal overhead - only allocates additional instances if absolutely necessary
+
+### Creating vertices and edges
+
+```scala
+import gremlin.scala._
+import gremlin.scala.schema._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+val graph = TinkerGraph.open.asScala
+
+// create labelled vertex
+val paris = graph + "Paris"
+
+// create vertex with typed properties
+object Founded extends Key[String]("founded")
+val london = graph + ("London", Founded("43 AD"))
+
+// create labelled edges 
+paris --- "OneWayRoad" --> london
+paris <-- "OtherWayAround" --- london
+
+// create labelled bidirectional edge
+paris <-- "Eurostar" --> london
+
+// create edge with typed properties
+object Name extends Key[String]("name")
+paris <-- ("EuroStar", Name("TrainName")) --- london
+
+```
+
+Many thanks to @dkrieg for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/src/test/scala/gremlin/scala/SchemaSpec.scala)
 
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
 
 ```scala
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 val graph = TinkerGraph.open.asScala
 graph.V.outE.outE //does _not_ compile
 graph.V.outE.inV  //compiles
@@ -32,6 +79,8 @@ Gremlin-Scala has support for full type safety in a traversal. You can label any
 For example:
 
 ```scala
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 val graph = TinkerFactory.createModern.asScala
 graph.V.as("a")
   .out.as("b")
@@ -47,11 +96,12 @@ In comparison: Gremlin-Java and Gremlin-Groovy just return a `List[Any]` and you
 You can save and load case classes as a vertex - this is still experimental but pretty cool:
 
 ```scala
-  import gremlin.scala._
-  val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
-  val gs = TinkerGraph.open.asScala
-  val v = gs.save(example)
-  v.start.load[ExampleClass].head shouldBe example
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
+val gs = TinkerGraph.open.asScala
+val v = gs.save(example)
+v.start.load[ExampleClass].head shouldBe example
 ```
 
 Note that you can also use Options as the example shows.

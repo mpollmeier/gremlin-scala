@@ -1,12 +1,14 @@
 package gremlin
 
-import java.util.function.{Function ⇒ JFunction, Predicate ⇒ JPredicate, BiPredicate}
+import java.util.function.{ BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate }
 
-import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.structure
 import shapeless._
+
 import _root_.scala.language.implicitConversions
+import _root_.scala.reflect.runtime.universe._
 
 package object scala {
   type Vertex = structure.Vertex
@@ -84,14 +86,14 @@ package object scala {
     /**
      * Load a vertex values into a case class
      */
-    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
      * Load a edge values into a case class
      */
-    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
   }
 
   // Arrow syntax implicits
@@ -101,22 +103,29 @@ package object scala {
     def -->(right: ScalaVertex) = SemiDoubleEdge(right, label)
   }
 
-  implicit class SemiEdgePropertiesFunctions(labelProperties: (String, Map[String, Any])) {
-    private val (label, properties) = labelProperties
+  implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A))(implicit tag: TypeTag[A]) {
+    private val label = t._1
+    private lazy val properties =
+      if (t._2.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String"))
+        Map(t._2.asInstanceOf[(String, Any)])
+      else t._2.productIterator.foldLeft(Map.empty[String, Any]) { (m, a) ⇒
+        a match {
+          case (k, v) ⇒ m.updated(k.asInstanceOf[String], v)
+        }
+      }
 
     def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
   }
 
-  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
+  implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
     def ---(from: ScalaVertex) = {
-      val (id, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
       SemiEdge(from, label, properties)
     }
-  }
-  
-  implicit class ScalaGraphVertexFunctions[T <: structure.Graph](g: ScalaGraph[T]) {
-    def ++(label: String, properties: (String, Any)*): ScalaVertex = g.addVertex(label, properties.toMap)
 
-    def ++(properties: (String, Any)*): ScalaVertex = g.addVertex(properties.toMap)
+    def -->(from: ScalaVertex) = {
+      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
+      SemiDoubleEdge(from, label, properties)
+    }
   }
 }

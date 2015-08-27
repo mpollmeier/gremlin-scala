@@ -37,6 +37,48 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.asJava.outVertex shouldBe paris.asJava
   }
 
+  it("add bidirectional edge with case class") {
+    val graph = TinkerGraph.open.asScala
+
+    val paris = graph.addVertex("Paris")
+    val london = graph.addVertex("London")
+
+    val (e0, e1) = paris <-- CCWithLabel(
+      "some string",
+      Long.MaxValue,
+      Some("option type"),
+      Seq("test1", "test2"),
+      Map("key1" -> "value1", "key2" -> "value2"),
+      NestedClass("nested")
+    ) --> london
+
+    e0.asJava.inVertex shouldBe london.asJava
+    e0.asJava.outVertex shouldBe paris.asJava
+
+    e1.asJava.inVertex shouldBe paris.asJava
+    e1.asJava.outVertex shouldBe london.asJava
+  }
+
+  it("add left edge with case class") {
+    val graph = TinkerGraph.open.asScala
+
+    val paris = graph.addVertex("Paris")
+    val london = graph.addVertex("London")
+
+    val e = paris <-- CCWithLabelAndId(
+      "some string",
+      Int.MaxValue,
+      Long.MaxValue,
+      Some("option type"),
+      Seq("test1", "test2"),
+      Map("key1" -> "value1", "key2" -> "value2"),
+      NestedClass("nested")
+    ) --- london
+
+    e.asJava.inVertex shouldBe paris.asJava
+    e.asJava.outVertex shouldBe london.asJava
+  }
+
   it("add bidirectional edge with syntax sugar") {
     val graph = TinkerGraph.open.asScala
 
@@ -58,7 +100,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- ("eurostar", Map("type" -> "WDiEdge", "weight" -> 2)) --> london
+    val e = paris --- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
 
     e.asJava.inVertex shouldBe london.asJava
     e.asJava.outVertex shouldBe paris.asJava
@@ -72,11 +114,10 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris <-- ("eurostar", Map("type" -> "WDiEdge", "weight" -> 2)) --- london
+    val e = paris <-- ("eurostar", "type" -> "WDiEdge") --- london
 
     e.asJava.inVertex shouldBe paris.asJava
     e.asJava.outVertex shouldBe london.asJava
     e.value("type") shouldBe Some("WDiEdge")
-    e.value("weight") shouldBe Some(2)
   }
 }

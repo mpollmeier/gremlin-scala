@@ -17,12 +17,13 @@ class FilterSpec extends TestBase {
   it("has - sugar") {
     def name(n: String) = "name" -> n
     def created(n: Int) = "created" -> n
+    def label(n: String) = n
 
     val g = TinkerGraph.open.asScala
-    g + ("software", Map(name("blueprints"), created(2010)))
-    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlin"), created(2009))))
-    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + ("software", Map(name("gremlinScala"))))
-    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + ("person", Map(name("mpollmeier"))))
+    g + (label("software"), name("blueprints"), created(2010))
+    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + (label("software"), name("gremlin"), created(2009)))
+    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + (label("software"), name("gremlinScala")))
+    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + (label("person"), name("mpollmeier")))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3
@@ -31,6 +32,8 @@ class FilterSpec extends TestBase {
     g.E.toList().size shouldBe 3
     g.E.hasLabel("dependsOn").toList().size shouldBe 2
     g.E.hasLabel("createdBy").toList().size shouldBe 1
+
+    g.asJava.close()
   }
 
   it("hasNot") {

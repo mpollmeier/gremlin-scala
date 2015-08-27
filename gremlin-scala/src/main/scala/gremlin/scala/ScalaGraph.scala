@@ -6,21 +6,16 @@ import shapeless._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
-  def addVertex() = ScalaVertex(graph.addVertex())
+  def addVertex(): ScalaVertex = graph.addVertex()
 
-  def addVertex(label: String) = ScalaVertex(graph.addVertex(label))
+  def addVertex(label: String): ScalaVertex = graph.addVertex(label)
 
-  def addVertex(properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex()
-    v.setProperties(properties)
-    v
+  def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {
+    graph.addVertex(label).setProperties(properties.toMap)
   }
 
-  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex = {
-    val v = addVertex(label)
-    v.setProperties(properties)
-    v
-  }
+  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex =
+    addVertex(label).setProperties(properties)
 
   /**
    * Save an object's values into a new vertex
@@ -29,18 +24,16 @@ case class ScalaGraph[G <: Graph](graph: G) {
    * @tparam P
    * @return
    */
-  def addVertex[P <: Product : Marshallable](cc: P): ScalaVertex = {
+  def addVertex[P <: Product: Marshallable](cc: P): ScalaVertex = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ (T.label +: label +: params): _*)
   }
 
   def +(label: String): ScalaVertex = addVertex(label)
 
-  def +(properties: Map[String, Any]): ScalaVertex = addVertex(properties)
-
-  def +(label: String, properties: Map[String, Any]): ScalaVertex = addVertex(label, properties)
+  def +(label: String, properties: (String, Any)*): ScalaVertex = addVertex(label, properties.toMap)
 
   // get vertex by id
   def v(id: AnyRef): Option[ScalaVertex] =
