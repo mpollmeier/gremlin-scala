@@ -69,7 +69,7 @@ class MarshallerSpec extends FunSpec with Matchers {
     vl.valueMap should contain("nested" → example.nested)
   }
 
-  it("load a vertex into a case class") {
+  it("load a vertex into a case class - second example") {
     val graph = TinkerGraph.open.asScala
 
     val v = graph.addVertex(example)
