@@ -35,6 +35,15 @@ case class NestedClass(s: String)
 class NoneCaseClass(s: String)
 
 class MarshallerSpec extends FunSpec with Matchers {
+
+  case class Example(i: Int, s:Option[String])
+  it("load a vertex into a case class") {
+    val graph = TinkerGraph.open.asScala
+    val example = Example(Int.MaxValue, Some("optional value"))
+    val v = graph.addVertex(example)
+    v.toCC[Example] shouldBe example
+  }
+
   val example = CCWithLabelAndId(
     "some string",
     Int.MaxValue,

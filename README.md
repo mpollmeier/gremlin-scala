@@ -1,40 +1,39 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
 [![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=stable)](http://travis-ci.org/mpollmeier/gremlin-scala)
+ [![Join the chat at https://gitter.im/mpollmeier/gremlin-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mpollmeier/gremlin-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Gremlin-Scala for Apache Tinkerpop 3
 
-[![Join the chat at https://gitter.im/mpollmeier/gremlin-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mpollmeier/gremlin-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Scala. This is the current development branch for [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop). If you are looking for an earlier version check out the [2.x branch](https://github.com/mpollmeier/gremlin-scala/tree/2.x).
+A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Scala. This is the current development branch for [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop). The old version for Tinkerpop 2 is still in the [2.x branch](https://github.com/mpollmeier/gremlin-scala/tree/2.x).
+
+### Benefits
+* Scala friendly function signatures, aiming to be close to the standard collection library
+* Nicer DSL e.g. to create vertices and edges
+* You can use standard Scala functions instead of having to worry about how to implement things like `java.util.function.BiPredicate`
+* Nothing is hidden away, you can always easily access the Gremlin-Java objects if needed. Examples include accessing graph db specifics things like indexes, or using a step that hasn't been implemented in Gremlin-Scala yet
+* Minimal overhead - only allocates additional instances if absolutely necessary
 
 ### Getting started
-Just clone the [examples project](https://github.com/mpollmeier/gremlin-scala-examples) and start with a working example for the graph database of your choice.
+The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. 
 
-### Using Scala Console within SBT
-* From the root directory where you cloned the project type `sbt` to start an SBT session
-* Typing `projects` shows the following project structure where `*root` is the current project 
+### Using the sbt console
+* tl;dr: `sbt gremlin-scala/console`
+* start `sbt` in the root project
 ```
 > projects
-[info] In file:/Projects/gremlin-scala/
 [info]     gremlin-scala
 [info]     macros
 [info]   * root
 >
 ```
-* Next, change to the gremlin-scala project by typing `project gremlin-scala`
+* Next, change to the gremlin-scala project using `project gremlin-scala`
 * Finally, to test out the API in a REPL type `console` 
-
-## Benefits
-* Scala friendly function signatures, aiming to be close to the standard collection library
-* Nicer DSL e.g. to create vertices and edges
-* You can use standard Scala functions instead of having to worry about how to implement `java.util.function.BiPredicate`
-* Nothing is hidden away, you can always easily access the Gremlin-Java objects if needed. Examples include accessing graph db specifics things like indexes, or using a step that hasn't been implemented in Gremlin-Scala yet
-* Minimal overhead - only allocates additional instances if absolutely necessary
 
 ### Creating vertices and edges
 
 ```scala
 import gremlin.scala._
-import gremlin.scala.schema._
+import gremlin.scala.schema.Key
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 val graph = TinkerGraph.open.asScala
 
@@ -55,10 +54,9 @@ paris <-- "Eurostar" --> london
 // create edge with typed properties
 object Name extends Key[String]("name")
 paris <-- ("EuroStar", Name("TrainName")) --- london
-
 ```
 
-Many thanks to @dkrieg for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/src/test/scala/gremlin/scala/SchemaSpec.scala)
+Many thanks to [@dkrieg](https://github.com/dkrieg) for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
 
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
@@ -67,8 +65,8 @@ Gremlin-Scala aims to helps you at compile time as much as possible. Take this s
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 val graph = TinkerGraph.open.asScala
-graph.V.outE.outE //does _not_ compile
 graph.V.outE.inV  //compiles
+graph.V.outE.outE //does _not_ compile
 ```
 
 In standard Gremlin there's nothing stopping you to create the first traversal - it will explode at runtime, as
@@ -82,26 +80,28 @@ For example:
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 val graph = TinkerFactory.createModern.asScala
-graph.V.as("a")
-  .out.as("b")
-  .value[String]("name").as("c")
-  .labelledPath
-// returns `Vertex :: Vertex :: String :: HNil` for each path
+val traversal = graph.V.as("a").out.value[String]("name").as("b").labelledPath
+traversal.toList
+// returns `Vertex :: String :: HNil` for each path
 ```
 
-You can label as many steps as you like and Gremlin-Scala will preserve the types for you. For more examples see [LabelledPathSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/src/test/scala/gremlin/scala/LabelledPathSpec.scala).
+You can label as many steps as you like and Gremlin-Scala will preserve the types for you. For more examples see [LabelledPathSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/LabelledPathSpec.scala).
 In comparison: Gremlin-Java and Gremlin-Groovy just return a `List[Any]` and you then have to cast the elements - the types got lost on the way. Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
 ### Saving / loading case classes
-You can save and load case classes as a vertex - this is still experimental but pretty cool:
+You can save and load case classes as a vertex - this is still experimental but pretty cool. Note: this does _not_ work in a REPL, you have to put it into a test. For examples check out the [MarshallerSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallerSpec.scala).
 
 ```scala
-import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-val example = ExampleClass("some string", Int.MaxValue, Long.MaxValue, Some("option type"))
-val gs = TinkerGraph.open.asScala
-val v = gs.save(example)
-v.start.load[ExampleClass].head shouldBe example
+val graph = TinkerGraph.open.asScala
+case class Example(i: Int, s:Option[String])
+
+it("load a vertex into a case class") {
+  val graph = TinkerGraph.open.asScala
+  val example = Example(Int.MaxValue, Some("optional value"))
+  val v = graph.addVertex(example)
+  v.toCC[Example] shouldBe example
+}
 ```
 
 Note that you can also use Options as the example shows.

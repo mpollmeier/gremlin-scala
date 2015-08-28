@@ -19,10 +19,7 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   /**
    * Save an object's values into a new vertex
-   *
    * @param cc The case class to persist as a vertex
-   * @tparam P
-   * @return
    */
   def addVertex[P <: Product: Marshallable](cc: P): ScalaVertex = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
