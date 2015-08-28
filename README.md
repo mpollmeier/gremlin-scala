@@ -1,5 +1,5 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
-[![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=stable)](http://travis-ci.org/mpollmeier/gremlin-scala)
+[![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=master)](http://travis-ci.org/mpollmeier/gremlin-scala)
  [![Join the chat at https://gitter.im/mpollmeier/gremlin-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mpollmeier/gremlin-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Gremlin-Scala for Apache Tinkerpop 3
