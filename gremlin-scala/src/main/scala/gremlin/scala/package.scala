@@ -1,6 +1,6 @@
 package gremlin
 
-import java.util.function.{ BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate }
+import java.util.function.{BiPredicate, Function => JFunction, Predicate => JPredicate}
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -72,28 +72,28 @@ package object scala {
     override def test(a: A): Boolean = f(a)
   }
 
-  //converts e.g. `(i: Int, s: String) ⇒ true` into a BiPredicate
-  implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean) =
+  //converts e.g. `(i: Int, s: String) => true` into a BiPredicate
+  implicit def toJavaBiPredicate[A, B](predicate: (A, B) => Boolean) =
     new BiPredicate[A, B] {
       def test(a: A, b: B) = predicate(a, b)
     }
 
-  implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
-    (t: Traverser[A]) ⇒ fun(t.get)
+  implicit def liftTraverser[A, B](fun: A => B): Traverser[A] => B =
+    (t: Traverser[A]) => fun(t.get)
 
   // Marshalling implicits
   implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
     /**
      * Load a vertex values into a case class
      */
-    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
      * Load a edge values into a case class
      */
-    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
+    def toCC[T <: Product : Marshallable] = gs map (_.toCC[T])
   }
 
   // Arrow syntax implicits
@@ -108,16 +108,16 @@ package object scala {
     private lazy val properties =
       if (t._2.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String"))
         Map(t._2.asInstanceOf[(String, Any)])
-      else t._2.productIterator.foldLeft(Map.empty[String, Any]) { (m, a) ⇒
+      else t._2.productIterator.foldLeft(Map.empty[String, Any]) { (m, a) =>
         a match {
-          case (k, v) ⇒ m.updated(k.asInstanceOf[String], v)
+          case (k, v) => m.updated(k.asInstanceOf[String], v)
         }
       }
 
     def ---(from: ScalaVertex) = SemiEdge(from, label, properties)
   }
 
-  implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
+  implicit class SemiEdgeCcFunctions[T <: Product : Marshallable](cc: T) {
     def ---(from: ScalaVertex) = {
       val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
       SemiEdge(from, label, properties)
@@ -128,4 +128,5 @@ package object scala {
       SemiDoubleEdge(from, label, properties)
     }
   }
+
 }
