@@ -1,27 +1,29 @@
 package gremlin.scala
 
-import java.lang.{Long => JLong, Double => JDouble}
-import java.util.function.{Predicate => JPredicate, Consumer => JConsumer}
-import java.util.{Comparator, List => JList, Map => JMap, Collection => JCollection, Iterator => JIterator}
+import java.lang.{ Long => JLong, Double => JDouble }
+import java.util.function.{ Predicate => JPredicate, Consumer => JConsumer, BiPredicate, Supplier }
+import java.util.{ Comparator, List => JList, Map => JMap, Collection => JCollection, Iterator ? JIterator }
+import java.util.stream.{ Stream => JStream }
 
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
-import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
-import org.apache.tinkerpop.gremlin.structure.{T, Direction}
-import shapeless.{HList, HNil, ::}
+import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
+import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
+import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 import scala.language.existentials
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
-  def toStream(): java.util.stream.Stream[End] = traversal.toStream
+  def toStream(): JStream[End] = traversal.toStream
 
   def toList(): List[End] = traversal.toList.toList
 
   def toSet(): Set[End] = traversal.toList.toSet
 
+  // unsafe! this will throw a runtime exception if there is no element. better use `headOption`
   def head(): End = toList.head
 
   def headOption(): Option[End] = toList.headOption
@@ -298,7 +300,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 }
 
 class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
-  extends GremlinScala[End, Labels](gremlinScala.traversal) {
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
   def properties(keys: String*) =
     GremlinScala[Property[Any], Labels](traversal.properties(keys: _*)
@@ -324,11 +326,11 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def has(p: (String, Any)) = GremlinScala[End, Labels](traversal.has(p._1, p._2))
 
-  def has(key: String, predicate: P[_]) = GremlinScala[End, Labels](traversal.has(key, predicate))
+  def has[A](key: String, predicate: P[A]) = GremlinScala[End, Labels](traversal.has(key, predicate))
 
   def has(accessor: T, value: Any) = GremlinScala[End, Labels](traversal.has(accessor, value))
 
-  def has(accessor: T, predicate: P[_]) = GremlinScala[End, Labels](traversal.has(accessor, predicate))
+  def has[A](accessor: T, predicate: P[A]) = GremlinScala[End, Labels](traversal.has(accessor, predicate))
 
   // A: type of the property value
   def has[A, B](key: String, propertyTraversal: GremlinScala[A, HNil] => GremlinScala[B, _]) =
@@ -371,7 +373,7 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 }
 
 class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
-  extends GremlinScala[End, Labels](gremlinScala.traversal) {
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
   def out() = GremlinScala[Vertex, Labels](traversal.out())
 
@@ -399,7 +401,7 @@ class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinSc
 }
 
 class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
-  extends GremlinScala[End, Labels](gremlinScala.traversal) {
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
   def inV = GremlinScala[Vertex, Labels](traversal.inV)
 
