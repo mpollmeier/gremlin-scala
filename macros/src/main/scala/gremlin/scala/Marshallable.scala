@@ -6,16 +6,16 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 
-trait Marshallable[P] {
+trait Marshallable[P <: Product] {
   def fromCC(cc: P): (Option[AnyRef], String, Map[String, Any])
 
   def toCC(id: AnyRef, valueMap: Map[String, Any]): P
 }
 
 object Marshallable {
-  implicit def materializeMappable[P]: Marshallable[P] = macro materializeMappableImpl[P]
+  implicit def materializeMappable[P <: Product]: Marshallable[P] = macro materializeMappableImpl[P]
 
-  def materializeMappableImpl[P: c.WeakTypeTag](c: blackbox.Context): c.Expr[Marshallable[P]] = {
+  def materializeMappableImpl[P <: Product: c.WeakTypeTag](c: blackbox.Context): c.Expr[Marshallable[P]] = {
     import c.universe._
     val tpe = weakTypeOf[P]
     val companion = tpe.typeSymbol.companion
