@@ -80,12 +80,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def path() = GremlinScala[Path, Labels](traversal.path())
 
-  // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec` 
+  // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec`
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
-  def select[A, B](selectKey: String) = GremlinScala[B, Labels](traversal.select(selectKey))
+  def select[A](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
 
-  def select[A, B](pop: Pop, selectKey: String) = GremlinScala[B, Labels](traversal.select(pop, selectKey))
+  def select[A](pop: Pop, selectKey: String) = GremlinScala[A, Labels](traversal.select(pop, selectKey))
 
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, End], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))

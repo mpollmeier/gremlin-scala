@@ -45,8 +45,12 @@ object Tests {
         .by(__.bothE().values[java.lang.Float]("weight").fold())
         .by(__.dedup(Scope.local))
         .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
-
     //TODO: get rid of cast
+
+    override def get_g_V_outE_asXeX_inV_asXvX_selectXeX_order_byXweight_incrX_selectXvX_valuesXnameX_dedup =
+      graph.asScala.V.outE.as("e").inV.as("v")
+        .select[Edge]("e").order.by("weight", Order.incr)
+        .select[Vertex]("v").values[String]("name").dedup()
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
@@ -173,6 +177,9 @@ object Tests {
 
     override def get_g_V_hasXlocationX =
       graph.asScala.V.has("location")
+
+    override def get_g_VXv1X_hasXage_gt_30X(v1Id: AnyRef) =
+      graph.asScala.V(graph.V(v1Id).head).has("age", P.gt(30))
   }
 
   class ScalaCoinTest extends CoinTest with StandardTest {
