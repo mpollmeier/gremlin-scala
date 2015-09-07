@@ -4,7 +4,7 @@ import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
-import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
+import org.apache.tinkerpop.gremlin.structure.{ Transaction, T }
 import shapeless._
 import scala.collection.JavaConversions._
 
@@ -16,12 +16,12 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {
     val labelParam = Seq(T.label, label)
-    val params = properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(labelParam ++ params: _*)
   }
 
   def addVertex(properties: (String, Any)*): ScalaVertex = {
-    val params = properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(params: _*)
   }
 
@@ -32,14 +32,14 @@ case class ScalaGraph[G <: Graph](graph: G) {
     addVertex(properties.toSeq: _*)
 
   /**
-   * Save an object's values into a new vertex
-   * @param cc The case class to persist as a vertex
-   */
-  def addVertex[P <: Product : Marshallable](cc: P): ScalaVertex = {
+    * Save an object's values into a new vertex
+    * @param cc The case class to persist as a vertex
+    */
+  def addVertex[P <: Product: Marshallable](cc: P): ScalaVertex = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
     val labelParam = Seq(T.label, label)
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 

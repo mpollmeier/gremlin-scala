@@ -59,8 +59,8 @@ class TraversalSpec extends TestBase {
     }
 
     it("does not allow edge steps") {
-      illTyped {"""v(1).inV"""}
-      illTyped {"""v(1).out.inV"""}
+      illTyped { """v(1).inV""" }
+      illTyped { """v(1).out.inV""" }
     }
   }
 
@@ -68,7 +68,7 @@ class TraversalSpec extends TestBase {
     it("gets all edges") {
       graph.E.toList should have size 6
     }
-    
+
     it("follows in vertex") {
       //TODO: wait until this is consistent in T3 between Vertex and Edge
       //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
@@ -82,8 +82,8 @@ class TraversalSpec extends TestBase {
     }
 
     //it("does not allow vertex steps") {
-      //illTyped {"""v(1).inV"""}
-      //TODO: all vertex steps: out, outE, in, inE, both
+    //illTyped {"""v(1).inV"""}
+    //TODO: all vertex steps: out, outE, in, inE, both
     //}
   }
 

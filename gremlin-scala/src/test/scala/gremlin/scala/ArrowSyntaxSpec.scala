@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{ FunSpec, Matchers }
 
 class ArrowSyntaxSpec extends FunSpec with Matchers {
 
@@ -29,7 +29,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       Long.MaxValue,
       Some("option type"),
       Seq("test1", "test2"),
-      Map("key1" -> "value1", "key2" -> "value2"),
+      Map("key1" → "value1", "key2" → "value2"),
       NestedClass("nested")
     ) --> london
 
@@ -48,7 +48,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       Long.MaxValue,
       Some("option type"),
       Seq("test1", "test2"),
-      Map("key1" -> "value1", "key2" -> "value2"),
+      Map("key1" → "value1", "key2" → "value2"),
       NestedClass("nested")
     ) --> london
 
@@ -71,7 +71,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       Long.MaxValue,
       Some("option type"),
       Seq("test1", "test2"),
-      Map("key1" -> "value1", "key2" -> "value2"),
+      Map("key1" → "value1", "key2" → "value2"),
       NestedClass("nested")
     ) --- london
 
@@ -100,7 +100,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris --- ("eurostar", "type" -> "WDiEdge", "weight" -> 2) --> london
+    val e = paris --- ("eurostar", "type" → "WDiEdge", "weight" → 2) --> london
 
     e.asJava.inVertex shouldBe london.asJava
     e.asJava.outVertex shouldBe paris.asJava
@@ -114,7 +114,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris <-- ("eurostar", "type" -> "WDiEdge") --- london
+    val e = paris <-- ("eurostar", "type" → "WDiEdge") --- london
 
     e.asJava.inVertex shouldBe paris.asJava
     e.asJava.outVertex shouldBe london.asJava
