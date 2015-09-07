@@ -1,7 +1,7 @@
 package gremlin.scala
 
-import java.lang.{Double => JDouble, Long => JLong}
-import java.util.{ArrayList => JArrayList, Collection => JCollection, List => JList, Map => JMap, Set => JSet}
+import java.lang.{ Double ⇒ JDouble, Long ⇒ JLong }
+import java.util.{ ArrayList ⇒ JArrayList, Collection ⇒ JCollection, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet }
 
 import org.apache.tinkerpop.gremlin.process.traversal._
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
@@ -209,34 +209,26 @@ object Tests {
   // override def get_g_V_asXaX_in_asXaX_in_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_limitXlocal_1X =
   //   graph.asScala.V.as("a").in.as("a").in.as("a").select[JList[String]]("a").by(unfold.values("name").fold).limit(local, 1)
 
-
   // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_1_3X =
   //   graph.asScala.V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 1, 3)
-
 
   // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_1_2X =
   //   graph.asScala.V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 1, 2)
 
-
   // override def get_g_V_asXaX_out_asXaX_out_asXaX_selectXaX_byXunfold_valuesXnameX_foldX_rangeXlocal_4_5X =
   //   graph.asScala.V.as("a").out.as("a").out.as("a").select[List<String>]("a").by(unfold.values("name").fold).range(local, 4, 5)
-
 
   // override def get_g_V_asXaX_in_asXbX_in_asXcX_selectXa_b_cX_byXnameX_limitXlocal_2X =
   //   graph.asScala.V.as("a").in.as("b").in.as("c").select[Map<String, String>]("a","b","c").by("name").limit(local, 2)
 
-
   // override def get_g_V_asXaX_in_asXbX_in_asXcX_selectXa_b_cX_byXnameX_limitXlocal_1X =
   //   graph.asScala.V.as("a").in.as("b").in.as("c").select[Map<String, String>]("a","b","c").by("name").limit(local, 1)
-
 
   // override def get_g_V_asXaX_out_asXbX_out_asXcX_selectXa_b_cX_byXnameX_rangeXlocal_1_3X =
   //   graph.asScala.V.as("a").out.as("b").out.as("c").select[Map<String, String>]("a","b","c").by("name").range(local, 1, 3)
 
-
   // override def get_g_V_asXaX_out_asXbX_out_asXcX_selectXa_b_cX_byXnameX_rangeXlocal_1_2X =
   //   graph.asScala.V.as("a").out.as("b").out.as("c").select[Map<String, String>]("a","b","c").by("name").range(local, 1, 2)
-
 
   // override def get_g_VX1X_out_limitX2X(v1Id: AnyRef) =
   //   graph.asScala.V(v1Id).out.limit(2)
@@ -643,7 +635,7 @@ trait StandardTest {
 }
 
 import java.io.File
-import java.util.{Map => JMap}
+import java.util.{ Map ⇒ JMap }
 
 import gremlin.scala.Tests._
 import org.apache.commons.configuration.Configuration
@@ -654,7 +646,7 @@ import org.junit.runners.model.RunnerBuilder
 
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
-    Array(//testsToExecute - all are in ProcessStandardSuite
+    Array( //testsToExecute - all are in ProcessStandardSuite
       classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
       classOf[ScalaSimplePathTest],
@@ -663,21 +655,21 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaAggregateTest],
       classOf[ScalaCountTest]
 
-      // classOf[ScalaMapTest],
-      // classOf[ScalaVertexTest],
-      // classOf[ScalaSideEffectTest]
-      // classOf[ScalaSideEffectCapTest]
-      // classOf[ScalaGroupCountTest]
-      // classOf[ScalaGroupTest]
-      // classOf[ScalaOrderTest]
-      // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
-      // classOf[ScalaRangeTest]
-      // classOf[ScalaHasTest] //three tests don't work for some reason...
+    // classOf[ScalaMapTest],
+    // classOf[ScalaVertexTest],
+    // classOf[ScalaSideEffectTest]
+    // classOf[ScalaSideEffectCapTest]
+    // classOf[ScalaGroupCountTest]
+    // classOf[ScalaGroupTest]
+    // classOf[ScalaOrderTest]
+    // classOf[ScalaSelectTest] //doesnt fully work yet.. we need a typesafe alternative
+    // classOf[ScalaRangeTest]
+    // classOf[ScalaHasTest] //three tests don't work for some reason...
     ),
     Array.empty, //testsToEnforce
     true, //gremlinFlavourSuite - don't enforce opt-ins for graph implementations
     TraversalEngine.Type.STANDARD //OLTP
-  )
+    )
 
 @RunWith(classOf[GremlinScalaStandardSuite])
 @GraphProviderClass(
@@ -702,13 +694,15 @@ class TinkerGraphGraphProvider extends AbstractGraphProvider {
     classOf[TinkerVertex],
     classOf[TinkerVertexProperty[_]],
     classOf[DefaultGraphTraversal[_, _]]
-    // classOf[AnonymousGraphTraversal.Tokens]
+  // classOf[AnonymousGraphTraversal.Tokens]
   ): Set[Class[_]]
 
-  override def getBaseConfiguration(graphName: String,
-                                    test: Class[_],
-                                    testMethodName: String,
-                                    loadGraphWith: LoadGraphWith.GraphData): JMap[String, AnyRef] =
+  override def getBaseConfiguration(
+    graphName: String,
+    test: Class[_],
+    testMethodName: String,
+    loadGraphWith: LoadGraphWith.GraphData
+  ): JMap[String, AnyRef] =
     Map("gremlin.graph" → classOf[TinkerGraph].getName)
 
   override def clear(graph: Graph, configuration: Configuration): Unit =

@@ -23,7 +23,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def propertyMap(wantedKeys: String*): Map[String, Any] = {
     val requiredKeys = if (wantedKeys.nonEmpty) wantedKeys else keys
-    requiredKeys map { key => (key, getValue(key)) }
+    requiredKeys map { key ⇒ (key, getValue(key)) }
   }.toMap
 
   // note: this may throw an IllegalStateException - better use `value`
@@ -35,9 +35,9 @@ trait ScalaElement[ElementType <: Element] {
     else None
   }
 
-  def valueMap(): Map[String, Any] = (keys map { key => (key, getValue(key)) }).toMap
+  def valueMap(): Map[String, Any] = (keys map { key ⇒ (key, getValue(key)) }).toMap
 
-  def valueOrElse[A](key: String, default: => A): A = property[A](key).orElse(default)
+  def valueOrElse[A](key: String, default: ⇒ A): A = property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 }

@@ -7,10 +7,10 @@ import org.scalatest.FunSpec
 
 trait TestGraph {
   val graph = TinkerFactory.createClassic().asScala
-  def v(i: Int) = graph.v(i:Integer).get
-  def e(i: Int) = graph.e(i:Integer).get
+  def v(i: Int) = graph.v(i: Integer).get
+  def e(i: Int) = graph.e(i: Integer).get
 
-  def print(gs: GremlinScala[_,_]) = println(gs.toList)
+  def print(gs: GremlinScala[_, _]) = println(gs.toList)
 }
 
 trait TestBase extends FunSpec with Matchers with TestGraph {

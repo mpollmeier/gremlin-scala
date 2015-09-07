@@ -15,8 +15,7 @@ class LabelledPathStep[S, Labels <: HList](traversal: Traversal[_, _]) extends M
 
   override def getRequirements = Set(TraverserRequirement.PATH)
 
-  override def map(traverser: org.apache.tinkerpop.gremlin.process.traversal
-.Traverser.Admin[S]): Labels =
+  override def map(traverser: org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin[S]): Labels =
     toHList(toList(traverser.path))
 
   def toList(path: Path): List[Any] = {

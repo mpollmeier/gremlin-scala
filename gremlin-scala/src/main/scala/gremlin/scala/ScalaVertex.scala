@@ -7,7 +7,7 @@ import shapeless._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  def toCC[P <: Product : Marshallable] =
+  def toCC[P <: Product: Marshallable] =
     implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap())
 
   def setProperty(key: String, value: Any): ScalaVertex = {
@@ -16,7 +16,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   }
 
   def setProperties(properties: Map[String, Any]): ScalaVertex = {
-    properties foreach { case (k, v) => setProperty(k, v) }
+    properties foreach { case (k, v) ⇒ setProperty(k, v) }
     this
   }
 
@@ -50,30 +50,32 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def bothE(labels: String*) = start().bothE(labels: _*)
 
-  def addEdge(label: String,
-              inVertex: ScalaVertex,
-              properties: Map[String, Any] = Map.empty): ScalaEdge = {
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+  def addEdge(
+    label: String,
+    inVertex: ScalaVertex,
+    properties: Map[String, Any] = Map.empty
+  ): ScalaEdge = {
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
-  def addEdge[P <: Product : Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
+  def addEdge[P <: Product: Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
   }
 
   def <--(se: SemiEdge) = se.from.addEdge(se.label, this, se.properties)
 
   def <--(de: SemiDoubleEdge): (ScalaEdge, ScalaEdge) =
-    addEdge(de.label, de.right, de.properties) -> de.right.addEdge(de.label, this, de.properties)
+    addEdge(de.label, de.right, de.properties) → de.right.addEdge(de.label, this, de.properties)
 
   def ---(label: String) = SemiEdge(this, label)
 
   def ---(label: String, properties: (String, Any)*) = SemiEdge(this, label, properties.toMap)
 
-  def ---[P <: Product : Marshallable](cc: P) = {
+  def ---[P <: Product: Marshallable](cc: P) = {
     val (_, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     SemiEdge(this, label, properties)
   }

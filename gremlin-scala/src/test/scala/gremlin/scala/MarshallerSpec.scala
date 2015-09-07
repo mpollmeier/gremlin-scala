@@ -5,28 +5,35 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
 
+case class CCWithoutLabelOrId(
+  s: String,
+  i: Int
+)
 
-case class CCWithoutLabelOrId(s: String,
-                              i: Int)
+case class CCWithOptionId(
+  s: String,
+  @id id: Option[Int]
+)
 
-case class CCWithOptionId(s: String,
-                          @id id: Option[Int])
-
-case class CCWithLabel(s: String,
-                       l: Long,
-                       o: Option[String],
-                       seq: Seq[String],
-                       map: Map[String, String],
-                       nested: NestedClass)
+case class CCWithLabel(
+  s: String,
+  l: Long,
+  o: Option[String],
+  seq: Seq[String],
+  map: Map[String, String],
+  nested: NestedClass
+)
 
 @label("the label")
-case class CCWithLabelAndId(s: String,
-                            @id id: Int,
-                            l: Long,
-                            o: Option[String],
-                            seq: Seq[String],
-                            map: Map[String, String],
-                            nested: NestedClass) {
+case class CCWithLabelAndId(
+  s: String,
+    @id id: Int,
+    l: Long,
+    o: Option[String],
+    seq: Seq[String],
+    map: Map[String, String],
+    nested: NestedClass
+) {
   def randomDef = ???
 }
 
@@ -36,7 +43,7 @@ class NoneCaseClass(s: String)
 
 class MarshallerSpec extends FunSpec with Matchers {
 
-  case class Example(i: Int, s:Option[String])
+  case class Example(i: Int, s: Option[String])
   it("load a vertex into a case class") {
     val graph = TinkerGraph.open.asScala
     val example = Example(Int.MaxValue, Some("optional value"))
@@ -50,7 +57,7 @@ class MarshallerSpec extends FunSpec with Matchers {
     Long.MaxValue,
     Some("option type"),
     Seq("test1", "test2"),
-    Map("key1" -> "value1", "key2" -> "value2"),
+    Map("key1" → "value1", "key2" → "value2"),
     NestedClass("nested")
   )
 
