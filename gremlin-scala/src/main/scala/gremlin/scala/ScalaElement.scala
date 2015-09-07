@@ -6,6 +6,8 @@ import shapeless._
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
 
+  def graph: ScalaGraph[Graph] = element.graph
+
   def start(): GremlinScala[ElementType, HNil]
 
   def id: AnyRef = element.id
@@ -14,17 +16,18 @@ trait ScalaElement[ElementType <: Element] {
 
   def keys: Set[String] = element.keys.toSet
 
+  def setProperty(key: String, value: Any): Any
+
   def property[A](key: String): Property[A] = element.property[A](key)
 
-  def properties(wantedKeys: String*): Seq[Property[Any]] = {
-    val requiredKeys = if (wantedKeys.nonEmpty) wantedKeys else keys
-    requiredKeys map property[Any]
-  }.toSeq
+  def properties[A]: Stream[Property[A]]
 
-  def propertyMap(wantedKeys: String*): Map[String, Any] = {
-    val requiredKeys = if (wantedKeys.nonEmpty) wantedKeys else keys
-    requiredKeys map { key => (key, getValue(key)) }
-  }.toMap
+  def properties[A](wantedKeys: String*): Stream[Property[A]]
+
+  def valueMap[A]: Map[String, A] = valueMap[A](keys.toSeq: _*)
+
+  def valueMap[A](wantedKeys: String*): Map[String, A] =
+    (properties[A](wantedKeys: _*) map (p => (p.key, p.value))).toMap
 
   // note: this may throw an IllegalStateException - better use `value`
   def getValue[A](key: String): A = element.value[A](key)
@@ -35,9 +38,8 @@ trait ScalaElement[ElementType <: Element] {
     else None
   }
 
-  def valueMap(): Map[String, Any] = (keys map { key => (key, getValue(key)) }).toMap
-
-  def valueOrElse[A](key: String, default: => A): A = property[A](key).orElse(default)
+  def valueOrElse[A](key: String, default: => A): A =
+    property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()
 }

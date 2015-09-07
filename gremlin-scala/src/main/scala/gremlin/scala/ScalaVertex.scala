@@ -1,14 +1,18 @@
 package gremlin.scala
 
+import java.util
+
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
-import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
+import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
 import shapeless._
+import scala.collection.JavaConversions._
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
   def toCC[P <: Product : Marshallable] =
-    implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap())
+    implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap)
 
   def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
@@ -78,5 +82,20 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     SemiEdge(this, label, properties)
   }
 
-  def start() = GremlinScala[Vertex, HNil](__.__(vertex))
+  override def start() = GremlinScala[Vertex, HNil](__.__(vertex))
+
+  def vertices(direction: Direction, edgeLabels: String*): util.Iterator[Vertex] =
+    vertex.vertices(direction, edgeLabels: _*)
+
+  def edges(direction: Direction, edgeLabels: String*): util.Iterator[Edge] =
+    vertex.edges(direction, edgeLabels: _*)
+
+  def property[V](cardinality: Cardinality, key: String, value: V, keyValues: AnyRef*): VertexProperty[V] =
+    vertex.property(cardinality, key, value, keyValues: _*)
+
+  override def properties[A]: Stream[VertexProperty[A]] =
+    vertex.properties[A](keys.toSeq: _*).toStream
+
+  override def properties[A](wantedKeys: String*): Stream[VertexProperty[A]] =
+    vertex.properties[A](wantedKeys: _*).toStream
 }

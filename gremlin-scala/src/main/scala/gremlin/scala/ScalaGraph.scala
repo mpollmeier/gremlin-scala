@@ -10,6 +10,8 @@ import scala.collection.JavaConversions._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
+  def addVertex(label: String): ScalaVertex = graph.addVertex(label)
+
   def addVertex(): ScalaVertex = graph.addVertex()
 
   def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {

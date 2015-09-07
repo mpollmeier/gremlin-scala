@@ -11,15 +11,15 @@ class ElementSpec extends TestBase {
       v(1).keys shouldBe Set("name", "age")
       v(1).property[String]("name").value should be("marko")
       v(1).property[String]("doesnt exit").isPresent shouldBe false
-      v(1).propertyMap() shouldBe Map("name" -> "marko", "age" -> 29)
-      v(1).propertyMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
-      v(1).properties("name", "age") should have length 2
-      v(1).properties() should have length 2
+      v(1).valueMap shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).valueMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).properties("name", "age").length shouldBe 2
+      v(1).properties.length shouldBe 2
 
       e(7).keys shouldBe Set("weight")
       e(7).property[Float]("weight").value shouldBe 0.5
       e(7).property[Float]("doesnt exit").isPresent shouldBe false
-      e(7).propertyMap("weight") shouldBe Map("weight" -> 0.5)
+      (e(7).valueMap("weight"): Map[String, Any]) shouldBe Map("weight" -> 0.5)
     }
 
     it("sets a property") {
@@ -156,8 +156,8 @@ class ElementSpec extends TestBase {
 
       val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
       e.label shouldBe "testLabel"
-      e.propertyMap("testKey") shouldBe Map("testKey" -> "testValue")
-      v1.outE().head should be(e.edge)
+      (e.valueMap("testKey"): Map[String, Any]) shouldBe Map("testKey" -> "testValue")
+      v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
 

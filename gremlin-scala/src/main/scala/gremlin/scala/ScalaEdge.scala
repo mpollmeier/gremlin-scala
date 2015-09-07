@@ -2,6 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
+import scala.collection.JavaConversions._
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
@@ -29,9 +30,15 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   def toCC[T <: Product: Marshallable] =
-    implicitly[Marshallable[T]].toCC(edge.id, edge.valueMap())
+    implicitly[Marshallable[T]].toCC(edge.id, edge.valueMap)
 
-  def start() = GremlinScala[Edge, HNil](__.__(edge))
+  override def start() = GremlinScala[Edge, HNil](__.__(edge))
+
+  override def properties[A]: Stream[Property[A]] =
+    edge.properties[A](keys.toSeq: _*).toStream
+
+  override def properties[A](wantedKeys: String*): Stream[Property[A]] =
+    edge.properties[A](wantedKeys: _*).toStream
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist
