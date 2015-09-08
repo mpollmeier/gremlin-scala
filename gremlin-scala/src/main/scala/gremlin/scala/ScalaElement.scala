@@ -10,7 +10,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def start(): GremlinScala[ElementType, HNil]
 
-  def id: AnyRef = element.id
+  def id[A: DefaultsToAny]: A = element.id.asInstanceOf[A]
 
   def label: String = element.label
 
