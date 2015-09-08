@@ -16,7 +16,11 @@ trait ScalaElement[ElementType <: Element] {
 
   def keys: Set[String] = element.keys.toSet
 
-  def setProperty(key: String, value: Any): ScalaElement[_]
+  def setProperty(key: String, value: Any): ScalaElement[ElementType]
+
+  def removeProperty(key: String): ScalaElement[ElementType]
+
+  def removeProperties(keys: String*): ScalaElement[ElementType]
 
   def property[A: DefaultsToAny](key: String): Property[A] = element.property[A](key)
 

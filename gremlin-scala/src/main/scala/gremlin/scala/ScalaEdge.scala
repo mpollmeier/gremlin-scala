@@ -7,7 +7,7 @@ import scala.collection.JavaConversions._
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  def setProperty(key: String, value: Any): ScalaEdge = {
+  override def setProperty(key: String, value: Any): ScalaEdge = {
     element.property(key, value)
     this
   }
@@ -23,9 +23,14 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     this
   }
 
-  def removeProperty(key: String): ScalaEdge = {
+  override def removeProperty(key: String): ScalaEdge = {
     val p = property(key)
     if (p.isPresent) p.remove()
+    this
+  }
+
+  override def removeProperties(keys: String*): ScalaEdge = {
+    keys foreach removeProperty
     this
   }
 

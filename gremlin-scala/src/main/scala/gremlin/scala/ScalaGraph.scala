@@ -83,7 +83,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def configuration(): Configuration = graph.configuration()
 
-  def compute[C <: GraphComputer](graphComputerClass: Class[C]): C = graph.compute(graphComputerClass)
+  def compute[C <: GraphComputer](graphComputerClass: Class[C]): C =
+    graph.compute(graphComputerClass)
 
   def compute(): GraphComputer = graph.compute()
 

@@ -14,7 +14,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def toCC[P <: Product : Marshallable] =
     implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap)
 
-  def setProperty(key: String, value: Any): ScalaVertex = {
+  override def setProperty(key: String, value: Any): ScalaVertex = {
     element.property(key, value)
     this
   }
@@ -24,9 +24,14 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     this
   }
 
-  def removeProperty(key: String): ScalaVertex = {
+  override def removeProperty(key: String): ScalaVertex = {
     val p = property(key)
     if (p.isPresent) p.remove()
+    this
+  }
+
+  override def removeProperties(keys: String*): ScalaVertex = {
+    keys foreach removeProperty
     this
   }
 
