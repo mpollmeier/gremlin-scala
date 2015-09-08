@@ -34,10 +34,10 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
 
   override def start() = GremlinScala[Edge, HNil](__.__(edge))
 
-  override def properties[A]: Stream[Property[A]] =
+  override def properties[A: DefaultsToAny]: Stream[Property[A]] =
     edge.properties[A](keys.toSeq: _*).toStream
 
-  override def properties[A](wantedKeys: String*): Stream[Property[A]] =
+  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
     edge.properties[A](wantedKeys: _*).toStream
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge

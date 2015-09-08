@@ -16,18 +16,18 @@ trait ScalaElement[ElementType <: Element] {
 
   def keys: Set[String] = element.keys.toSet
 
-  def setProperty(key: String, value: Any): Any
+  def setProperty(key: String, value: Any): ScalaElement[_]
 
-  def property[A](key: String): Property[A] = element.property[A](key)
+  def property[A: DefaultsToAny](key: String): Property[A] = element.property[A](key)
 
-  def properties[A]: Stream[Property[A]]
+  def properties[A: DefaultsToAny]: Stream[Property[A]]
 
-  def properties[A](wantedKeys: String*): Stream[Property[A]]
+  def properties[A: DefaultsToAny](keys: String*): Stream[Property[A]]
 
-  def valueMap[A]: Map[String, A] = valueMap[A](keys.toSeq: _*)
+  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq: _*)
 
-  def valueMap[A](wantedKeys: String*): Map[String, A] =
-    (properties[A](wantedKeys: _*) map (p => (p.key, p.value))).toMap
+  def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
+    (properties[A](keys: _*) map (p => (p.key, p.value))).toMap
 
   // note: this may throw an IllegalStateException - better use `value`
   def getValue[A](key: String): A = element.value[A](key)

@@ -20,7 +20,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   }
 
   def setProperties(properties: Map[String, Any]): ScalaVertex = {
-    properties foreach { case (k, v) => setProperty(k, v) }
+    properties foreach { case (k, v) ⇒ setProperty(k, v) }
     this
   }
 
@@ -57,14 +57,14 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def addEdge(label: String,
               inVertex: ScalaVertex,
               properties: Map[String, Any] = Map.empty): ScalaEdge = {
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
   def addEdge[P <: Product : Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
-    val params = properties.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
   }
 
@@ -93,9 +93,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def property[V](cardinality: Cardinality, key: String, value: V, keyValues: AnyRef*): VertexProperty[V] =
     vertex.property(cardinality, key, value, keyValues: _*)
 
-  override def properties[A]: Stream[VertexProperty[A]] =
+  override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
     vertex.properties[A](keys.toSeq: _*).toStream
 
-  override def properties[A](wantedKeys: String*): Stream[VertexProperty[A]] =
+  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
     vertex.properties[A](wantedKeys: _*).toStream
 }
