@@ -27,7 +27,7 @@ trait ScalaElement[ElementType <: Element] {
   def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq: _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
-    (properties[A](keys: _*) map (p => (p.key, p.value))).toMap
+    (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap
 
   // note: this may throw an IllegalStateException - better use `value`
   def getValue[A](key: String): A = element.value[A](key)
@@ -38,7 +38,7 @@ trait ScalaElement[ElementType <: Element] {
     else None
   }
 
-  def valueOrElse[A](key: String, default: => A): A =
+  def valueOrElse[A](key: String, default: ⇒ A): A =
     property[A](key).orElse(default)
 
   def remove(): Unit = element.remove()

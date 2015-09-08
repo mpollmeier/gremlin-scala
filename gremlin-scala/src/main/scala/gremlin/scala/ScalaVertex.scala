@@ -71,7 +71,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def <--(se: SemiEdge) = se.from.addEdge(se.label, this, se.properties)
 
   def <--(de: SemiDoubleEdge): (ScalaEdge, ScalaEdge) =
-    addEdge(de.label, de.right, de.properties) -> de.right.addEdge(de.label, this, de.properties)
+    addEdge(de.label, de.right, de.properties) → de.right.addEdge(de.label, this, de.properties)
 
   def ---(label: String) = SemiEdge(this, label)
 
