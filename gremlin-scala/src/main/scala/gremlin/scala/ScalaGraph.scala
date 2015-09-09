@@ -10,6 +10,8 @@ import scala.collection.JavaConversions._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
+  def addVertex(label: String): ScalaVertex = graph.addVertex(label)
+
   def addVertex(): ScalaVertex = graph.addVertex()
 
   def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {
@@ -46,12 +48,12 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def +(label: String, properties: (String, Any)*): ScalaVertex = addVertex(label, properties.toMap)
 
   // get vertex by id
-  def v(id: AnyRef): Option[ScalaVertex] =
-    graph.traversal.V(id).headOption map ScalaVertex.apply
+  def v(id: Any): Option[ScalaVertex] =
+    graph.traversal.V(id.asInstanceOf[AnyRef]).headOption map ScalaVertex.apply
 
   // get edge by id
-  def e(id: AnyRef): Option[ScalaEdge] =
-    graph.traversal.E(id).headOption map ScalaEdge.apply
+  def e(id: Any): Option[ScalaEdge] =
+    graph.traversal.E(id.asInstanceOf[AnyRef]).headOption map ScalaEdge.apply
 
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
@@ -60,14 +62,20 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
 
   // start traversal with some vertices identified by given ids 
-  def V(vertexIds: AnyRef*) = GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds: _*).asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(vertexIds: Any*) =
+    GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
+      .asInstanceOf[GraphTraversal[_, Vertex]])
 
   // start traversal with some edges identified by given ids 
-  def E(edgeIds: AnyRef*) = GremlinScala[Edge, HNil](graph.traversal.E(edgeIds: _*).asInstanceOf[GraphTraversal[_, Edge]])
+  def E(edgeIds: Any*) =
+    GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
+    .asInstanceOf[GraphTraversal[_, Edge]])
 
-  def edges(edgeIds: AnyRef*): Iterator[ScalaEdge] = graph.edges(edgeIds) map (_.asScala)
+  def edges(edgeIds: Any*): Iterator[ScalaEdge] =
+    graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]]) map (_.asScala)
 
-  def vertices(vertexIds: AnyRef*): Iterator[ScalaVertex] = graph.vertices(vertexIds) map (_.asScala)
+  def vertices(vertexIds: Any*): Iterator[ScalaVertex] =
+    graph.vertices(vertexIds.asInstanceOf[Seq[AnyRef]]) map (_.asScala)
 
   def tx(): Transaction = graph.tx()
 
@@ -75,7 +83,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def configuration(): Configuration = graph.configuration()
 
-  def compute[C <: GraphComputer](graphComputerClass: Class[C]): C = graph.compute(graphComputerClass)
+  def compute[C <: GraphComputer](graphComputerClass: Class[C]): C =
+    graph.compute(graphComputerClass)
 
   def compute(): GraphComputer = graph.compute()
 

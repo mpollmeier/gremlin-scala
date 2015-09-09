@@ -11,15 +11,15 @@ class ElementSpec extends TestBase {
       v(1).keys shouldBe Set("name", "age")
       v(1).property[String]("name").value should be("marko")
       v(1).property[String]("doesnt exit").isPresent shouldBe false
-      v(1).propertyMap() shouldBe Map("name" → "marko", "age" → 29)
-      v(1).propertyMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
-      v(1).properties("name", "age") should have length 2
-      v(1).properties() should have length 2
+      v(1).valueMap shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).valueMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
+      v(1).properties("name", "age").length shouldBe 2
+      v(1).properties.length shouldBe 2
 
       e(7).keys shouldBe Set("weight")
       e(7).property[Float]("weight").value shouldBe 0.5
       e(7).property[Float]("doesnt exit").isPresent shouldBe false
-      e(7).propertyMap("weight") shouldBe Map("weight" → 0.5)
+      e(7).valueMap("weight") shouldBe Map("weight" -> 0.5)
     }
 
     it("sets a property") {
@@ -113,7 +113,7 @@ class ElementSpec extends TestBase {
       val label2 = "label2"
 
       val v1 = graph + label1
-      val v2 = graph + (label2, "testkey" → "testValue")
+      val v2 = graph + (label2, "testkey" -> "testValue")
 
       graph.V.hasLabel(label1).head() shouldBe v1.vertex
       graph.V.hasLabel(label2).head() shouldBe v2.vertex
@@ -127,7 +127,7 @@ class ElementSpec extends TestBase {
       val label1 = "label1"
       val label2 = "label2"
       val testLabel = "testLabel"
-      (g + label1) --- testLabel --> (g + (label2, "testkey" → "testValue"))
+      (g + label1) --- testLabel --> (g + (label2, "testkey" -> "testValue"))
 
       g.V.hasLabel(label1).head().label() shouldBe label1
       g.V.hasLabel(label2).head().label() shouldBe label2
@@ -154,10 +154,10 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.addEdge("testLabel", v2, Map("testKey" → "testValue"))
+      val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
       e.label shouldBe "testLabel"
-      e.propertyMap("testKey") shouldBe Map("testKey" → "testValue")
-      v1.outE().head should be(e.edge)
+      e.valueMap("testKey") shouldBe Map("testKey" -> "testValue")
+      v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
 
