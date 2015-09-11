@@ -64,14 +64,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
 
-  def flatMap[A](fun: End ⇒ Iterable[A]) =
+  def flatMap[A](fun: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = GremlinScala[A, Labels]{
+    val start = GremlinScala[End, HNil](__.__[End]())
+    traversal.flatMap(fun(start).traversal)
+  }
+
+  // need to call this flatMap2 because of overloading and jvm type erasure. might not be needed anyway
+  def flatMap2[A](fun: End ⇒ Iterable[A]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { t: Traverser[End] ⇒
         fun(t.get).toIterator: JIterator[A]
       }
     )
 
-  def flatMapWithTraverser[A](fun: Traverser[End] ⇒ Iterable[A]) =
+  def flatMap2WithTraverser[A](fun: Traverser[End] ⇒ Iterable[A]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { e: Traverser[End] ⇒
         fun(e).toIterator: JIterator[A]
@@ -163,7 +169,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
-  def groupCount[A]() = GremlinScala[JMap[A, JLong], Labels](traversal.groupCount())
+  def groupCount() = GremlinScala[JMap[End, JLong], Labels](traversal.groupCount())
 
   // note that groupCount is a side effect step, other than the 'count' step..
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
@@ -231,7 +237,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sum() = GremlinScala[JDouble, Labels](traversal.sum())
 
   def sum(scope: Scope) = GremlinScala[JDouble, Labels](traversal.sum(scope))
-
 
   def mean() = GremlinScala[JDouble, Labels](traversal.mean())
 
@@ -416,3 +421,4 @@ class GremlinNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinSc
 
   def min(scope: Scope) = GremlinScala[End, Labels](traversal.min(scope))
 }
+
