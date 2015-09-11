@@ -163,7 +163,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
-  def group[A, B]() = GremlinScala[JMap[A, B], Labels](traversal.group())
+  def group[A]() = GremlinScala[JMap[String, A], Labels](traversal.group())
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
