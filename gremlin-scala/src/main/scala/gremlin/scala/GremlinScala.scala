@@ -135,8 +135,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def tail(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.tail(scope, limit))
 
-  // labels the current step and preserves the type - see `labelledPath` steps 
-  def as(name: String)(implicit p: Prepend[Labels, End :: HNil]) = GremlinScala[End, p.Out](traversal.as(name))
+  // labels the current step and preserves the type - see `labelledPath` steps
+  def as(name: String, moreNames: String*)(implicit p: Prepend[Labels, End :: HNil]) =
+    GremlinScala[End, p.Out](traversal.as(name, moreNames: _*))
 
   def label() = GremlinScala[String, Labels](traversal.label())
 
