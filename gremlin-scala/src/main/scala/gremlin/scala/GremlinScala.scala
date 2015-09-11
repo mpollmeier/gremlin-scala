@@ -210,17 +210,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         else 0
     }))
 
+  // provide arbitrary Traversal, e.g. by using `__.outE`
+  // can't help much with the types as `by` can be used to address previously labelled steps, not just the last one
   def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
 
   def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
-
-  //TODO: rename to by
-  def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
-    GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal))
-
-  //TODO: rename to by 
-  def byTraversal[A](byTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], order: Order) =
-    GremlinScala[End, Labels](traversal.by(byTraversal(start).traversal, order))
 
   def `match`[A](traversals: Seq[GremlinScala[_, _]]) =
     GremlinScala[JMap[String, A], Labels](
