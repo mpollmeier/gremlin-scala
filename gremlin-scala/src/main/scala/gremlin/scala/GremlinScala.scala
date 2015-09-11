@@ -9,7 +9,6 @@ import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
 import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
 import shapeless.{ HList, HNil, :: }
@@ -287,7 +286,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
 
-  protected def start[A] = GremlinScala[A, HNil](__.start[A]())
+  protected def start[A] = GremlinScala[A, HNil](__[A]())
 }
 
 class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels])

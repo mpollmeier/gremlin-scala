@@ -4,7 +4,6 @@ import java.lang.{ Double ⇒ JDouble, Long ⇒ JLong }
 import java.util.{ ArrayList ⇒ JArrayList, Collection ⇒ JCollection, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet }
 
 import org.apache.tinkerpop.gremlin.process.traversal._
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
 import org.apache.tinkerpop.gremlin.process.traversal.step.map._
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
@@ -35,6 +34,7 @@ object Tests {
 
     override def get_g_V_asXaX_both_asXbX_dedupXa_bX_byXlabelX_selectXa_bX =
       graph.asScala.V.as("a").both.as("b").dedup("a", "b").by(T.label).select("a", "b")
+        .asInstanceOf[GremlinScala[JMap[String, Vertex], _]]
 
     override def get_g_V_asXaX_outXcreatedX_asXbX_inXcreatedX_asXcX_dedupXa_bX_path =
       graph.asScala.V.as("a").out("created").as("b").in("created").as("c").dedup("a", "b").path

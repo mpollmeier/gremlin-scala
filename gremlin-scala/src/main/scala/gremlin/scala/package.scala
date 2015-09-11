@@ -42,6 +42,17 @@ package object scala {
     def asJava = v.vertex
   }
 
+  // create a new anonymous traversal, e.g. `__.outE`
+  // only defined here so that user doesn't need to import it
+  def __[A]() = {
+    org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]()
+  }
+
+  // only defined here so that user doesn't need to import it
+  def __[A](a: A) = {
+    org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](a)
+  }
+
   implicit def wrap(v: Vertex) = ScalaVertex(v)
 
   implicit def wrap(e: Edge) = ScalaEdge(e)
