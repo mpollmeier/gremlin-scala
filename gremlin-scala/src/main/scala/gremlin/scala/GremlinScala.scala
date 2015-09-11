@@ -232,13 +232,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def sum(scope: Scope) = GremlinScala[JDouble, Labels](traversal.sum(scope))
 
-  def max[A <: Number]() = GremlinScala[A, Labels](traversal.max())
-
-  def max[A <: Number](scope: Scope) = GremlinScala[A, Labels](traversal.max(scope))
-
-  def min[A <: Number]() = GremlinScala[A, Labels](traversal.min())
-
-  def min[A <: Number](scope: Scope) = GremlinScala[A, Labels](traversal.min(scope))
 
   def mean() = GremlinScala[JDouble, Labels](traversal.mean())
 
@@ -410,4 +403,16 @@ class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[
   def bothV() = GremlinScala[Vertex, Labels](traversal.bothV())
 
   def otherV() = GremlinScala[Vertex, Labels](traversal.otherV())
+}
+
+class GremlinNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
+
+  def max() = GremlinScala[End, Labels](traversal.max[End]())
+
+  def max(scope: Scope) = GremlinScala[End, Labels](traversal.max(scope))
+
+  def min() = GremlinScala[End, Labels](traversal.min[End]())
+
+  def min(scope: Scope) = GremlinScala[End, Labels](traversal.min(scope))
 }
