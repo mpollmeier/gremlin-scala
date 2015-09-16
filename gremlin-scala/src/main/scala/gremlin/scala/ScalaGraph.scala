@@ -89,4 +89,6 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def compute(): GraphComputer = graph.compute()
 
   def close(): Unit = graph.close()
+
+  def transactional[R](work: Graph => R) = graph.tx.submit(work)
 }
