@@ -7,6 +7,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{ Transaction, T }
 import shapeless._
 import scala.collection.JavaConversions._
+import java.util.function.{Function => JFunction}
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
@@ -89,4 +90,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def compute(): GraphComputer = graph.compute()
 
   def close(): Unit = graph.close()
+
+  def transactional[R](work: Graph => R) = graph.tx.submit(new JFunction[Graph, R] {
+    def apply(g: Graph) = work(g)
+  })
 }
