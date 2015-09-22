@@ -395,9 +395,9 @@ class GremlinVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinSc
 class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
     extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
-  def inV = GremlinScala[Vertex, Labels](traversal.inV)
+  def inV() = GremlinScala[Vertex, Labels](traversal.inV)
 
-  def outV = GremlinScala[Vertex, Labels](traversal.outV)
+  def outV() = GremlinScala[Vertex, Labels](traversal.outV)
 
   def bothV() = GremlinScala[Vertex, Labels](traversal.bothV())
 
