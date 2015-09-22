@@ -184,13 +184,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by() = GremlinScala[End, Labels](traversal.by())
 
-  def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
+  def by[A: DefaultsToAny](funProjection: End ⇒ A): GremlinScala[A, Labels] =
+    GremlinScala[A, Labels](traversal.by(funProjection).asInstanceOf[GraphTraversal[_, A]])
 
-  def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
+  def by[A: DefaultsToAny](tokenProjection: T) =
+    GremlinScala[A, Labels](traversal.by(tokenProjection).asInstanceOf[GraphTraversal[_, A]])
 
-  def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
+  def by[A: DefaultsToAny](elementPropertyKey: String) =
+    GremlinScala[A, Labels](traversal.by(elementPropertyKey).asInstanceOf[GraphTraversal[_, A]])
 
-  def by(elementPropertyKey: String, order: Order) = GremlinScala[End, Labels](traversal.by(elementPropertyKey, order))
+  def by[A: DefaultsToAny](elementPropertyKey: String, order: Order) =
+    GremlinScala[A, Labels](traversal.by(elementPropertyKey, order).asInstanceOf[GraphTraversal[_, A]])
 
   def by(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
@@ -211,11 +215,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   // provide arbitrary Traversal, e.g. by using `__.outE`
   // can't help much with the types as `by` can be used to address previously labelled steps, not just the last one
-  def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
+  // def by[A: DefaultsToAny](byTraversal: Traversal[_, End]) = GremlinScala[A, Labels](traversal.by(byTraversal))
+  def by[A: DefaultsToAny](byTraversal: Traversal[_, A]) =
+    GremlinScala[A, Labels](traversal.by(byTraversal).asInstanceOf[GraphTraversal[_, A]])
 
-  def by(byTraversal: Traversal[_, _], order: Order) = GremlinScala[End, Labels](traversal.by(byTraversal, order))
+  def by[A: DefaultsToAny](byTraversal: Traversal[_, A], order: Order) =
+    GremlinScala[A, Labels](traversal.by(byTraversal, order).asInstanceOf[GraphTraversal[_, A]])
 
-  def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
+  // def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
 
   def `match`[A](traversals: Seq[GremlinScala[_, _]]) =
     GremlinScala[JMap[String, A], Labels](
