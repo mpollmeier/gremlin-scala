@@ -6,11 +6,11 @@ val commonSettings = Seq(
   organization := "com.michaelpollmeier",
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
-  version := "3.0.0-SNAPSHOT",
+  version := "3.0.1-incubating",
   scalaVersion := "2.11.7",
 
   libraryDependencies <++= scalaVersion { scalaVersion =>
-    val gremlinVersion = "3.0.0-incubating"
+    val gremlinVersion = "3.0.1-incubating"
     Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),

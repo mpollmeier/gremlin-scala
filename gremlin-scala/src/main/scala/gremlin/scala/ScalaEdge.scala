@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import shapeless._
 import scala.collection.JavaConversions._
 
@@ -37,7 +36,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   def toCC[T <: Product: Marshallable] =
     implicitly[Marshallable[T]].toCC(edge.id, edge.valueMap)
 
-  override def start() = GremlinScala[Edge, HNil](__.__(edge))
+  override def start() = GremlinScala[Edge, HNil](__(edge))
 
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
     edge.properties[A](keys.toSeq: _*).toStream

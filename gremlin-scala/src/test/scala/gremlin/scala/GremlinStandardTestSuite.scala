@@ -4,7 +4,6 @@ import java.lang.{ Double ⇒ JDouble, Long ⇒ JLong }
 import java.util.{ ArrayList ⇒ JArrayList, Collection ⇒ JCollection, List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet }
 
 import org.apache.tinkerpop.gremlin.process.traversal._
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
 import org.apache.tinkerpop.gremlin.process.traversal.step.map._
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
@@ -35,6 +34,7 @@ object Tests {
 
     override def get_g_V_asXaX_both_asXbX_dedupXa_bX_byXlabelX_selectXa_bX =
       graph.asScala.V.as("a").both.as("b").dedup("a", "b").by(T.label).select("a", "b")
+        .asInstanceOf[GremlinScala[JMap[String, Vertex], _]]
 
     override def get_g_V_asXaX_outXcreatedX_asXbX_inXcreatedX_asXcX_dedupXa_bX_path =
       graph.asScala.V.as("a").out("created").as("b").in("created").as("c").dedup("a", "b").path
@@ -45,8 +45,12 @@ object Tests {
         .by(__.bothE().values[java.lang.Float]("weight").fold())
         .by(__.dedup(Scope.local))
         .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
-
     //TODO: get rid of cast
+
+    override def get_g_V_outE_asXeX_inV_asXvX_selectXeX_order_byXweight_incrX_selectXvX_valuesXnameX_dedup =
+      graph.asScala.V.outE.as("e").inV.as("v")
+        .select[Edge]("e").order.by("weight", Order.incr)
+        .select[Vertex]("v").values[String]("name").dedup()
   }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
@@ -173,6 +177,9 @@ object Tests {
 
     override def get_g_V_hasXlocationX =
       graph.asScala.V.has("location")
+
+    override def get_g_VXv1X_hasXage_gt_30X(v1Id: AnyRef) =
+      graph.asScala.V(graph.V(v1Id).head).has("age", P.gt(30))
   }
 
   class ScalaCoinTest extends CoinTest with StandardTest {

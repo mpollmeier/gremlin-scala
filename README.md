@@ -56,7 +56,7 @@ object Name extends Key[String]("name")
 paris <-- ("EuroStar", Name("TrainName")) --- london
 ```
 
-Many thanks to [@dkrieg](https://github.com/dkrieg) for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
+Many thanks to @dkrieg and @joan38 for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
 
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:

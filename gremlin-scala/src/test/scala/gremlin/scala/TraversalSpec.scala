@@ -129,4 +129,34 @@ class TraversalSpec extends TestBase {
     }
   }
 
+  describe("map") {
+    it("works just like any other step") {
+      val labels = graph.V.label.toList
+      labels should have length 6
+
+      graph.V.map(_.label).toList shouldBe labels
+    }
+
+    it("infers the right types") {
+      val labels: List[String] = graph.V.map(_.label).toList
+    }
+  }
+
+  describe("flatMap") {
+    it("works just like any other step") {
+      val v1outEdges = graph.V(1).outE.toList
+      v1outEdges should have length 3
+
+      graph.V(1).flatMap(_.outE).toList shouldBe v1outEdges
+    }
+
+    it("infers the right types") {
+      val edges: List[Edge] = graph.V(1).flatMap(_.outE).toList
+    }
+
+    it("doesn't compile for bad traversals") {
+      graph.V(1).flatMap(_.outE) //compiles fine
+      illTyped { """graph.V(1).flatMap(_.inV)""" } //verify doesn't compile
+    }
+  }
 }
