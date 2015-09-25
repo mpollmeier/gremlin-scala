@@ -69,7 +69,7 @@ graph.V.outE.inV  //compiles
 graph.V.outE.outE //does _not_ compile
 ```
 
-In standard Gremlin there's nothing stopping you to create the first traversal - it will explode at runtime, as
+In standard Gremlin there's nothing stopping you to create the second traversal - it will explode at runtime, as
 outgoing edges do not have outgoing edges. This is simply an invalid step and we can use the compiler to help us. 
 
 ### Type safe traversals
