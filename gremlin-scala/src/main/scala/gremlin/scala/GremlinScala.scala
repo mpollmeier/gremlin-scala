@@ -217,11 +217,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
 
-  def `match`[A](traversals: Seq[GremlinScala[_, _]]) =
+  def `match`[A](traversals: Traversal[End, _]*) =
     GremlinScala[JMap[String, A], Labels](
-      traversal.`match`(
-        traversals map (_.traversal): _*
-      )
+      traversal.`match`(traversals: _*)
     )
 
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
