@@ -73,7 +73,7 @@ In standard Gremlin there's nothing stopping you to create the second traversal 
 outgoing edges do not have outgoing edges. This is simply an invalid step and we can use the compiler to help us. 
 
 ### Type safe traversals
-Gremlin-Scala has support for full type safety in a traversal. You can label any step you want and in the end call `labelledPath` - you will the values in each labelled step as an HList. That's a type safe list, i.e. the compiler guarantees the types, which also helps you auto-complete in your IDE. In contrast: in Java and Groovy you would have to cast to the type you *think* it will be, which is ugly and error prone. 
+Gremlin-Scala has support for full type safety in a traversal. You can label any step you want and in the end call `labelledPath` - it will return the values in each labelled step as an HList. An HList is a typesafe list, i.e. the compiler knows the types, which helps prevent bugs and allows your IDE to auto-complete your code. In contrast: in Java and Groovy you would have to cast to the type you *think* it will be, which is ugly and error prone. 
 For example:
 
 ```scala
