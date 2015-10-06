@@ -108,6 +108,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def sample(scope: Scope, amount: Int) = GremlinScala[End, Labels](traversal.sample(scope, amount))
 
+  /* removes elements/properties from the graph */
   def drop() = GremlinScala[End, Labels](traversal.drop())
 
   def dedup(dedupLabels: String*) = GremlinScala[End, Labels](traversal.dedup(dedupLabels: _*))
