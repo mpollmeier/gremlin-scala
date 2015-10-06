@@ -13,8 +13,8 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     val e = paris --- "eurostar" --> london
 
-    e.asJava.inVertex shouldBe london.asJava
-    e.asJava.outVertex shouldBe paris.asJava
+    e.inVertex shouldBe london
+    e.outVertex shouldBe paris
   }
 
   it("add edge with case class") {
@@ -33,8 +33,8 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       NestedClass("nested")
     ) --> london
 
-    e.asJava.inVertex shouldBe london.asJava
-    e.asJava.outVertex shouldBe paris.asJava
+    e.inVertex shouldBe london
+    e.outVertex shouldBe paris
   }
 
   it("add bidirectional edge with case class") {
@@ -52,11 +52,11 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       NestedClass("nested")
     ) --> london
 
-    e0.asJava.inVertex shouldBe london.asJava
-    e0.asJava.outVertex shouldBe paris.asJava
+    e0.inVertex shouldBe london
+    e0.outVertex shouldBe paris
 
-    e1.asJava.inVertex shouldBe paris.asJava
-    e1.asJava.outVertex shouldBe london.asJava
+    e1.inVertex shouldBe paris
+    e1.outVertex shouldBe london
   }
 
   it("add left edge with case class") {
@@ -75,8 +75,8 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
       NestedClass("nested")
     ) --- london
 
-    e.asJava.inVertex shouldBe paris.asJava
-    e.asJava.outVertex shouldBe london.asJava
+    e.inVertex shouldBe paris
+    e.outVertex shouldBe london
   }
 
   it("add bidirectional edge with syntax sugar") {
@@ -87,11 +87,11 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     val (edgeParisToLondon, edgeLondonToParis) = paris <-- "eurostar" --> london
 
-    edgeParisToLondon.asJava.inVertex shouldBe london.asJava
-    edgeParisToLondon.asJava.outVertex shouldBe paris.asJava
+    edgeParisToLondon.inVertex shouldBe london
+    edgeParisToLondon.outVertex shouldBe paris
 
-    edgeLondonToParis.asJava.inVertex shouldBe paris.asJava
-    edgeLondonToParis.asJava.outVertex shouldBe london.asJava
+    edgeLondonToParis.inVertex shouldBe paris
+    edgeLondonToParis.outVertex shouldBe london
   }
 
   it("add edge with properties using syntax sugar") {
@@ -102,10 +102,10 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     val e = paris --- ("eurostar", "type" → "WDiEdge", "weight" → 2) --> london
 
-    e.asJava.inVertex shouldBe london.asJava
-    e.asJava.outVertex shouldBe paris.asJava
-    e.value("type") shouldBe Some("WDiEdge")
-    e.value("weight") shouldBe Some(2)
+    e.inVertex shouldBe london
+    e.outVertex shouldBe paris
+    e.value[String]("type") shouldBe Some("WDiEdge")
+    e.value[Int]("weight") shouldBe Some(2)
   }
 
   it("add left edge with properties using syntax sugar") {
@@ -116,8 +116,8 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     val e = paris <-- ("eurostar", "type" → "WDiEdge") --- london
 
-    e.asJava.inVertex shouldBe paris.asJava
-    e.asJava.outVertex shouldBe london.asJava
-    e.value("type") shouldBe Some("WDiEdge")
+    e.inVertex shouldBe paris
+    e.outVertex shouldBe london
+    e.value[String]("type") shouldBe Some("WDiEdge")
   }
 }

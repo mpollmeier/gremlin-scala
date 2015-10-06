@@ -13,25 +13,25 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def toCC[P <: Product : Marshallable] =
     implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap)
 
-  override def setProperty(key: String, value: Any): ScalaVertex = {
+  override def setProperty(key: String, value: Any): Vertex = {
     element.property(key, value)
-    this
+    vertex
   }
 
-  def setProperties(properties: Map[String, Any]): ScalaVertex = {
+  def setProperties(properties: Map[String, Any]): Vertex = {
     properties foreach { case (k, v) ⇒ setProperty(k, v) }
-    this
+    vertex
   }
 
-  override def removeProperty(key: String): ScalaVertex = {
+  override def removeProperty(key: String): Vertex = {
     val p = property(key)
     if (p.isPresent) p.remove()
-    this
+    vertex
   }
 
-  override def removeProperties(keys: String*): ScalaVertex = {
+  override def removeProperties(keys: String*): Vertex = {
     keys foreach removeProperty
-    this
+    vertex
   }
 
   def out() = start().out()
@@ -59,31 +59,31 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def bothE(labels: String*) = start().bothE(labels: _*)
 
   def addEdge(label: String,
-              inVertex: ScalaVertex,
-              properties: Map[String, Any] = Map.empty): ScalaEdge = {
+              inVertex: Vertex,
+              properties: Map[String, Any] = Map.empty): Edge = {
     val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
-  def addEdge[P <: Product : Marshallable](inVertex: ScalaVertex, cc: P): ScalaEdge = {
+  def addEdge[P <: Product : Marshallable](inVertex: Vertex, cc: P): ScalaEdge = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
     val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
   }
 
-  def <--(se: SemiEdge) = se.from.addEdge(se.label, this, se.properties)
+  def <--(se: SemiEdge) = se.from.addEdge(se.label, vertex, se.properties)
 
-  def <--(de: SemiDoubleEdge): (ScalaEdge, ScalaEdge) =
-    addEdge(de.label, de.right, de.properties) → de.right.addEdge(de.label, this, de.properties)
+  def <--(de: SemiDoubleEdge): (Edge, Edge) =
+    addEdge(de.label, de.right, de.properties) → de.right.addEdge(de.label, vertex, de.properties)
 
-  def ---(label: String) = SemiEdge(this, label)
+  def ---(label: String) = SemiEdge(vertex, label)
 
-  def ---(label: String, properties: (String, Any)*) = SemiEdge(this, label, properties.toMap)
+  def ---(label: String, properties: (String, Any)*) = SemiEdge(vertex, label, properties.toMap)
 
   def ---[P <: Product : Marshallable](cc: P) = {
     val (_, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
-    SemiEdge(this, label, properties)
+    SemiEdge(vertex, label, properties)
   }
 
   override def start() = GremlinScala[Vertex, HNil](__(vertex))

@@ -13,8 +13,8 @@ class ElementSpec extends TestBase {
       v(1).property[String]("doesnt exit").isPresent shouldBe false
       v(1).valueMap shouldBe Map("name" -> "marko", "age" -> 29)
       v(1).valueMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
-      v(1).properties("name", "age").length shouldBe 2
-      v(1).properties.length shouldBe 2
+      v(1).asScala.properties("name", "age") shouldBe 2
+      v(1).asScala.properties.length shouldBe 2
 
       e(7).keys shouldBe Set("weight")
       e(7).property[Float]("weight").value shouldBe 0.5

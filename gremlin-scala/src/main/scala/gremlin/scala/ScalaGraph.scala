@@ -10,32 +10,32 @@ import scala.collection.JavaConversions._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
-  def addVertex(label: String): ScalaVertex = graph.addVertex(label)
+  def addVertex(label: String): Vertex = graph.addVertex(label)
 
-  def addVertex(): ScalaVertex = graph.addVertex()
+  def addVertex(): Vertex = graph.addVertex()
 
-  def addVertex(label: String, properties: (String, Any)*): ScalaVertex = {
+  def addVertex(label: String, properties: (String, Any)*): Vertex = {
     val labelParam = Seq(T.label, label)
     val params = properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(labelParam ++ params: _*)
   }
 
-  def addVertex(properties: (String, Any)*): ScalaVertex = {
+  def addVertex(properties: (String, Any)*): Vertex = {
     val params = properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(params: _*)
   }
 
-  def addVertex(label: String, properties: Map[String, Any]): ScalaVertex =
+  def addVertex(label: String, properties: Map[String, Any]): Vertex =
     addVertex(label, properties.toSeq: _*)
 
-  def addVertex(properties: Map[String, Any]): ScalaVertex =
+  def addVertex(properties: Map[String, Any]): Vertex =
     addVertex(properties.toSeq: _*)
 
   /**
     * Save an object's values into a new vertex
     * @param cc The case class to persist as a vertex
     */
-  def addVertex[P <: Product: Marshallable](cc: P): ScalaVertex = {
+  def addVertex[P <: Product: Marshallable](cc: P): Vertex = {
     val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
     val idParam = id.toSeq flatMap (List(T.id, _))
     val labelParam = Seq(T.label, label)
@@ -43,17 +43,17 @@ case class ScalaGraph[G <: Graph](graph: G) {
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
-  def +(label: String): ScalaVertex = addVertex(label)
+  def +(label: String): Vertex = addVertex(label)
 
-  def +(label: String, properties: (String, Any)*): ScalaVertex = addVertex(label, properties.toMap)
+  def +(label: String, properties: (String, Any)*): Vertex = addVertex(label, properties.toMap)
 
   // get vertex by id
-  def v(id: Any): Option[ScalaVertex] =
-    graph.traversal.V(id.asInstanceOf[AnyRef]).headOption map ScalaVertex.apply
+  def v(id: Any): Option[Vertex] =
+    graph.traversal.V(id.asInstanceOf[AnyRef]).headOption
 
   // get edge by id
-  def e(id: Any): Option[ScalaEdge] =
-    graph.traversal.E(id.asInstanceOf[AnyRef]).headOption map ScalaEdge.apply
+  def e(id: Any): Option[Edge] =
+    graph.traversal.E(id.asInstanceOf[AnyRef]).headOption
 
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
@@ -71,11 +71,11 @@ case class ScalaGraph[G <: Graph](graph: G) {
     GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
     .asInstanceOf[GraphTraversal[_, Edge]])
 
-  def edges(edgeIds: Any*): Iterator[ScalaEdge] =
-    graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]]) map (_.asScala)
+  def edges(edgeIds: Any*): Iterator[Edge] =
+    graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]])
 
-  def vertices(vertexIds: Any*): Iterator[ScalaVertex] =
-    graph.vertices(vertexIds.asInstanceOf[Seq[AnyRef]]) map (_.asScala)
+  def vertices(vertexIds: Any*): Iterator[Vertex] =
+    graph.vertices(vertexIds.asInstanceOf[Seq[AnyRef]])
 
   def tx(): Transaction = graph.tx()
 

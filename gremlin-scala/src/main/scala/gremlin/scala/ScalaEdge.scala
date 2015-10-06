@@ -6,31 +6,31 @@ import scala.collection.JavaConversions._
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  override def setProperty(key: String, value: Any): ScalaEdge = {
+  override def setProperty(key: String, value: Any): Edge = {
     element.property(key, value)
-    this
+    edge
   }
 
-  def setProperties(properties: Map[String, Any]): ScalaEdge = {
+  def setProperties(properties: Map[String, Any]): Edge = {
     properties foreach { case (k, v) ⇒ setProperty(k, v) }
-    this
+    edge
   }
 
-  def setProperties[T <: Product: Marshallable](cc: T): ScalaEdge = {
+  def setProperties[T <: Product: Marshallable](cc: T): Edge = {
     val (_, _, properties) = implicitly[Marshallable[T]].fromCC(cc)
     setProperties(properties)
-    this
+    edge
   }
 
-  override def removeProperty(key: String): ScalaEdge = {
+  override def removeProperty(key: String): Edge = {
     val p = property(key)
     if (p.isPresent) p.remove()
-    this
+    edge
   }
 
-  override def removeProperties(keys: String*): ScalaEdge = {
+  override def removeProperties(keys: String*): Edge = {
     keys foreach removeProperty
-    this
+    edge
   }
 
   def toCC[T <: Product: Marshallable] =

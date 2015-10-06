@@ -70,11 +70,11 @@ class SchemaSpec extends FunSpec with Matchers {
 
       val (edgeParisToLondon, edgeLondonToParis) = paris <-- EuroStar --> london
 
-      edgeParisToLondon.asJava.inVertex shouldBe london.asJava
-      edgeParisToLondon.asJava.outVertex shouldBe paris.asJava
+      edgeParisToLondon.inVertex shouldBe london
+      edgeParisToLondon.outVertex shouldBe paris
 
-      edgeLondonToParis.asJava.inVertex shouldBe paris.asJava
-      edgeLondonToParis.asJava.outVertex shouldBe london.asJava
+      edgeLondonToParis.inVertex shouldBe paris
+      edgeLondonToParis.outVertex shouldBe london
     }
 
     it("add edge with properties using syntax sugar") {
@@ -85,10 +85,10 @@ class SchemaSpec extends FunSpec with Matchers {
 
       val e = paris --- (EuroStar, Type("WDiEdge"), Weight(2)) --> london
 
-      e.asJava.inVertex shouldBe london.asJava
-      e.asJava.outVertex shouldBe paris.asJava
-      e.value(Type.key) shouldBe Some("WDiEdge")
-      e.value(Weight.key) shouldBe Some(2)
+      e.inVertex shouldBe london
+      e.outVertex shouldBe paris
+      e.value[String](Type.key) shouldBe Some("WDiEdge")
+      e.value[String](Weight.key) shouldBe Some(2)
     }
 
     it("to add left edge using syntax sugar with just Label") {
@@ -99,10 +99,10 @@ class SchemaSpec extends FunSpec with Matchers {
 
       val e = paris <-- EuroStar --- london
 
-      e.asJava.inVertex shouldBe paris.asJava
-      e.asJava.outVertex shouldBe london.asJava
+      e.inVertex shouldBe paris
+      e.outVertex shouldBe london
 
-      g.asJava.close()
+      g.close()
     }
 
     it("to add left edge using syntax sugar with Label and Name") {
@@ -113,10 +113,10 @@ class SchemaSpec extends FunSpec with Matchers {
 
       val e = paris <-- (EuroStar, Name("test")) --- london
 
-      e.asJava.inVertex shouldBe paris.asJava
-      e.asJava.outVertex shouldBe london.asJava
+      e.inVertex shouldBe paris
+      e.outVertex shouldBe london
 
-      g.asJava.close()
+      g.close()
     }
 
     it("to add left edge using syntax sugar with Label, Weight and Name") {
@@ -127,8 +127,8 @@ class SchemaSpec extends FunSpec with Matchers {
 
       val e = paris <-- (EuroStar, (Weight(99), Name("test"))) --- london
 
-      e.asJava.inVertex shouldBe paris.asJava
-      e.asJava.outVertex shouldBe london.asJava
+      e.inVertex shouldBe paris
+      e.outVertex shouldBe london
 
       g.asJava.close()
     }
