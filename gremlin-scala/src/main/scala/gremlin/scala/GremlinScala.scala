@@ -9,6 +9,7 @@ import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
 import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
 import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
 import shapeless.{ HList, HNil, :: }
@@ -165,6 +166,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
   def group[A: DefaultsToAny]() = GremlinScala[JMap[String, A], Labels](traversal.group())
+
+  def group[A <: AnyRef](byTraversal: End ⇒ A) =
+    GremlinScala[JMap[A, BulkSet[End]], Labels](traversal.group().by(byTraversal))
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
