@@ -107,6 +107,70 @@ it("load a vertex into a case class") {
 Note that you can also use Options as the example shows.
 Thanks to <a href="https://github.com/joan38">joan38</a> for <a href="https://github.com/mpollmeier/gremlin-scala/pull/66">contributing</a> this feature!
 
+### Some more advanced traversals
+Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/) which you can easily run on your machine:
+
+What is `Die Hard's` average rating?
+```scala
+g.V.has("movie", "name", "Die Hard")
+  .inE("rated")
+  .values("stars")
+  .mean
+  .head
+```
+
+Get the maximum number of movies a single user rated
+```scala
+g.V.hasLabel("person")
+  .flatMap(_.outE("rated").count)
+  .max
+  .head
+```
+
+What 80's action movies do 30-something programmers like?
+Group count the movies by their name and sort the group count map in decreasing order by value.
+```scala
+g.V
+  .`match`(
+    __.as("a").hasLabel("movie"),
+    __.as("a").out("hasGenre").has("name", "Action"),
+    __.as("a").has("year", P.between(1980, 1990)),
+    __.as("a").inE("rated").as("b"),
+    __.as("b").has("stars", 5),
+    __.as("b").outV().as("c"),
+    __.as("c").out("hasOccupation").has("name", "programmer"),
+    __.as("c").has("age", P.between(30, 40))
+  )
+  .select[Vertex]("a")
+  .map(_.value[String]("name"))
+  .groupCount()
+  .order(Scope.local).by(Order.valueDecr)
+  .limit(Scope.local, 10)
+  .head
+```
+
+What is the most liked movie in each decade?
+```
+g.V()
+  .hasLabel("movie")
+  .where(_.inE("rated").count().is(P.gt(10)))
+  .group { v ⇒
+    val year = v.value[Integer]("year")
+    val decade = (year / 10)
+    (decade * 10): Integer
+  }
+  .map { moviesByDecade ⇒
+    val highestRatedByDecade = moviesByDecade.mapValues { movies ⇒
+      movies.toList
+        .sortBy { _.inE("rated").values("stars").mean().head }
+        .reverse.head //get the movie with the highest mean rating
+    }
+    highestRatedByDecade.mapValues(_.value[String]("name"))
+  }
+  .order(Scope.local).by(Order.keyIncr)
+  .head
+```
+
 ## Help - it's open source!
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)
