@@ -281,6 +281,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def is(predicate: P[End]) = GremlinScala[End, Labels](traversal.is(predicate))
 
+  def not(notTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+    GremlinScala[End, Labels](traversal.not(notTraversal(start).traversal))
+
   def where(predicate: P[String]) = GremlinScala[End, Labels](traversal.where(predicate))
 
   def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
