@@ -14,7 +14,7 @@ A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Sca
 * Minimal overhead - only allocates additional instances if absolutely necessary
 
 ### Getting started
-The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. 
+The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`.
 
 ### Using the sbt console
 * tl;dr: `sbt gremlin-scala/console`
