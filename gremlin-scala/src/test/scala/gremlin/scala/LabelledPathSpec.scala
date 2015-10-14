@@ -20,7 +20,7 @@ class LabelledPathSpec extends TestBase {
 
     it("supports multiple steps") {
       val path: List[Vertex :: Edge :: HNil] =
-        v(1).as("a").outE.as("b").labelledPath.toList
+        v(1).asScala.as("a").outE.as("b").labelledPath.toList
 
       path should be(List(
         v(1).vertex :: e(9).edge :: HNil,
@@ -53,7 +53,7 @@ class LabelledPathSpec extends TestBase {
 
     it("supports arbitrary classes") {
       val path: List[Vertex :: Vertex :: String :: HNil] =
-        v(1).as("a").out.as("b").values[String]("name").as("c").labelledPath.toList
+        v(1).asScala.as("a").out.as("b").values[String]("name").as("c").labelledPath.toList
 
       path should be(List(
         v(1).vertex :: v(3).vertex :: "lop" :: HNil,

@@ -8,77 +8,77 @@ class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
-      v(1).keys shouldBe Set("name", "age")
-      v(1).property[String]("name").value should be("marko")
-      v(1).property[String]("doesnt exit").isPresent shouldBe false
-      v(1).valueMap shouldBe Map("name" -> "marko", "age" -> 29)
-      v(1).valueMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
-      v(1).properties("name", "age").length shouldBe 2
-      v(1).properties.length shouldBe 2
+      v1.keys shouldBe Set("name", "age")
+      v1.property[String]("name").value should be("marko")
+      v1.property[String]("doesnt exit").isPresent shouldBe false
+      v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
+      v1.valueMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
+      v1.properties("name", "age").length shouldBe 2
+      v1.properties.length shouldBe 2
 
-      e(7).keys shouldBe Set("weight")
-      e(7).property[Float]("weight").value shouldBe 0.5
-      e(7).property[Float]("doesnt exit").isPresent shouldBe false
-      e(7).valueMap("weight") shouldBe Map("weight" -> 0.5)
+      e7.keys shouldBe Set("weight")
+      e7.property[Float]("weight").value shouldBe 0.5
+      e7.property[Float]("doesnt exit").isPresent shouldBe false
+      e7.valueMap("weight") shouldBe Map("weight" → 0.5)
     }
 
     it("sets a property") {
-      v(1).setProperty("vertexProperty", "updated")
-      v(1).property[String]("vertexProperty").value shouldBe "updated"
+      v1.setProperty("vertexProperty", "updated")
+      v1.property[String]("vertexProperty").value shouldBe "updated"
 
-      e(7).setProperty("edgeProperty", "updated")
-      e(7).property[String]("edgeProperty").value shouldBe "updated"
+      e7.setProperty("edgeProperty", "updated")
+      e7.property[String]("edgeProperty").value shouldBe "updated"
     }
 
     it("removes a property") {
-      v(1).setProperty("vertexProperty1", "updated")
-      v(1).removeProperty("vertexProperty1")
-      v(1).removeProperty("doesnt exist")
-      v(1).property[String]("vertexProperty1").isPresent shouldBe false
+      v1.setProperty("vertexProperty1", "updated")
+      v1.removeProperty("vertexProperty1")
+      v1.removeProperty("doesnt exist")
+      v1.property[String]("vertexProperty1").isPresent shouldBe false
 
-      e(7).setProperty("edgeProperty", "updated")
-      e(7).removeProperty("edgeProperty")
-      e(7).removeProperty("doesnt exist")
-      e(7).property[String]("edgeProperty").isPresent shouldBe false
+      e7.setProperty("edgeProperty", "updated")
+      e7.removeProperty("edgeProperty")
+      e7.removeProperty("doesnt exist")
+      e7.property[String]("edgeProperty").isPresent shouldBe false
     }
   }
 
   describe("values") {
     it("gets a value") {
-      v(1).value[String]("name") shouldBe Some("marko")
-      v(1).value[String]("doesn't exist") shouldBe None
-      v(1).getValue[String]("name") shouldBe "marko"
-      e(7).value[Float]("weight") shouldBe Some(0.5)
+      v1.value[String]("name") shouldBe Some("marko")
+      v1.value[String]("doesn't exist") shouldBe None
+      v1.getValue[String]("name") shouldBe "marko"
+      e7.value[Float]("weight") shouldBe Some(0.5)
     }
 
     it("falls back to default value if value doesnt exist") {
-      v(1).valueOrElse("doesnt exist", "blub") shouldBe "blub"
-      e(7).valueOrElse("doesnt exist", 0.8) shouldBe 0.8
+      v1.valueOrElse("doesnt exist", "blub") shouldBe "blub"
+      e7.valueOrElse("doesnt exist", 0.8) shouldBe 0.8
     }
 
     it("returns None if it doesn't exist") {
-      v(1).value[String]("doesnt exit") shouldBe None
-      e(7).value[Float]("doesnt exit") shouldBe None
+      v1.value[String]("doesnt exit") shouldBe None
+      e7.value[Float]("doesnt exit") shouldBe None
     }
   }
 
   describe("id, equality and hashCode") {
     it("has an id") {
-      v(1).id shouldBe 1
-      e(7).id shouldBe 7
+      v1.id shouldBe 1
+      e7.id shouldBe 7
     }
 
     it("equals") {
-      v(1) == v(1) shouldBe true
-      v(1) == v(2) shouldBe false
+      v1 == v(1).asScala shouldBe true
+      v1 == v(2).asScala shouldBe false
     }
 
     it("uses the right hashCodes") {
-      v(1).hashCode shouldBe v(1).hashCode
-      v(1).hashCode should not be v(2).hashCode
+      v1.hashCode shouldBe v(1).asScala.hashCode
+      v1.hashCode should not be v(2).asScala.hashCode
 
-      Set(v(1)) contains v(1) shouldBe true
-      Set(v(1)) contains v(2) shouldBe false
+      Set(v1) contains v(1) shouldBe true
+      Set(v1) contains v(2) shouldBe false
     }
   }
 
@@ -113,27 +113,11 @@ class ElementSpec extends TestBase {
       val label2 = "label2"
 
       val v1 = graph + label1
-      val v2 = graph + (label2, "testkey" -> "testValue")
+      val v2 = graph + (label2, "testkey" → "testValue")
 
       graph.V.hasLabel(label1).head() shouldBe v1.vertex
       graph.V.hasLabel(label2).head() shouldBe v2.vertex
       graph.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
-
-      graph.asJava.close()
-    }
-
-    it("adds a vertex and edges with a given label with syntactic sugar") {
-      val g = TinkerGraph.open.asScala
-      val label1 = "label1"
-      val label2 = "label2"
-      val testLabel = "testLabel"
-      (g + label1) --- testLabel --> (g + (label2, "testkey" -> "testValue"))
-
-      g.V.hasLabel(label1).head().label() shouldBe label1
-      g.V.hasLabel(label2).head().label() shouldBe label2
-      g.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
-      g.V.hasLabel(label1).head().outE().head().label() shouldBe testLabel
-      g.V.hasLabel(label1).head().out(testLabel).head().label() shouldBe label2
 
       graph.asJava.close()
     }
@@ -154,9 +138,9 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.addEdge("testLabel", v2, Map("testKey" -> "testValue"))
+      val e = v1.asScala.addEdge("testLabel", v2, Map("testKey" → "testValue"))
       e.label shouldBe "testLabel"
-      e.valueMap("testKey") shouldBe Map("testKey" -> "testValue")
+      e.valueMap("testKey") shouldBe Map("testKey" → "testValue")
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
@@ -168,5 +152,8 @@ class ElementSpec extends TestBase {
       graph.V.toList() shouldBe empty
     }
   }
+
+  def v1 = v(1).asScala
+  def e7 = e(7).asScala
 }
 
