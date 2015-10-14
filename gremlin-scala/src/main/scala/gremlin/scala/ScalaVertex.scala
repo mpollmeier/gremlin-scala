@@ -72,10 +72,10 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
   }
 
-  def <--(se: SemiEdge) = se.from.addEdge(se.label, vertex, se.properties)
+  def <--(se: SemiEdge) = se.from.asScala.addEdge(se.label, vertex, se.properties)
 
   def <--(de: SemiDoubleEdge): (Edge, Edge) =
-    addEdge(de.label, de.right, de.properties) → de.right.addEdge(de.label, vertex, de.properties)
+    addEdge(de.label, de.right, de.properties) → de.right.asScala.addEdge(de.label, vertex, de.properties)
 
   def ---(label: String) = SemiEdge(vertex, label)
 

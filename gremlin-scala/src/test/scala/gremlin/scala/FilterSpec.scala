@@ -21,6 +21,7 @@ class FilterSpec extends TestBase {
 
     val g = TinkerGraph.open.asScala
     g + (label("software"), name("blueprints"), created(2010))
+
     g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + (label("software"), name("gremlin"), created(2009)))
     g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + (label("software"), name("gremlinScala")))
     g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + (label("person"), name("mpollmeier")))
