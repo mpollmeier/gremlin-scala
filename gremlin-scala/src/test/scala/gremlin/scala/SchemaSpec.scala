@@ -88,7 +88,7 @@ class SchemaSpec extends FunSpec with Matchers {
       e.inVertex shouldBe london
       e.outVertex shouldBe paris
       e.value[String](Type.key) shouldBe "WDiEdge"
-      e.value[Integer](Weight.key) shouldBe 2
+      e.value[Int](Weight.key) shouldBe 2
     }
 
     it("to add left edge using syntax sugar with just Label") {

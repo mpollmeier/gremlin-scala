@@ -104,8 +104,8 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     e.inVertex shouldBe london
     e.outVertex shouldBe paris
-    e.value[String]("type") shouldBe Some("WDiEdge")
-    e.value[Int]("weight") shouldBe Some(2)
+    e.value[String]("type") shouldBe "WDiEdge"
+    e.value[Int]("weight") shouldBe 2
   }
 
   it("add left edge with properties using syntax sugar") {
@@ -118,6 +118,6 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     e.inVertex shouldBe paris
     e.outVertex shouldBe london
-    e.value[String]("type") shouldBe Some("WDiEdge")
+    e.value[String]("type") shouldBe "WDiEdge"
   }
 }
