@@ -73,4 +73,14 @@ class LogicalSpec extends TestBase {
     }
 
   }
+
+  describe("exists") {
+    it("returns true if one or more elements found") {
+      graph.V.exists shouldBe true
+    }
+
+    it("returns false if no elements found") {
+      graph.V.filter(_ ⇒ false).exists shouldBe false
+    }
+  }
 }
