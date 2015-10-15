@@ -3,6 +3,8 @@ package gremlin.scala
 import scala.collection.JavaConversions._
 import shapeless._
 
+case class Label(value: String) extends AnyVal
+
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
 
@@ -12,7 +14,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def id[A: DefaultsToAny]: A = element.id.asInstanceOf[A]
 
-  def label: String = element.label
+  def label: Label = Label(element.label)
 
   def keys: Set[String] = element.keys.toSet
 

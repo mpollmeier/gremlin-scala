@@ -7,7 +7,7 @@ import scala.reflect.macros.blackbox
 
 
 trait Marshallable[P <: Product] {
-  def fromCC(cc: P): (Option[AnyRef], String, Map[String, Any])
+  def fromCC(cc: P): (Option[AnyRef], Label, Map[String, Any])
 
   def toCC(id: AnyRef, valueMap: Map[String, Any]): P
 }
@@ -56,7 +56,7 @@ object Marshallable {
 
     c.Expr[Marshallable[P]] { q"""
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe): (Option[AnyRef], String, Map[String, Any]) = ($idParam, $label, Map(..$fromCCParams))
+        def fromCC(cc: $tpe): (Option[AnyRef], Label, Map[String, Any]) = ($idParam, $label, Map(..$fromCCParams))
         def toCC(id: AnyRef, valueMap: Map[String, Any]): $tpe = $companion(..$toCCParams)
       }
     """
