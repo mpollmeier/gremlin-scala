@@ -6,7 +6,7 @@ class FilterSpec extends TestBase {
 
   it("filters") {
     graph.V
-      .filter { _.valueOrElse("age", default = 0) > 30 }
+      .filter { _.property("age").orElse(0) > 30 }
       .values[String]("name").toSet should be(Set("josh", "peter"))
   }
 

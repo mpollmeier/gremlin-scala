@@ -50,20 +50,14 @@ class ElementSpec extends TestBase {
 
   describe("values") {
     it("gets a value") {
-      v1.value[String]("name") shouldBe Some("marko")
-      v1.value[String]("doesn't exist") shouldBe None
-      v1.getValue[String]("name") shouldBe "marko"
-      e7.value[Float]("weight") shouldBe Some(0.5)
+      v1.value[String]("name") shouldBe "marko"
+      v1.value[String]("name") shouldBe "marko"
+      e7.value[Float]("weight") shouldBe 0.5
     }
 
-    it("falls back to default value if value doesnt exist") {
-      v1.valueOrElse("doesnt exist", "blub") shouldBe "blub"
-      e7.valueOrElse("doesnt exist", 0.8) shouldBe 0.8
-    }
-
-    it("returns None if it doesn't exist") {
-      v1.value[String]("doesnt exit") shouldBe None
-      e7.value[Float]("doesnt exit") shouldBe None
+    it("throws an exception if it doesn't exist") {
+      intercept[IllegalStateException] { v1.value[String]("doesnt exit") shouldBe None }
+      intercept[IllegalStateException] { e7.value[Float]("doesnt exit") shouldBe None }
     }
   }
 
