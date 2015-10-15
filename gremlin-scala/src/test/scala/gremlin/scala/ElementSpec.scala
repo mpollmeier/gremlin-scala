@@ -22,6 +22,11 @@ class ElementSpec extends TestBase {
       e7.valueMap("weight") shouldBe Map("weight" → 0.5)
     }
 
+    it("maps properties to scala.Option") {
+      v1.property[String]("name").toOption should be(Some("marko"))
+      e7.property[Float]("weight").toOption shouldBe Some(0.5)
+    }
+
     it("sets a property") {
       v1.setProperty("vertexProperty", "updated")
       v1.property[String]("vertexProperty").value shouldBe "updated"

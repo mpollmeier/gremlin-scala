@@ -5,12 +5,15 @@ import java.util.function.{ BiPredicate, Function ⇒ JFunction, Predicate ⇒ J
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
+import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.reflect.runtime.universe._
 
 package object scala {
+
+
   type Vertex = structure.Vertex
   type Edge = structure.Edge
   type Element = structure.Element
@@ -40,6 +43,12 @@ package object scala {
 
   implicit class VertexAsJava(v: ScalaVertex) {
     def asJava = v.vertex
+  }
+
+  implicit class PropertyAsScala[A](property: Property[A]) {
+    def toOption: Option[A] =
+      if (property.isPresent) Some(property.value)
+      else None
   }
 
   // create a new anonymous traversal, e.g. `__.outE`

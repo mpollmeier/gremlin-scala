@@ -58,6 +58,27 @@ paris <-- ("EuroStar", Name("TrainName")) --- london
 
 Many thanks to @dkrieg and @joan38 for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
 
+### Vertices and edges have properties
+
+```scala
+v1.keys shouldBe Set("name", "age")
+v1.property[String]("name").value should be("marko")
+v1.property[String]("doesnt exit").isPresent shouldBe false
+v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
+v1.valueMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
+v1.properties("name", "age").length shouldBe 2
+v1.properties.length shouldBe 2
+
+v1.property[String]("name").toOption should be(Some("marko"))
+e7.property[Float]("weight").toOption shouldBe Some(0.5)
+
+e7.keys shouldBe Set("weight")
+e7.property[Float]("weight").value shouldBe 0.5
+e7.property[Float]("doesnt exit").isPresent shouldBe false
+e7.valueMap("weight") shouldBe Map("weight" → 0.5)
+```
+See more working examples in [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala)
+
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
 
