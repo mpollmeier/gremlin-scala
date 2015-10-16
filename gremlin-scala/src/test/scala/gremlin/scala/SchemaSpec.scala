@@ -4,12 +4,12 @@ import java.time.LocalDateTime
 
 import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.{ WordSpec, Matchers }
 import collection.JavaConversions._
 
-class SchemaSpec extends FunSpec with Matchers {
-  describe("a schema defines a sequence of Atoms that apply a value to build a Tuple2 and") {
-    it("has important default atoms") {
+class SchemaSpec extends WordSpec with Matchers {
+  "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
+    "use some default atoms" in {
       Label("software") shouldBe "label" → "software"
       ID(1) shouldBe "id" → 1
 
@@ -17,7 +17,7 @@ class SchemaSpec extends FunSpec with Matchers {
       ID(1) shouldBe ID.key → 1
     }
 
-    it("has extension points to add new Atom definitions") {
+    "use extension points to add new Atom definitions" in {
       object Created extends Key[LocalDateTime]("created")
       val now = LocalDateTime.now()
       Created(now) shouldBe "created" → now
@@ -33,7 +33,7 @@ class SchemaSpec extends FunSpec with Matchers {
     }
   }
 
-  describe("a schema with defined Atoms can be used in a Map") {
+  "a schema with defined Atoms" can {
     val Software = Label("software").value
     val Person = Label("person").value
     val Paris = Label("Paris").value
@@ -44,7 +44,7 @@ class SchemaSpec extends FunSpec with Matchers {
     object Type extends Key[String]("type")
     object Weight extends Key[Int]("weight")
 
-    it("to create a Vertex in a Graph") {
+    "create vertices" in {
       val g = TinkerGraph.open.asScala
 
       val v0 = g + (Software, Name("blueprints"), Created(2010))
@@ -62,7 +62,7 @@ class SchemaSpec extends FunSpec with Matchers {
       g.asJava.close()
     }
 
-    it("add bidirectional edge with syntax sugar") {
+    "add bidirectional edges" in {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris
@@ -77,7 +77,7 @@ class SchemaSpec extends FunSpec with Matchers {
       edgeLondonToParis.outVertex shouldBe london
     }
 
-    it("add edge with properties using syntax sugar") {
+    "add edges with properties" in {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris
@@ -91,7 +91,7 @@ class SchemaSpec extends FunSpec with Matchers {
       e.value[Int](Weight.key) shouldBe 2
     }
 
-    it("to add left edge using syntax sugar with just Label") {
+    "add left edge with just a Label" in {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris
@@ -105,7 +105,7 @@ class SchemaSpec extends FunSpec with Matchers {
       g.close()
     }
 
-    it("to add left edge using syntax sugar with Label and Name") {
+    "add left edge with Label and Name" in {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris
@@ -119,7 +119,7 @@ class SchemaSpec extends FunSpec with Matchers {
       g.close()
     }
 
-    it("to add left edge using syntax sugar with Label, Weight and Name") {
+    "add left edge with Label, Weight and Name" in {
       val g = TinkerGraph.open.asScala
 
       val paris = g + Paris

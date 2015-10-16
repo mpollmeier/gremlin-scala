@@ -7,9 +7,7 @@ import scala.language.implicitConversions
 object schema {
   /**
     * Smaller than an Element, consisting of the particles used
-    * compose a Property or VertexProperty of an Element (Edge or Vertex)
-    *
-    * @param key
+    * compose a Property (or VertexProperty) of an Element (Edge or Vertex)
     */
   sealed abstract class Atom[A](val key: String) {
     def apply(n: A): (String, A) = key → n
