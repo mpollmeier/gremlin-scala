@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{ WordSpec, Matchers }
+import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
 
 class SchemaSpec extends WordSpec with Matchers {
