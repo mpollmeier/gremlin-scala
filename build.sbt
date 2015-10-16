@@ -65,5 +65,6 @@ lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
   .dependsOn(macros)
 
+// macros can't be in the same compilation unit according to joan: https://github.com/mpollmeier/gremlin-scala/issues/100
 lazy val macros = project.in(file("macros"))
   .settings(commonSettings: _*)
