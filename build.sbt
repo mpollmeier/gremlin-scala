@@ -1,4 +1,6 @@
-name := "gremlin-scala"
+name := "root"
+organization := "com.michaelpollmeier"
+publishArtifact := false
 
 scalaVersion := "2.11.7"
 
