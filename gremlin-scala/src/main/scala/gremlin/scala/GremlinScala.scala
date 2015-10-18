@@ -314,6 +314,9 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
   def value[A](key: String) =
     GremlinScala[A, Labels](traversal.values[A](key))
 
+  def value[A](key: schema.Key[A]) =
+    GremlinScala[A, Labels](traversal.values[A](key.key))
+
   def values[A](key: String*) =
     GremlinScala[A, Labels](traversal.values[A](key: _*))
 

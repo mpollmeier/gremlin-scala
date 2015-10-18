@@ -6,6 +6,7 @@ import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
+import shapeless.test.illTyped
 
 class SchemaSpec extends WordSpec with Matchers {
   "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
@@ -131,6 +132,72 @@ class SchemaSpec extends WordSpec with Matchers {
       e.outVertex shouldBe london
 
       g.asJava.close()
+    }
+
+    "read type safe properties" when {
+      "using `value`" should {
+        "support vertices" in new Fixture {
+          val name = paris.value2(Name)
+          val someString: String = name
+          illTyped { //to ensure that there is no implicit conversion to make the above work
+            """
+            val i: Integer = paris.value2(Name)
+          """
+          }
+        }
+
+        "support edges" in new Fixture {
+          val distance = rail.value2(Distance)
+          val someInt: Int = distance
+          illTyped { //to ensure that there is no implicit conversion to make the above work
+            """
+            val i: String = v.value2(Distance)
+          """
+          }
+        }
+
+        "support traversal" in new Fixture {
+          val name = paris.out(EuroStar).value(Name).head
+          val someString: String = name //no implicit conversion, it already is a String
+
+          val distance = paris.outE(EuroStar).value(Distance).head
+          val someInt: Int = distance //no implicit conversion, it already is an Int
+        }
+      }
+
+      "using `property`" should {
+        "support vertices" in new Fixture {
+          val name = paris.property(Name)
+          val someString: Property[String] = name
+          illTyped { //to ensure that there is no implicit conversion to make the above work
+            """
+            val i: Property[Integer] = paris.value2(Name)
+          """
+          }
+        }
+
+        "support edges" in new Fixture {
+          val distance = rail.property(Distance)
+          val someInt: Property[Int] = distance //no implicit conversion, it already is an Int
+          illTyped { //to ensure that there is no implicit conversion to make the above work
+            """
+            val i: Property[String] = v.value2(Distance)
+          """
+          }
+        }
+      }
+
+      trait Fixture {
+        val City = Label("city").value
+        object Name extends Key[String]("name")
+        object Population extends Key[Int]("population")
+        object Distance extends Key[Int]("distance")
+
+        val g = TinkerGraph.open.asScala
+        val paris = g + (City, Name("paris"))
+        val london = g + (City, Name("london"))
+        val rail = paris --- (EuroStar, Distance(495)) --> london
+      }
     }
   }
 }
