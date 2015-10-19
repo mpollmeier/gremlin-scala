@@ -4,9 +4,10 @@ import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
-import org.apache.tinkerpop.gremlin.structure.{ Transaction, T }
+import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
+import schema._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
@@ -45,7 +46,8 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def +(label: String): Vertex = addVertex(label)
 
-  def +(label: String, properties: (String, Any)*): Vertex = addVertex(label, properties.toMap)
+  def +(label: String, properties: (Key[_], Any)*): Vertex =
+    addVertex(label, properties.toMap.map { case (k, v) ⇒ (k.key, v) })
 
   // get vertex by id
   def v(id: Any): Option[Vertex] =
@@ -69,7 +71,7 @@ case class ScalaGraph[G <: Graph](graph: G) {
   // start traversal with some edges identified by given ids 
   def E(edgeIds: Any*) =
     GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
-    .asInstanceOf[GraphTraversal[_, Edge]])
+      .asInstanceOf[GraphTraversal[_, Edge]])
 
   def edges(edgeIds: Any*): Iterator[Edge] =
     graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]])
@@ -90,5 +92,5 @@ case class ScalaGraph[G <: Graph](graph: G) {
 
   def close(): Unit = graph.close()
 
-  def transactional[R](work: Graph => R) = graph.tx.submit(work)
+  def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
 }

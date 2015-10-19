@@ -15,11 +15,16 @@ trait TestGraph {
   def print(gs: GremlinScala[_, _]) = println(gs.toList)
 }
 
-trait TestBase extends FunSpec with Matchers with TestGraph {
+object TestGraph {
   val Name = Key[String]("name")
-  val Weight = Key[Float]("weight")
+  val Age = Key[Int]("age")
+  val Created = Key[Int]("created")
+  val Location = Key[String]("location")
+  val Weight = Key[Double]("weight")
   val DoesNotExist = Key[Any]("doesnt_exist")
+}
 
+trait TestBase extends FunSpec with Matchers with TestGraph {
   implicit class Properties[A](set: Traversable[Property[A]]) {
     def unroll(): Traversable[A] = set map (_.value)
   }

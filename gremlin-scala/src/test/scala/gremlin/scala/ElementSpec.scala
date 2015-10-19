@@ -4,6 +4,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
 import org.apache.tinkerpop.gremlin.structure.T
 import schema.Key
+import TestGraph._
 
 class ElementSpec extends TestBase {
 
@@ -111,11 +112,11 @@ class ElementSpec extends TestBase {
       val label2 = "label2"
 
       val v1 = graph + label1
-      val v2 = graph + (label2, "testkey" → "testValue")
+      val v2 = graph + (label2, TestProperty → "testValue")
 
-      graph.V.hasLabel(label1).head() shouldBe v1.vertex
-      graph.V.hasLabel(label2).head() shouldBe v2.vertex
-      graph.V.hasLabel(label2).head().value[String]("testkey") shouldBe "testValue"
+      graph.V.hasLabel(label1).head shouldBe v1.vertex
+      graph.V.hasLabel(label2).head shouldBe v2.vertex
+      graph.V.hasLabel(label2).value(TestProperty).head shouldBe "testValue"
 
       graph.asJava.close()
     }

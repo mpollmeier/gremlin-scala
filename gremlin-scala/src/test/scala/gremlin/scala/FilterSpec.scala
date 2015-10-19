@@ -1,6 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import TestGraph._
 
 class FilterSpec extends TestBase {
 
@@ -11,20 +12,16 @@ class FilterSpec extends TestBase {
   }
 
   it("has") {
-    graph.V.has("age", 35).value[String]("name").toSet shouldBe Set("peter")
+    graph.V.has(Age, 35).value(Name).toSet shouldBe Set("peter")
   }
 
   it("has - sugar") {
-    def name(n: String) = "name" → n
-    def created(n: Int) = "created" → n
-    def label(n: String) = n
-
     val g = TinkerGraph.open.asScala
-    g + (label("software"), name("blueprints"), created(2010))
+    g + ("software", Name -> "blueprints", Created -> 2010)
 
-    g.V.has(name("blueprints")).head <-- "dependsOn" --- (g + (label("software"), name("gremlin"), created(2009)))
-    g.V.has(name("gremlin")).head <-- "dependsOn" --- (g + (label("software"), name("gremlinScala")))
-    g.V.has(name("gremlinScala")).head <-- "createdBy" --- (g + (label("person"), name("mpollmeier")))
+    g.V.has(Name -> "blueprints").head <-- "dependsOn" --- (g + ("software", Name -> "gremlin", Created -> 2009))
+    g.V.has(Name -> "gremlin").head <-- "dependsOn" --- (g + ("software", Name -> "gremlinScala"))
+    g.V.has(Name -> "gremlinScala").head <-- "createdBy" --- (g + ("person", Name -> "mpollmeier"))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3
@@ -38,7 +35,7 @@ class FilterSpec extends TestBase {
   }
 
   it("hasNot") {
-    graph.V.hasNot("age", 35).value[String]("name").toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+    graph.V.hasNot(Age, 35).value(Name).toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
   }
 
   describe("dedup") {
