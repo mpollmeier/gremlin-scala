@@ -7,7 +7,6 @@ import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
-import schema._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
@@ -47,7 +46,7 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def +(label: String): Vertex = addVertex(label)
 
   def +(label: String, properties: (Key[_], Any)*): Vertex =
-    addVertex(label, properties.toMap.map { case (k, v) ⇒ (k.key, v) })
+    addVertex(label, properties.toMap.map { case (k, v) ⇒ (k.value, v) })
 
   // get vertex by id
   def v(id: Any): Option[Vertex] =

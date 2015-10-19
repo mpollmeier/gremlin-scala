@@ -2,44 +2,18 @@ package gremlin.scala
 
 import java.time.LocalDateTime
 
-import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
 import shapeless.test.illTyped
 
 class SchemaSpec extends WordSpec with Matchers {
-  "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
-    "use some default atoms" in {
-      Label("software") shouldBe "label" → "software"
-      ID(1) shouldBe "id" → 1
-
-      Label("software") shouldBe Label.key → "software"
-      ID(1) shouldBe ID.key → 1
-    }
-
-    "use extension points to add new Atom definitions" in {
-      object Created extends Key[LocalDateTime]("created")
-      val now = LocalDateTime.now()
-      Created(now) shouldBe "created" → now
-      Created(now) shouldBe Created.key → now
-
-      object Name extends Key[String]("name")
-      Name("Daniel") shouldBe "name" → "Daniel"
-      Name("Daniel") shouldBe Name.key → "Daniel"
-
-      val Software = Label("software")
-      Software shouldBe Label.key → "software"
-      Software shouldBe Label.key → Software.value
-    }
-  }
-
   "a schema with defined Atoms" can {
-    val Software = Label("software").value
-    val Person = Label("person").value
-    val Paris = Label("Paris").value
-    val London = Label("London").value
-    val EuroStar = Label("eurostar").value
+    val Software = "software"
+    val Person = "person"
+    val Paris = "Paris"
+    val London = "London"
+    val EuroStar = "eurostar"
     object Name extends Key[String]("name")
     object Created extends Key[Int]("created")
     object Type extends Key[String]("type")
@@ -188,7 +162,7 @@ class SchemaSpec extends WordSpec with Matchers {
       }
 
       trait Fixture {
-        val City = Label("city").value
+        val City = "city"
         object Name extends Key[String]("name")
         object Population extends Key[Int]("population")
         object Distance extends Key[Int]("distance")
