@@ -15,7 +15,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def label: String = element.label
 
-  def keys: Set[String] = element.keys.toSet
+  def keys: Set[Key[Any]] = element.keys.toSet.map(Key.apply[Any])
 
   def setProperty[A](key: Key[A], value: A): ElementType
 
@@ -42,7 +42,7 @@ trait ScalaElement[ElementType <: Element] {
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =
     element.values[A](keys: _*)
 
-  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq: _*)
+  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq.map(_.key): _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
     (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap

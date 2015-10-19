@@ -95,11 +95,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def edges(direction: Direction, edgeLabels: String*): util.Iterator[Edge] =
     vertex.edges(direction, edgeLabels: _*)
 
-  def property[V](cardinality: Cardinality, key: String, value: V, keyValues: AnyRef*): VertexProperty[V] =
+  def property[A](cardinality: Cardinality, key: Key[A], value: A, keyValues: AnyRef*): VertexProperty[A] =
     vertex.property(cardinality, key, value, keyValues: _*)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.toSeq: _*).toStream
+    vertex.properties[A](keys.map(_.key).toSeq: _*).toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
     vertex.properties[A](wantedKeys: _*).toStream

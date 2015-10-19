@@ -9,7 +9,7 @@ class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
-      v1.keys shouldBe Set("name", "age")
+      v1.keys shouldBe Set(Key("name"), Key("age"))
       v1.property(Name).value shouldBe "marko"
       v1.property(DoesNotExist).isPresent shouldBe false
       v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
@@ -17,7 +17,7 @@ class ElementSpec extends TestBase {
       v1.properties("name", "age").length shouldBe 2
       v1.properties.length shouldBe 2
 
-      e7.keys shouldBe Set("weight")
+      e7.keys shouldBe Set(Key("weight"))
       e7.property(Weight).value shouldBe 0.5
       e7.property(DoesNotExist).isPresent shouldBe false
       e7.valueMap("weight") shouldBe Map("weight" → 0.5)
