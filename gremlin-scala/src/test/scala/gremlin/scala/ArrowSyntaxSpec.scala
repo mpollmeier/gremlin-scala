@@ -2,6 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{ FunSpec, Matchers }
+import schema.Key
 
 class ArrowSyntaxSpec extends FunSpec with Matchers {
 
@@ -99,25 +100,28 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
 
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
+    val Type = Key[String]("type")
+    val Weight = Key[Int]("weight")
 
-    val e = paris --- ("eurostar", "type" → "WDiEdge", "weight" → 2) --> london
+    val e = paris --- ("eurostar", Type → "WDiEdge", Weight → 2) --> london
 
     e.inVertex shouldBe london
     e.outVertex shouldBe paris
-    e.value[String]("type") shouldBe "WDiEdge"
-    e.value[Int]("weight") shouldBe 2
+    e.value2(Type) shouldBe "WDiEdge"
+    e.value2(Weight) shouldBe 2
   }
 
   it("add left edge with properties using syntax sugar") {
     val graph = TinkerGraph.open.asScala
+    val Type = Key[String]("type")
 
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
 
-    val e = paris <-- ("eurostar", "type" → "WDiEdge") --- london
+    val e = paris <-- ("eurostar", Type → "WDiEdge") --- london
 
     e.inVertex shouldBe paris
     e.outVertex shouldBe london
-    e.value[String]("type") shouldBe "WDiEdge"
+    e.value2(Type) shouldBe "WDiEdge"
   }
 }

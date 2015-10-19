@@ -50,14 +50,13 @@ class ElementSpec extends TestBase {
 
   describe("values") {
     it("gets a value") {
-      v1.value[String]("name") shouldBe "marko"
-      v1.value[String]("name") shouldBe "marko"
-      e7.value[Float]("weight") shouldBe 0.5
+      v1.value2(Name) shouldBe "marko"
+      v1.value2(Name) shouldBe "marko"
+      e7.value2(Weight) shouldBe 0.5
     }
 
     it("throws an exception if it doesn't exist") {
-      intercept[IllegalStateException] { v1.value[String]("doesnt exit") shouldBe None }
-      intercept[IllegalStateException] { e7.value[Float]("doesnt exit") shouldBe None }
+      intercept[IllegalStateException] { v1.value2(DoesNotExist) }
     }
   }
 
@@ -99,11 +98,11 @@ class ElementSpec extends TestBase {
       val label1 = "label1"
       val label2 = "label2"
       val v1 = graph.addVertex(label1)
-      val v2 = graph.addVertex(label2, Map("testkey" → "testValue"))
+      val v2 = graph.addVertex(label2, Map(TestProperty.key → "testValue"))
 
-      graph.V.has(T.label, label1).head() shouldBe v1.vertex
-      graph.V.has(T.label, label2).head() shouldBe v2.vertex
-      graph.V.has(T.label, label2).head().value[String]("testkey") shouldBe "testValue"
+      graph.V.has(T.label, label1).head shouldBe v1.vertex
+      graph.V.has(T.label, label2).head shouldBe v2.vertex
+      graph.V.has(T.label, label2).value(TestProperty).head shouldBe "testValue"
     }
 
     it("adds a vertex with a given label with syntactic sugar") {
@@ -137,9 +136,10 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.asScala.addEdge("testLabel", v2, Map("testKey" → "testValue"))
+      val e = v1.asScala.addEdge("testLabel", v2, Map(TestProperty → "testValue"))
       e.label shouldBe "testLabel"
-      e.valueMap("testKey") shouldBe Map("testKey" → "testValue")
+      e.value2(TestProperty) shouldBe "testValue"
+      e.valueMap(TestProperty.key) shouldBe Map(TestProperty.key → "testValue")
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }

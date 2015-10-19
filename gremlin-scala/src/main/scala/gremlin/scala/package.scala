@@ -1,18 +1,18 @@
 package gremlin
 
-import java.util.function.{ BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate }
+import java.util.function.{BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate}
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
+import gremlin.scala.schema.Key
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.reflect.runtime.universe._
 
 package object scala {
-
 
   type Vertex = structure.Vertex
   type Edge = structure.Edge
@@ -128,27 +128,28 @@ package object scala {
 
   implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A))(implicit tag: TypeTag[A]) {
     private val label = t._1
-    private lazy val properties =
+    private lazy val properties: Map[Key[_], Any] = {
       if (t._2.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String"))
-        Map(t._2.asInstanceOf[(String, Any)])
-      else t._2.productIterator.foldLeft(Map.empty[String, Any]) { (m, a) ⇒
+        Map(t._2.asInstanceOf[(String, Any)]).map { case (k, v) ⇒ (Key(k), v) }
+      else t._2.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, a) ⇒
         a match {
-          case (k, v) ⇒ m.updated(k.asInstanceOf[String], v)
+          case (k, v) ⇒ m.updated(Key(k.asInstanceOf[String]), v)
         }
       }
+    }
 
-    def ---(from: Vertex) = SemiEdge(from, label, properties)
+    def ---(from: Vertex) = SemiEdge(from, label, properties.asInstanceOf[Map[Key[_], Any]])
   }
 
   implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
     def ---(from: Vertex) = {
       val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiEdge(from, label, properties)
+      SemiEdge(from, label, properties.map { case (k, v) ⇒ (Key(k), v) })
     }
 
     def -->(from: Vertex) = {
       val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiDoubleEdge(from, label, properties)
+      SemiDoubleEdge(from, label, properties.map { case (k, v) ⇒ (Key(k), v) })
     }
   }
 

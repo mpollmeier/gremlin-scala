@@ -1,7 +1,9 @@
 package gremlin.scala
 
-case class SemiEdge(from: Vertex, label: String, properties: Map[String, Any] = Map.empty) {
+import schema.Key
+
+case class SemiEdge(from: Vertex, label: String, properties: Map[Key[_], Any] = Map.empty) {
   def -->(to: Vertex) = from.asScala.addEdge(label, to, properties)
 }
 
-case class SemiDoubleEdge(right: Vertex, label: String, properties: Map[String, Any] = Map.empty)
+case class SemiDoubleEdge(right: Vertex, label: String, properties: Map[Key[_], Any] = Map.empty)

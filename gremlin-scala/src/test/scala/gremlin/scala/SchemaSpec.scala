@@ -84,12 +84,12 @@ class SchemaSpec extends WordSpec with Matchers {
       val paris = g + Paris
       val london = g + London
 
-      val e = paris --- (EuroStar, Type("WDiEdge"), Weight(2)) --> london
+      val e = paris --- (EuroStar, Type -> "WDiEdge", Weight -> 2) --> london
 
       e.inVertex shouldBe london
       e.outVertex shouldBe paris
-      e.value[String](Type.key) shouldBe "WDiEdge"
-      e.value[Int](Weight.key) shouldBe 2
+      e.value2(Type) shouldBe "WDiEdge"
+      e.value2(Weight) shouldBe 2
     }
 
     "add left edge with just a Label" in {
@@ -196,7 +196,7 @@ class SchemaSpec extends WordSpec with Matchers {
         val g = TinkerGraph.open.asScala
         val paris = g + (City, Name → "paris")
         val london = g + (City, Name → "london")
-        val rail = paris --- (EuroStar, Distance(495)) --> london
+        val rail = paris --- (EuroStar, Distance -> 495) --> london
       }
     }
   }
