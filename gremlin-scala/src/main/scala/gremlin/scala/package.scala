@@ -133,11 +133,12 @@ package object scala {
     // this is the price we pay for nice syntax a la `paris <-- ("eurostar", Name → "test") --- london`
     private lazy val properties: Map[Key[_], Any] = {
       keys match {
-        case (k: String,v) => Map(Key(k) -> v)
-        case (k: Key[_],v) => Map(k -> v)
-        case keys => keys.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, prop) ⇒
+        case (k: String, v) ⇒ Map(Key(k) → v)
+        case (k: Key[_], v) ⇒ Map(k → v)
+        case keys ⇒ keys.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, prop) ⇒
           prop match {
             case (k: String, v) ⇒ m.updated(Key(k), v)
+            case (k: Key[_], v) ⇒ m.updated(k, v)
           }
         }
       }

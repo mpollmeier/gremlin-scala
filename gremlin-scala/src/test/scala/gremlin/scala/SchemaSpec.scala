@@ -84,7 +84,7 @@ class SchemaSpec extends WordSpec with Matchers {
       val paris = g + Paris
       val london = g + London
 
-      val e = paris --- (EuroStar, Type -> "WDiEdge", Weight -> 2) --> london
+      val e = paris --- (EuroStar, Type → "WDiEdge", Weight → 2) --> london
 
       e.inVertex shouldBe london
       e.outVertex shouldBe paris
@@ -112,7 +112,7 @@ class SchemaSpec extends WordSpec with Matchers {
       val paris = g + Paris
       val london = g + London
 
-      val e = paris <-- (EuroStar, Name("test")) --- london
+      val e = paris <-- (EuroStar, Name → "test") --- london
 
       e.inVertex shouldBe paris
       e.outVertex shouldBe london
@@ -126,7 +126,7 @@ class SchemaSpec extends WordSpec with Matchers {
       val paris = g + Paris
       val london = g + London
 
-      val e = paris <-- (EuroStar, (Weight(99), Name("test"))) --- london
+      val e = paris <-- (EuroStar, (Weight → 99, Name → "test")) --- london
 
       e.inVertex shouldBe paris
       e.outVertex shouldBe london
@@ -196,7 +196,7 @@ class SchemaSpec extends WordSpec with Matchers {
         val g = TinkerGraph.open.asScala
         val paris = g + (City, Name → "paris")
         val london = g + (City, Name → "london")
-        val rail = paris --- (EuroStar, Distance -> 495) --> london
+        val rail = paris --- (EuroStar, Distance → 495) --> london
       }
     }
   }
