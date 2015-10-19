@@ -23,4 +23,7 @@ object schema {
     def key: String = p._1
     def value: A = p._2
   }
+
+  // type safe label for steps
+  case class StepLabel[A](name: String)
 }

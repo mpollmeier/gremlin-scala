@@ -3,10 +3,12 @@ package gremlin.scala
 import java.time.LocalDateTime
 
 import gremlin.scala.schema._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
 import shapeless.test.illTyped
+import schema.StepLabel
 
 class SchemaSpec extends WordSpec with Matchers {
   "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
@@ -198,6 +200,35 @@ class SchemaSpec extends WordSpec with Matchers {
         val london = g + (City, Name → "london")
         val rail = paris --- (EuroStar, Distance → 495) --> london
       }
+    }
+  }
+
+  "StepLabel" can {
+    def g: ScalaGraph[TinkerGraph] = TinkerFactory.createModern.asScala
+    val a = StepLabel[Vertex]("start")
+    val b = StepLabel[Edge]("createdE")
+
+    "derive types for a simple as/select" in {
+      val results = g.V(1).as(a).outE("created").as(b).select(b).toList
+      val e: Edge = results.head
+
+      illTyped { //to ensure that there is no implicit conversion to make the above work
+        """
+          val e2: Vertex = results.head
+        """
+      }
+    }
+
+      // see TODO in GremlinScala.select - to make this work
+    "derive types for as/select with multiple labels" ignore {
+      // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
+      // val ve: (Vertex, Edge) = results.head
+
+      // illTyped { //to ensure that there is no implicit conversion to make the above work
+      //   """
+      //     val ve2: (Edge, Vertex) = results.head
+      //   """
+      // }
     }
   }
 }

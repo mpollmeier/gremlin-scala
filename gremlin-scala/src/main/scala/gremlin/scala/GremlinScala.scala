@@ -16,6 +16,7 @@ import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 import scala.language.existentials
 import schema.Key
+import schema.StepLabel
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
@@ -90,12 +91,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec`
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
+  def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
+
   def select[A: DefaultsToAny](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
 
   def select[A: DefaultsToAny](pop: Pop, selectKey: String) = GremlinScala[A, Labels](traversal.select(pop, selectKey))
 
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
+
+  // TODO: return HMap, get key types from StepLabels
+  // def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
+  //   GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
@@ -140,6 +147,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // labels the current step and preserves the type - see `labelledPath` steps
   def as(name: String, moreNames: String*)(implicit p: Prepend[Labels, End :: HNil]) =
     GremlinScala[End, p.Out](traversal.as(name, moreNames: _*))
+
+  def as(stepLabel: StepLabel[End])(implicit p: Prepend[Labels, End :: HNil]) =
+    GremlinScala[End, p.Out](traversal.as(stepLabel.name))
 
   def label() = GremlinScala[String, Labels](traversal.label())
 
