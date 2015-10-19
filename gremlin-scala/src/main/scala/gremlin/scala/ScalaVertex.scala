@@ -6,7 +6,6 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
 import shapeless._
 import scala.collection.JavaConversions._
-import schema.Key
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex

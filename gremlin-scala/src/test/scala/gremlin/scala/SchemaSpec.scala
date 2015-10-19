@@ -2,7 +2,6 @@ package gremlin.scala
 
 import java.time.LocalDateTime
 
-import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._

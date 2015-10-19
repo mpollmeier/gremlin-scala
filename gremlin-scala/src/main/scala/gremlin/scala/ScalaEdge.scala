@@ -2,7 +2,6 @@ package gremlin.scala
 
 import shapeless._
 import scala.collection.JavaConversions._
-import schema.Key
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge

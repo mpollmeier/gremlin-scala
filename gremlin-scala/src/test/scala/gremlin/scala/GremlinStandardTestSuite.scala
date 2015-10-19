@@ -8,7 +8,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.filter._
 import org.apache.tinkerpop.gremlin.process.traversal.step.map._
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect._
 import org.apache.tinkerpop.gremlin.structure.T
-import schema.Key
 import TestGraph._
 
 import scala.collection.JavaConversions._

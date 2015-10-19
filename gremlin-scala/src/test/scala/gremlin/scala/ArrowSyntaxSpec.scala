@@ -2,7 +2,6 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{ FunSpec, Matchers }
-import schema.Key
 
 class ArrowSyntaxSpec extends FunSpec with Matchers {
 

@@ -3,7 +3,6 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
 import org.apache.tinkerpop.gremlin.structure.T
-import schema.Key
 import TestGraph._
 
 class ElementSpec extends TestBase {

@@ -4,7 +4,6 @@ import org.apache.tinkerpop.gremlin.structure._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
-import schema.Key
 
 trait TestGraph {
   val graph = TinkerFactory.createClassic().asScala

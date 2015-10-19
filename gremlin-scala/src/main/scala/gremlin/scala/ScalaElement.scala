@@ -2,7 +2,6 @@ package gremlin.scala
 
 import scala.collection.JavaConversions._
 import shapeless._
-import schema.Key
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType

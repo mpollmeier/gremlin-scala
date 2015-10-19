@@ -7,7 +7,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
-import gremlin.scala.schema.Key
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.reflect.runtime.universe._

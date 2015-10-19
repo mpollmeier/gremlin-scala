@@ -15,7 +15,6 @@ import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 import scala.language.existentials
-import schema.Key
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream

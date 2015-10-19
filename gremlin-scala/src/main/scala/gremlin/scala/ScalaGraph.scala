@@ -7,7 +7,6 @@ import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
-import schema._
 
 case class ScalaGraph[G <: Graph](graph: G) {
 
