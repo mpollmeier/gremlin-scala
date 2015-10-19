@@ -8,7 +8,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
   override def setProperty[A](key: Key[A], value: A): Edge = {
-    element.property(key.key, value)
+    element.property(key.value, value)
     edge
   }
 
@@ -40,7 +40,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def start() = GremlinScala[Edge, HNil](__(edge))
 
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
-    edge.properties[A](keys.map(_.key).toSeq: _*).toStream
+    edge.properties[A](keys.map(_.value).toSeq: _*).toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
     edge.properties[A](wantedKeys: _*).toStream

@@ -47,7 +47,7 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def +(label: String): Vertex = addVertex(label)
 
   def +(label: String, properties: (Key[_], Any)*): Vertex =
-    addVertex(label, properties.toMap.map { case (k, v) ⇒ (k.key, v) })
+    addVertex(label, properties.toMap.map { case (k, v) ⇒ (k.value, v) })
 
   // get vertex by id
   def v(id: Any): Option[Vertex] =
