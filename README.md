@@ -29,7 +29,7 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 * Next, change to the gremlin-scala project using `project gremlin-scala`
 * Finally, to test out the API in a REPL type `console` 
 
-### Creating vertices and edges
+### Creating vertices and edges with type safe properties
 
 ```scala
 import gremlin.scala._
@@ -54,11 +54,16 @@ paris <-- "Eurostar" --> london
 // create edge with typed properties
 object Name extends Key[String]("name")
 paris <-- ("EuroStar", Name("TrainName")) --- london
+
+// access properties - compiler infers the type for you
+london.value2(Founded) //type: String
+london.property(Founded) //type: Property[String]
+paris.out("Eurostar").value(Founded).head //type: String
 ```
 
-Many thanks to @dkrieg and @joan38 for contributing this. For more details check out the [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
+More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
 
-### Vertices and edges have properties
+### Other means to access properties
 
 ```scala
 v1.keys shouldBe Set("name", "age")
@@ -77,7 +82,8 @@ e7.property[Float]("weight").value shouldBe 0.5
 e7.property[Float]("doesnt exit").isPresent shouldBe false
 e7.valueMap("weight") shouldBe Map("weight" → 0.5)
 ```
-See more working examples in [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala)
+
+More working examples in [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ElementSpec.scala)
 
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
