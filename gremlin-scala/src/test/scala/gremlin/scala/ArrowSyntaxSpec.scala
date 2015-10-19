@@ -111,7 +111,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.value2(Weight) shouldBe 2
   }
 
-  it("add left edge with properties using syntax sugar") {
+  it("add left edge with properties using syntax sugar", org.scalatest.Tag("foo")) {
     val graph = TinkerGraph.open.asScala
     val Type = Key[String]("type")
 

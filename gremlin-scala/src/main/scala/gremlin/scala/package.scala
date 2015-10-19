@@ -128,12 +128,18 @@ package object scala {
 
   implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A))(implicit tag: TypeTag[A]) {
     private val label = t._1
+    private val keys = t._2
+
+    // this is the price we pay for nice syntax a la `paris <-- ("eurostar", Name → "test") --- london`
     private lazy val properties: Map[Key[_], Any] = {
-      if (t._2.productArity == 2 && tag.tpe.typeArgs.head.typeSymbol.name.toString.equals("String"))
-        Map(t._2.asInstanceOf[(String, Any)]).map { case (k, v) ⇒ (Key(k), v) }
-      else t._2.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, a) ⇒
-        a match {
-          case (k, v) ⇒ m.updated(Key(k.asInstanceOf[String]), v)
+      val keyType = tag.tpe.typeArgs.head.typeSymbol.name.toString
+      keys match {
+        case (k: String,v) => Map(Key(k) -> v)
+        case (k: Key[_],v) => Map(k -> v)
+        case keys => keys.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, a) ⇒
+          a match {
+            case (k, v) ⇒ m.updated(Key(k.asInstanceOf[String]), v)
+          }
         }
       }
     }
