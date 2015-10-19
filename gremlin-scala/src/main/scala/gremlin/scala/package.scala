@@ -126,19 +126,18 @@ package object scala {
     def -->(right: Vertex) = SemiDoubleEdge(right, label)
   }
 
-  implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A))(implicit tag: TypeTag[A]) {
+  implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A)) {
     private val label = t._1
     private val keys = t._2
 
     // this is the price we pay for nice syntax a la `paris <-- ("eurostar", Name → "test") --- london`
     private lazy val properties: Map[Key[_], Any] = {
-      val keyType = tag.tpe.typeArgs.head.typeSymbol.name.toString
       keys match {
         case (k: String,v) => Map(Key(k) -> v)
         case (k: Key[_],v) => Map(k -> v)
-        case keys => keys.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, a) ⇒
-          a match {
-            case (k, v) ⇒ m.updated(Key(k.asInstanceOf[String]), v)
+        case keys => keys.productIterator.foldLeft(Map.empty[Key[_], Any]) { (m, prop) ⇒
+          prop match {
+            case (k: String, v) ⇒ m.updated(Key(k), v)
           }
         }
       }
