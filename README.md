@@ -29,7 +29,7 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 * Next, change to the gremlin-scala project using `project gremlin-scala`
 * Finally, to test out the API in a REPL type `console` 
 
-### Creating vertices and edges with type safe properties
+### Vertices and edges with type safe properties
 
 ```scala
 import gremlin.scala._
@@ -37,28 +37,33 @@ import gremlin.scala.schema.Key
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 val graph = TinkerGraph.open.asScala
 
+
+// define some Keys
+object Name extends Key[String]("name")
+object Population extends Key[Int]("population")
+object Distance extends Key[Int]("distance")
+
 // create labelled vertex
 val paris = graph + "Paris"
 
 // create vertex with typed properties
-object Founded extends Key[String]("founded")
-val london = graph + ("London", Founded("43 AD"))
+val Founded = Key[String]("founded")
+val london = graph + ("London", Founded → "43 AD")
 
 // create labelled edges 
 paris --- "OneWayRoad" --> london
 paris <-- "OtherWayAround" --- london
-
-// create labelled bidirectional edge
 paris <-- "Eurostar" --> london
 
 // create edge with typed properties
-object Name extends Key[String]("name")
-paris <-- ("EuroStar", Name("TrainName")) --- london
+val Distance = Key[Int]("distance")
+paris --- ("Eurostar", Distance → 495) --> london
 
-// access properties - compiler infers the type for you
-london.value2(Founded) //type: String
-london.property(Founded) //type: Property[String]
-paris.out("Eurostar").value(Founded).head //type: String
+// type safe access to properties (compiler infers the correct type)
+london.property(Founded) //Property(founded->43 AD)
+london.value2(Founded) //43 AD
+paris.out("Eurostar").value(Founded).head //43 AD
+paris.outE("Eurostar").value(Distance).head //495
 ```
 
 More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
@@ -66,21 +71,12 @@ More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scal
 ### Other means to access properties
 
 ```scala
-v1.keys shouldBe Set("name", "age")
-v1.property[String]("name").value should be("marko")
-v1.property[String]("doesnt exit").isPresent shouldBe false
-v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
-v1.valueMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
-v1.properties("name", "age").length shouldBe 2
-v1.properties.length shouldBe 2
-
-v1.property[String]("name").toOption should be(Some("marko"))
-e7.property[Float]("weight").toOption shouldBe Some(0.5)
-
-e7.keys shouldBe Set("weight")
-e7.property[Float]("weight").value shouldBe 0.5
-e7.property[Float]("doesnt exit").isPresent shouldBe false
-e7.valueMap("weight") shouldBe Map("weight" → 0.5)
+v1.keys // Set(Key("name"), Key("age"))
+v1.property(Name) // "marko"
+v1.valueMap // Map("name" → "marko", "age" → 29)
+v1.valueMap("name", "age") // Map("name" → "marko", "age" → 29)
+v1.properties("name", "age").length // 2
+v1.properties.length // 2
 ```
 
 More working examples in [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ElementSpec.scala)
@@ -139,7 +135,7 @@ Here are some examples of more complex traversals from the [examples repo](https
 
 What is `Die Hard's` average rating?
 ```scala
-g.V.has("movie", "name", "Die Hard")
+graph.V.has("movie", "name", "Die Hard")
   .inE("rated")
   .values("stars")
   .mean
