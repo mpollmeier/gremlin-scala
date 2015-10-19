@@ -15,6 +15,7 @@ import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
 import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 import scala.language.existentials
+import schema.Key
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
@@ -314,7 +315,7 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
   def value[A](key: String) =
     GremlinScala[A, Labels](traversal.values[A](key))
 
-  def value[A](key: schema.Key[A]) =
+  def value[A](key: Key[A]) =
     GremlinScala[A, Labels](traversal.values[A](key.key))
 
   def values[A](key: String*) =

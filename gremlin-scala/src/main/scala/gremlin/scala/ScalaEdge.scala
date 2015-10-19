@@ -2,33 +2,34 @@ package gremlin.scala
 
 import shapeless._
 import scala.collection.JavaConversions._
+import schema.Key
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
 
-  override def setProperty(key: String, value: Any): Edge = {
-    element.property(key, value)
+  override def setProperty[A](key: Key[A], value: A): Edge = {
+    element.property(key.key, value)
     edge
   }
 
-  def setProperties(properties: Map[String, Any]): Edge = {
+  def setProperties(properties: Map[Key[Any], Any]): Edge = {
     properties foreach { case (k, v) ⇒ setProperty(k, v) }
     edge
   }
 
   def setProperties[T <: Product: Marshallable](cc: T): Edge = {
     val (_, _, properties) = implicitly[Marshallable[T]].fromCC(cc)
-    setProperties(properties)
+    properties foreach { case (k, v) ⇒ element.property(k, v) }
     edge
   }
 
-  override def removeProperty(key: String): Edge = {
+  override def removeProperty(key: Key[_]): Edge = {
     val p = property(key)
     if (p.isPresent) p.remove()
     edge
   }
 
-  override def removeProperties(keys: String*): Edge = {
+  override def removeProperties(keys: Key[_]*): Edge = {
     keys foreach removeProperty
     edge
   }

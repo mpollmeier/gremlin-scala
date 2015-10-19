@@ -6,6 +6,7 @@ import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
 import shapeless._
 import scala.collection.JavaConversions._
+import schema.Key
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
@@ -13,23 +14,23 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def toCC[P <: Product : Marshallable] =
     implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap)
 
-  override def setProperty(key: String, value: Any): Vertex = {
-    element.property(key, value)
+  override def setProperty[A](key: Key[A], value: A): Vertex = {
+    element.property(key.key, value)
     vertex
   }
 
-  def setProperties(properties: Map[String, Any]): Vertex = {
+  def setProperties(properties: Map[Key[Any], Any]): Vertex = {
     properties foreach { case (k, v) ⇒ setProperty(k, v) }
     vertex
   }
 
-  override def removeProperty(key: String): Vertex = {
+  override def removeProperty(key: Key[_]): Vertex = {
     val p = property(key)
     if (p.isPresent) p.remove()
     vertex
   }
 
-  override def removeProperties(keys: String*): Vertex = {
+  override def removeProperties(keys: Key[_]*): Vertex = {
     keys foreach removeProperty
     vertex
   }

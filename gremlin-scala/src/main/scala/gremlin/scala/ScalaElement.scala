@@ -2,6 +2,7 @@ package gremlin.scala
 
 import scala.collection.JavaConversions._
 import shapeless._
+import schema.Key
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
@@ -16,15 +17,13 @@ trait ScalaElement[ElementType <: Element] {
 
   def keys: Set[String] = element.keys.toSet
 
-  def setProperty(key: String, value: Any): ElementType
+  def setProperty[A](key: Key[A], value: A): ElementType
 
-  def removeProperty(key: String): ElementType
+  def removeProperty(key: Key[_]): ElementType
 
-  def removeProperties(keys: String*): ElementType
+  def removeProperties(keys: Key[_]*): ElementType
 
-  def property[A: DefaultsToAny](key: String): Property[A] = element.property[A](key)
-
-  def property[A](key: schema.Key[A]): Property[A] = element.property[A](key.key)
+  def property[A](key: Key[A]): Property[A] = element.property[A](key.key)
 
   def properties[A: DefaultsToAny]: Stream[Property[A]]
 
@@ -36,7 +35,7 @@ trait ScalaElement[ElementType <: Element] {
 
   // typesafe version of `value. have to call it `value2` because of a scala compiler bug :(
   // https://issues.scala-lang.org/browse/SI-9523
-  def value2[A](key: schema.Key[A]): A =
+  def value2[A](key: Key[A]): A =
     element.value[A](key.key)
 
   // note: this may throw an IllegalStateException - better use `Property`

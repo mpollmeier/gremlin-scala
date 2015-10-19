@@ -3,48 +3,47 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.matchers.ShouldMatchers
 import org.apache.tinkerpop.gremlin.structure.T
+import schema.Key
 
 class ElementSpec extends TestBase {
 
   describe("properties") {
     it("gets properties") {
       v1.keys shouldBe Set("name", "age")
-      v1.property[String]("name").value should be("marko")
-      v1.property[String]("doesnt exit").isPresent shouldBe false
+      v1.property(Name).value shouldBe "marko"
+      v1.property(DoesNotExist).isPresent shouldBe false
       v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
       v1.valueMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
       v1.properties("name", "age").length shouldBe 2
       v1.properties.length shouldBe 2
 
       e7.keys shouldBe Set("weight")
-      e7.property[Float]("weight").value shouldBe 0.5
-      e7.property[Float]("doesnt exit").isPresent shouldBe false
+      e7.property(Weight).value shouldBe 0.5
+      e7.property(DoesNotExist).isPresent shouldBe false
       e7.valueMap("weight") shouldBe Map("weight" → 0.5)
     }
 
     it("maps properties to scala.Option") {
-      v1.property[String]("name").toOption should be(Some("marko"))
-      e7.property[Float]("weight").toOption shouldBe Some(0.5)
+      v1.property(Name).toOption should be(Some("marko"))
+      e7.property(Weight).toOption shouldBe Some(0.5)
     }
 
     it("sets a property") {
-      v1.setProperty("vertexProperty", "updated")
-      v1.property[String]("vertexProperty").value shouldBe "updated"
+      v1.setProperty(TestProperty, "updated")
+      v1.property(TestProperty).value shouldBe "updated"
 
-      e7.setProperty("edgeProperty", "updated")
-      e7.property[String]("edgeProperty").value shouldBe "updated"
+      e7.setProperty(TestProperty, "updated")
+      e7.property(TestProperty).value shouldBe "updated"
     }
 
     it("removes a property") {
-      v1.setProperty("vertexProperty1", "updated")
-      v1.removeProperty("vertexProperty1")
-      v1.removeProperty("doesnt exist")
-      v1.property[String]("vertexProperty1").isPresent shouldBe false
+      v1.setProperty(TestProperty, "updated")
+      v1.removeProperty(TestProperty)
+      v1.property(TestProperty).isPresent shouldBe false
 
-      e7.setProperty("edgeProperty", "updated")
-      e7.removeProperty("edgeProperty")
-      e7.removeProperty("doesnt exist")
-      e7.property[String]("edgeProperty").isPresent shouldBe false
+      e7.setProperty(TestProperty, "updated")
+      e7.removeProperty(TestProperty)
+      e7.property(TestProperty).isPresent shouldBe false
     }
   }
 
@@ -87,10 +86,10 @@ class ElementSpec extends TestBase {
       val graph = TinkerGraph.open.asScala
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
-      v2.setProperty("testkey", "testValue")
+      v2.setProperty(TestProperty, "testValue")
 
       graph.v(v1.id) shouldBe Some(v1)
-      graph.v(v2.id).get.property[String]("testkey").value shouldBe "testValue"
+      graph.v(v2.id).get.property(TestProperty).value shouldBe "testValue"
       graph.V.toList() should have size 2
     }
 
@@ -154,5 +153,6 @@ class ElementSpec extends TestBase {
 
   def v1 = v(1).asScala
   def e7 = e(7).asScala
+  val TestProperty = Key[String]("testProperty")
 }
 
