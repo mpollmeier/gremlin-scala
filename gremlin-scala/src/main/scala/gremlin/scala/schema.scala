@@ -15,8 +15,6 @@ object schema {
 
   case class Key[A](override val key: String) extends Atom[A](key)
 
-  object Label extends Atom[String](T.label.name)
-
   object ID extends Atom[Any](T.id.name)
 
   implicit class AtomValue[A](p: (String, A)) {
