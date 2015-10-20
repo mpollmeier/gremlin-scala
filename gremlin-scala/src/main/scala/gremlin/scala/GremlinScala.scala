@@ -16,7 +16,7 @@ import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.Prepend
 import scala.language.existentials
 import schema.Key
-import schema.StepLabel
+import StepLabels._
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
@@ -100,9 +100,56 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
-  // TODO: return HMap, get key types from StepLabels
-  // def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
-  //   GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
+    // TODO: clean up
+    import shapeless.UnaryTCConstraint._
+    import shapeless._
+    import shapeless.ops.hlist._
+    import shapeless.poly._
+
+    //takes only HList of StepLabel
+  def select[A <: HList : *->*[StepLabel]#λ](stepLabels: A)(
+    // ) = {
+    implicit ev1: Mapper[GetLabelName.type, A]) = {
+    // implicit ev1: Mapper[String, A]) = {
+    // ev2: Mapper[GetLabelValue.type, A]) = {
+
+    // type Aux[HF, In <: HList, Out0 <: HList] = Mapper[HF, In] { type Out = Out0 }
+    // val s: Aux[GetLabelName.type, A, A]#Out = ???
+
+    val names = stepLabels map GetLabelName
+
+    // val traversal2 = traversal.select()
+    object GetLabelValue extends (StepLabelWithValue ~> Id) {
+      def apply[B](label: StepLabelWithValue[B]) = label.value
+    }
+
+    // val values = stepLabels map GetLabelValue
+
+    println(names)
+    names
+    // implicit val unifier = new shapeless.ops.hlist.Unifier[A]{
+    //   type Out = String :: HNil
+    //   override def apply(a: A) = {
+    //     val b = a.asInstanceOf[StepLabel[_] :: HNil]
+    //     b.head.name :: HNil
+    //   }
+    // }
+    // val z = stepLabels.unify
+    // println(z)
+
+
+    // implicit val mapper = new shapeless.ops.hlist.Mapper[String, A] {
+    // }
+    // val z2 = stepLabels.map(???)
+
+    // stepLabels map getLabelName
+    // GremlinScala(traversal)
+  }
+  // GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
+
+  // def select(stepLabels: HList[StepLabel[A], stepLabel2: StepLabel[B]/*, otherSelectKeys: String* */) =
+  //   GremlinScala[A :: B :: HNil, Labels](???)
+
 
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))

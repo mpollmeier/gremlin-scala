@@ -8,7 +8,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
 import shapeless.test.illTyped
-import schema.StepLabel
+import StepLabels._
 
 class SchemaSpec extends WordSpec with Matchers {
   "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
@@ -219,8 +219,25 @@ class SchemaSpec extends WordSpec with Matchers {
       }
     }
 
-      // see TODO in GremlinScala.select - to make this work
-    "derive types for as/select with multiple labels" ignore {
+    // see TODO in GremlinScala.select - to make this work
+    "derive types for as/select with two labels" taggedAs(org.scalatest.Tag("foo")) in {
+      // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
+      // val ve = results.head
+      // val ve: (Vertex, Edge) = results.head
+
+      // illTyped { //to ensure that there is no implicit conversion to make the above work
+      //   """
+      //     val ve2: (Edge, Vertex) = results.head
+      //   """
+      // }
+    }
+
+    // see TODO in GremlinScala.select - to make this work
+    "derive types for as/select with multiple labels" taggedAs(org.scalatest.Tag("foo")) in {
+      import shapeless._
+      import shapeless.ops.hlist._
+      val results =  g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil)
+      results shouldBe a.name :: b.name :: HNil
       // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
       // val ve: (Vertex, Edge) = results.head
 

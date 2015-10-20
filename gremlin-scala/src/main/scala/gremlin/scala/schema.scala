@@ -3,6 +3,7 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.structure._
 
 import scala.language.implicitConversions
+import shapeless.poly._
 
 object schema {
   /**
@@ -24,6 +25,24 @@ object schema {
     def value: A = p._2
   }
 
-  // type safe label for steps
+}
+
+// type safety for labelled steps
+object StepLabels {
+  import shapeless._
+  import schema._
+
   case class StepLabel[A](name: String)
+  case class StepLabelWithValue[A](label: StepLabel[A], value: A)
+
+  object GetLabelName extends (StepLabel ~> Const[String]#λ) {
+    def apply[B](label: StepLabel[B]) = label.name
+  }
+
+  // object ToString extends Poly1 {
+  //   implicit def apply[Z] = at[StepLabel[Z]](_.name)
+  // }
+  // object GetLabelValue extends (StepLabelWithValue ~> Id) {
+  //   def apply[B](label: StepLabelWithValue[B]) = label.value
+  // }
 }
