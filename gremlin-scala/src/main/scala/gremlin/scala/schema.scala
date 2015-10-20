@@ -31,13 +31,53 @@ object schema {
 object StepLabels {
   import shapeless._
   import schema._
+  import java.util.{Map ⇒ JMap}
+  import shapeless.poly._
 
   case class StepLabel[A](name: String)
   case class StepLabelWithValue[A](label: StepLabel[A], value: A)
 
-  object GetLabelName extends (StepLabel ~> Const[String]#λ) {
+  object GetLabelName extends (StepLabel ~>> String) {
     def apply[B](label: StepLabel[B]) = label.name
   }
+
+  // object GetLabelWithValue extends (StepLabel ~> StepLabelWithValue) {
+  //   def apply[C](label: StepLabel[C]) = ???
+  //   // StepLabelWithValue(label, selectValues.get(label.name).asInstanceOf[C])
+  // }
+
+  var badGlobalState: JMap[String, Any] = _
+
+  // def GetLabelWithValue(m: JMap[String, Any]) = new Poly1 {
+  //   implicit def caseLabel[A] = at[StepLabel[A]] { label ⇒
+  //     // TODO: pass in selectValues somehow
+  //     StepLabelWithValue(label, badGlobalState.get(label.name).asInstanceOf[A])
+  //   }
+  // }
+  object GetLabelWithValue extends Poly1 {
+    implicit def caseLabel[A] = at[StepLabel[A]] { label ⇒
+      // TODO: pass in selectValues somehow
+      StepLabelWithValue(label, badGlobalState.get(label.name).asInstanceOf[A])
+    }
+  }
+
+  // object GetLabelWithValue extends Poly2 {
+  //   implicit def caseLabel[A] = at[StepLabel[A], JMap[String, Any]] { (label, jmap) ⇒
+  //     // TODO: pass in selectValues somehow
+  //     StepLabelWithValue(label, jmap.get(label.name).asInstanceOf[A])
+  //   }
+  // }
+
+  // object GetLabelWithValue extends Poly2 {
+  //   implicit def caseLabelWithValue[A] = at[StepLabel[A], A] { (label, value) ⇒
+  //     StepLabelWithValue(label, value)
+  //   }
+  // }
+
+  // def getLabelWithValue(selectValues: JMap[String, Any]) = new (StepLabel ~> StepLabelWithValue) {
+  //   def apply[C](label: StepLabel[C]) =
+  //     StepLabelWithValue(label, selectValues.get(label.name).asInstanceOf[C])
+  // }
 
   // object ToString extends Poly1 {
   //   implicit def apply[Z] = at[StepLabel[Z]](_.name)
