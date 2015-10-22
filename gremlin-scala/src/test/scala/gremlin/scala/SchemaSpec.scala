@@ -7,6 +7,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import collection.JavaConversions._
+import shapeless._
 import shapeless.test.illTyped
 import StepLabels._
 
@@ -204,9 +205,10 @@ class SchemaSpec extends WordSpec with Matchers {
   }
 
   "StepLabel" can {
+
     def g: ScalaGraph[TinkerGraph] = TinkerFactory.createModern.asScala
-    val a = StepLabel[Vertex]("start")
-    val b = StepLabel[Edge]("createdE")
+    val a = StepLabel[Vertex]()
+    val b = StepLabel[Edge]()
 
     "derive types for a simple as/select" in {
       // val results = g.V(1).as(a).outE("created").as(b).select(b).toList
@@ -233,10 +235,6 @@ class SchemaSpec extends WordSpec with Matchers {
     }
 
     "derive types for as/select with multiple labels" taggedAs(org.scalatest.Tag("foo")) in {
-      import shapeless._
-      import shapeless.ops.hlist._
-      import shapeless.ops.hlist.Mapper._
-
       val result: Vertex :: Edge :: HNil =
         g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil).head
 

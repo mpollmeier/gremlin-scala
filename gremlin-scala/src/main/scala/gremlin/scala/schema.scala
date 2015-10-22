@@ -30,9 +30,10 @@ object schema {
 // type safety for labelled steps
 object StepLabels {
   import shapeless._
+  import java.util.UUID.randomUUID
   import java.util.{Map ⇒ JMap}
 
-  case class StepLabel[A](name: String)
+  case class StepLabel[A](name: String = randomUUID.toString)
 
   object GetLabelName extends (StepLabel ~>> String) {
     def apply[B](label: StepLabel[B]) = label.name
