@@ -209,14 +209,14 @@ class SchemaSpec extends WordSpec with Matchers {
     val b = StepLabel[Edge]("createdE")
 
     "derive types for a simple as/select" in {
-      val results = g.V(1).as(a).outE("created").as(b).select(b).toList
-      val e: Edge = results.head
+      // val results = g.V(1).as(a).outE("created").as(b).select(b).toList
+      // val e: Edge = results.head
 
-      illTyped { //to ensure that there is no implicit conversion to make the above work
-        """
-          val e2: Vertex = results.head
-        """
-      }
+      // illTyped { //to ensure that there is no implicit conversion to make the above work
+      //   """
+      //     val e2: Vertex = results.head
+      //   """
+      // }
     }
 
     // see TODO in GremlinScala.select - to make this work
@@ -234,25 +234,15 @@ class SchemaSpec extends WordSpec with Matchers {
 
     "derive types for as/select with multiple labels" taggedAs(org.scalatest.Tag("foo")) in {
       import shapeless._
+      import shapeless.ops.hlist._
+      import shapeless.ops.hlist.Mapper._
 
-      // type safe awesomeness
-      val result: StepLabelWithValue[Vertex] :: StepLabelWithValue[Edge] :: HNil =
+      val result: Vertex :: Edge :: HNil =
         g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil).head
 
       val v1 = g.V(1).head
       val e9 = g.E(9).head
-      result shouldBe StepLabelWithValue(a, v1) :: StepLabelWithValue(b, e9) :: HNil
-
-      // TODO: map to A
-      // result shouldBe a.name :: b.name :: HNil
-      // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
-      // val ve: (Vertex, Edge) = results.head
-
-      // illTyped { //to ensure that there is no implicit conversion to make the above work
-      //   """
-      //     val ve2: (Edge, Vertex) = results.head
-      //   """
-      // }
+      result shouldBe v1 :: e9 :: HNil
     }
   }
 }

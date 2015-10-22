@@ -33,7 +33,6 @@ object StepLabels {
   import java.util.{Map ⇒ JMap}
 
   case class StepLabel[A](name: String)
-  case class StepLabelWithValue[A](label: StepLabel[A], value: A)
 
   object GetLabelName extends (StepLabel ~>> String) {
     def apply[B](label: StepLabel[B]) = label.name
@@ -42,8 +41,7 @@ object StepLabels {
   object combineLabelWithValue extends Poly2 {
     implicit def atLabel[A, L <: HList] = at[StepLabel[A], (L, JMap[String, Any])] {
       case (label, (acc, values)) ⇒
-        val newAcc = StepLabelWithValue(label, values.get(label.name).asInstanceOf[A]) :: acc
-        (newAcc, values)
+        (values.get(label.name).asInstanceOf[A] :: acc, values)
     }
   }
 }

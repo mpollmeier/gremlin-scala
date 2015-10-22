@@ -92,7 +92,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec`
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
-  def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
+  // def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
 
   def select[A: DefaultsToAny](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
 
@@ -103,16 +103,23 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   // TODO: clean up - which imports and implicits are actually needed?
   // TODO: shorten/simplify implementation
-  // A is a non-empty HList whose members are all StepLabel[_]
+  /* Lot's of type level magic here to make this work...
+   *   * takes a non-empty HList whose members are all StepLabel[_]
+   *   * get's the actual values from the TP3 java as a Map[String, Any]
+   *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
+   */
   import shapeless._
   import shapeless.ops.hlist._
   import shapeless.ops.tuple.IsComposite
-  def select[L <: HList : *->*[StepLabel]#λ : IsHCons, L1 <: HList, Z, Out](stepLabels: L)(
-    implicit mapper: Mapper.Aux[GetLabelName.type, L, L1],
-    trav: ToTraversable.Aux[L1, List, String],
-    folder: RightFolder.Aux[L, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, Z],
-    ic: IsComposite.Aux[Z, Out, _]
-  ) = GremlinScala[Out, Labels] {
+  def select[StepLabels <: HList : *->*[StepLabel]#λ : IsHCons,
+             LabelNames <: HList,
+             TupleWithValue,
+             Values <: HList](stepLabels: StepLabels)(
+    implicit stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
+    trav: ToTraversable.Aux[LabelNames, List, String],
+    folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, TupleWithValue],
+    ic: IsComposite.Aux[TupleWithValue, Values, _]
+  ) = GremlinScala[Values, Labels] {
     stepLabels.map(GetLabelName).toList match {
       // case Nil => ??? // TODO: ignore this case? or rather implement for all cases?
       // case List(label1) => ???
@@ -125,10 +132,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
           .map{ selectValues: JMap[String, Any] =>
             val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
             ic.head(resultTuple)
-          }.traversal
+        }.traversal
     }
   }
-  // GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
