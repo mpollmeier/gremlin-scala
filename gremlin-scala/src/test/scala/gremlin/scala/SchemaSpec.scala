@@ -232,15 +232,19 @@ class SchemaSpec extends WordSpec with Matchers {
       // }
     }
 
-    // see TODO in GremlinScala.select - to make this work
     "derive types for as/select with multiple labels" taggedAs(org.scalatest.Tag("foo")) in {
       import shapeless._
-      // import shapeless.ops.hlist._
 
-      val results =  g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil).toList
-      println(results)
-      // val results =  g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil)
-      // results shouldBe a.name :: b.name :: HNil
+      // type safe awesomeness
+      val result: StepLabelWithValue[Vertex] :: StepLabelWithValue[Edge] :: HNil =
+        g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil).head
+
+      val v1 = g.V(1).head
+      val e9 = g.E(9).head
+      result shouldBe StepLabelWithValue(a, v1) :: StepLabelWithValue(b, e9) :: HNil
+
+      // TODO: map to A
+      // result shouldBe a.name :: b.name :: HNil
       // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
       // val ve: (Vertex, Edge) = results.head
 

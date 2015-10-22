@@ -101,131 +101,31 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
-  // TODO: clean up - which implicits are actually needed?
-  // TODO: return type
-  // A is an HList whose members are all StepLabel[_]
-  def select[A <: HList : *->*[StepLabel]#λ : IsHCons, B <: HList, C <: HList](stepLabels: A)(
-    implicit mapper1: Mapper.Aux[GetLabelName.type, A, B],
-    mapper2: Mapper.Aux[GetLabelWithValue.type, A, C],
-    trav1: ToTraversable.Aux[A, List, StepLabel[_]],
-    trav2: ToTraversable.Aux[B, List, String]) = {
-    // import shapeless.poly._
-    // import shapeless._
-    // object GetLabelValue extends (StepLabelWithValue ~> Id) {
-    //   def apply[C](label: StepLabelWithValue[C]) = label.value
-    // }
-
-    // val values = stepLabels map GetLabelValue
-
+  // TODO: clean up - which imports and implicits are actually needed?
+  // TODO: shorten/simplify implementation
+  // A is a non-empty HList whose members are all StepLabel[_]
+  import shapeless._
+  import shapeless.ops.hlist._
+  import shapeless.ops.tuple.IsComposite
+  def select[L <: HList : *->*[StepLabel]#λ : IsHCons, L1 <: HList, Z, Out](stepLabels: L)(
+    implicit mapper: Mapper.Aux[GetLabelName.type, L, L1],
+    trav: ToTraversable.Aux[L1, List, String],
+    folder: RightFolder.Aux[L, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, Z],
+    ic: IsComposite.Aux[Z, Out, _]
+  ) = GremlinScala[Out, Labels] {
     stepLabels.map(GetLabelName).toList match {
-      case Nil => ???
-      case List(label1) => ???
+      // case Nil => ??? // TODO: ignore this case? or rather implement for all cases?
+      // case List(label1) => ???
       case labels => // 2 or more labels
         val label1 = labels.head
         val label2 = labels.tail.head
         val remainder = labels.tail.tail
-        val t2: GraphTraversal[_, JMap[String, Any]] = traversal.select(label1, label2, remainder: _*)
-        val gs2 = GremlinScala(t2)
-        gs2.map{ selectValues: JMap[String, Any] =>
-          // option1: this looses the type again - no good
-          // val l: List[StepLabel[Any]] = stepLabels.toList
-          // val lbl1 = l.head
-          // val labelWithValue1: StepLabelWithValue[Any] = StepLabelWithValue(lbl1, selectValues.get(lbl1.name))
-
-          // option2: polymorphic map
-          // import shapeless.poly._
-          // object GetLabelWithValue2 extends (StepLabel ~> StepLabelWithValue) {
-          //   def apply[C](label: StepLabel[C]) =
-          //     StepLabelWithValue(label, selectValues.get(label.name).asInstanceOf[C])
-          // }
-          // def getLabelWithValue(selectValues: JMap[String, Any]) = new (StepLabel ~> StepLabelWithValue) {
-          //   def apply[C](label: StepLabel[C]) =
-          //     StepLabelWithValue(label, selectValues.get(label.name).asInstanceOf[C])
-          // }
-
-          // use mapper2 to create a new implicit Mapper from C to D?
-          // implement like the generic one in shapeless?
-          import shapeless._
-          import shapeless.poly._
-
-          // object Foo extends Poly2 {
-          //   implicit def caseLabel[Z] = at[StepLabel[Z], JMap[String, Any]] { (label, jmap) ⇒
-          //     // TODO: pass in selectValues somehow
-          //     StepLabelWithValue(label, jmap.get(label.name).asInstanceOf[Z])
-          //   }
-          // }
-          case class Foo1[Z](label: StepLabel[Z], map: JMap[String, Any])
-          object Foo extends (StepLabel ~> Foo1) {
-            def apply[Z](label: StepLabel[Z]) = Foo1(label, selectValues)
-          }
-
-          // implicit val fooMapper = new Mapper[Foo.type, A] {
-          //   // TODO: how to create a mapper like this? check generic shapeless mappers
-          //   // type Out =
-          //   def apply(labels: A) = {
-          //     println("XXXXXXXXX")
-          //     println(labels)
-          //       ???
-          //   }
-          // }
-          implicit def fooMapper[InH, InT <: HList]
-             (implicit hc: Case1[Foo.type, InH])
-          //   (implicit hc: Case1[Foo.type, InH], mt: Mapper[Foo.type, InT])
-            = new Mapper[Foo.type, InH :: InT] {
-            // TODO: how to create a mapper like this? check generic shapeless mappers
-            type Out = hc.Result :: HNil //mt.Out
-            // def apply(labels: A): Out = {
-              def apply(labels: InH :: InT): Out = {
-              println("XXXXXXXXX")
-              println(labels)
-              hc(labels.head) :: HNil
-            }
-          }
-
-          // implicit val fooMapper1 = fooMapper[Foo.type, ]
-
-          // implicit def hlistMapper1[HF <: Poly, InH, InT <: HList]
-          //   (implicit hc : Case1[HF, InH], mt : Mapper[HF, InT]): Mapper.Aux[HF, InH :: InT, hc.Result :: mt.Out] =
-          //   new Mapper[HF, InH :: InT] {
-          //     type Out = hc.Result :: mt.Out
-          //     def apply(l : InH :: InT): Out = hc(l.head) :: mt(l.tail)
-          //   }
-
-          // stepLabels map Foo
-          StepLabels.badGlobalState = selectValues
-          val values = stepLabels map GetLabelWithValue
-          // values map Foo
-
-          // val values = stepLabels.map(GetLabelWithValue(selectValues))
-          // import shapeless._
-          // import shapeless.poly._
-          // object GetLabelWithValue extends Poly2 {
-          //   implicit def caseLabelWithValue[Z] = at[StepLabel[Z], Z] { (label, value) ⇒
-          //     StepLabelWithValue(label, value)
-          //   }
-          // }
-          // implicit def mapper3[Z <: HList] = new Mapper[GetLabelWithValue.type, A]{
-          //   type Out = Z
-          //   def apply(labels: A) = {
-          //     println("XXXXXXXXXXXXXXXXXX")
-          //     println(labels)
-          //     labels.head
-          //     // labels.tail.head
-          //     ???
-          //   }
-          // }
-          // println("ZZZZZZZZZZZZZZZZZZ")
-          // println(stepLabels)
-          // val values = stepLabels map GetLabelWithValue
-
-          // implicit val mapper3: Mapper.Aux[getLabelWithValue.type, A, B] = ???
-          // val values = stepLabels map getLabelWithValue(selectValues)
-
-          // TODO: assert list length of 2 min - no need for other checks above in match then
-          // stepLabels.tail.head
-
-          values
-        }
+        // TODO: no need to wrap in another GremlinScala?
+        GremlinScala[JMap[String, Any], Labels](traversal.select(label1, label2, remainder: _*))
+          .map{ selectValues: JMap[String, Any] =>
+            val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
+            ic.head(resultTuple)
+          }.traversal
     }
   }
   // GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
