@@ -15,45 +15,45 @@ import scala.collection.JavaConversions._
 
 object Tests {
 
-  class ScalaDedupTest extends DedupTest with StandardTest {
-    override def get_g_V_both_dedup_name =
-      graph.asScala.V.both.dedup().values[String]("name")
+  // class ScalaDedupTest extends DedupTest with StandardTest {
+  //   override def get_g_V_both_dedup_name =
+  //     graph.asScala.V.both.dedup().values[String]("name")
 
-    override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
-      graph.asScala.V.both.has(T.label, "software").dedup().by("lang").values[String]("name")
+  //   override def get_g_V_both_hasXlabel_softwareX_dedup_byXlangX_name =
+  //     graph.asScala.V.both.has(T.label, "software").dedup().by("lang").values[String]("name")
 
-    override def get_g_V_both_name_order_byXa_bX_dedup_value =
-      graph.asScala.V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup()
+  //   override def get_g_V_both_name_order_byXa_bX_dedup_value =
+  //     graph.asScala.V.both.values[String]("name").order.by { (a, b) ⇒ a < b }.dedup()
 
-    override def get_g_V_both_both_name_dedup =
-      graph.asScala.V.both.both.values[String]("name").dedup()
+  //   override def get_g_V_both_both_name_dedup =
+  //     graph.asScala.V.both.both.values[String]("name").dedup()
 
-    override def get_g_V_both_both_dedup =
-      graph.asScala.V.both.both.dedup()
+  //   override def get_g_V_both_both_dedup =
+  //     graph.asScala.V.both.both.dedup()
 
-    override def get_g_V_both_both_dedup_byXlabelX =
-      graph.asScala.V.both.both.dedup().by(T.label)
+  //   override def get_g_V_both_both_dedup_byXlabelX =
+  //     graph.asScala.V.both.both.dedup().by(T.label)
 
-    override def get_g_V_asXaX_both_asXbX_dedupXa_bX_byXlabelX_selectXa_bX =
-      graph.asScala.V.as("a").both.as("b").dedup("a", "b").by(T.label).select("a", "b")
-        .asInstanceOf[GremlinScala[JMap[String, Vertex], _]]
+  //   // override def get_g_V_asXaX_both_asXbX_dedupXa_bX_byXlabelX_selectXa_bX =
+  //   //   graph.asScala.V.as("a").both.as("b").dedup("a", "b").by(T.label).select("a", "b")
+  //   //     .asInstanceOf[GremlinScala[JMap[String, Vertex], _]]
 
-    override def get_g_V_asXaX_outXcreatedX_asXbX_inXcreatedX_asXcX_dedupXa_bX_path =
-      graph.asScala.V.as("a").out("created").as("b").in("created").as("c").dedup("a", "b").path
+  //   override def get_g_V_asXaX_outXcreatedX_asXbX_inXcreatedX_asXcX_dedupXa_bX_path =
+  //     graph.asScala.V.as("a").out("created").as("b").in("created").as("c").dedup("a", "b").path
 
-    override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
-      graph.asScala.V.group()
-        .by(T.label)
-        .by(__.bothE().values[java.lang.Float]("weight").fold())
-        .by(__.dedup(Scope.local))
-        .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
-    //TODO: get rid of cast
+  //   override def get_g_V_group_byXlabelX_byXbothE_valuesXweightX_foldX_byXdedupXlocalXX =
+  //     graph.asScala.V.group()
+  //       .by(T.label)
+  //       .by(__.bothE().values[java.lang.Float]("weight").fold())
+  //       .by(__.dedup(Scope.local))
+  //       .asInstanceOf[GremlinScala[JMap[String, JSet[JDouble]], _]]
+  //   //TODO: get rid of cast
 
-    override def get_g_V_outE_asXeX_inV_asXvX_selectXeX_order_byXweight_incrX_selectXvX_valuesXnameX_dedup =
-      graph.asScala.V.outE.as("e").inV.as("v")
-        .select[Edge]("e").order.by("weight", Order.incr)
-        .select[Vertex]("v").values[String]("name").dedup()
-  }
+  //   override def get_g_V_outE_asXeX_inV_asXvX_selectXeX_order_byXweight_incrX_selectXvX_valuesXnameX_dedup =
+  //     graph.asScala.V.outE.as("e").inV.as("v")
+  //       .select[Edge]("e").order.by("weight", Order.incr)
+  //       .select[Vertex]("v").values[String]("name").dedup()
+  // }
 
   class ScalaFilterTest extends FilterTest with StandardTest {
     override def get_g_V_filterXfalseX = graph.asScala.V.filter(_ ⇒ false)
@@ -656,7 +656,7 @@ import org.junit.runners.model.RunnerBuilder
 class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
   extends AbstractGremlinSuite(clazz, builder,
     Array( //testsToExecute - all are in ProcessStandardSuite
-      classOf[ScalaDedupTest],
+      // classOf[ScalaDedupTest],
       classOf[ScalaFilterTest],
       classOf[ScalaSimplePathTest],
       classOf[ScalaCyclicPathTest],

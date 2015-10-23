@@ -95,13 +95,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
 
-  def select[A: DefaultsToAny](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
-
-  def select[A: DefaultsToAny](pop: Pop, selectKey: String) = GremlinScala[A, Labels](traversal.select(pop, selectKey))
-
-  def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
-    GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
-
   /* Lot's of type level magic here to make this work...
    *   * takes a HList (with least two elements) whose elements are all StepLabel[_]
    *   * get's the actual values from the TP3 java as a Map[String, Any]
@@ -130,9 +123,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       ic.head(resultTuple)
     }
   }
-
-  def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
-    GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
   def order() = GremlinScala[End, Labels](traversal.order())
 
