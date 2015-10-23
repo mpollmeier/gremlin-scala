@@ -92,7 +92,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // like path, but type safe and contains only the labelled steps - see `as` step and `LabelledPathSpec`
   def labelledPath() = GremlinScala[Labels, Labels](traversal.asAdmin.addStep(new LabelledPathStep[End, Labels](traversal)))
 
-  // def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
+  def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
 
   def select[A: DefaultsToAny](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
 
