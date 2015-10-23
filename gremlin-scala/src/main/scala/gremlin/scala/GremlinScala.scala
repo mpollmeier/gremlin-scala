@@ -13,7 +13,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
 import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
 import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
 import shapeless.{ HList, HNil, :: }
-import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, ToTraversable}
+import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable}
+import shapeless.ops.tuple.IsComposite
 import shapeless.UnaryTCConstraint._
 import scala.language.existentials
 import schema.Key
@@ -101,15 +102,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
-  // TODO: shorten/simplify implementation
   /* Lot's of type level magic here to make this work...
    *   * takes a HList (with least two elements) whose elements are all StepLabel[_]
    *   * get's the actual values from the TP3 java as a Map[String, Any]
    *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
    */
-  import shapeless._
-  import shapeless.ops.hlist._
-  import shapeless.ops.tuple.IsComposite
   def select[StepLabels <: HList : *->*[StepLabel]#λ : IsHCons,
              LabelNames <: HList,
              TupleWithValue,

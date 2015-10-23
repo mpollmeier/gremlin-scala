@@ -214,21 +214,21 @@ class SchemaSpec extends WordSpec with Matchers {
     val e9 = g.E(9).head
     def traversal = g.V(1).as(a).outE("created").as(b).value("weight").as(c)
 
-    "derive types for a simple as/select" taggedAs(org.scalatest.Tag("foo")) in {
+    "derive types for a simple as/select" in {
       val result: Vertex =
         traversal.select(a).head
 
       result shouldBe v1
     }
 
-    "derive types for as/select with two labels" taggedAs(org.scalatest.Tag("foo")) in {
+    "derive types for as/select with two labels" in {
       val result: Vertex :: Edge :: HNil =
         traversal.select(a :: b :: HNil).head
 
       result shouldBe v1 :: e9 :: HNil
     }
 
-    "derive types for as/select with three labels" taggedAs(org.scalatest.Tag("foo")) in {
+    "derive types for as/select with three labels" in {
       val result: Vertex :: Edge :: Double :: HNil =
         traversal.select(a :: b :: c :: HNil).head
 
