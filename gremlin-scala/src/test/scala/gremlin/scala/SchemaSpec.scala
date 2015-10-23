@@ -209,38 +209,31 @@ class SchemaSpec extends WordSpec with Matchers {
     def g: ScalaGraph[TinkerGraph] = TinkerFactory.createModern.asScala
     val a = StepLabel[Vertex]()
     val b = StepLabel[Edge]()
+    val c = StepLabel[Double]()
+    val v1 = g.V(1).head
+    val e9 = g.E(9).head
+    def traversal = g.V(1).as(a).outE("created").as(b).value("weight").as(c)
 
     "derive types for a simple as/select" in {
-      // val results = g.V(1).as(a).outE("created").as(b).select(b).toList
-      // val e: Edge = results.head
+      ???
+      // val result: Vertex =
+      //   traversal.select(a).head
 
-      // illTyped { //to ensure that there is no implicit conversion to make the above work
-      //   """
-      //     val e2: Vertex = results.head
-      //   """
-      // }
+      // result shouldBe v1
     }
 
-    // see TODO in GremlinScala.select - to make this work
     "derive types for as/select with two labels" taggedAs(org.scalatest.Tag("foo")) in {
-      // val results =  g.V(1).as(a).outE("created").as(b).select(a, b).toList
-      // val ve = results.head
-      // val ve: (Vertex, Edge) = results.head
+      val result: Vertex :: Edge :: HNil =
+        traversal.select(a :: b :: HNil).head
 
-      // illTyped { //to ensure that there is no implicit conversion to make the above work
-      //   """
-      //     val ve2: (Edge, Vertex) = results.head
-      //   """
-      // }
+      result shouldBe v1 :: e9 :: HNil
     }
 
-    "derive types for as/select with multiple labels" taggedAs(org.scalatest.Tag("foo")) in {
-      val result: Vertex :: Edge :: HNil =
-        g.V(1).as(a).outE("created").as(b).select(a :: b :: HNil).head
+    "derive types for as/select with three labels" taggedAs(org.scalatest.Tag("foo")) in {
+      val result: Vertex :: Edge :: Double :: HNil =
+        traversal.select(a :: b :: c :: HNil).head
 
-      val v1 = g.V(1).head
-      val e9 = g.E(9).head
-      result shouldBe v1 :: e9 :: HNil
+      result shouldBe v1 :: e9 :: 0.4 :: HNil
     }
   }
 }

@@ -101,10 +101,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
 
-  // TODO: clean up - which imports and implicits are actually needed?
   // TODO: shorten/simplify implementation
   /* Lot's of type level magic here to make this work...
-   *   * takes a non-empty HList whose members are all StepLabel[_]
+   *   * takes a HList (with least two elements) whose elements are all StepLabel[_]
    *   * get's the actual values from the TP3 java as a Map[String, Any]
    *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
    */
@@ -119,20 +118,16 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     trav: ToTraversable.Aux[LabelNames, List, String],
     folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, TupleWithValue],
     ic: IsComposite.Aux[TupleWithValue, Values, _]
-  ) = GremlinScala[Values, Labels] {
-    stepLabels.map(GetLabelName).toList match {
-      // case Nil => ??? // TODO: ignore this case? or rather implement for all cases?
-      // case List(label1) => ???
-      case labels => // 2 or more labels
-        val label1 = labels.head
-        val label2 = labels.tail.head
-        val remainder = labels.tail.tail
-        // TODO: no need to wrap in another GremlinScala?
-        GremlinScala[JMap[String, Any], Labels](traversal.select(label1, label2, remainder: _*))
-          .map{ selectValues: JMap[String, Any] =>
-            val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
-            ic.head(resultTuple)
-        }.traversal
+  ): GremlinScala[Values, Labels] = {
+    val labels = stepLabels.map(GetLabelName).toList
+    val label1 = labels.head
+    val label2 = labels.tail.head
+    val remainder = labels.tail.tail
+
+    val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
+    GremlinScala(selectTraversal).map{ selectValues =>
+      val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
+      ic.head(resultTuple)
     }
   }
 
