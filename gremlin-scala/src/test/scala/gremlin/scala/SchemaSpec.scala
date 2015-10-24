@@ -6,9 +6,7 @@ import gremlin.scala.schema._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
-import shapeless._
 import shapeless.test.illTyped
-import StepLabels._
 
 class SchemaSpec extends WordSpec with Matchers {
   "a schema with a sequence of Atoms that apply a value to build a Tuple2" can {
@@ -200,38 +198,6 @@ class SchemaSpec extends WordSpec with Matchers {
         val london = g + (City, Name → "london")
         val rail = paris --- (EuroStar, Distance → 495) --> london
       }
-    }
-  }
-
-  "StepLabel" can {
-
-    def g: ScalaGraph[TinkerGraph] = TinkerFactory.createModern.asScala
-    val a = StepLabel[Vertex]()
-    val b = StepLabel[Edge]()
-    val c = StepLabel[Double]()
-    val v1 = g.V(1).head
-    val e9 = g.E(9).head
-    def traversal = g.V(1).as(a).outE("created").as(b).value("weight").as(c)
-
-    "derive types for a simple as/select" in {
-      val result: Vertex =
-        traversal.select(a).head
-
-      result shouldBe v1
-    }
-
-    "derive types for as/select with two labels" in {
-      val result: Vertex :: Edge :: HNil =
-        traversal.select(a :: b :: HNil).head
-
-      result shouldBe v1 :: e9 :: HNil
-    }
-
-    "derive types for as/select with three labels" in {
-      val result: Vertex :: Edge :: Double :: HNil =
-        traversal.select(a :: b :: c :: HNil).head
-
-      result shouldBe v1 :: e9 :: 0.4 :: HNil
     }
   }
 }
