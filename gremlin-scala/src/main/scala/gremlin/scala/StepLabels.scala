@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import scala.language.implicitConversions
 import shapeless.poly._
 
 // type safety for labelled steps
