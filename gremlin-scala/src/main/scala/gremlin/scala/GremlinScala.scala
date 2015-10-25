@@ -16,7 +16,6 @@ import shapeless.{ HList, HNil, :: }
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable}
 import shapeless.UnaryTCConstraint._
 import scala.language.existentials
-import schema.Key
 import StepLabels._
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
@@ -115,11 +114,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val label2 = labels.tail.head
     val remainder = labels.tail.tail
 
-  def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
-    GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
-
-  def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
-    GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
+    val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
+    GremlinScala(selectTraversal).map{ selectValues =>
+      val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
+      resultTuple._1
+    }
+  }
 
   def order() = GremlinScala[End, Labels](traversal.order())
 
