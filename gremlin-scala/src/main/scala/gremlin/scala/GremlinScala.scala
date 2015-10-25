@@ -1,18 +1,18 @@
 package gremlin.scala
 
-import java.lang.{ Long ⇒ JLong, Double ⇒ JDouble }
-import java.util.function.{ Predicate ⇒ JPredicate, Consumer ⇒ JConsumer }
-import java.util.{ Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator }
-import java.util.stream.{ Stream ⇒ JStream }
+import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
+import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer}
+import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
+import java.util.stream.{Stream ⇒ JStream}
 
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
-import org.apache.tinkerpop.gremlin.process.traversal.{ P, Path, Scope, Traversal }
-import org.apache.tinkerpop.gremlin.structure.{ T, Direction }
-import shapeless.{ HList, HNil, :: }
+import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
+import org.apache.tinkerpop.gremlin.structure.{T, Direction}
+import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable}
 import shapeless.UnaryTCConstraint._
 import scala.language.existentials
@@ -98,12 +98,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
    *   * get's the actual values from the TP3 java as a Map[String, Any]
    *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
    */
-  def select[StepLabels <: HList : *->*[StepLabel]#λ,
-             H0, T0 <: HList, //head and tail of StepLabels, so that we can prove that it's of size >= 2
-             LabelNames <: HList,
-             TupleWithValue,
-             Values, Z](stepLabels: StepLabels)(
-    implicit hasOne: IsHCons.Aux[StepLabels, H0, T0],
+  def select[StepLabels <: HList: *->*[StepLabel]#λ, H0, T0 <: HList, //head and tail of StepLabels, so that we can prove that it's of size >= 2
+  LabelNames <: HList, TupleWithValue, Values, Z](stepLabels: StepLabels)(
+    implicit
+    hasOne: IsHCons.Aux[StepLabels, H0, T0],
     hasTwo: IsHCons[T0],
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
@@ -115,7 +113,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val remainder = labels.tail.tail
 
     val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
-    GremlinScala(selectTraversal).map{ selectValues =>
+    GremlinScala(selectTraversal).map { selectValues ⇒
       val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
       resultTuple._1
     }
