@@ -104,13 +104,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
              H0, T0 <: HList, //head and tail of StepLabels, so that we can prove that it's of size >= 2
              LabelNames <: HList,
              TupleWithValue,
-             Values <: HList](stepLabels: StepLabels)(
+             Values, Z](stepLabels: StepLabels)(
     implicit hasOne: IsHCons.Aux[StepLabels, H0, T0],
     hasTwo: IsHCons[T0],
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
-    folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, TupleWithValue],
-    ic: IsComposite.Aux[TupleWithValue, Values, _]
+    folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, (Values, Z)]
   ): GremlinScala[Values, Labels] = {
     val labels = stepLabels.map(GetLabelName).toList
     val label1 = labels.head
@@ -120,7 +119,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
     GremlinScala(selectTraversal).map{ selectValues =>
       val resultTuple = stepLabels.foldRight((HNil, selectValues))(combineLabelWithValue)
-      ic.head(resultTuple)
+      resultTuple._1
     }
   }
 
