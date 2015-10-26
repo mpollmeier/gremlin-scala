@@ -1,12 +1,11 @@
 package gremlin.scala
 
-// import gremlin.scala.StepLabels.StepLabel
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
 import org.scalatest.{Matchers, WordSpec}
 import shapeless._
 
 class SelectSpec extends WordSpec with Matchers {
-  def g: ScalaGraph[TinkerGraph] = TinkerFactory.createModern.asScala
+  def g = TinkerFactory.createModern.asScala
 
   "select" when {
     val a = StepLabel[Vertex]()

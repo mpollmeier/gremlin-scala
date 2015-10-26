@@ -7,11 +7,12 @@
 A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Scala. This is the current development branch for [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop). The old version for Tinkerpop 2 is still in the [2.x branch](https://github.com/mpollmeier/gremlin-scala/tree/2.x).
 
 ### Benefits
-* Scala friendly function signatures, aiming to be close to the standard collection library
-* Nicer DSL e.g. to create vertices and edges
-* You can use standard Scala functions instead of having to worry about how to implement things like `java.util.function.BiPredicate`
-* Nothing is hidden away, you can always easily access the Gremlin-Java objects if needed. Examples include accessing graph db specifics things like indexes, or using a step that hasn't been implemented in Gremlin-Scala yet
-* Minimal overhead - only allocates additional instances if absolutely necessary
+* Scala friendly function signatures, aiming to be close to the Scala collection library.
+  * use standard Scala functions instead of having to worry about how to implement things like `java.util.function.BiPredicate`
+* Beautiful DSL to create vertices and edges
+* Type safe traversals
+* Minimal runtime overhead - only allocates additional instances if absolutely necessary
+* Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
 ### Getting started
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`.
@@ -33,21 +34,19 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 
 ```scala
 import gremlin.scala._
-import gremlin.scala.schema.Key
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 val graph = TinkerGraph.open.asScala
 
-
-// define some Keys
-object Name extends Key[String]("name")
-object Population extends Key[Int]("population")
-object Distance extends Key[Int]("distance")
+// Keys for properties which can later be used for type safe traversals
+val Founded = Key[String]("founded")
+val Distance = Key[Int]("distance")
+val Name = Key[String]("name")
+val Population = Key[Int]("population")
 
 // create labelled vertex
 val paris = graph + "Paris"
 
 // create vertex with typed properties
-val Founded = Key[String]("founded")
 val london = graph + ("London", Founded → "43 AD")
 
 // create labelled edges 
@@ -56,10 +55,9 @@ paris <-- "OtherWayAround" --- london
 paris <-- "Eurostar" --> london
 
 // create edge with typed properties
-val Distance = Key[Int]("distance")
 paris --- ("Eurostar", Distance → 495) --> london
 
-// type safe access to properties (compiler infers the correct type)
+// type safe access to properties
 london.property(Founded) //Property(founded->43 AD)
 london.value2(Founded) //43 AD
 paris.out("Eurostar").value(Founded).head //43 AD
@@ -92,24 +90,41 @@ graph.V.outE.inV  //compiles
 graph.V.outE.outE //does _not_ compile
 ```
 
-In standard Gremlin there's nothing stopping you to create the second traversal - it will explode at runtime, as
-outgoing edges do not have outgoing edges. This is simply an invalid step and we can use the compiler to help us. 
+In Gremlin-Groovy there's nothing stopping you to create the second traversal - it will explode at runtime, as outgoing edges do not have outgoing edges. In Gremlin-Scala this simply doesn't compile.
 
 ### Type safe traversals
-Gremlin-Scala has support for full type safety in a traversal. You can label any step you want and in the end call `labelledPath` - it will return the values in each labelled step as an HList. An HList is a typesafe list, i.e. the compiler knows the types, which helps prevent bugs and allows your IDE to auto-complete your code. In contrast: in Java and Groovy you would have to cast to the type you *think* it will be, which is ugly and error prone. 
-For example:
+You can label any step using `as(Key)` and the compiler will infer the correct types for you in the select step using an HList (a type safe list, i.e. the compiler knows the types of the elements of the list). In Gremlin-Java and Gremlin-Groovy you get a `Map[String, Any]`, so you have to cast to the type you *think* it will be, which is ugly and error prone. For example:
 
 ```scala
+// use :paste in Scala REPL
 import gremlin.scala._
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-val graph = TinkerFactory.createModern.asScala
-val traversal = graph.V.as("a").out.value[String]("name").as("b").labelledPath
-traversal.toList
-// returns `Vertex :: String :: HNil` for each path
+import shapeless._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
+def g = TinkerFactory.createModern.asScala
+
+val a = StepLabel[Vertex]()
+val b = StepLabel[Edge]()
+val c = StepLabel[Double]()
+
+// select all labelled steps
+g.V(1).as(a)
+.outE.as(b)
+.select
+.toList
+// returns Vertex :: Edge :: HNil for each path
+
+// select subset of labelled steps
+g.V(1)
+.outE("created").as(b)
+.value("weight").as(c)
+.select(b :: c :: HNil)
+.head
+
+// returns e[9][1-created->3] :: 0.4 :: HNil
+// return type is: Edge :: Double :: HNil
 ```
 
-You can label as many steps as you like and Gremlin-Scala will preserve the types for you. For more examples see [LabelledPathSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/LabelledPathSpec.scala).
-In comparison: Gremlin-Java and Gremlin-Groovy just return a `List[Any]` and you then have to cast the elements - the types got lost on the way. Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
+More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
 ### Saving / loading case classes
 You can save and load case classes as a vertex - this is still experimental but pretty cool. Note: this does _not_ work in a REPL, you have to put it into a test. For examples check out the [MarshallerSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallerSpec.scala).
@@ -135,6 +150,7 @@ Here are some examples of more complex traversals from the [examples repo](https
 
 What is `Die Hard's` average rating?
 ```scala
+// use :paste in Scala REPL
 graph.V.has("movie", "name", "Die Hard")
   .inE("rated")
   .values("stars")
@@ -144,6 +160,7 @@ graph.V.has("movie", "name", "Die Hard")
 
 Get the maximum number of movies a single user rated
 ```scala
+// use :paste in Scala REPL
 g.V.hasLabel("person")
   .flatMap(_.outE("rated").count)
   .max
@@ -153,6 +170,7 @@ g.V.hasLabel("person")
 What 80's action movies do 30-something programmers like?
 Group count the movies by their name and sort the group count map in decreasing order by value.
 ```scala
+// use :paste in Scala REPL
 g.V
   .`match`(
     __.as("a").hasLabel("movie"),
@@ -174,6 +192,7 @@ g.V
 
 What is the most liked movie in each decade?
 ```
+// use :paste in Scala REPL
 g.V()
   .hasLabel("movie")
   .where(_.inE("rated").count().is(P.gt(10)))
