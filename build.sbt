@@ -31,7 +31,7 @@ val commonSettings = Seq(
     // "-Xfatal-warnings",
     // "-feature"
     // "-deprecation", //hard to handle when supporting multiple scala versions...
-    //"-Xlog-implicits"
+    // , "-Xlog-implicits"
     //"-Ydebug"
   ),
   // testOptions in Test += Tests.Argument("-oF"), // full stack traces
