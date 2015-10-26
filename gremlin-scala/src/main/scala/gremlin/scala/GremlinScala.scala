@@ -13,7 +13,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
 import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
-import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable}
+import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.UnaryTCConstraint._
 import scala.language.existentials
 import StepLabels._
@@ -98,11 +98,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
    *   * get's the actual values from the TP3 java as a Map[String, Any]
    *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
    */
-  def select[StepLabels <: HList: *->*[StepLabel]#λ, H0, T0 <: HList, //head and tail of StepLabels, so that we can prove that it's of size >= 2
-  LabelNames <: HList, TupleWithValue, Values, Z](stepLabels: StepLabels)(
+  def select[
+    StepLabels <: HList: *->*[StepLabel]#λ,
+    H0, T0 <: HList,
+    LabelNames <: HList,
+    TupleWithValue,
+    Values <: HList, ValueTuples, Z](stepLabels: StepLabels)(
     implicit
-    hasOne: IsHCons.Aux[StepLabels, H0, T0],
-    hasTwo: IsHCons[T0],
+    hasOne: IsHCons.Aux[StepLabels, H0, T0], // witnesses that stepLabels has > 0 elements
+    hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
     folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, (Values, Z)]
