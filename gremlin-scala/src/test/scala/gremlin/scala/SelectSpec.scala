@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import gremlin.scala.StepLabels.StepLabel
+// import gremlin.scala.StepLabels.StepLabel
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
 import org.scalatest.{Matchers, WordSpec}
 import shapeless._

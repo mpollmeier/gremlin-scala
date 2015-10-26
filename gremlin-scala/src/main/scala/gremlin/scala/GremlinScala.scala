@@ -16,7 +16,7 @@ import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.UnaryTCConstraint._
 import scala.language.existentials
-import StepLabels._
+import StepLabel.{combineLabelWithValue, GetLabelName}
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
