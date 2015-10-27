@@ -119,7 +119,6 @@ g.V(1)
 .value("weight").as(c)
 .select(b :: c :: HNil)
 .head
-
 // returns e[9][1-created->3] :: 0.4 :: HNil
 // return type is: Edge :: Double :: HNil
 ```
@@ -127,7 +126,7 @@ g.V(1)
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
 ### Saving / loading case classes
-You can save and load case classes as a vertex - this is still experimental but pretty cool. Note: this does _not_ work in a REPL, you have to put it into a test. For examples check out the [MarshallerSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallerSpec.scala).
+You can save and load case classes as a vertex (implemented with a blackbox macro). Note: this does _not_ work in a REPL. 
 
 ```scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -142,13 +141,12 @@ it("load a vertex into a case class") {
 }
 ```
 
-Note that you can also use Options as the example shows.
-Thanks to <a href="https://github.com/joan38">joan38</a> for <a href="https://github.com/mpollmeier/gremlin-scala/pull/66">contributing</a> this feature!
+For more examples check out the [MarshallerSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallerSpec.scala).
 
 ### Some more advanced traversals
-Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/) which you can easily run on your machine:
+Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/). If you want to run them yourself, check out the tinkergraph examples in there. 
 
-What is `Die Hard's` average rating?
+_What is `Die Hard's` average rating?_
 ```scala
 // use :paste in Scala REPL
 graph.V.has("movie", "name", "Die Hard")
@@ -158,7 +156,7 @@ graph.V.has("movie", "name", "Die Hard")
   .head
 ```
 
-Get the maximum number of movies a single user rated
+_Get the maximum number of movies a single user rated_
 ```scala
 // use :paste in Scala REPL
 g.V.hasLabel("person")
@@ -167,8 +165,8 @@ g.V.hasLabel("person")
   .head
 ```
 
-What 80's action movies do 30-something programmers like?
-Group count the movies by their name and sort the group count map in decreasing order by value.
+_What 80's action movies do 30-something programmers like?_
+_Group count the movies by their name and sort the group count map in decreasing order by value._
 ```scala
 // use :paste in Scala REPL
 g.V
@@ -190,7 +188,7 @@ g.V
   .head
 ```
 
-What is the most liked movie in each decade?
+_What is the most liked movie in each decade?_
 ```
 // use :paste in Scala REPL
 g.V()
@@ -217,11 +215,12 @@ g.V()
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)
 * port over more TP3 steps - see [TP3 testsuite](https://github.com/apache/incubator-tinkerpop/tree/master/gremlin-test/src/main/java/org/apache/tinkerpop/gremlin/process/traversal/step) and [Gremlin-Scala StandardTests](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/GremlinStandardTestSuite.scala)
+* ideas for more type safety in traversals
 * fill this readme and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
 ## Further reading
-For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/docs/3.0.0-incubating/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
-Please note that while Gremlin-Scala is very close to the original Gremlin, there a slight differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
+For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
+Please note that while Gremlin-Scala is very close to the original Gremlin, there are differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
 
 Random links:
 * [Shortest path algorithm with Gremlin-Scala 3.0.0 (Michael
