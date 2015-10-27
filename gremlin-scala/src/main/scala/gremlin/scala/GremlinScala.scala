@@ -104,9 +104,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     LabelNames <: HList,
     TupleWithValue,
     Values <: HList, ValueTuples, Z](stepLabels: StepLabels)(
-    implicit
-    hasOne: IsHCons.Aux[StepLabels, H0, T0], // witnesses that stepLabels has > 0 elements
-    hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
+    implicit hasOne: IsHCons.Aux[StepLabels, H0, T0], hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
     folder: RightFolder.Aux[StepLabels, (HNil.type, JMap[String, Any]), combineLabelWithValue.type, (Values, Z)]
