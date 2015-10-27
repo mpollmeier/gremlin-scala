@@ -8,7 +8,7 @@ val commonSettings = Seq(
   organization := "com.michaelpollmeier",
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
-  version := "3.0.1-incubating3-SNAPSHOT",
+  version := "3.0.1-incubating3",
   scalaVersion := "2.11.7",
 
   libraryDependencies <++= scalaVersion { scalaVersion =>
