@@ -123,6 +123,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     }
   }
 
+  // TODO: remove once by/cap etc. are ported over to type safe model using StepLabel
+  def select[A: DefaultsToAny](selectKey: String) = GremlinScala[A, Labels](traversal.select(selectKey))
+
+  // TODO: remove once by/cap etc. are ported over to type safe model using StepLabel
+  def select[A: DefaultsToAny](pop: Pop, selectKey: String) = GremlinScala[A, Labels](traversal.select(pop, selectKey))
+
+  // TODO: remove once by/cap etc. are ported over to type safe model using StepLabel
+  def select(selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
+    GremlinScala[JMap[String, Any], Labels](traversal.select(selectKey1, selectKey2, otherSelectKeys: _*))
+
+  // TODO: remove once by/cap etc. are ported over to type safe model using StepLabel
+  def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
+    GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
+
   def order() = GremlinScala[End, Labels](traversal.order())
 
   def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope))
