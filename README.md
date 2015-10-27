@@ -4,11 +4,10 @@
 
 ## Gremlin-Scala for Apache Tinkerpop 3
 
-A slim wrapper to make Gremlin - a JVM graph traversal library - usable from Scala. This is the current development branch for [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop). The old version for Tinkerpop 2 is still in the [2.x branch](https://github.com/mpollmeier/gremlin-scala/tree/2.x).
+A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop) - a JVM graph traversal library - from Scala.
 
-### Benefits
 * Scala friendly function signatures, aiming to be close to the Scala collection library.
-  * use standard Scala functions instead of having to worry about how to implement things like `java.util.function.BiPredicate`
+  * use standard Scala functions - no need to worry about how to implement things like `java.util.function.BiPredicate`
 * Beautiful DSL to create vertices and edges
 * Type safe traversals
 * Minimal runtime overhead - only allocates additional instances if absolutely necessary
@@ -93,13 +92,14 @@ graph.V.outE.outE //does _not_ compile
 In Gremlin-Groovy there's nothing stopping you to create the second traversal - it will explode at runtime, as outgoing edges do not have outgoing edges. In Gremlin-Scala this simply doesn't compile.
 
 ### Type safe traversals
-You can label any step using `as(Key)` and the compiler will infer the correct types for you in the select step using an HList (a type safe list, i.e. the compiler knows the types of the elements of the list). In Gremlin-Java and Gremlin-Groovy you get a `Map[String, Any]`, so you have to cast to the type you *think* it will be, which is ugly and error prone. For example:
+You can label any step using `as(StepLabel)` and the compiler will infer the correct types for you in the select step using an HList (a type safe list, i.e. the compiler knows the types of the elements of the list). In Gremlin-Java and Gremlin-Groovy you get a `Map[String, Any]`, so you have to cast to the type you *think* it will be, which is ugly and error prone. For example:
 
 ```scala
 // use :paste in Scala REPL
 import gremlin.scala._
 import shapeless._
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 def g = TinkerFactory.createModern.asScala
 
 val a = StepLabel[Vertex]()
