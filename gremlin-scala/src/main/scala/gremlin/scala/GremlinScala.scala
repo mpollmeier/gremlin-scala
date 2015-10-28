@@ -14,6 +14,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
+import shapeless.syntax.std.product.productOps
 import shapeless.UnaryTCConstraint.*->*
 import scala.language.existentials
 import StepLabel.{combineLabelWithValue, GetLabelName}
@@ -94,24 +95,30 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def select[A](stepLabel: StepLabel[A]) = GremlinScala[A, Labels](traversal.select(stepLabel.name))
 
-  /* Lot's of type level magic here to make this work...
-   *   * takes a HList (with least two elements) whose elements are all StepLabel[_]
-   *   * get's the actual values from the TP3 java as a Map[String, Any]
+  /* Select values from the traversal based on some given StepLabels (must be a tuple of `StepLabel`)
+   *
+   *  Lot's of type level magic here to make this work...
+   *   * takes a tuple (with least two elements) whose elements are all StepLabel[_]
+   *   * converts it to an HList
+   *   * get's the actual values from the Tinkerpop3 java select as a Map[String, Any]
    *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
    */
   def select[
-    StepLabels <: HList: *->*[StepLabel]#λ,
+    StepLabelsAsTuple <: Product,
+    StepLabels <: HList,
     H0, T0 <: HList,
     LabelNames <: HList,
     TupleWithValue,
     Values <: HList, Z,
-    ValueTuples](stepLabels: StepLabels)(
-    implicit hasOne: IsHCons.Aux[StepLabels, H0, T0], hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
+    ValueTuples](stepLabelsTuple: StepLabelsAsTuple)(
+    implicit toHList: shapeless.ops.product.ToHList.Aux[StepLabelsAsTuple,StepLabels],
+    hasOne: IsHCons.Aux[StepLabels, H0, T0], hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
     folder: RightFolder.Aux[StepLabels, (HNil, JMap[String, Any]), combineLabelWithValue.type, (Values, Z)],
     tupler: Tupler.Aux[Values, ValueTuples]
   ): GremlinScala[ValueTuples, Labels] = {
+    val stepLabels: StepLabels = stepLabelsTuple.toHList
     val labels: List[String] = stepLabels.map(GetLabelName).toList
     val label1 = labels.head
     val label2 = labels.tail.head

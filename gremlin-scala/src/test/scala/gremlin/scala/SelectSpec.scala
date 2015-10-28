@@ -55,19 +55,18 @@ class SelectSpec extends WordSpec with Matchers {
 
       "derive types for as/select with two labels" in {
         val result: (Vertex, Edge) =
-          traversal.select(a :: b :: HNil).head
+          traversal.select((a, b)).head
 
         result shouldBe ((v1, e9))
       }
 
       "derive types for as/select with three labels" in {
         val result: (Vertex, Edge, Double) =
-          traversal.select(a :: b :: c :: HNil).head
+          traversal.select((a, b, c)).head
 
         result shouldBe ((v1, e9, 0.4))
       }
     }
   }
-
 
 }
