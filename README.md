@@ -111,16 +111,15 @@ g.V(1).as(a)
 .outE.as(b)
 .select
 .toList
-// returns Vertex :: Edge :: HNil for each path
+// returns a `(Vertex, Edge)` for each path
 
 // select subset of labelled steps
 g.V(1)
 .outE("created").as(b)
 .value("weight").as(c)
-.select(b :: c :: HNil)
+.select((b, c)) //step labels parsed as tuple of any size
 .head
-// returns e[9][1-created->3] :: 0.4 :: HNil
-// return type is: Edge :: Double :: HNil
+// returns a `(Edge, Double)`
 ```
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 

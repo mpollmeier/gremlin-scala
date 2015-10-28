@@ -14,31 +14,31 @@ class SelectSpec extends WordSpec with Matchers {
 
     "selecting all labelled steps" should {
       "support single label" in {
-        val path: List[Edge :: HNil] =
+        val path: List[Tuple1[Edge]] =
           g.V(1).outE.as(b).select.toList
 
-        path(0) shouldBe g.E(9).head :: HNil
-        path(1) shouldBe g.E(7).head :: HNil
-        path(2) shouldBe g.E(8).head :: HNil
+        path(0) shouldBe Tuple1(g.E(9).head)
+        path(1) shouldBe Tuple1(g.E(7).head)
+        path(2) shouldBe Tuple1(g.E(8).head)
       }
 
       "support multiple label" in {
-        val path: List[Vertex :: Edge :: HNil] =
+        val path: List[(Vertex, Edge)] =
           g.V(1).as(a).outE.as(b).select.toList
 
         val v1 = g.V(1).head
-        path(0) shouldBe v1 :: g.E(9).head :: HNil
-        path(1) shouldBe v1 :: g.E(7).head :: HNil
-        path(2) shouldBe v1 :: g.E(8).head :: HNil
+        path(0) shouldBe ((v1, g.E(9).head))
+        path(1) shouldBe ((v1, g.E(7).head))
+        path(2) shouldBe ((v1, g.E(8).head))
       }
 
       "works without labelled steps" in {
-        val path: List[HNil] =
+        val path: List[Unit] =
           g.V(1).outE.inV.select.toList
 
-        path(0) shouldBe HNil
-        path(1) shouldBe HNil
-        path(2) shouldBe HNil
+        path(0) shouldBe (())
+        path(1) shouldBe (())
+        path(2) shouldBe (())
       }
     }
 
@@ -54,17 +54,17 @@ class SelectSpec extends WordSpec with Matchers {
       }
 
       "derive types for as/select with two labels" in {
-        val result: Vertex :: Edge :: HNil =
-          traversal.select(a :: b :: HNil).head
+        val result: (Vertex, Edge) =
+          traversal.select((a, b)).head
 
-        result shouldBe v1 :: e9 :: HNil
+        result shouldBe ((v1, e9))
       }
 
       "derive types for as/select with three labels" in {
-        val result: Vertex :: Edge :: Double :: HNil =
-          traversal.select(a :: b :: c :: HNil).head
+        val result: (Vertex, Edge, Double) =
+          traversal.select((a, b, c)).head
 
-        result shouldBe v1 :: e9 :: 0.4 :: HNil
+        result shouldBe ((v1, e9, 0.4))
       }
     }
   }
