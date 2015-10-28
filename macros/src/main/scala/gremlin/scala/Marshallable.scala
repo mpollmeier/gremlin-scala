@@ -29,23 +29,21 @@ object Marshallable {
           val decoded = name.decodedName.toString
           val returnType = tpe.decl(name).typeSignature
 
-          // @id as Option
-          if ((field.annotations map (_.tree.tpe) contains weakTypeOf[id]) &&
-            returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
-            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
-              _fromCCParams,
-              _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
-          // @id
-          else if (field.annotations map (_.tree.tpe) contains weakTypeOf[id])
-            (q"Option(cc.$name.asInstanceOf[AnyRef])",
-              _fromCCParams,
-              _toCCParams :+ q"id.asInstanceOf[$returnType]")
-          // property
-          else {
+          if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) // @id as Option
+              (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+                _fromCCParams,
+                _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
+            else // @id as AnyRef
+              (q"Option(cc.$name.asInstanceOf[AnyRef])",
+                _fromCCParams,
+                _toCCParams :+ q"id.asInstanceOf[$returnType]")
+          } else {
+            // normal property member
             assert(!Hidden.isHidden(decoded), s"The parameter name $decoded can't be used in the persistable case class $tpe")
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
               (_idParam,
-               //TODO: setting the `__gs` property isn't necessary
+                //TODO: setting the `__gs` property isn't necessary
                 _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
                 _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
             } else
