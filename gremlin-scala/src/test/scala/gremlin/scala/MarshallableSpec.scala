@@ -56,9 +56,6 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
 
     "contain options" should {
-      // Background: if we marshal Option types, the graph db needs to understand scala.Option,
-      // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
-      // https://github.com/mpollmeier/gremlin-scala/issues/98
       "map `Some[A]` to `A`" in new Fixture {
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
         val v = graph.addVertex(ccWithOptionSome)
@@ -76,6 +73,26 @@ class MarshallableSpec extends WordSpec with Matchers {
         val vl = graph.V(v.id).head
         vl.keys should not contain "s"  //None should be mapped to `null`
       }
+
+      // Background: if we marshal Option types, the graph db needs to understand scala.Option,
+      // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
+      // https://github.com/mpollmeier/gremlin-scala/issues/98
+    }
+
+    "define their custom marshaller" in new Fixture {
+      val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
+
+      val marshaller = new Marshallable[CCWithOption] {
+        def fromCC(cc: CCWithOption): (Option[AnyRef], String, Map[String, Any]) =
+          (None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+
+        def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
+          CCWithOption(i = valueMap("i").asInstanceOf[Int],
+                       s = valueMap.get("s").asInstanceOf[Option[String]])
+      }
+
+      val v = graph.addVertex(ccWithOptionNone)(marshaller)
+      v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
     "use @label and @id annotations" in new Fixture {
