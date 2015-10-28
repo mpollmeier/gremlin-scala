@@ -29,28 +29,36 @@ object Marshallable {
           val decoded = name.decodedName.toString
           val returnType = tpe.decl(name).typeSignature
 
+          def idAsOption =
+            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+              _fromCCParams,
+              _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
+
+          def idAsAnyRef =
+            (q"Option(cc.$name.asInstanceOf[AnyRef])",
+              _fromCCParams,
+              _toCCParams :+ q"id.asInstanceOf[$returnType]")
+
+          def optionProperty =
+            (_idParam,
+              //TODO: setting the `__gs` property isn't necessary
+              _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
+              _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+
+          def property =
+            (_idParam,
+              _fromCCParams :+ q"$decoded -> cc.$name",
+              _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+
           if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
-            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) // @id as Option
-              (q"cc.$name.asInstanceOf[Option[AnyRef]]",
-                _fromCCParams,
-                _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
-            else // @id as AnyRef
-              (q"Option(cc.$name.asInstanceOf[AnyRef])",
-                _fromCCParams,
-                _toCCParams :+ q"id.asInstanceOf[$returnType]")
-          } else {
-            // normal property member
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) idAsOption
+            else idAsAnyRef
+          } else { // normal property member
             assert(!Hidden.isHidden(decoded), s"The parameter name $decoded can't be used in the persistable case class $tpe")
-            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
-              (_idParam,
-                //TODO: setting the `__gs` property isn't necessary
-                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
-                _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
-            } else
-              (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name",
-                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) optionProperty
+            else property
           }
+
         case (params, _) ⇒ params
       }
 
