@@ -39,14 +39,15 @@ object Marshallable {
             (q"Option(cc.$name.asInstanceOf[AnyRef])",
               _fromCCParams,
               _toCCParams :+ q"id.asInstanceOf[$returnType]")
-          // standard property
+          // property
           else {
             assert(!Hidden.isHidden(decoded), s"The parameter name $decoded can't be used in the persistable case class $tpe")
-            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
               (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name.getOrElse(null)",
+               //TODO: setting the `__gs` property isn't necessary
+                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
                 _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
-            else
+            } else
               (_idParam,
                 _fromCCParams :+ q"$decoded -> cc.$name",
                 _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")

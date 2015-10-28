@@ -45,15 +45,15 @@ class MarshallableSpec extends WordSpec with Matchers {
 
   "marshals / unmarshals case classes" which {
 
-    // "only have simple members" in new Fixture {
-    //   val cc = CCSimple("text", 12)
-    //   val v = graph.addVertex(cc)
+    "only have simple members" in new Fixture {
+      val cc = CCSimple("text", 12)
+      val v = graph.addVertex(cc)
 
-    //   val vl = graph.V(v.id).head
-    //   vl.label shouldBe cc.getClass.getSimpleName
-    //   vl.valueMap should contain("s" → cc.s)
-    //   vl.valueMap should contain("i" → cc.i)
-    // }
+      val vl = graph.V(v.id).head
+      vl.label shouldBe cc.getClass.getSimpleName
+      vl.valueMap should contain("s" → cc.s)
+      vl.valueMap should contain("i" → cc.i)
+    }
 
     "contain options" should {
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
@@ -78,56 +78,55 @@ class MarshallableSpec extends WordSpec with Matchers {
       }
     }
 
-    // "use @label and @id annotations" in new Fixture {
-    //   val ccWithLabelAndId = CCWithLabelAndId(
-    //     "some string",
-    //     Int.MaxValue,
-    //     Long.MaxValue,
-    //     Some("option type"),
-    //     Seq("test1", "test2"),
-    //     Map("key1" → "value1", "key2" → "value2"),
-    //     NestedClass("nested")
-    //   )
+    "use @label and @id annotations" in new Fixture {
+      val ccWithLabelAndId = CCWithLabelAndId(
+        "some string",
+        Int.MaxValue,
+        Long.MaxValue,
+        Some("option type"),
+        Seq("test1", "test2"),
+        Map("key1" → "value1", "key2" → "value2"),
+        NestedClass("nested")
+      )
 
-    //   val v = graph.addVertex(ccWithLabelAndId)
+      val v = graph.addVertex(ccWithLabelAndId)
 
-    //   v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
+      v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
 
-    //   val vl = graph.V(v.id).head()
-    //   vl.label shouldBe "the label"
-    //   vl.id shouldBe ccWithLabelAndId.id
-    //   vl.valueMap should contain("s" → ccWithLabelAndId.s)
-    //   vl.valueMap should contain("l" → ccWithLabelAndId.l)
-    //   vl.valueMap should contain("o" → ccWithLabelAndId.o)
-    //   vl.valueMap should contain("seq" → ccWithLabelAndId.seq)
-    //   vl.valueMap should contain("map" → ccWithLabelAndId.map)
-    //   vl.valueMap should contain("nested" → ccWithLabelAndId.nested)
-    // }
+      val vl = graph.V(v.id).head()
+      vl.label shouldBe "the label"
+      vl.id shouldBe ccWithLabelAndId.id
+      vl.valueMap should contain("s" → ccWithLabelAndId.s)
+      vl.valueMap should contain("l" → ccWithLabelAndId.l)
+      vl.valueMap should contain("o" → ccWithLabelAndId.o.get)
+      vl.valueMap should contain("seq" → ccWithLabelAndId.seq)
+      vl.valueMap should contain("map" → ccWithLabelAndId.map)
+      vl.valueMap should contain("nested" → ccWithLabelAndId.nested)
+    }
 
-    // "have an Option @id annotation" in new Fixture {
-    //   val cc = CCWithOptionId("text", Some(12))
-    //   val v = graph.addVertex(cc)
+    "have an Option @id annotation" in new Fixture {
+      val cc = CCWithOptionId("text", Some(12))
+      val v = graph.addVertex(cc)
 
-    //   v.toCC[CCWithOptionId] shouldBe cc
+      v.toCC[CCWithOptionId] shouldBe cc
 
-    //   val vl = graph.V(v.id).head()
-    //   vl.label shouldBe cc.getClass.getSimpleName
-    //   vl.id shouldBe cc.id.get
-    //   vl.valueMap should contain("s" → cc.s)
-    // }
+      val vl = graph.V(v.id).head()
+      vl.label shouldBe cc.getClass.getSimpleName
+      vl.id shouldBe cc.id.get
+      vl.valueMap should contain("s" → cc.s)
+    }
 
     trait Fixture {
       val graph = TinkerGraph.open.asScala
     }
   }
 
-  // "can't persist a none product type (none case class or tuple)" in {
-  //   illTyped {
-  //     """
-  //       val graph = TinkerGraph.open.asScala
-  //       graph.addVertex(new NoneCaseClass("test"))
-  //     """
-  //   }
-  // }
-
+  "can't persist a none product type (none case class or tuple)" in {
+    illTyped {
+      """
+        val graph = TinkerGraph.open.asScala
+        graph.addVertex(new NoneCaseClass("test"))
+      """
+    }
+  }
 }
