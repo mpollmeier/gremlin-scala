@@ -15,7 +15,6 @@ import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.syntax.std.product.productOps
-import shapeless.UnaryTCConstraint.*->*
 import scala.language.existentials
 import StepLabel.{combineLabelWithValue, GetLabelName}
 
