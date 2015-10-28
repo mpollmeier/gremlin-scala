@@ -49,19 +49,46 @@ class MarshallableSpec extends WordSpec with Matchers {
       val cc = CCSimple("text", 12)
       val v = graph.addVertex(cc)
 
-      val vl = graph.V(v.id).head()
+      val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" → cc.s)
       vl.valueMap should contain("i" → cc.i)
     }
 
-    "contain options" in new Fixture {
-      val ccWithOption = CCWithOption(Int.MaxValue, Some("optional value"))
-      val v = graph.addVertex(ccWithOption)
-      v.toCC[CCWithOption] shouldBe ccWithOption
+    "contain options" should {
+      // Background: if we marshal Option types, the graph db needs to understand scala.Option,
+      // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
+      // https://github.com/mpollmeier/gremlin-scala/issues/98
+      "map `Some[A]` to `A`" taggedAs (org.scalatest.Tag("foo")) in new Fixture {
+        val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
+        val v = graph.addVertex(ccWithOptionSome)
+        v.toCC[CCWithOption] shouldBe ccWithOptionSome
+
+        val vl = graph.V(v.id).head
+        vl.value[String]("s") shouldBe ccWithOptionSome.s.get
+      }
+
+      "map `None` to `null`" taggedAs (org.scalatest.Tag("foo")) in new Fixture {
+        val ccWithOptionNone = CCWithOption(Int.MaxValue, Some("optional value"))
+        val v = graph.addVertex(ccWithOptionNone)
+        v.toCC[CCWithOption] shouldBe ccWithOptionNone
+
+        val vl = graph.V(v.id).head
+        vl.keys should not contain "s"  //None should be mapped to `null`
+      }
     }
 
     "use @label and @id annotations" in new Fixture {
+      val ccWithLabelAndId = CCWithLabelAndId(
+        "some string",
+        Int.MaxValue,
+        Long.MaxValue,
+        Some("option type"),
+        Seq("test1", "test2"),
+        Map("key1" → "value1", "key2" → "value2"),
+        NestedClass("nested")
+      )
+
       val v = graph.addVertex(ccWithLabelAndId)
 
       v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
@@ -91,16 +118,6 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     trait Fixture {
       val graph = TinkerGraph.open.asScala
-
-      val ccWithLabelAndId = CCWithLabelAndId(
-        "some string",
-        Int.MaxValue,
-        Long.MaxValue,
-        Some("option type"),
-        Seq("test1", "test2"),
-        Map("key1" → "value1", "key2" → "value2"),
-        NestedClass("nested")
-      )
     }
   }
 
