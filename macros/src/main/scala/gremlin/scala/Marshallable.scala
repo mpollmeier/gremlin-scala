@@ -5,9 +5,12 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 trait Marshallable[P <: Product] {
-  def fromCC(cc: P): (Option[AnyRef], String, Map[String, Any])
+  type Id = AnyRef
+  type Label = String
+  type ValueMap = Map[String, Any]
 
-  def toCC(id: AnyRef, valueMap: Map[String, Any]): P
+  def fromCC(cc: P): (Option[Id], Label, ValueMap)
+  def toCC(id: Id, valueMap: ValueMap): P
 }
 
 object Marshallable {
@@ -36,17 +39,21 @@ object Marshallable {
             (q"Option(cc.$name.asInstanceOf[AnyRef])",
               _fromCCParams,
               _toCCParams :+ q"id.asInstanceOf[$returnType]")
-          // Property
+          // standard property
           else {
             assert(!Hidden.isHidden(decoded), s"The parameter name $decoded can't be used in the persistable case class $tpe")
-            (_idParam,
-              _fromCCParams :+ q"$decoded -> cc.$name",
-              _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
+              (_idParam,
+                _fromCCParams :+ q"$decoded -> cc.$name.getOrElse(null)",
+                _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+            else
+              (_idParam,
+                _fromCCParams :+ q"$decoded -> cc.$name",
+                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
           }
         case (params, _) ⇒ params
       }
 
-    // Label
     val label = tpe.typeSymbol.asClass.annotations find (_.tree.tpe =:= weakTypeOf[label]) map { annotation ⇒
       val label = annotation.tree.children.tail.head
       q"""$label"""
