@@ -8,8 +8,9 @@ trait Marshallable[P <: Product] {
   type Id = AnyRef
   type Label = String
   type ValueMap = Map[String, Any]
+  case class FromCC(id: Option[Id], label: Label, valueMap: ValueMap)
 
-  def fromCC(cc: P): (Option[Id], Label, ValueMap)
+  def fromCC(cc: P): FromCC
   def toCC(id: Id, valueMap: ValueMap): P
 }
 
@@ -63,7 +64,7 @@ object Marshallable {
     c.Expr[Marshallable[P]] {
       q"""
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe): (Option[AnyRef], String, Map[String, Any]) = ($idParam, $label, Map(..$fromCCParams))
+        def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))
         def toCC(id: AnyRef, valueMap: Map[String, Any]): $tpe = $companion(..$toCCParams)
       }
     """

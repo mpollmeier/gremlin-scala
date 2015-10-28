@@ -36,10 +36,10 @@ case class ScalaGraph[G <: Graph](graph: G) {
     * @param cc The case class to persist as a vertex
     */
   def addVertex[P <: Product: Marshallable](cc: P): Vertex = {
-    val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
-    val idParam = id.toSeq flatMap (List(T.id, _))
-    val labelParam = Seq(T.label, label)
-    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
+    val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
+    val labelParam = Seq(T.label, fromCC.label)
+    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 

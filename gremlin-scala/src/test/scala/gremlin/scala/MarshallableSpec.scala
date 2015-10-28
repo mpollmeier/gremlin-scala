@@ -83,8 +83,8 @@ class MarshallableSpec extends WordSpec with Matchers {
       val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
       val marshaller = new Marshallable[CCWithOption] {
-        def fromCC(cc: CCWithOption): (Option[AnyRef], String, Map[String, Any]) =
-          (None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+        def fromCC(cc: CCWithOption) =
+          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
 
         def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
           CCWithOption(i = valueMap("i").asInstanceOf[Int],
