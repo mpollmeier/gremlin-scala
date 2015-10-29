@@ -126,22 +126,27 @@ g.V(1)
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
 ### Saving / loading case classes
-You can save and load case classes as a vertex (implemented with a blackbox macro). Note: this does _not_ work in a REPL. 
+You can save and load case classes as a vertex - implemented with a blackbox macro. The macro has first class support for Scala's `Option`, i.e. a `Some[A]` will be stored as the value of type `A` in the database, or `null` if it's `None`. If we wouldn't unwrap it, the database would have to understand Scala's Option type itself. 
 
 ```scala
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-val graph = TinkerGraph.open.asScala
-case class Example(i: Int, s:Option[String])
+// this does _not_ work in a REPL
+object MyEntities {
+  case class Example(i: Int, s: Option[String])
+}
 
-it("load a vertex into a case class") {
+object MyLogic {
+  import gremlin.scala._
+  import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+  import MyEntities.Example
+
   val graph = TinkerGraph.open.asScala
   val example = Example(Int.MaxValue, Some("optional value"))
   val v = graph.addVertex(example)
-  v.toCC[Example] shouldBe example
+  assert(v.toCC[Example] == example)
 }
 ```
 
-For more examples check out the [MarshallerSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallerSpec.scala).
+Of course you can also define your own marshaller, if the macro generated one doesn't quite cut it. For that and more examples check out the [MarshallableSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallableSpec.scala).
 
 ### Some more advanced traversals
 Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/). If you want to run them yourself, check out the tinkergraph examples in there. 
