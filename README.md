@@ -102,18 +102,19 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 def g = TinkerFactory.createModern.asScala
 
-val a = StepLabel[Vertex]()
-val b = StepLabel[Edge]()
-val c = StepLabel[Double]()
-
 // select all labelled steps
-g.V(1).as(a)
-.outE.as(b)
+g.V(1).as("a")
+.outE.as("b")
 .select
 .toList
 // returns a `(Vertex, Edge)` for each path
 
+
 // select subset of labelled steps
+val a = StepLabel[Vertex]()
+val b = StepLabel[Edge]()
+val c = StepLabel[Double]()
+
 g.V(1)
 .outE("created").as(b)
 .value("weight").as(c)
