@@ -5,17 +5,11 @@ import org.scalatest.WordSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
 
-case class CCSimple(
-  s: String,
-  i: Int
-)
+case class CCSimple(s: String, i: Int)
 
 case class CCWithOption(i: Int, s: Option[String])
 
-case class CCWithOptionId(
-  s: String,
-  @id id: Option[Int]
-)
+case class CCWithOptionId(s: String, @id id: Option[Int])
 
 case class CCWithLabel(
   s: String,
