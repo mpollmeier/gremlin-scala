@@ -7,6 +7,9 @@ import shapeless.test.illTyped
 
 case class CCSimple(s: String, i: Int)
 
+case class MyValueClass(value: Int) extends AnyVal
+case class CCWithValueClass(s: String, i: MyValueClass)
+
 case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
@@ -47,6 +50,16 @@ class MarshallableSpec extends WordSpec with Matchers {
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" → cc.s)
       vl.valueMap should contain("i" → cc.i)
+    }
+
+    "contain value classes" in new Fixture {
+      val cc = CCWithValueClass("some text", MyValueClass(42))
+      val v = graph.addVertex(cc)
+
+      val vl = graph.V(v.id).head
+      vl.label shouldBe cc.getClass.getSimpleName
+      vl.valueMap should contain("s" → cc.s)
+      vl.valueMap should contain("i" → cc.i.value)
     }
 
     "contain options" should {
