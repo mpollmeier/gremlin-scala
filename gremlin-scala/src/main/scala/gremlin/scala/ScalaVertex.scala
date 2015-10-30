@@ -66,9 +66,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   }
 
   def addEdge[P <: Product : Marshallable](inVertex: Vertex, cc: P): ScalaEdge = {
-    val (id, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
-    val idParam = id.toSeq flatMap (List(T.id, _))
-    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
+    val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
+    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
   }
 
@@ -83,8 +83,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     SemiEdge(vertex, label, properties.toMap)
 
   def ---[P <: Product : Marshallable](cc: P) = {
-    val (_, label, properties) = implicitly[Marshallable[P]].fromCC(cc)
-    SemiEdge(vertex, label, properties.toMap.map{case (k,v) => (Key[Any](k), v)})
+    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
+    SemiEdge(vertex, fromCC.label, fromCC.valueMap.toMap.map{case (k,v) => (Key[Any](k), v)})
   }
 
   override def start() = GremlinScala[Vertex, HNil](__(vertex))

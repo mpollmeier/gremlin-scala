@@ -17,8 +17,8 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   def setProperties[T <: Product: Marshallable](cc: T): Edge = {
-    val (_, _, properties) = implicitly[Marshallable[T]].fromCC(cc)
-    properties foreach { case (k, v) ⇒ element.property(k, v) }
+    val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+    fromCC.valueMap foreach { case (k, v) ⇒ element.property(k, v) }
     edge
   }
 

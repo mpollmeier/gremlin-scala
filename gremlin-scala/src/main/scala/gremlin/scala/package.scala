@@ -146,13 +146,13 @@ package object scala {
 
   implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
     def ---(from: Vertex) = {
-      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiEdge(from, label, properties.map { case (k, v) ⇒ (Key(k), v) })
+      val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+      SemiEdge(from, fromCC.label, fromCC.valueMap.map { case (k, v) ⇒ (Key(k), v) })
     }
 
     def -->(from: Vertex) = {
-      val (_, label, properties) = implicitly[Marshallable[T]].fromCC(cc)
-      SemiDoubleEdge(from, label, properties.map { case (k, v) ⇒ (Key(k), v) })
+      val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+      SemiDoubleEdge(from, fromCC.label, fromCC.valueMap.map { case (k, v) ⇒ (Key(k), v) })
     }
   }
 
