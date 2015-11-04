@@ -22,27 +22,6 @@ object Marshallable {
     val tpe = weakTypeOf[P]
     val companion = tpe.typeSymbol.companion
 
-    tpe.decls.foreach {
-      case sym: MethodSymbol if sym.toString == ("value i") ⇒
-      // println(s"method: $sym")
-      // val rt = sym.returnType
-      // println("return type: " + rt)
-      // println(rt <:< typeOf[AnyVal])
-      // println("return type: " + rt.getClass)
-
-      case sym if sym.toString == ("value i") ⇒
-      // println(s"other: $sym")
-
-      // case sym if sym.toString == ("value i") =>
-      //   println(sym)
-      //   println("class: " + sym.getClass)
-      //   println("info: " + sym.info)
-      //   println("is class: " + sym.isClass)
-      //   // println(sym.asClass.isDerivedValueClass)
-
-      case other ⇒
-    }
-
     val (idParam, fromCCParams, toCCParams) = tpe.decls
       .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"None", Seq.empty, Seq.empty)) {
         case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol) if field.isCaseAccessor ⇒
@@ -67,43 +46,40 @@ object Marshallable {
               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
 
           def property = {
-            // checks if the property is a value class. if so, we want to unwrap it
-            def valueTypeProps: Option[(List[MethodSymbol], MethodSymbol)] = {
-              lazy val valueGetters = returnType.declarations
-                .sorted
-                .filter(_.isMethod)
-                .map(_.asMethod)
-                .takeWhile(!_.isConstructor)
-                .filter(_.paramss == Nil /* nullary */ )
+            // check if the property is a value class and try to extract everything we need to unwrap it
+            lazy val valueGetter: Option[MethodSymbol] = returnType.declarations
+              .sorted
+              .filter(_.isMethod)
+              .map(_.asMethod)
+              .takeWhile(!_.isConstructor)
+              .filter(_.paramss == Nil /* nullary */ )
+              .headOption
 
-              lazy val valueClassConstructor: Option[MethodSymbol] =
-                returnType.companion.declarations.filter(_.name.toString == "apply").headOption match {
-                  case Some(m: MethodSymbol) ⇒ Some(m)
-                  case _                     ⇒ None
-                }
+            lazy val valueClassConstructor: Option[MethodSymbol] =
+              returnType.companion.declarations.filter(_.name.toString == "apply").headOption match {
+                case Some(m: MethodSymbol) ⇒ Some(m)
+                case _                     ⇒ None
+              }
 
-              if (returnType <:< typeOf[AnyVal]
-                && valueGetters.size > 0
-                && valueClassConstructor.isDefined) {
-                Some((valueGetters, valueClassConstructor.get))
-              } else
-                None
-            }
+            lazy val wrappedTypeMaybe: Option[Type] =
+              util.Try(valueClassConstructor.get.paramLists.head.head.typeSignature).toOption
 
-            valueTypeProps match {
-              case Some((valueGetters, valueClassConstructor)) ⇒
-                val valueName = valueGetters.head.name
-                val valueClassCompanion = returnType.typeSymbol.companion
-                val wrappedType = valueClassConstructor.paramLists.head.head.typeSignature
+            // not using a pattern match to make use of lazy evaluation
+            if (returnType <:< typeOf[AnyVal]
+              && valueGetter.isDefined
+              && valueClassConstructor.isDefined
+              && wrappedTypeMaybe.isDefined) { // found a value class and everything we need to unwrap it
+              val valueName = valueGetter.get.name
+              val valueClassCompanion = returnType.typeSymbol.companion
+              val wrappedType = wrappedTypeMaybe.get
 
-                (_idParam,
-                  _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-                  _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
-              case _ ⇒
-                (_idParam,
-                  _fromCCParams :+ q"$decoded -> cc.$name",
-                  _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
-            }
+              (_idParam,
+                _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
+                _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
+            } else //normal property
+              (_idParam,
+                _fromCCParams :+ q"$decoded -> cc.$name",
+                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
           }
 
           if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
