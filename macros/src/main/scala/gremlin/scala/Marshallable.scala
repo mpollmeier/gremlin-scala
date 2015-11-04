@@ -76,47 +76,16 @@ object Marshallable {
 
             if (returnType <:< typeOf[AnyVal] && valueGetters.size > 0) {
               val valueName = valueGetters.head.name
-              // println("companion members: " + returnType.companion.members)
-              // println("companion declarations: " + returnType.companion.declarations)
-              // TODO: this is the part that doesn't work yet
-              val valueClassConstructor: MethodSymbol = {
-                // println(valueGetters.head)
-                // println(returnType)
-                // TODO: make this work for all value class companions, not just this specific one - find by name and one constructor argument?
-                  returnType.companion.declarations.tail.tail.head
-                // returnType.companion.members.tail.head
-                .asInstanceOf[MethodSymbol] // TODO: remove cast
-                // println(
-                //   returnType.companion.declarations.filter { s =>
-                //     println("inside "+ s.name.decodedName)
-                //     s.name.decodedName == "apply"
-                //   }
-                // )
-              }
-              // println(valueClassConstructor)
-              // println(valueClassConstructor.paramLists)
-              val valueClassCompanion = returnType.companion
+              val valueClassCompanion = returnType.typeSymbol.companion
 
-              // TODO: cast valueMap(x) to the right type - get from the apply method
+              val valueClassConstructor = returnType.companion.declarations.filter(_.name.toString == "apply").head.asInstanceOf[MethodSymbol] // TODO: remove cast
+
               // TODO: more safety here
               val wrappedType = valueClassConstructor.paramLists.head.head.typeSignature
-              println(returnType)
-              println(wrappedType)
 
               (_idParam,
                 _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-
-                //ClassCastException: Int is not MyValueClass
-                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
-
-               //works, but not generic
-               // _toCCParams :+ q"gremlin.scala.MyValueClass(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
-
-              //scala.MatchError: apply (of class scala.reflect.internal.Trees$Ident)
-                // _toCCParams :+ q"$valueClassConstructor{valueMap($decoded).asInstanceOf[$wrappedType]}.asInstanceOf[$returnType]")
-
-                // scala.reflect.internal.FatalError: Unexpected tree in genLoad
-                // _toCCParams :+ q"$valueClassCompanion.apply(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
+                _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
             } else {
               (_idParam,
                 _fromCCParams :+ q"$decoded -> cc.$name",
