@@ -67,6 +67,7 @@ object Marshallable {
               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
 
           def property = {
+            // checks if the property is a value class. if so, we want to unwrap it
             def valueTypeProps: Option[(List[MethodSymbol], MethodSymbol)] = {
               lazy val valueGetters = returnType.declarations
                 .sorted
