@@ -67,29 +67,41 @@ object Marshallable {
               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
 
           def property = {
-            val valueGetters = returnType.declarations
-              .sorted
-              .filter(_.isMethod)
-              .map(_.asMethod)
-              .takeWhile(!_.isConstructor)
-              .filter(_.paramss == Nil /* nullary */ )
+            def valueTypeProps: Option[(List[MethodSymbol], MethodSymbol)] = {
+              lazy val valueGetters = returnType.declarations
+                .sorted
+                .filter(_.isMethod)
+                .map(_.asMethod)
+                .takeWhile(!_.isConstructor)
+                .filter(_.paramss == Nil /* nullary */ )
 
-            if (returnType <:< typeOf[AnyVal] && valueGetters.size > 0) {
-              val valueName = valueGetters.head.name
-              val valueClassCompanion = returnType.typeSymbol.companion
+              lazy val valueClassConstructor: Option[MethodSymbol] =
+                returnType.companion.declarations.filter(_.name.toString == "apply").headOption match {
+                  case Some(m: MethodSymbol) ⇒ Some(m)
+                  case _                     ⇒ None
+                }
 
-              val valueClassConstructor = returnType.companion.declarations.filter(_.name.toString == "apply").head.asInstanceOf[MethodSymbol] // TODO: remove cast
+              if (returnType <:< typeOf[AnyVal]
+                && valueGetters.size > 0
+                && valueClassConstructor.isDefined) {
+                Some((valueGetters, valueClassConstructor.get))
+              } else
+                None
+            }
 
-              // TODO: more safety here
-              val wrappedType = valueClassConstructor.paramLists.head.head.typeSignature
+            valueTypeProps match {
+              case Some((valueGetters, valueClassConstructor)) ⇒
+                val valueName = valueGetters.head.name
+                val valueClassCompanion = returnType.typeSymbol.companion
+                val wrappedType = valueClassConstructor.paramLists.head.head.typeSignature
 
-              (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-                _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
-            } else {
-              (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name",
-                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+                (_idParam,
+                  _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
+                  _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
+              case _ ⇒
+                (_idParam,
+                  _fromCCParams :+ q"$decoded -> cc.$name",
+                  _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
             }
           }
 
