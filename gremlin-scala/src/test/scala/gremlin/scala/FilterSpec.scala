@@ -17,11 +17,11 @@ class FilterSpec extends TestBase {
 
   it("has - sugar") {
     val g = TinkerGraph.open.asScala
-    g + ("software", Name -> "blueprints", Created -> 2010)
+    g + ("software", Name → "blueprints", Created → 2010)
 
-    g.V.has(Name -> "blueprints").head <-- "dependsOn" --- (g + ("software", Name -> "gremlin", Created -> 2009))
-    g.V.has(Name -> "gremlin").head <-- "dependsOn" --- (g + ("software", Name -> "gremlinScala"))
-    g.V.has(Name -> "gremlinScala").head <-- "createdBy" --- (g + ("person", Name -> "mpollmeier"))
+    g.V.has(Name -> "blueprints").head <-- "dependsOn" --- (g + ("software", Name → "gremlin", Created → 2009))
+    g.V.has(Name -> "gremlin").head <-- "dependsOn" --- (g + ("software", Name → "gremlinScala"))
+    g.V.has(Name -> "gremlinScala").head <-- "createdBy" --- (g + ("person", Name → "mpollmeier"))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3

@@ -26,7 +26,7 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
   }
 
   private def toHList[T <: HList](path: List[_]): T =
-    if (path.length == 0)
+    if (path.isEmpty)
       HNil.asInstanceOf[T]
     else
       (path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]

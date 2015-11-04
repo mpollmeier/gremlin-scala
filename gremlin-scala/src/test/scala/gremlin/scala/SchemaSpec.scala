@@ -1,12 +1,11 @@
 package gremlin.scala
 
-import java.time.LocalDateTime
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import shapeless.test.illTyped
 
 class SchemaSpec extends WordSpec with Matchers {
+
   "a schema with defined Atoms" can {
     val Software = "software"
     val Person = "person"
@@ -21,7 +20,7 @@ class SchemaSpec extends WordSpec with Matchers {
     "create vertices" in {
       val g = TinkerGraph.open.asScala
 
-      val v0 = g + (Software, Name → "blueprints", Created → 2010)
+      val v0 = g + (Software, Name → "blueprints" , Created → 2010)
       val v1 = g + (Software, Created → 2009, Name → "gremlin")
       val v2 = g + (Software, Name → "gremlinScala")
       val v3 = g + (Person, Name → "mpollmeier")
