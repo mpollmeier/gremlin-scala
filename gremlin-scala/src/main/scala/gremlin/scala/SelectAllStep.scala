@@ -1,6 +1,7 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.{Path, Traversal, Traverser}
+import org.apache.tinkerpop.gremlin.process.traversal.{Path, Traversal}
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapStep
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
@@ -13,7 +14,7 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
 
   override def getRequirements = Set(TraverserRequirement.PATH)
 
-  override def map(traverser: Traverser.Admin[S]): LabelsTuple = {
+  override def map(traverser: Admin[S]): LabelsTuple = {
     val labels: Labels = toHList(toList(traverser.path))
     tupler(labels)
   }
