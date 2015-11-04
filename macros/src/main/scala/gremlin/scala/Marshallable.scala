@@ -39,39 +39,47 @@ object Marshallable {
               _fromCCParams,
               _toCCParams :+ q"id.asInstanceOf[$returnType]")
 
-          def optionProperty =
-            (_idParam,
-              //TODO: setting the `__gs` property isn't necessary
-              _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
-              _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+          def optionProperty = {
+            // check if the property is a value class and try to extract everything we need to unwrap it
+            // not using a pattern match to make use of lazy evaluation
 
+            val optionInnerType: Option[Type] =
+              if (returnType <:< typeOf[Option[_]]) returnType.typeArgs.headOption
+              else None
+
+            // TODO: use partial functions and pattern matching to remove clutter
+            if (optionInnerType.isDefined
+            && optionInnerType.get <:< typeOf[AnyVal]
+              && valueGetter(optionInnerType.get).isDefined
+                  && valueClassConstructor(optionInnerType.get).isDefined
+                  && wrappedTypeMaybe(optionInnerType.get).isDefined) {
+              val valueName = valueGetter(optionInnerType.get).get.name
+              val valueClassCompanion = optionInnerType.get.typeSymbol.companion
+              val wrappedType = wrappedTypeMaybe(optionInnerType.get).get
+
+              (_idParam,
+               //TODO: setting the `__gs` property isn't necessary
+               _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
+               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[Option[$wrappedType]].map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+            } else //normal option property
+              (_idParam,
+                //TODO: setting the `__gs` property isn't necessary
+                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
+                _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+          }
+
+        // TODO: reuse stuff between the two value class implementations
           def property = {
             // check if the property is a value class and try to extract everything we need to unwrap it
-            lazy val valueGetter: Option[MethodSymbol] = returnType.declarations
-              .sorted
-              .filter(_.isMethod)
-              .map(_.asMethod)
-              .takeWhile(!_.isConstructor)
-              .filter(_.paramss == Nil /* nullary */ )
-              .headOption
-
-            lazy val valueClassConstructor: Option[MethodSymbol] =
-              returnType.companion.declarations.filter(_.name.toString == "apply").headOption match {
-                case Some(m: MethodSymbol) ⇒ Some(m)
-                case _                     ⇒ None
-              }
-
-            lazy val wrappedTypeMaybe: Option[Type] =
-              util.Try(valueClassConstructor.get.paramLists.head.head.typeSignature).toOption
-
             // not using a pattern match to make use of lazy evaluation
+            // TODO: avoid calling methods multiple times
             if (returnType <:< typeOf[AnyVal]
-              && valueGetter.isDefined
-              && valueClassConstructor.isDefined
-              && wrappedTypeMaybe.isDefined) { // found a value class and everything we need to unwrap it
-              val valueName = valueGetter.get.name
+                  && valueGetter(returnType).isDefined
+                  && valueClassConstructor(returnType).isDefined
+                  && wrappedTypeMaybe(returnType).isDefined) {
+              val valueName = valueGetter(returnType).get.name
               val valueClassCompanion = returnType.typeSymbol.companion
-              val wrappedType = wrappedTypeMaybe.get
+              val wrappedType = wrappedTypeMaybe(returnType).get
 
               (_idParam,
                 _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
@@ -81,6 +89,24 @@ object Marshallable {
                 _fromCCParams :+ q"$decoded -> cc.$name",
                 _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
           }
+
+        // TODO: extract methods, change call of methods
+          def valueGetter(tpe: Type): Option[MethodSymbol] = tpe.declarations
+            .sorted
+            .filter(_.isMethod)
+            .map(_.asMethod)
+            .takeWhile(!_.isConstructor)
+            .filter(_.paramss == Nil /* nullary */ )
+            .headOption
+
+          def valueClassConstructor(tpe: Type): Option[MethodSymbol] =
+            tpe.companion.declarations.filter(_.name.toString == "apply").headOption match {
+              case Some(m: MethodSymbol) ⇒ Some(m)
+              case _                     ⇒ None
+            }
+
+          def wrappedTypeMaybe(tpe: Type): Option[Type] =
+            util.Try(valueClassConstructor(tpe).get.paramLists.head.head.typeSignature).toOption
 
           if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)

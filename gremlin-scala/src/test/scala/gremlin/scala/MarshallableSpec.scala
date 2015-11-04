@@ -103,7 +103,6 @@ class MarshallableSpec extends WordSpec with Matchers {
       // TODO: handle None case
     }
 
-
     "define their custom marshaller" in new Fixture {
       val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
