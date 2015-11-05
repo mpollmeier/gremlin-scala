@@ -44,7 +44,7 @@ class FilterSpec extends TestBase {
     }
 
     // TODO: fix
-    ignore("dedups by a given uniqueness function", org.scalatest.Tag("foo")) {
+    ignore("dedups by a given uniqueness function") {
       v(1).out.in
         .dedup().by(_.property[String]("lang").orElse(null))
         .values[String]("name").toList should be(List("marko"))

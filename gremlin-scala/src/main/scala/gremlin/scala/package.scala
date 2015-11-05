@@ -10,7 +10,6 @@ import shapeless._
 import _root_.scala.language.implicitConversions
 
 package object scala {
-
   type Vertex = structure.Vertex
   type Edge = structure.Edge
   type Element = structure.Element
@@ -138,15 +137,15 @@ package object scala {
     // this is the price we pay for nice syntax a la `paris <-- ("eurostar", Name → "test") --- london`
     private lazy val properties: Seq[KeyValue[Any]] = {
       keys match {
-        case k: KeyValue[Any] ⇒ Seq(k)
-        case (k: String, v) ⇒ Seq(Key[Any](k) → v)
-        case (k: Key[Any], v) ⇒ Seq(k → v)
+        case k: KeyValue[_] ⇒ Seq(k.asInstanceOf[KeyValue[Any]])
+        //casting to get rid of type erasure warning...
         case _ ⇒ keys.productIterator.foldLeft(Seq[KeyValue[Any]]()) { (m, prop) ⇒
           prop match {
-            case (k: String, v) ⇒ m :+ (Key[Any](k) → v)
-            case (k: Key[Any], v) ⇒ m :+ (k → v)
-            case e ⇒
-              m
+            case (k: Key[_], v) ⇒ m :+ (k.asInstanceOf[Key[Any]] → v)
+            case k: KeyValue[_] ⇒ m :+ k.asInstanceOf[KeyValue[Any]]
+            // case e ⇒
+            //   println(e)
+            //   m
           }
         }
       }
