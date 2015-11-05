@@ -60,7 +60,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def addEdge(label: String,
               inVertex: Vertex,
-              properties: Seq[KeyValue[_]] = Seq()): Edge = {
+              properties: Seq[KeyValue[_]] = Nil): Edge = {
     val params = properties.toSeq.flatMap(pair ⇒ Seq(pair.key.value, pair.value.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
