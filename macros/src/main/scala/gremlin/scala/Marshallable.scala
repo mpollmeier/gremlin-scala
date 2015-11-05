@@ -44,7 +44,6 @@ object Marshallable {
             val treesForOptionValue = for {
               innerValueClassType ← returnType.typeArgs.headOption if innerValueClassType <:< typeOf[AnyVal]
               valueName ← valueGetter(innerValueClassType).map(_.name)
-              valueClassConstructor2 ← valueClassConstructor(innerValueClassType)
               wrappedType ← wrappedTypeMaybe(innerValueClassType)
             } yield {
               val valueClassCompanion = innerValueClassType.typeSymbol.companion
@@ -61,26 +60,22 @@ object Marshallable {
             }
           }
 
-          // TODO: reuse stuff between the two value class implementations
           def property = {
             // check if the property is a value class and try to extract everything we need to unwrap it
-            // not using a pattern match to make use of lazy evaluation
-            // TODO: avoid calling methods multiple times
-            if (returnType <:< typeOf[AnyVal]
-              && valueGetter(returnType).isDefined
-              && valueClassConstructor(returnType).isDefined
-              && wrappedTypeMaybe(returnType).isDefined) {
-              val valueName = valueGetter(returnType).get.name
+            val treesForValueClass = for {
+              valueName <- valueGetter(returnType) if returnType <:< typeOf[AnyVal]
+              wrappedType ← wrappedTypeMaybe(returnType)
+            } yield {
               val valueClassCompanion = returnType.typeSymbol.companion
-              val wrappedType = wrappedTypeMaybe(returnType).get
-
               (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-                _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
-            } else //normal property
+               _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
+               _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
+            }
+            treesForValueClass.getOrElse { //normal property
               (_idParam,
-                _fromCCParams :+ q"$decoded -> cc.$name",
-                _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+               _fromCCParams :+ q"$decoded -> cc.$name",
+               _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+            }
           }
 
           def valueGetter(tpe: Type): Option[MethodSymbol] = tpe.declarations
