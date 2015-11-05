@@ -96,7 +96,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.edges(direction, edgeLabels: _*)
 
   def property[A](cardinality: Cardinality, key: Key[A], value: A, keyValues: AnyRef*): VertexProperty[A] =
-    vertex.property(cardinality, key, value, keyValues: _*)
+    vertex.property(cardinality, key.value, value, keyValues: _*)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
     vertex.properties[A](keys.map(_.value).toSeq: _*).toStream
