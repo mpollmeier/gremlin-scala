@@ -1,11 +1,11 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.{WordSpec, Matchers}
 
-class ArrowSyntaxSpec extends FunSpec with Matchers {
+class ArrowSyntaxSpec extends WordSpec with Matchers {
 
-  it("add edge with syntax sugar") {
+  "adding edge with syntax sugar" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -17,7 +17,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.outVertex shouldBe paris
   }
 
-  it("add edge with case class") {
+  "adding edge with case class" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -37,7 +37,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.outVertex shouldBe paris
   }
 
-  it("add bidirectional edge with case class") {
+  "adding bidirectional edge with case class" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -59,7 +59,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e1.outVertex shouldBe london
   }
 
-  it("add left edge with case class") {
+  "adding left edge with case class" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -79,7 +79,7 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.outVertex shouldBe london
   }
 
-  it("add bidirectional edge with syntax sugar") {
+  "adding bidirectional edge with syntax sugar" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
@@ -94,23 +94,21 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     edgeLondonToParis.outVertex shouldBe london
   }
 
-  it("add edge with properties using syntax sugar") {
+  "adding edge with properties using syntax sugar" in {
     val graph = TinkerGraph.open.asScala
 
     val paris = graph.addVertex("Paris")
     val london = graph.addVertex("London")
     val Type = Key[String]("type")
-    val Weight = Key[Int]("weight")
 
-    val e = paris --- ("eurostar", Type → "WDiEdge", Weight → 2) --> london
+    val e = paris --- ("eurostar", Type → "WDiEdge") --> london
 
     e.inVertex shouldBe london
     e.outVertex shouldBe paris
     e.value2(Type) shouldBe "WDiEdge"
-    e.value2(Weight) shouldBe 2
   }
 
-  it("add left edge with properties using syntax sugar", org.scalatest.Tag("foo")) {
+  "adding left edge with properties using syntax sugar" in {
     val graph = TinkerGraph.open.asScala
     val Type = Key[String]("type")
 
@@ -122,5 +120,25 @@ class ArrowSyntaxSpec extends FunSpec with Matchers {
     e.inVertex shouldBe paris
     e.outVertex shouldBe london
     e.value2(Type) shouldBe "WDiEdge"
+  }
+
+  "multiple properties" in {
+    val graph = TinkerGraph.open.asScala
+    val Type = Key[String]("type")
+    val Weight = Key[Int]("weight")
+
+    val paris = graph.addVertex("Paris")
+    val london = graph.addVertex("London")
+    // TODO: get same behaviour for all cases
+    val e1 = paris --- ("eurostar", Type → "value1", Weight → 1) --> london
+    val e2 = paris <-- ("eurostar", (Type → "value2", Weight → 2)) --- london
+    // val e3 = paris <-- ("eurostar", (Type → "value3", Weight → 3)) --> london
+
+    e1.value2(Type) shouldBe "value1"
+    e1.value2(Weight) shouldBe 1
+    e2.value2(Type) shouldBe "value2"
+    e2.value2(Weight) shouldBe 2
+    // e3.value2(Type) shouldBe "value3"
+    // e3.value2(Weight) shouldBe 3
   }
 }

@@ -135,7 +135,7 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.asScala.addEdge("testLabel", v2, Map(TestProperty → "testValue"))
+      val e = v1.asScala.addEdge("testLabel", v2, Seq(TestProperty → "testValue"))
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
       e.valueMap(TestProperty.value) shouldBe Map(TestProperty.value → "testValue")

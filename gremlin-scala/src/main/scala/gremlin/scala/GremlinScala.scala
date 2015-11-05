@@ -376,6 +376,8 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def has[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.has(key.value, value))
 
+  def has[A](p: KeyValue[A]) = GremlinScala[End, Labels](traversal.has(p.key.value, p.value))
+
   def has[A](p: (Key[A], A)) = GremlinScala[End, Labels](traversal.has(p._1.value, p._2))
 
   def has[A](key: Key[A], predicate: P[A]) = GremlinScala[End, Labels](traversal.has(key.value, predicate))
@@ -403,6 +405,8 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
   def hasValue(values: String*) = GremlinScala[End, Labels](traversal.hasValue(values: _*))
 
   def hasNot(key: Key[_]) = GremlinScala[End, Labels](traversal.hasNot(key.value))
+
+  def hasNot[A](key: KeyValue[A]) = GremlinScala[End, Labels](traversal.not(__.has(key.key.value, key.value)))
 
   def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.has(key.value, value)))
 
