@@ -143,9 +143,6 @@ package object scala {
           prop match {
             case (k: Key[_], v) ⇒ m :+ (k.asInstanceOf[Key[Any]] → v)
             case k: KeyValue[_] ⇒ m :+ k.asInstanceOf[KeyValue[Any]]
-            // case e ⇒
-            //   println(e)
-            //   m
           }
         }
       }
