@@ -43,13 +43,13 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
     }
 
-    // "has a label and multiple properties" in new Fixture {
-    //   paris <-- (Eurostar, Name → "alpha", Length -> 100) --- london
+    "has a label and multiple properties" in new Fixture {
+      paris <-- (Eurostar, Name → "alpha", Length -> 100) --- london
 
-    //   paris.in(Eurostar).head shouldBe london
-    //   paris.inE(Eurostar).value(Name).head shouldBe "alpha"
-    //   paris.inE(Eurostar).value(Length).head shouldBe 100
-    // }
+      paris.in(Eurostar).head shouldBe london
+      paris.inE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.inE(Eurostar).value(Length).head shouldBe 100
+    }
   }
 
   "A <--> B create edges" which {

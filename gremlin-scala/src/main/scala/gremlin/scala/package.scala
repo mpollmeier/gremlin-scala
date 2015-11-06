@@ -7,6 +7,10 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
+import shapeless.ops.hlist.IsHCons
+import shapeless.ops.hlist.{IsHCons, ToTraversable}
+import shapeless.ops.product.ToHList
+import shapeless.syntax.std.product.productOps
 import _root_.scala.language.implicitConversions
 
 package object scala {
@@ -16,6 +20,7 @@ package object scala {
   type Graph = structure.Graph
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
+  type Label = String
 
   implicit class KeyOps[A](key: Key[A]) {
     def →(value: A): KeyValue[A] = KeyValue(key, value)
@@ -124,43 +129,41 @@ package object scala {
   }
 
   // Arrow syntax implicits
-  implicit class SemiEdgeFunctions(label: String) {
+  implicit class SemiEdgeFunctions(label: Label) {
     def ---(from: Vertex) = SemiEdge(from, label)
 
     def -->(right: Vertex) = SemiDoubleEdge(right, label)
   }
 
-  implicit class SemiEdgeProductFunctions[A <: Product](t: (String, A)) {
-    private val label = t._1
-    private val keys = t._2
+  implicit class SemiEdgeProductFunctions[
+    LabelAndValuesAsTuple <: Product,
+    LabelAndValues <: HList,
+    Lbl <: String,
+    KeyValues <: HList
+  ](labelAndValuesAsTuple: LabelAndValuesAsTuple)
+  (implicit toHList: ToHList.Aux[LabelAndValuesAsTuple,LabelAndValues],
+   startsWithLabel: IsHCons.Aux[LabelAndValues, Lbl, KeyValues], // first element has to be a Label
+   keyValueToList: ToTraversable.Aux[KeyValues, List, KeyValue[_]] // all other elements have to be KeyValue[_]
+  ) {
+    lazy val labelAndValues = labelAndValuesAsTuple.toHList
+    lazy val label: String = labelAndValues.head
+    lazy val keyValues: KeyValues = labelAndValues.tail
+    lazy val properties: List[KeyValue[_]] = keyValues.toList
 
-    // this is the price we pay for nice syntax a la `paris <-- ("eurostar", Name → "test") --- london`
-    private lazy val properties: Seq[KeyValue[Any]] = {
-      keys match {
-        case k: KeyValue[_] ⇒ Seq(k.asInstanceOf[KeyValue[Any]])
-        //casting to get rid of type erasure warning...
-        case _ ⇒ keys.productIterator.foldLeft(Seq[KeyValue[Any]]()) { (m, prop) ⇒
-          prop match {
-            case (k: Key[_], v) ⇒ m :+ (k.asInstanceOf[Key[Any]] → v)
-            case k: KeyValue[_] ⇒ m :+ k.asInstanceOf[KeyValue[Any]]
-          }
-        }
-      }
-    }
-
-    def ---(from: Vertex) = SemiEdge(from, label, properties)
+    def ---(from: Vertex): SemiEdge = SemiEdge(from, label, properties)
   }
 
-  implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
-    def ---(from: Vertex) = {
-      val fromCC = implicitly[Marshallable[T]].fromCC(cc)
-      SemiEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
-    }
+  // TODO: get back to work?
+  // implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
+  //   def ---(from: Vertex) = {
+  //     val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+  //     SemiEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
+  //   }
 
-    def -->(from: Vertex) = {
-      val fromCC = implicitly[Marshallable[T]].fromCC(cc)
-      SemiDoubleEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
-    }
-  }
+  //   def -->(from: Vertex) = {
+  //     val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+  //     SemiDoubleEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
+  //   }
+  // }
 
 }
