@@ -150,10 +150,11 @@ package object scala {
     lazy val keyValues: KeyValues = labelAndValues.tail
     lazy val properties: List[KeyValue[_]] = keyValues.toList
 
-    def ---(from: Vertex): SemiEdge = SemiEdge(from, label, properties)
+    def ---(from: Vertex) = SemiEdge(from, label, properties)
+    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties)
   }
 
-  // TODO: get back to work?
+  // TODO: get back to work? conflicts with other SemiEdgeProductFunctions...
   // implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
   //   def ---(from: Vertex) = {
   //     val fromCC = implicitly[Marshallable[T]].fromCC(cc)

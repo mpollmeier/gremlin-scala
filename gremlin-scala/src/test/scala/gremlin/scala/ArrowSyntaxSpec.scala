@@ -60,27 +60,28 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       london.out(Eurostar).head shouldBe paris
     }
 
-    // "have labels and one property" in new Fixture {
-    //   paris <-- (Eurostar, Name → "alpha") --> london
+    "have labels and one property" in new Fixture {
+      paris <-- (Eurostar, Name → "alpha") --> london
 
-    //   paris.out(Eurostar).head shouldBe london
-    //   paris.outE(Eurostar).value(Name).head shouldBe "alpha"
-    //   paris.in(Eurostar).head shouldBe london
-    //   paris.inE(Eurostar).value(Name).head shouldBe "alpha"
-    // }
+      paris.out(Eurostar).head shouldBe london
+      paris.outE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.in(Eurostar).head shouldBe london
+      paris.inE(Eurostar).value(Name).head shouldBe "alpha"
+    }
 
-    // "have labels and multiple properties" in new Fixture {
-    //   paris <-- (Eurostar, Name → "alpha", Length → 100) --> london
+    "have labels and multiple properties" in new Fixture {
+      paris <-- (Eurostar, Name → "alpha", Length → 100) --> london
 
-    //   paris.out(Eurostar).head shouldBe london
-    //   paris.outE(Eurostar).value(Name).head shouldBe "alpha"
-    //   paris.outE(Eurostar).value(Length).head shouldBe 100
-    //   paris.in(Eurostar).head shouldBe london
-    //   paris.inE(Eurostar).value(Name).head shouldBe "alpha"
-    //   paris.inE(Eurostar).value(Length).head shouldBe 100
-    // }
+      paris.out(Eurostar).head shouldBe london
+      paris.outE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.outE(Eurostar).value(Length).head shouldBe 100
+      paris.in(Eurostar).head shouldBe london
+      paris.inE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.inE(Eurostar).value(Length).head shouldBe 100
+    }
   }
 
+  // TODO: case class support
   // "adding edge with case class" in {
   //   val graph = TinkerGraph.open.asScala
 
