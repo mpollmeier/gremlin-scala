@@ -5,6 +5,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.apache.tinkerpop.gremlin.structure.T
 import TestGraph._
 
+// TODO: rewrite using new type safe steps
 class ElementSpec extends TestBase {
 
   describe("properties") {

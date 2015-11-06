@@ -14,6 +14,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
+import shapeless.ops.product.ToHList
 import shapeless.syntax.std.product.productOps
 import scala.language.existentials
 import StepLabel.{combineLabelWithValue, GetLabelName}
@@ -88,7 +89,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def path() = GremlinScala[Path, Labels](traversal.path())
 
-  // select all labelled steps - like path, but type safe and contains only the labelled steps - see `as` step and `SelectSpec`
+  // select all labelled steps - see `as` step and `SelectSpec`
   def select[LabelsTuple]()(implicit tupler: Tupler.Aux[Labels, LabelsTuple]) =
     GremlinScala[LabelsTuple, Labels](traversal.asAdmin.addStep(new SelectAllStep[End, Labels, LabelsTuple](traversal)))
 
@@ -110,7 +111,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     TupleWithValue,
     Values <: HList, Z,
     ValueTuples](stepLabelsTuple: StepLabelsAsTuple)(
-    implicit toHList: shapeless.ops.product.ToHList.Aux[StepLabelsAsTuple,StepLabels],
+    implicit toHList: ToHList.Aux[StepLabelsAsTuple,StepLabels],
     hasOne: IsHCons.Aux[StepLabels, H0, T0], hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
     stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
     trav: ToTraversable.Aux[LabelNames, List, String],
