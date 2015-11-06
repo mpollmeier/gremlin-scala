@@ -6,7 +6,7 @@ import shapeless.test.illTyped
 
 class SchemaSpec extends WordSpec with Matchers {
 
-  "a schema with defined Atoms" can {
+  "a schema with defined Keys" can {
     val Software = "software"
     val Person = "person"
     val Paris = "Paris"
@@ -31,77 +31,6 @@ class SchemaSpec extends WordSpec with Matchers {
 
       g.V.has(Name).toList().size shouldBe 4
       g.V.has(Created).toList().size shouldBe 2
-
-      g.asJava.close()
-    }
-
-    "add bidirectional edges" in {
-      val g = TinkerGraph.open.asScala
-
-      val paris = g + Paris
-      val london = g + London
-
-      val (edgeParisToLondon, edgeLondonToParis) = paris <-- EuroStar --> london
-
-      edgeParisToLondon.inVertex shouldBe london
-      edgeParisToLondon.outVertex shouldBe paris
-
-      edgeLondonToParis.inVertex shouldBe paris
-      edgeLondonToParis.outVertex shouldBe london
-    }
-
-    "add edges with properties" in {
-      val g = TinkerGraph.open.asScala
-
-      val paris = g + Paris
-      val london = g + London
-
-      val e = paris --- (EuroStar, Type → "WDiEdge", Weight → 2) --> london
-
-      e.inVertex shouldBe london
-      e.outVertex shouldBe paris
-      e.value2(Type) shouldBe "WDiEdge"
-      e.value2(Weight) shouldBe 2
-    }
-
-    "add left edge with just a Label" in {
-      val g = TinkerGraph.open.asScala
-
-      val paris = g + Paris
-      val london = g + London
-
-      val e = paris <-- EuroStar --- london
-
-      e.inVertex shouldBe paris
-      e.outVertex shouldBe london
-
-      g.close()
-    }
-
-    "add left edge with Label and Name" in {
-      val g = TinkerGraph.open.asScala
-
-      val paris = g + Paris
-      val london = g + London
-
-      val e = paris <-- (EuroStar, Name → "test") --- london
-
-      e.inVertex shouldBe paris
-      e.outVertex shouldBe london
-
-      g.close()
-    }
-
-    "add left edge with Label, Weight and Name" in {
-      val g = TinkerGraph.open.asScala
-
-      val paris = g + Paris
-      val london = g + London
-
-      val e = paris <-- (EuroStar, (Weight → 99, Name → "test")) --- london
-
-      e.inVertex shouldBe paris
-      e.outVertex shouldBe london
 
       g.asJava.close()
     }
