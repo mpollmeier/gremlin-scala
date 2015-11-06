@@ -7,6 +7,10 @@ import shapeless.test.illTyped
 
 case class CCSimple(s: String, i: Int)
 
+case class MyValueClass(value: Int) extends AnyVal
+case class CCWithValueClass(s: String, i: MyValueClass)
+case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
+
 case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
@@ -71,6 +75,32 @@ class MarshallableSpec extends WordSpec with Matchers {
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
       // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
       // https://github.com/mpollmeier/gremlin-scala/issues/98
+    }
+
+    "contain value classes" should {
+      "unwrap a plain value class" in new Fixture {
+        val cc = CCWithValueClass("some text", MyValueClass(42))
+        val v = graph.addVertex(cc)
+
+        val vl = graph.V(v.id).head
+        vl.label shouldBe cc.getClass.getSimpleName
+        vl.valueMap should contain("s" → cc.s)
+        vl.valueMap should contain("i" → cc.i.value)
+        vl.toCC[CCWithValueClass] shouldBe cc
+      }
+
+      "unwrap an optional value class" in new Fixture {
+        val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
+        val v = graph.addVertex(cc)
+
+        val vl = graph.V(v.id).head
+        vl.label shouldBe cc.getClass.getSimpleName
+        vl.valueMap should contain("s" → cc.s)
+        vl.valueMap should contain("i" → cc.i.get.value)
+        vl.toCC[CCWithOptionValueClass] shouldBe cc
+      }
+
+      // TODO: handle None case
     }
 
     "define their custom marshaller" in new Fixture {
