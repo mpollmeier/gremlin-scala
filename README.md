@@ -39,8 +39,6 @@ val graph = TinkerGraph.open.asScala
 // Keys for properties which can later be used for type safe traversals
 val Founded = Key[String]("founded")
 val Distance = Key[Int]("distance")
-val Name = Key[String]("name")
-val Population = Key[Int]("population")
 
 // create labelled vertex
 val paris = graph + "Paris"
@@ -57,13 +55,11 @@ paris <-- "Eurostar" --> london
 paris --- ("Eurostar", Distance → 495) --> london
 
 // type safe access to properties
-london.property(Founded) //Property(founded->43 AD)
-london.value2(Founded) //43 AD
 paris.out("Eurostar").value(Founded).head //43 AD
 paris.outE("Eurostar").value(Distance).head //495
 ```
 
-More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala).
+More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala) and [ArrowSyntaxSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ArrowSyntaxSpec.scala).
 
 ### Other means to access properties
 
