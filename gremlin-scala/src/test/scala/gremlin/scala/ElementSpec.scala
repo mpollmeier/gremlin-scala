@@ -51,8 +51,12 @@ class ElementSpec extends TestBase {
   describe("values") {
     it("gets a value") {
       v1.value2(Name) shouldBe "marko"
-      v1.value2(Name) shouldBe "marko"
       e7.value2(Weight) shouldBe 0.5
+    }
+
+    it("gets an optional value") {
+      v1.valueOption(Name) shouldBe Some("marko")
+      v1.valueOption(DoesNotExist) shouldBe None
     }
 
     it("throws an exception if it doesn't exist") {

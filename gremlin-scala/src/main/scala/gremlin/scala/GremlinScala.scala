@@ -361,11 +361,17 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def key() = GremlinScala[String, Labels](traversal.key)
 
+  def value[A](key: Key[A]) =
+    GremlinScala[A, Labels](traversal.values[A](key.value))
+
   def value[A](key: String) =
     GremlinScala[A, Labels](traversal.values[A](key))
 
-  def value[A](key: Key[A]) =
-    GremlinScala[A, Labels](traversal.values[A](key.value))
+  def valueOption[A](key: Key[A]): GremlinScala[Option[A], Labels] =
+    this.properties(key.value).map(_.toOption.asInstanceOf[Option[A]])
+
+  def valueOption[A](key: String): GremlinScala[Option[A], Labels] =
+    this.properties(key).map(_.toOption.asInstanceOf[Option[A]])
 
   def values[A](key: String*) =
     GremlinScala[A, Labels](traversal.values[A](key: _*))

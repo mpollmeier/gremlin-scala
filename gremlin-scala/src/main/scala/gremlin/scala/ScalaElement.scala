@@ -28,7 +28,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def properties[A: DefaultsToAny](keys: String*): Stream[Property[A]]
 
-  // note: this may throw an IllegalStateException - better use `Property`
+  // note: this may throw an IllegalStateException - better use `valueOption` or `Property`
   def value[A: DefaultsToAny](key: String): A =
     element.value[A](key)
 
@@ -36,6 +36,12 @@ trait ScalaElement[ElementType <: Element] {
   // https://issues.scala-lang.org/browse/SI-9523
   def value2[A](key: Key[A]): A =
     element.value[A](key.value)
+
+  def valueOption[A: DefaultsToAny](key: String): Option[A] =
+    element.property[A](key).toOption
+
+  def valueOption[A](key: Key[A]): Option[A] =
+    element.property[A](key.value).toOption
 
   // note: this may throw an IllegalStateException - better use `Property`
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =

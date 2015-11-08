@@ -57,6 +57,8 @@ paris --- ("Eurostar", Distance → 495) --> london
 // type safe access to properties
 paris.out("Eurostar").value(Founded).head //43 AD
 paris.outE("Eurostar").value(Distance).head //495
+london.valueOption(Founded) //Some(43 AD)
+london.valueOption(Distance) //None
 ```
 
 More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala) and [ArrowSyntaxSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ArrowSyntaxSpec.scala).
