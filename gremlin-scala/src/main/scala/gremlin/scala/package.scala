@@ -22,14 +22,6 @@ package object scala {
   type Traverser[A] = traversal.Traverser[A]
   type Label = String
 
-  implicit class KeyOps[A](key: Key[A]) {
-    def →(value: A): KeyValue[A] = KeyValue(key, value)
-
-    def ->(value: A): KeyValue[A] = KeyValue(key, value)
-
-    def of(value: A): KeyValue[A] = KeyValue(key, value)
-  }
-
   implicit class GraphAsScala[G <: Graph](g: G) {
     def asScala = ScalaGraph(g)
   }
@@ -54,10 +46,18 @@ package object scala {
     def asJava = v.vertex
   }
 
-  implicit class PropertyAsScala[A](property: Property[A]) {
+  implicit class PropertyOps[A](property: Property[A]) {
     def toOption: Option[A] =
       if (property.isPresent) Some(property.value)
       else None
+  }
+
+  implicit class KeyOps[A](key: Key[A]) {
+    def →(value: A): KeyValue[A] = KeyValue(key, value)
+
+    def ->(value: A): KeyValue[A] = KeyValue(key, value)
+
+    def of(value: A): KeyValue[A] = KeyValue(key, value)
   }
 
   // create a new anonymous traversal, e.g. `__.outE`

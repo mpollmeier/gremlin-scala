@@ -72,7 +72,7 @@ class SchemaSpec extends WordSpec with Matchers {
           val someString: Property[String] = name
           illTyped { //to ensure that there is no implicit conversion to make the above work
             """
-            val i: Property[Integer] = paris.value2(Name)
+            val i: Property[Integer] = paris.property(Name)
           """
           }
         }
@@ -82,7 +82,7 @@ class SchemaSpec extends WordSpec with Matchers {
           val someInt: Property[Int] = distance //no implicit conversion, it already is an Int
           illTyped { //to ensure that there is no implicit conversion to make the above work
             """
-            val i: Property[String] = v.value2(Distance)
+            val i: Property[String] = v.property(Distance)
           """
           }
         }
