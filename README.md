@@ -29,6 +29,30 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 * Next, change to the gremlin-scala project using `project gremlin-scala`
 * Finally, to test out the API in a REPL type `console` 
 
+### Simple traversals
+
+The below create traversals, which are lazy computations. To run a traversal, you can use e.g. `toSet`, `toList`, `head`, `headOption` etc. 
+
+```scala
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+val graph = TinkerFactory.createModern.asScala
+
+graph.V //all vertices
+graph.E //all edges
+
+graph.V(1).outE("knows") //follow outgoing edges
+graph.V(1).out("knows") //follow outgoing edges to incoming vertex
+
+// gremlin-scala is a monad
+for {
+  vertex ← graph.V
+  edge ← vertex.outE
+} yield edge.label
+```
+
+More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
+
 ### Vertices and edges with type safe properties
 
 ```scala

@@ -70,17 +70,17 @@ class TraversalSpec extends WordSpec with Matchers {
       graph.E.toList should have size 6
     }
 
-  //   "follow in vertex" in new Fixture {
-  //     //TODO: wait until this is consistent in T3 between Vertex and Edge
-  //     //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
-  //     //e(7).inV//.out.values[String]("name").toSet should be(Set("vadas", "josh", "lop"))
-  //     //graph.V(1).out("knows").values[String]("name").toSet should be(Set("vadas", "josh"))
-  //     //graph.V(1).out(1, "knows").values[String]("name").toSet should be(Set("vadas"))
+    //   "follow in vertex" in new Fixture {
+    //     //TODO: wait until this is consistent in T3 between Vertex and Edge
+    //     //currently Vertex.outE returns a Traversal, Edge.inV doesnt quite exist
+    //     //e(7).inV//.out.values[String]("name").toSet should be(Set("vadas", "josh", "lop"))
+    //     //graph.V(1).out("knows").values[String]("name").toSet should be(Set("vadas", "josh"))
+    //     //graph.V(1).out(1, "knows").values[String]("name").toSet should be(Set("vadas"))
 
-  //     //graph.V(1).out.out.values[String]("name").toSet should be(Set("ripple", "lop"))
-  //     //graph.V(1).out.out("created").values[String]("name").toSet should be(Set("ripple", "lop"))
-  //     //graph.V(1).out.out(1, "created").values[String]("name").toSet should be(Set("lop"))
-  //   }
+    //     //graph.V(1).out.out.values[String]("name").toSet should be(Set("ripple", "lop"))
+    //     //graph.V(1).out.out("created").values[String]("name").toSet should be(Set("ripple", "lop"))
+    //     //graph.V(1).out.out(1, "created").values[String]("name").toSet should be(Set("lop"))
+    //   }
 
     //"does not allow vertex steps" in new Fixture {
     //illTyped {"""graph.V(1).inV"""}
@@ -88,43 +88,43 @@ class TraversalSpec extends WordSpec with Matchers {
     //}
   }
 
-    "head" can {
-      "get the first element" in new Fixture {
-        graph.V.values[String]("name").head shouldBe "marko"
-      }
-
-      "throw an exception if there is no result" in new Fixture {
-        intercept[NoSuchElementException] {
-          graph.V.filter(_ ⇒ false).values[String]("name").head
-        }
-      }
+  "head" can {
+    "get the first element" in new Fixture {
+      graph.V.values[String]("name").head shouldBe "marko"
     }
 
-    "headOption" can {
-      "get the first element" in new Fixture {
-        graph.V.values[String]("name").headOption shouldBe Some("marko")
-      }
-
-      "return None if there is no result" in new Fixture {
-        graph.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
+    "throw an exception if there is no result" in new Fixture {
+      intercept[NoSuchElementException] {
+        graph.V.filter(_ ⇒ false).values[String]("name").head
       }
     }
+  }
 
-      "value gets values" in new Fixture {
-        val Age = Key[Int]("age")
-        graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
-      }
-
-    "order" can {
-      "sort by natural order" in new Fixture {
-        graph.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
-      }
-
-      "sort by provided comparator" in new Fixture {
-        graph.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
-        graph.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
-      }
+  "headOption" can {
+    "get the first element" in new Fixture {
+      graph.V.values[String]("name").headOption shouldBe Some("marko")
     }
+
+    "return None if there is no result" in new Fixture {
+      graph.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
+    }
+  }
+
+  "value gets values" in new Fixture {
+    val Age = Key[Int]("age")
+    graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
+  }
+
+  "order" can {
+    "sort by natural order" in new Fixture {
+      graph.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
+    }
+
+    "sort by provided comparator" in new Fixture {
+      graph.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
+      graph.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
+    }
+  }
 
   "map" can {
     "transform the latest step" in new Fixture {
@@ -133,6 +133,14 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "infer the right types" in new Fixture {
       val labels: List[String] = graph.V.map(_.label).toList
+    }
+
+    "support for comprehension" in new Fixture {
+      val labels = for {
+        vertex ← graph.V
+      } yield vertex.label
+
+      labels.toSet shouldBe graph.V.label.toSet
     }
   }
 
@@ -146,6 +154,15 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "infers the right types" in new Fixture {
       val edges: List[Edge] = graph.V(1).flatMap(_.outE).toList
+    }
+
+    "support for comprehension" in new Fixture {
+      val edgeLabels = for {
+        vertex ← graph.V
+        edge ← vertex.outE
+      } yield edge.label
+
+      edgeLabels.toSet shouldBe graph.E.label.toSet
     }
 
     "doesn't compile for bad traversals" in new Fixture {
