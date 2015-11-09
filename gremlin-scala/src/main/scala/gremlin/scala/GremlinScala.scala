@@ -69,21 +69,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
 
-  def flatMap[A](fun: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) =
-    GremlinScala[A, Labels](traversal.flatMap(fun(start).traversal))
-
-  // need to call this flatMap2 because of overloading and jvm type erasure. might not be needed anyway
-  def flatMap2[A](fun: End ⇒ Iterable[A]) =
+  def flatMap[A](fun: End ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { t: Traverser[End] ⇒
-        fun(t.get).toIterator: JIterator[A]
+        fun(t.get).toList.toIterator: JIterator[A]
       }
     )
 
-  def flatMap2WithTraverser[A](fun: Traverser[End] ⇒ Iterable[A]) =
+  def flatMapWithTraverser[A](fun: Traverser[End] ⇒ GremlinScala[A, _]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { e: Traverser[End] ⇒
-        fun(e).toIterator: JIterator[A]
+        fun(e).toList.toIterator: JIterator[A]
       }
     )
 
