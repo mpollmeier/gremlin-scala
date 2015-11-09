@@ -1,6 +1,8 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import shapeless.test.illTyped
 
@@ -170,6 +172,36 @@ class TraversalSpec extends WordSpec with Matchers {
       illTyped { """graph.GRAPH.V(1).flatMap(_.inV)""" } //verify doesn't compile
     }
   }
+
+  "limit in nested traversals" in {
+    val graph = TinkerGraph.open.asScala
+    val person = "person"
+    val likes = "likes"
+    val name = Key[String]("name")
+    val weight = Key[Float]("weight")
+
+    val scala = graph + "scala"
+    val groovy = graph + "groovy"
+    val michael = graph + (person, name -> "michael")
+    val marko = graph + (person, name -> "marko")
+
+    michael --- (likes, weight -> 3) --> groovy
+    michael --- (likes, weight -> 5) --> scala
+    marko --- (likes, weight -> 4) --> groovy
+    marko --- (likes, weight -> 3) --> scala
+
+    val traversal = for {
+      person <- graph.V.hasLabel(person)
+      favorite <- person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+    } yield (person.value2(name), favorite.label)
+
+    val favorites = traversal.toList.toMap
+    favorites shouldBe Map(
+      "michael" -> "scala",
+      "marko" -> "groovy"
+    )
+  }
+
 
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
