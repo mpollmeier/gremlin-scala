@@ -406,6 +406,9 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def hasLabel(labels: String*) = GremlinScala[End, Labels](traversal.hasLabel(labels: _*))
 
+  def hasLabel[CC <: Product: Marshallable](cc: CC): GremlinScala[End, Labels] =
+    hasLabel(implicitly[Marshallable[CC]].fromCC(cc).label)
+
   def hasKey(keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(keys.map(_.value): _*))
 
   def hasValue(values: String*) = GremlinScala[End, Labels](traversal.hasValue(values: _*))

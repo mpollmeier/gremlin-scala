@@ -16,8 +16,8 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     edge
   }
 
-  def setProperties[T <: Product: Marshallable](cc: T): Edge = {
-    val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+  def setProperties[CC <: Product: Marshallable](cc: CC): Edge = {
+    val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     fromCC.valueMap foreach { case (k, v) ⇒ element.property(k, v) }
     edge
   }
@@ -33,8 +33,8 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     edge
   }
 
-  def toCC[T <: Product: Marshallable] =
-    implicitly[Marshallable[T]].toCC(edge.id, edge.valueMap)
+  def toCC[CC <: Product: Marshallable] =
+    implicitly[Marshallable[CC]].toCC(edge.id, edge.valueMap)
 
   override def start() = GremlinScala[Edge, HNil](__(edge))
 

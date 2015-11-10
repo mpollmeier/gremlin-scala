@@ -10,8 +10,8 @@ import scala.collection.JavaConversions._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  def toCC[P <: Product : Marshallable] =
-    implicitly[Marshallable[P]].toCC(vertex.id, vertex.valueMap)
+  def toCC[CC <: Product: Marshallable] =
+    implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
 
   override def setProperty[A](key: Key[A], value: A): Vertex = {
     element.property(key.value, value)
@@ -58,15 +58,17 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def bothE(labels: String*) = start().bothE(labels: _*)
 
-  def addEdge(label: String,
-              inVertex: Vertex,
-              properties: Seq[KeyValue[_]] = Nil): Edge = {
+  def addEdge(
+    label: String,
+    inVertex: Vertex,
+    properties: Seq[KeyValue[_]] = Nil
+  ): Edge = {
     val params = properties.toSeq.flatMap(pair ⇒ Seq(pair.key.value, pair.value.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
-  def addEdge[P <: Product : Marshallable](inVertex: Vertex, cc: P): ScalaEdge = {
-    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
+  def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): ScalaEdge = {
+    val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
     val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
@@ -82,9 +84,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def ---(label: String, properties: KeyValue[_]*): SemiEdge =
     SemiEdge(vertex, label, properties)
 
-  def ---[P <: Product : Marshallable](cc: P): SemiEdge = {
-    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
-    SemiEdge(vertex, fromCC.label, fromCC.valueMap.map{r ⇒ Key[Any](r._1) → r._2}.toSeq )
+  def ---[CC <: Product: Marshallable](cc: CC): SemiEdge = {
+    val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
+    SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
   }
 
   override def start() = GremlinScala[Vertex, HNil](__(vertex))
