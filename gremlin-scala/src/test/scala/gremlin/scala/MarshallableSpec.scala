@@ -45,7 +45,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     "only have simple members" in new Fixture {
       val cc = CCSimple("text", 12)
-      val v = graph.addVertex(cc)
+      val v = graph + cc
 
       val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
@@ -56,7 +56,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     "contain options" should {
       "map `Some[A]` to `A`" in new Fixture {
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
-        val v = graph.addVertex(ccWithOptionSome)
+        val v = graph + ccWithOptionSome
         v.toCC[CCWithOption] shouldBe ccWithOptionSome
 
         val vl = graph.V(v.id).head
@@ -65,7 +65,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       "map `None` to `null`" in new Fixture {
         val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
-        val v = graph.addVertex(ccWithOptionNone)
+        val v = graph + ccWithOptionNone
         v.toCC[CCWithOption] shouldBe ccWithOptionNone
 
         val vl = graph.V(v.id).head
@@ -80,7 +80,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     "contain value classes" should {
       "unwrap a plain value class" in new Fixture {
         val cc = CCWithValueClass("some text", MyValueClass(42))
-        val v = graph.addVertex(cc)
+        val v = graph + cc
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
@@ -91,7 +91,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       "unwrap an optional value class" in new Fixture {
         val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
-        val v = graph.addVertex(cc)
+        val v = graph + cc
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
@@ -115,7 +115,7 @@ class MarshallableSpec extends WordSpec with Matchers {
                        s = valueMap.get("s").asInstanceOf[Option[String]])
       }
 
-      val v = graph.addVertex(ccWithOptionNone)(marshaller)
+      val v = graph.+(ccWithOptionNone)(marshaller)
       v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
@@ -130,7 +130,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         NestedClass("nested")
       )
 
-      val v = graph.addVertex(ccWithLabelAndId)
+      val v = graph + ccWithLabelAndId
 
       v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
 
@@ -147,7 +147,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     "have an Option @id annotation" in new Fixture {
       val cc = CCWithOptionId("text", Some(12))
-      val v = graph.addVertex(cc)
+      val v = graph + cc
 
       v.toCC[CCWithOptionId] shouldBe cc
 
@@ -166,7 +166,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     illTyped {
       """
         val graph = TinkerGraph.open.asScala
-        graph.addVertex(new NoneCaseClass("test"))
+        graph + new NoneCaseClass("test")
       """
     }
   }
