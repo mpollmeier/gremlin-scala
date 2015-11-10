@@ -60,6 +60,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     override def test(h: Traverser[End]): Boolean = p(h)
   }))
 
+  def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
+    filter(pf.isDefinedAt).map(pf)
+
   def count() = GremlinScala[JLong, Labels](traversal.count())
 
   def count(scope: Scope) = GremlinScala[JLong, Labels](traversal.count(scope))
