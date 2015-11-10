@@ -24,7 +24,7 @@ case class CCWithLabel(
   nested: NestedClass
 )
 
-@label("the label")
+@label("the_label")
 case class CCWithLabelAndId(
   s: String,
   @id id: Int,
@@ -135,7 +135,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
 
       val vl = graph.V(v.id).head()
-      vl.label shouldBe "the label"
+      vl.label shouldBe "the_label"
       vl.id shouldBe ccWithLabelAndId.id
       vl.valueMap should contain("s" → ccWithLabelAndId.s)
       vl.valueMap should contain("l" → ccWithLabelAndId.l)
@@ -157,9 +157,23 @@ class MarshallableSpec extends WordSpec with Matchers {
       vl.valueMap should contain("s" → cc.s)
     }
 
-    trait Fixture {
-      val graph = TinkerGraph.open.asScala
-    }
+  }
+
+  "find vertices by label" in new Fixture {
+    val ccSimple = CCSimple("a string", 42)
+    val ccWithOption = CCWithOption(52, Some("other string"))
+
+    graph + ccSimple
+    graph + ccWithOption
+
+    graph.V.count.head shouldBe 2
+    val ccSimpleVertices = graph.V.hasLabel(ccSimple).toList
+    ccSimpleVertices should have size 1
+    ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
+  }
+
+  trait Fixture {
+    val graph = TinkerGraph.open.asScala
   }
 
   "can't persist a none product type (none case class or tuple)" in {
