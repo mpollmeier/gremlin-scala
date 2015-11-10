@@ -113,7 +113,6 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "value gets values" in new Fixture {
-    val Age = Key[Int]("age")
     graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
   }
 
@@ -202,8 +201,17 @@ class TraversalSpec extends WordSpec with Matchers {
     )
   }
 
+  "collect" in new Fixture {
+    val ages: Set[Int] = graph.V.valueOption(Age).collect {
+      case Some(age) => age
+    }.toSet
+
+    ages shouldBe Set(27,29,32,35)
+  }
 
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
+    val Name = Key[String]("name")
+    val Age = Key[Int]("age")
   }
 }
