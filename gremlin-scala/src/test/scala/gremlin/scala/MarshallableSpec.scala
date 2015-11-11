@@ -100,7 +100,16 @@ class MarshallableSpec extends WordSpec with Matchers {
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
 
-      // TODO: handle None case
+      "handle None value class" in new Fixture {
+        val cc = CCWithOptionValueClass("some text", None)
+        val v = graph + cc
+
+        val vl = graph.V(v.id).head
+        vl.label shouldBe cc.getClass.getSimpleName
+        vl.valueMap should contain("s" → cc.s)
+        vl.valueMap.keySet should not contain("i")
+        vl.toCC[CCWithOptionValueClass] shouldBe cc
+      }
     }
 
     "define their custom marshaller" in new Fixture {
