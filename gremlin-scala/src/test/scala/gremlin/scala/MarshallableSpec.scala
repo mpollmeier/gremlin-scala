@@ -15,16 +15,10 @@ case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 
-case class CCWithLabel(
-  s: String,
-  l: Long,
-  o: Option[String],
-  seq: Seq[String],
-  map: Map[String, String],
-  nested: NestedClass
-)
+@label("label_a")
+case class CCWithLabel(s: String)
 
-@label("the label")
+@label("the_label")
 case class CCWithLabelAndId(
   s: String,
   @id id: Int,
@@ -45,7 +39,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     "only have simple members" in new Fixture {
       val cc = CCSimple("text", 12)
-      val v = graph.addVertex(cc)
+      val v = graph + cc
 
       val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
@@ -56,7 +50,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     "contain options" should {
       "map `Some[A]` to `A`" in new Fixture {
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
-        val v = graph.addVertex(ccWithOptionSome)
+        val v = graph + ccWithOptionSome
         v.toCC[CCWithOption] shouldBe ccWithOptionSome
 
         val vl = graph.V(v.id).head
@@ -65,7 +59,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       "map `None` to `null`" in new Fixture {
         val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
-        val v = graph.addVertex(ccWithOptionNone)
+        val v = graph + ccWithOptionNone
         v.toCC[CCWithOption] shouldBe ccWithOptionNone
 
         val vl = graph.V(v.id).head
@@ -80,7 +74,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     "contain value classes" should {
       "unwrap a plain value class" in new Fixture {
         val cc = CCWithValueClass("some text", MyValueClass(42))
-        val v = graph.addVertex(cc)
+        val v = graph + cc
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
@@ -91,7 +85,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       "unwrap an optional value class" in new Fixture {
         val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
-        val v = graph.addVertex(cc)
+        val v = graph + cc
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
@@ -100,7 +94,16 @@ class MarshallableSpec extends WordSpec with Matchers {
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
 
-      // TODO: handle None case
+      "handle None value class" in new Fixture {
+        val cc = CCWithOptionValueClass("some text", None)
+        val v = graph + cc
+
+        val vl = graph.V(v.id).head
+        vl.label shouldBe cc.getClass.getSimpleName
+        vl.valueMap should contain("s" → cc.s)
+        vl.valueMap.keySet should not contain("i")
+        vl.toCC[CCWithOptionValueClass] shouldBe cc
+      }
     }
 
     "define their custom marshaller" in new Fixture {
@@ -115,7 +118,7 @@ class MarshallableSpec extends WordSpec with Matchers {
                        s = valueMap.get("s").asInstanceOf[Option[String]])
       }
 
-      val v = graph.addVertex(ccWithOptionNone)(marshaller)
+      val v = graph.+(ccWithOptionNone)(marshaller)
       v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
@@ -130,12 +133,12 @@ class MarshallableSpec extends WordSpec with Matchers {
         NestedClass("nested")
       )
 
-      val v = graph.addVertex(ccWithLabelAndId)
+      val v = graph + ccWithLabelAndId
 
       v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
 
       val vl = graph.V(v.id).head()
-      vl.label shouldBe "the label"
+      vl.label shouldBe "the_label"
       vl.id shouldBe ccWithLabelAndId.id
       vl.valueMap should contain("s" → ccWithLabelAndId.s)
       vl.valueMap should contain("l" → ccWithLabelAndId.l)
@@ -147,7 +150,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     "have an Option @id annotation" in new Fixture {
       val cc = CCWithOptionId("text", Some(12))
-      val v = graph.addVertex(cc)
+      val v = graph + cc
 
       v.toCC[CCWithOptionId] shouldBe cc
 
@@ -157,16 +160,37 @@ class MarshallableSpec extends WordSpec with Matchers {
       vl.valueMap should contain("s" → cc.s)
     }
 
-    trait Fixture {
-      val graph = TinkerGraph.open.asScala
-    }
+  }
+
+  "find vertices by label" in new Fixture {
+    val ccSimple = CCSimple("a string", 42)
+    val ccWithOption = CCWithOption(52, Some("other string"))
+    val ccWithLabel = CCWithLabel("s")
+
+    graph + ccSimple
+    graph + ccWithOption
+    graph + ccWithLabel
+
+    graph.V.count.head shouldBe 3
+
+    val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
+    ccSimpleVertices should have size 1
+    ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
+
+    val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
+    ccWithLabelVertices should have size 1
+    ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
+  }
+
+  trait Fixture {
+    val graph = TinkerGraph.open.asScala
   }
 
   "can't persist a none product type (none case class or tuple)" in {
     illTyped {
       """
         val graph = TinkerGraph.open.asScala
-        graph.addVertex(new NoneCaseClass("test"))
+        graph + new NoneCaseClass("test")
       """
     }
   }

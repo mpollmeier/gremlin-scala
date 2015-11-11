@@ -4,22 +4,22 @@ import org.apache.tinkerpop.gremlin.structure.Graph.Hidden
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-trait Marshallable[P <: Product] {
+trait Marshallable[CC <: Product] {
   type Id = AnyRef
   type Label = String
   type ValueMap = Map[String, Any]
   case class FromCC(id: Option[Id], label: Label, valueMap: ValueMap)
 
-  def fromCC(cc: P): FromCC
-  def toCC(id: Id, valueMap: ValueMap): P
+  def fromCC(cc: CC): FromCC
+  def toCC(id: Id, valueMap: ValueMap): CC
 }
 
 object Marshallable {
-  implicit def materializeMappable[P <: Product]: Marshallable[P] = macro materializeMappableImpl[P]
+  implicit def materializeMappable[CC <: Product]: Marshallable[CC] = macro materializeMappableImpl[CC]
 
-  def materializeMappableImpl[P <: Product: c.WeakTypeTag](c: blackbox.Context): c.Expr[Marshallable[P]] = {
+  def materializeMappableImpl[CC <: Product: c.WeakTypeTag](c: blackbox.Context): c.Expr[Marshallable[CC]] = {
     import c.universe._
-    val tpe = weakTypeOf[P]
+    val tpe = weakTypeOf[CC]
     val companion = tpe.typeSymbol.companion
 
     val (idParam, fromCCParams, toCCParams) = tpe.decls
@@ -116,7 +116,7 @@ object Marshallable {
       q"""$label"""
     } getOrElse q"cc.getClass.getSimpleName"
 
-    c.Expr[Marshallable[P]] {
+    c.Expr[Marshallable[CC]] {
       q"""
       new Marshallable[$tpe] {
         def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))

@@ -118,14 +118,14 @@ package object scala {
     /**
       * Load a vertex values into a case class
       */
-    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
+    def toCC[CC <: Product: Marshallable] = gs map (_.toCC[CC])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
       * Load a edge values into a case class
       */
-    def toCC[T <: Product: Marshallable] = gs map (_.toCC[T])
+    def toCC[CC <: Product: Marshallable] = gs map (_.toCC[CC])
   }
 
   // Arrow syntax implicits
@@ -155,14 +155,14 @@ package object scala {
   }
 
   // TODO: get back to work? conflicts with other SemiEdgeProductFunctions...
-  // implicit class SemiEdgeCcFunctions[T <: Product: Marshallable](cc: T) {
+  // implicit class SemiEdgeCcFunctions[CC <: Product: Marshallable](cc: CC) {
   //   def ---(from: Vertex) = {
-  //     val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+  //     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
   //     SemiEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
   //   }
 
   //   def -->(from: Vertex) = {
-  //     val fromCC = implicitly[Marshallable[T]].fromCC(cc)
+  //     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
   //     SemiDoubleEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
   //   }
   // }

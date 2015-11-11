@@ -46,9 +46,9 @@ graph.V(1).out("knows") //follow outgoing edges to incoming vertex
 
 // gremlin-scala is a monad
 for {
-  vertex ← graph.V
-  edge ← vertex.outE
-} yield edge.label
+  person <- graph.V.hasLabel(person)
+  favorite <- person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+} yield (person, favorite.label)
 ```
 
 You can `filter`, `map`, `flatMap`, `collect` et cetera, just like in standard Scala collections. 
@@ -148,7 +148,7 @@ g.V(1)
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
-### Marshalling vertices from/to case classes
+### Mapping vertices from/to case classes
 You can save and load case classes as a vertex - implemented with a [blackbox macro](http://docs.scala-lang.org/overviews/macros/blackbox-whitebox.html). You can optionally annotate the id and label of your case class. Scala's `Option` types will be automatically unwrapped, i.e. a `Some[A]` will be stored as the value of type `A` in the database, or `null` if it's `None`. If we wouldn't unwrap it, the database would have to understand Scala's Option type itself. The same goes for value classes, i.e. a `case class ShoeSize(value: Int) extends AnyVal` will be stored as an Integer.
 
 ```scala
@@ -158,14 +158,17 @@ case class Example(@id id: Option[Int],
                    longValue: Long,
                    stringValue: Option[String])
 
-object MyLogic {
+object Main {
   import gremlin.scala._
   import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
   val graph = TinkerGraph.open.asScala
   val example = Example(None, Long.MaxValue, Some("optional value"))
-  val v = graph.addVertex(example)
-  v.toCC[Example] // like example, but with id set
+  val v = graph + example
+  v.toCC[Example] // equal to `example`, but with id set
+
+  // find all vertices with the label of the case class `Example`
+  graph.V.hasLabel[Example]
 }
 ```
 

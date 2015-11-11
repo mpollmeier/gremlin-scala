@@ -35,13 +35,15 @@ case class ScalaGraph[G <: Graph](graph: G) {
     * Save an object's values into a new vertex
     * @param cc The case class to persist as a vertex
     */
-  def addVertex[P <: Product: Marshallable](cc: P): Vertex = {
-    val fromCC = implicitly[Marshallable[P]].fromCC(cc)
+  def addVertex[CC <: Product: Marshallable](cc: CC): Vertex = {
+    val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
     val labelParam = Seq(T.label, fromCC.label)
     val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
+
+  def +[CC <: Product: Marshallable](cc: CC): Vertex = addVertex(cc)
 
   def +(label: String): Vertex = addVertex(label)
 
