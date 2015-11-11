@@ -15,14 +15,8 @@ case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 
-case class CCWithLabel(
-  s: String,
-  l: Long,
-  o: Option[String],
-  seq: Seq[String],
-  map: Map[String, String],
-  nested: NestedClass
-)
+@label("label_a")
+case class CCWithLabel(s: String)
 
 @label("the_label")
 case class CCWithLabelAndId(
@@ -171,14 +165,21 @@ class MarshallableSpec extends WordSpec with Matchers {
   "find vertices by label" in new Fixture {
     val ccSimple = CCSimple("a string", 42)
     val ccWithOption = CCWithOption(52, Some("other string"))
+    val ccWithLabel = CCWithLabel("s")
 
     graph + ccSimple
     graph + ccWithOption
+    graph + ccWithLabel
 
-    graph.V.count.head shouldBe 2
-    val ccSimpleVertices = graph.V.hasLabel(ccSimple).toList
+    graph.V.count.head shouldBe 3
+
+    val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
     ccSimpleVertices should have size 1
     ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
+
+    val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
+    ccWithLabelVertices should have size 1
+    ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
   }
 
   trait Fixture {

@@ -17,6 +17,7 @@ import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable
 import shapeless.ops.product.ToHList
 import shapeless.syntax.std.product.productOps
 import scala.language.existentials
+import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
@@ -406,8 +407,26 @@ class GremlinElementSteps[End <: Element, Labels <: HList](gremlinScala: Gremlin
 
   def hasLabel(labels: String*) = GremlinScala[End, Labels](traversal.hasLabel(labels: _*))
 
-  def hasLabel[CC <: Product: Marshallable](cc: CC): GremlinScala[End, Labels] =
-    hasLabel(implicitly[Marshallable[CC]].fromCC(cc).label)
+  def hasLabel[CC <: Product: ru.WeakTypeTag]: GremlinScala[End, Labels] = {
+    val tpe = implicitly[ru.WeakTypeTag[CC]].tpe
+
+    // TODO: there must be a way to avoid this...
+    def unquote(s: String) = {
+      val quote = "\""
+      if (s.startsWith(quote) && s.endsWith(quote))
+        s.substring(1, s.length-1)
+      else s
+    }
+
+    val label: String =
+      tpe.typeSymbol.asClass.annotations
+        .find{_.toString.startsWith("gremlin.scala.label(\"")}
+        .map(_.tree.children.tail.head.toString)
+        .map(unquote)
+        .getOrElse(tpe.typeSymbol.name.toString)
+
+    hasLabel(label)
+  }
 
   def hasKey(keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(keys.map(_.value): _*))
 
