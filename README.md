@@ -46,9 +46,9 @@ graph.V(1).out("knows") //follow outgoing edges to incoming vertex
 
 // gremlin-scala is a monad
 for {
-  vertex ← graph.V
-  edge ← vertex.outE
-} yield edge.label
+  person <- graph.V.hasLabel(person)
+  favorite <- person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+} yield (person, favorite.label)
 ```
 
 You can `filter`, `map`, `flatMap`, `collect` et cetera, just like in standard Scala collections. 
