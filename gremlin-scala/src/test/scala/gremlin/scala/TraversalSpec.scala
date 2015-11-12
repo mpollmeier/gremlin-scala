@@ -5,6 +5,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import shapeless.test.illTyped
+import collection.JavaConversions._
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -207,6 +208,22 @@ class TraversalSpec extends WordSpec with Matchers {
     }.toSet
 
     ages shouldBe Set(27,29,32,35)
+  }
+
+  "find all edges between two vertices" in {
+    val graph = TinkerGraph.open.asScala
+
+    val v0 = graph + "v0"
+    val v1 = graph + "v1"
+    val v2 = graph + "v2"
+
+    v0 --- "e0" --> v1
+    v0 <-- "e1" --- v1
+    v0 <-- "e2" --> v2
+
+    graph.E.count.head shouldBe 4
+    val v0v1Edges = v0.bothE.filter(_.bothVertices.contains(v1)).label.toSet
+    v0v1Edges shouldBe Set("e0", "e1")
   }
 
   trait Fixture {
