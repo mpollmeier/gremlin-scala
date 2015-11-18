@@ -62,12 +62,12 @@ package object scala {
 
   // create a new anonymous traversal, e.g. `__.outE`
   // only defined here so that user doesn't need to import it
-  def __[A]() = {
+  def __[A](): GraphTraversal[A, A] = {
     org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]()
   }
 
   // only defined here so that user doesn't need to import it
-  def __[A](a: A) = {
+  def __[A](a: A): GraphTraversal[A, A] = {
     org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](a)
   }
 

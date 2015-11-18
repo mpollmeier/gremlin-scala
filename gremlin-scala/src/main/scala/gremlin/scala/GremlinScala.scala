@@ -20,6 +20,12 @@ import scala.language.existentials
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 
+object GremlinScala {
+  // start at any given value
+  def apply[A](start: A): GremlinScala[A, HNil] =
+    GremlinScala[A, HNil](__(start))
+}
+
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
 

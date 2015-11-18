@@ -158,18 +158,33 @@ class TraversalSpec extends WordSpec with Matchers {
       val edges: List[Edge] = graph.V(1).flatMap(_.outE).toList
     }
 
-    "support for comprehension" in new Fixture {
-      val edgeLabels = for {
-        vertex ← graph.V
-        edge ← vertex.outE
-      } yield edge.label
+    "support for comprehension" when {
+      "using simple case" in new Fixture {
+        val edgeLabels = for {
+          vertex ← graph.V
+          edge ← vertex.outE
+        } yield edge.label
 
-      edgeLabels.toSet shouldBe graph.E.label.toSet
+        edgeLabels.toSet shouldBe graph.E.label.toSet
+      }
+
+      "using slightly more complex case" in new Fixture {
+        // what is the mean age of the developers for a given software?
+        val softwareAndDevAges = for {
+          software ← graph.V.hasLabel("software")
+          meanAge ← software.in("created").value(Age).mean
+        } yield (software.value2(Name), meanAge)
+
+        softwareAndDevAges.toSet shouldBe Set(
+          "lop" → 32d,
+          "ripple" → 32d
+        )
+      }
     }
 
     "doesn't compile for bad traversals" in new Fixture {
       graph.V(1).flatMap(_.outE) //compiles fine
-      illTyped { """graph.GRAPH.V(1).flatMap(_.inV)""" } //verify doesn't compile
+      illTyped { """graph.V(1).flatMap(_.inV)""" } //verify doesn't compile
     }
   }
 
@@ -182,32 +197,32 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val scala = graph + "scala"
     val groovy = graph + "groovy"
-    val michael = graph + (person, name -> "michael")
-    val marko = graph + (person, name -> "marko")
+    val michael = graph + (person, name → "michael")
+    val marko = graph + (person, name → "marko")
 
-    michael --- (likes, weight -> 3) --> groovy
-    michael --- (likes, weight -> 5) --> scala
-    marko --- (likes, weight -> 4) --> groovy
-    marko --- (likes, weight -> 3) --> scala
+    michael --- (likes, weight → 3) --> groovy
+    michael --- (likes, weight → 5) --> scala
+    marko --- (likes, weight → 4) --> groovy
+    marko --- (likes, weight → 3) --> scala
 
     val traversal = for {
-      person <- graph.V.hasLabel(person)
-      favorite <- person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+      person ← graph.V.hasLabel(person)
+      favorite ← person.outE(likes).order.by("weight", Order.decr).limit(1).inV
     } yield (person.value2(name), favorite.label)
 
     val favorites = traversal.toList.toMap
     favorites shouldBe Map(
-      "michael" -> "scala",
-      "marko" -> "groovy"
+      "michael" → "scala",
+      "marko" → "groovy"
     )
   }
 
   "collect" in new Fixture {
     val ages: Set[Int] = graph.V.valueOption(Age).collect {
-      case Some(age) => age
+      case Some(age) ⇒ age
     }.toSet
 
-    ages shouldBe Set(27,29,32,35)
+    ages shouldBe Set(27, 29, 32, 35)
   }
 
   "find all edges between two vertices" in {
