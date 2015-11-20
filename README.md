@@ -36,7 +36,6 @@ The below create traversals, which are lazy computations. To run a traversal, yo
 ```scala
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-val graph = TinkerFactory.createModern.asScala
 
 graph.V //all vertices
 graph.E //all edges
@@ -46,9 +45,13 @@ graph.V(1).out("knows") //follow outgoing edges to incoming vertex
 
 // gremlin-scala is a monad
 for {
-  person <- graph.V.hasLabel(person)
-  favorite <- person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+  person <- graph.V.hasLabel("person")
+  favorite <- person.outE("likes").order.by("weight", Order.decr).limit(1).inV
 } yield (person, favorite.label)
+
+// remove all people over 30 from the graph - also removes corresponding edges
+val Age = Key[Int]("age")
+graph.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
 ```
 
 You can `filter`, `map`, `flatMap`, `collect` et cetera, just like in standard Scala collections. 

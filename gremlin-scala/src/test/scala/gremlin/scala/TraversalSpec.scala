@@ -6,6 +6,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import shapeless.test.illTyped
 import collection.JavaConversions._
+import org.apache.tinkerpop.gremlin.process.traversal.P
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -239,6 +240,16 @@ class TraversalSpec extends WordSpec with Matchers {
     graph.E.count.head shouldBe 4
     val v0v1Edges = v0.bothE.filter(_.bothVertices.contains(v1)).label.toSet
     v0v1Edges shouldBe Set("e0", "e1")
+  }
+
+  "`drop` removes elements from the graph" in new Fixture {
+    // remove all people over 30 from the graph
+    graph.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
+
+    graph.V.hasLabel("person").count.head shouldBe 2
+    withClue("should remove corresponding edges as well") {
+      graph.E.count.head shouldBe 2
+    }
   }
 
   trait Fixture {
