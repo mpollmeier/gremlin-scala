@@ -1,27 +1,44 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import TestGraph._
+import org.scalatest.Matchers
+import org.scalatest.WordSpec
 
-class FilterSpec extends TestBase {
+class FilterSpec extends WordSpec with Matchers {
 
-  it("filters") {
+  "filter" in new Fixture {
     graph.V
-      .filter { _.property("age").orElse(0) > 30 }
-      .values[String]("name").toSet should be(Set("josh", "peter"))
+      .filter { _.property(Age).orElse(0) > 30 }
+      .value(Name)
+      .toSet should be(Set("josh", "peter"))
   }
 
-  it("has") {
+  "filterNot" in new Fixture {
+    graph.V
+      .filterNot { _.property(Age).orElse(0) > 30 }
+      .value(Name)
+      .toSet should be(Set("marko", "vadas", "lop", "ripple"))
+  }
+
+  // "filterNot" in new Fixture {
+  //   graph.V
+  //     .filter { _.property("age").orElse(0) > 30 }
+  //     .values[String]("name").toSet should be(Set("josh", "peter"))
+  // }
+
+  "has" in new Fixture {
     graph.V.has(Age, 35).value(Name).toSet shouldBe Set("peter")
   }
 
-  it("has - sugar") {
+  "has - sugar" in new Fixture {
     val g = TinkerGraph.open.asScala
     g + ("software", Name → "blueprints", Created → 2010)
 
-    g.V.has(Name -> "blueprints").head <-- "dependsOn" --- (g + ("software", Name → "gremlin", Created → 2009))
-    g.V.has(Name -> "gremlin").head <-- "dependsOn" --- (g + ("software", Name → "gremlinScala"))
-    g.V.has(Name -> "gremlinScala").head <-- "createdBy" --- (g + ("person", Name → "mpollmeier"))
+    g.V.has(Name → "blueprints").head <-- "dependsOn" --- (g + ("software", Name → "gremlin", Created → 2009))
+    g.V.has(Name → "gremlin").head <-- "dependsOn" --- (g + ("software", Name → "gremlinScala"))
+    g.V.has(Name → "gremlinScala").head <-- "createdBy" --- (g + ("person", Name → "mpollmeier"))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3
@@ -34,21 +51,21 @@ class FilterSpec extends TestBase {
     g.asJava.close()
   }
 
-  it("hasNot") {
+  "hasNot" in new Fixture {
     graph.V.hasNot(Age, 35).value(Name).toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
   }
 
-  describe("dedup") {
-    it("dedups") {
-      v(1).out.in.dedup().toList should be(v(1).out.in.toSet.toList)
+  "dedup" should {
+    "dedup" in new Fixture {
+      graph.V(1).out.in.dedup().toList shouldBe graph.V(1).out.in.toSet.toList
     }
 
     // TODO: fix
-    ignore("dedups by a given uniqueness function") {
-      v(1).out.in
-        .dedup().by(_.property[String]("lang").orElse(null))
-        .values[String]("name").toList should be(List("marko"))
-    }
+    // ignore("dedups by a given uniqueness function") {
+    //   v(1).out.in
+    //     .dedup().by(_.property[String]("lang").orElse(null))
+    //     .values[String]("name").toList should be(List("marko"))
+    // }
   }
 
   //TODO redo with where step
@@ -76,4 +93,8 @@ class FilterSpec extends TestBase {
   //       .toSet should be (Set("ripple"))
   //   }
   // }
+
+  trait Fixture {
+    val graph = TinkerFactory.createClassic.asScala
+  }
 }

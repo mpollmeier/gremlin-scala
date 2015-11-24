@@ -53,13 +53,22 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.option(pickToken, t))
   }
 
-  def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
-    override def test(h: Traverser[End]): Boolean = p(h.get)
-  }))
+  def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](
+    traversal.filter(new JPredicate[Traverser[End]] {
+      override def test(h: Traverser[End]): Boolean = p(h.get)
+    })
+  )
 
-  def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.filter(new JPredicate[Traverser[End]] {
+  def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](
+    traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h)
   }))
+
+  def filterNot(p: End ⇒ Boolean) = GremlinScala[End, Labels](
+    traversal.filter(new JPredicate[Traverser[End]] {
+      override def test(h: Traverser[End]): Boolean = !p(h.get)
+    })
+  )
 
   def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
     filter(pf.isDefinedAt).map(pf)
