@@ -296,9 +296,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def sum(scope: Scope) = GremlinScala[JDouble, Labels](traversal.sum(scope))
 
-  def mean() = GremlinScala[JDouble, Labels](traversal.mean())
+  def mean() = GremlinScala[JDouble, HNil](traversal.mean())
 
-  def mean(scope: Scope) = GremlinScala[JDouble, Labels](traversal.mean(scope))
+  def mean(scope: Scope) = GremlinScala[JDouble, HNil](traversal.mean(scope))
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 
