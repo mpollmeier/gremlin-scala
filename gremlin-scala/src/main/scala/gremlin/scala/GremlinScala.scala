@@ -508,12 +508,12 @@ class GremlinEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[
 class GremlinNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinScala[End, Labels])
     extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
-  def max() = GremlinScala[End, Labels](traversal.max[End]())
+  def max() = GremlinScala[End, HNil](traversal.max[End]())
 
-  def max(scope: Scope) = GremlinScala[End, Labels](traversal.max(scope))
+  def max(scope: Scope) = GremlinScala[End, HNil](traversal.max(scope))
 
-  def min() = GremlinScala[End, Labels](traversal.min[End]())
+  def min() = GremlinScala[End, HNil](traversal.min[End]())
 
-  def min(scope: Scope) = GremlinScala[End, Labels](traversal.min(scope))
+  def min(scope: Scope) = GremlinScala[End, HNil](traversal.min(scope))
 }
 
