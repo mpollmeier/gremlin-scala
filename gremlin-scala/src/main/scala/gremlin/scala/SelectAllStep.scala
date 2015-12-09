@@ -23,7 +23,7 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
     val labels = path.labels
     def hasUserLabel(i: Int) = !labels(i).isEmpty
 
-    (0 until path.size) filter hasUserLabel map path.get[Any] toList
+    (0 until path.size).filter(hasUserLabel).map(path.get[Any]).toList
   }
 
   private def toHList[T <: HList](path: List[_]): T =

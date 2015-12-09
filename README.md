@@ -87,22 +87,14 @@ paris.out("Eurostar").value(Founded).head //43 AD
 paris.outE("Eurostar").value(Distance).head //495
 london.valueOption(Founded) //Some(43 AD)
 london.valueOption(Distance) //None
-```
-
-More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala) and [ArrowSyntaxSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ArrowSyntaxSpec.scala).
-
-### Other means to access properties
-
-```scala
+paris.setProperty(Founded, "300 BC")
 v1.keys // Set(Key("name"), Key("age"))
 v1.property(Name) // "marko"
 v1.valueMap // Map("name" → "marko", "age" → 29)
 v1.valueMap("name", "age") // Map("name" → "marko", "age" → 29)
-v1.properties("name", "age").length // 2
-v1.properties.length // 2
 ```
 
-More working examples in [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ElementSpec.scala)
+More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala), [ArrowSyntaxSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ArrowSyntaxSpec.scala) and [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ElementSpec.scala).
 
 ### Compiler helps to eliminate invalid traversals
 Gremlin-Scala aims to helps you at compile time as much as possible. Take this simple example:
