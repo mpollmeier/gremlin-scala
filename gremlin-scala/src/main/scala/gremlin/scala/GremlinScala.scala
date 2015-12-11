@@ -74,9 +74,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
     filter(pf.isDefinedAt).map(pf)
 
-  def count() = GremlinScala[JLong, Labels](traversal.count())
+  def count() = GremlinScala[JLong, HNil](traversal.count())
 
-  def count(scope: Scope) = GremlinScala[JLong, Labels](traversal.count(scope))
+  def count(scope: Scope) = GremlinScala[JLong, HNil](traversal.count(scope))
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
 
