@@ -33,6 +33,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def headOption(): Option[End] = toList.headOption
 
   def exists(): Boolean = headOption.isDefined
+  def notExists(): Boolean = !exists()
 
   // execute pipeline - applies all side effects
   def iterate() = {
