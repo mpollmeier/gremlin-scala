@@ -518,3 +518,14 @@ class GremlinNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinSc
   def min(scope: Scope) = GremlinScala[End, HNil](traversal.min(scope))
 }
 
+class GremlinNumericSteps[End, EndNumber <: Number, Labels <: HList](gremlinScala: GremlinScala[End, Labels])(toNumber: End ⇒ EndNumber)
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
+
+  def max() = GremlinScala[EndNumber, HNil](gremlinScala.map(toNumber).traversal.max[EndNumber]())
+
+  def max(scope: Scope) = GremlinScala[EndNumber, HNil](gremlinScala.map(toNumber).traversal.max[EndNumber](scope))
+
+  def min() = GremlinScala[EndNumber, HNil](gremlinScala.map(toNumber).traversal.min[EndNumber]())
+
+  def min(scope: Scope) = GremlinScala[EndNumber, HNil](gremlinScala.map(toNumber).traversal.min[EndNumber](scope))
+}
