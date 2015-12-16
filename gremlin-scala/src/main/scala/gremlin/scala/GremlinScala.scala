@@ -291,7 +291,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
 
-  def fold() = GremlinScala[JList[End], Labels](traversal.fold())
+  def fold() = GremlinScala[JList[End], HNil](traversal.fold())
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 

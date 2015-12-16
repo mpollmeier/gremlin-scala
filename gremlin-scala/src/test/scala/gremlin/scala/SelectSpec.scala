@@ -84,18 +84,32 @@ class SelectSpec extends WordSpec with Matchers {
     }
 
     "work for `max`" in {
-      // val x: Number = 5
-      // val t = graph.V.as("a").outE("created")
-      //   .value(TestGraph.Weight)
-      // .map(_.toInt)
-      // .max.as("b")
-      //   .toList.foreach println
+      graph.V.as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .max().as("b")
+        .select()
+        .head._1 shouldBe 1.0
+    }
 
-      // new GremlinNumberSteps(t)
+    "work for `min`" in {
+      graph.V.as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .min().as("b")
+        .select()
+        .head._1 shouldBe 0.2
+    }
 
+    "work for `sum`" in {
+      val sum =graph.V.as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .sum().as("b")
+        .select()
+        .head._1
 
-        // .select()
-        // .head._1 shouldBe 0.49999999999999994
+      (sum: Double) shouldBe 2d +- 0.1d
     }
   }
 }
