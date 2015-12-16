@@ -2,7 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
 import org.scalatest.{Matchers, WordSpec}
-import java.lang.{Double => JDouble}
+import java.lang.{Double ⇒ JDouble, Long ⇒ JLong}
 
 class SelectSpec extends WordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala
@@ -67,15 +67,49 @@ class SelectSpec extends WordSpec with Matchers {
     }
   }
 
-  "resets labels on `mean` step" in {
-    val result: Tuple1[JDouble] =
+  "resets labels on ReducingBarrier steps" should {
+    "work for `mean`" in {
+        graph.V.as("a").outE("created")
+          .value(TestGraph.Weight)
+          .mean.as("b")
+          .select()
+          .head._1 shouldBe 0.49999999999999994
+    }
+
+    "work for `count`" in {
+      graph.V.as("a")
+        .out("created")
+        .count().as("b")
+        .select().head._1 shouldBe 4
+    }
+
+    "work for `max`" in {
       graph.V.as("a")
         .outE("created")
         .value(TestGraph.Weight)
-        .mean.as("b")
+        .max().as("b")
         .select()
-        .head
+        .head._1 shouldBe 1.0
+    }
 
-    result._1 shouldBe 0.49999999999999994
+    "work for `min`" in {
+      graph.V.as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .min().as("b")
+        .select()
+        .head._1 shouldBe 0.2
+    }
+
+    "work for `sum`" in {
+      val sum =graph.V.as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .sum().as("b")
+        .select()
+        .head._1
+
+      (sum: Double) shouldBe 2d +- 0.1d
+    }
   }
 }

@@ -74,9 +74,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
     filter(pf.isDefinedAt).map(pf)
 
-  def count() = GremlinScala[JLong, Labels](traversal.count())
+  def count() = GremlinScala[JLong, HNil](traversal.count())
 
-  def count(scope: Scope) = GremlinScala[JLong, Labels](traversal.count(scope))
+  def count(scope: Scope) = GremlinScala[JLong, HNil](traversal.count(scope))
 
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
 
@@ -291,15 +291,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
 
-  def fold() = GremlinScala[JList[End], Labels](traversal.fold())
-
-  def sum() = GremlinScala[JDouble, Labels](traversal.sum())
-
-  def sum(scope: Scope) = GremlinScala[JDouble, Labels](traversal.sum(scope))
-
-  def mean() = GremlinScala[JDouble, HNil](traversal.mean())
-
-  def mean(scope: Scope) = GremlinScala[JDouble, HNil](traversal.mean(scope))
+  def fold() = GremlinScala[JList[End], HNil](traversal.fold())
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 
@@ -510,11 +502,32 @@ class GremlinNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinSc
     extends GremlinScala[End, Labels](gremlinScala.traversal) {
 
   def max() = GremlinScala[End, HNil](traversal.max[End]())
-
   def max(scope: Scope) = GremlinScala[End, HNil](traversal.max(scope))
 
   def min() = GremlinScala[End, HNil](traversal.min[End]())
-
   def min(scope: Scope) = GremlinScala[End, HNil](traversal.min(scope))
+
+  def sum() = GremlinScala[End, Labels](traversal.sum())
+  def sum(scope: Scope) = GremlinScala[End, Labels](traversal.sum(scope))
+
+  def mean() = GremlinScala[JDouble, HNil](traversal.mean())
+  def mean(scope: Scope) = GremlinScala[JDouble, HNil](traversal.mean(scope))
 }
 
+class GremlinNumericSteps[End, EndNumber <: Number, Labels <: HList](gremlinScala: GremlinScala[End, Labels])(toNumber: End ⇒ EndNumber)
+    extends GremlinScala[End, Labels](gremlinScala.traversal) {
+
+  def max() = GremlinScala[EndNumber, HNil](mapped.max())
+  def max(scope: Scope) = GremlinScala[EndNumber, HNil](mapped.max(scope))
+
+  def min() = GremlinScala[EndNumber, HNil](mapped.min())
+  def min(scope: Scope) = GremlinScala[EndNumber, HNil](mapped.min(scope))
+
+  def sum() = GremlinScala[EndNumber, HNil](mapped.sum())
+  def sum(scope: Scope) = GremlinScala[EndNumber, HNil](mapped.sum(scope))
+
+  def mean() = GremlinScala[JDouble, HNil](mapped.mean())
+  def mean(scope: Scope) = GremlinScala[JDouble, HNil](mapped.mean(scope))
+
+  private def mapped(): GraphTraversal[_, EndNumber] = gremlinScala.map(toNumber).traversal
+}

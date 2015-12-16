@@ -88,8 +88,13 @@ package object scala {
   implicit def toEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels]): GremlinEdgeSteps[End, Labels] =
     new GremlinEdgeSteps(gremlinScala)
 
-  implicit def toNumberSteps[End <: Number, Labels <: HList](gremlinScala: GremlinScala[End, Labels]): GremlinNumberSteps[End, Labels] =
+  implicit def toNumberSteps[End <: Number, Labels <: HList](
+    gremlinScala: GremlinScala[End, Labels]): GremlinNumberSteps[End, Labels] =
     new GremlinNumberSteps(gremlinScala)
+
+  implicit def toNumericSteps[End, EndNumber <: Number, Labels <: HList](
+    gremlinScala: GremlinScala[End, Labels])(implicit toNumber: End ⇒ EndNumber): GremlinNumericSteps[End, EndNumber, Labels] =
+    new GremlinNumericSteps(gremlinScala)(toNumber)
 
   //TODO make vertexSteps extend elementSteps and return VertexSteps here
   implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex, HNil] = v.start()
