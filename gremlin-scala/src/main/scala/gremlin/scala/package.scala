@@ -79,28 +79,6 @@ package object scala {
 
   implicit def wrap[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
 
-  implicit def toElementSteps[End <: Element, Labels <: HList](gremlinScala: GremlinScala[End, Labels]): GremlinElementSteps[End, Labels] =
-    new GremlinElementSteps(gremlinScala)
-
-  implicit def toVertexSteps[End <: Vertex, Labels <: HList](gremlinScala: GremlinScala[End, Labels]): GremlinVertexSteps[End, Labels] =
-    new GremlinVertexSteps(gremlinScala)
-
-  implicit def toEdgeSteps[End <: Edge, Labels <: HList](gremlinScala: GremlinScala[End, Labels]): GremlinEdgeSteps[End, Labels] =
-    new GremlinEdgeSteps(gremlinScala)
-
-  implicit def toNumberSteps[End <: Number, Labels <: HList](
-    gremlinScala: GremlinScala[End, Labels]): GremlinNumberSteps[End, Labels] =
-    new GremlinNumberSteps(gremlinScala)
-
-  implicit def toNumericSteps[End, EndNumber <: Number, Labels <: HList](
-    gremlinScala: GremlinScala[End, Labels])(implicit toNumber: End ⇒ EndNumber): GremlinNumericSteps[End, EndNumber, Labels] =
-    new GremlinNumericSteps(gremlinScala)(toNumber)
-
-  //TODO make vertexSteps extend elementSteps and return VertexSteps here
-  implicit def toElementSteps(v: ScalaVertex): GremlinElementSteps[Vertex, HNil] = v.start()
-
-  implicit def toElementSteps(e: ScalaEdge): GremlinElementSteps[Edge, HNil] = e.start()
-
   implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] = new JFunction[A, B] {
     override def apply(a: A): B = f(a)
   }
@@ -158,18 +136,4 @@ package object scala {
     def ---(from: Vertex) = SemiEdge(from, label, properties)
     def -->(right: Vertex) = SemiDoubleEdge(right, label, properties)
   }
-
-  // TODO: get back to work? conflicts with other SemiEdgeProductFunctions...
-  // implicit class SemiEdgeCcFunctions[CC <: Product: Marshallable](cc: CC) {
-  //   def ---(from: Vertex) = {
-  //     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-  //     SemiEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
-  //   }
-
-  //   def -->(from: Vertex) = {
-  //     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-  //     SemiDoubleEdge(from, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
-  //   }
-  // }
-
 }

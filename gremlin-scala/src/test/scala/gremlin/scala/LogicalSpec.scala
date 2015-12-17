@@ -8,7 +8,7 @@ class LogicalSpec extends TestBase {
     it("returns a vertex if both conditions are met") {
       val x = v(1).asScala
 
-      x.and(
+      x.start.and(
         _.out().has(Name → "lop"),
         _.out().has(Name → "vadas")
       ).values[String]("name").toSet should be(Set("marko"))
@@ -17,7 +17,7 @@ class LogicalSpec extends TestBase {
     it("returns empty set if one of the conditions isn't met") {
       val x = v(1).asScala
 
-      x.and(
+      x.start.and(
         _.out().has(Name → "lop"),
         _.out().has(Name → "foo") // unmet condition
       ).values[String]("name").toSet should be(Set())
@@ -30,7 +30,7 @@ class LogicalSpec extends TestBase {
     it("returns a vertex if at least one condition is met") {
       val x = v(1).asScala
 
-      x.or(
+      x.start.or(
         _.out().has(Name → "lop"),
         _.out().has(Name → "foo") // unmet condition
       ).values[String]("name").toSet should be(Set("marko"))
@@ -39,7 +39,7 @@ class LogicalSpec extends TestBase {
     it("returns empty set if none condition is met") {
       val x = v(1).asScala
 
-      x.or(
+      x.start.or(
         _.out().has(Name → "bar"), // unmet condition
         _.out().has(Name → "foo") // unmet condition
       ).values[String]("name").toSet should be(Set())
@@ -52,7 +52,7 @@ class LogicalSpec extends TestBase {
     it("returns a vertex given and and or conditions are met") {
       val x = v(1).asScala
 
-      x.or(
+      x.start.or(
         _.and(
           _.out().has(Name → "lop"),
           _.out().has(Name → "vadas")
@@ -64,7 +64,7 @@ class LogicalSpec extends TestBase {
     it("returns an empty set given and and or conditions aren't met") {
       val x = v(1).asScala
 
-      x.and(
+      x.start.and(
         _.or(
           _.out().has(Name → "lop"),
           _.out().has(Name → "vadas")
