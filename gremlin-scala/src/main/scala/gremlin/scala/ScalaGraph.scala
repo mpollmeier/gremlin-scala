@@ -50,14 +50,6 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def +(label: String, properties: KeyValue[_]*): Vertex =
     addVertex(label, properties.map(v ⇒ (v.key.value, v.value)).toMap )
 
-  // get vertex by id
-  def v(id: Any): Option[Vertex] =
-    graph.traversal.V(id.asInstanceOf[AnyRef]).headOption
-
-  // get edge by id
-  def e(id: Any): Option[Edge] =
-    graph.traversal.E(id.asInstanceOf[AnyRef]).headOption
-
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
 

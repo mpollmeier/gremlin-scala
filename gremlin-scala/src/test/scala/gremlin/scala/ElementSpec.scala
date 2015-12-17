@@ -92,8 +92,8 @@ class ElementSpec extends TestBase {
       val v2 = graph.addVertex()
       v2.setProperty(TestProperty, "testValue")
 
-      graph.v(v1.id) shouldBe Some(v1)
-      graph.v(v2.id).get.property(TestProperty).value shouldBe "testValue"
+      graph.V(v1.id).head shouldBe v1
+      graph.V(v2.id).head.property(TestProperty).value shouldBe "testValue"
       graph.V.toList() should have size 2
     }
 
