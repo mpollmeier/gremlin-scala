@@ -160,6 +160,22 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope))
 
+  def orderBy[A <: AnyRef](by: End ⇒ A)(
+    implicit ev: End <:< Element): GremlinScala[End, Labels] =
+    order().by(by, Order.incr)
+
+  def orderBy[A](by: End ⇒ A, comparator: Comparator[A])(
+    implicit ev: End <:< Element): GremlinScala[End, Labels] =
+    order().by(by, comparator)
+
+  def orderBy(elementPropertyKey: String)(
+    implicit ev: End <:< Element): GremlinScala[End, Labels] =
+    order().by(elementPropertyKey, Order.incr)
+
+  def orderBy(elementPropertyKey: String, comparator: Order)(
+    implicit ev: End <:< Element): GremlinScala[End, Labels] =
+    order().by(elementPropertyKey, comparator)
+
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
 
   def cyclicPath() = GremlinScala[End, Labels](traversal.cyclicPath())
@@ -252,6 +268,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def by() = GremlinScala[End, Labels](traversal.by())
 
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
+
+  def by[A](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](
+      traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[Element, A]], comparator)
+    )
 
   def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
 
