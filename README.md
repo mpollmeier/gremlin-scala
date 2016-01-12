@@ -237,6 +237,10 @@ g.V()
   .head
 ```
 
+## Serialise to and from files
+Currently graphML, graphson and gryo/kryo are supported file formats, it is very easy to serialise and deserialise into those: see [GraphSerialisationSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/GraphSerialisationSpec.scala). 
+An easy way to visualise your graph is to export it into graphML and import it into (gephi)[https://gephi.org/]. 
+
 ## Help - it's open source!
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)
