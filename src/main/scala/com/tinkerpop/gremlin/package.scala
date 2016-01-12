@@ -26,8 +26,8 @@ package object scala {
 
   /** Start a new pipeline */
   def ->[S]: GremlinScalaPipeline[S, S] = new GremlinScalaPipeline[S, S]()
-  def `⇒`[S] = ->
-  def startPipe[S] = ->
+  def `⇒`[S] = ->[S]
+  def startPipe[S] = ->[S]
 
 }
 
