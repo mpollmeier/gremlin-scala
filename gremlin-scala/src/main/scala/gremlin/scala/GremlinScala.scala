@@ -156,25 +156,29 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
-  def order() = GremlinScala[End, Labels](traversal.order())
-
-  def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope))
-
   def orderBy[A <: AnyRef](by: End ⇒ A)(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
-    order().by(by, Order.incr)
+    GremlinScala[End, Labels](traversal.order()).by(by, Order.incr)
 
   def orderBy[A](by: End ⇒ A, comparator: Comparator[A])(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
-    order().by(by, comparator)
+    GremlinScala[End, Labels](traversal.order()).by(by, comparator)
 
   def orderBy(elementPropertyKey: String)(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
-    order().by(elementPropertyKey, Order.incr)
+    GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, Order.incr))
 
   def orderBy(elementPropertyKey: String, comparator: Order)(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
-    order().by(elementPropertyKey, comparator)
+    GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, comparator))
+
+  def order() = GremlinScala[End, Labels](traversal.order().by(Order.incr))
+
+  def order(comparator: Order) = GremlinScala[End, Labels](traversal.order().by(comparator))
+
+  def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope).by(Order.incr))
+
+  def order(scope: Scope, comparator: Order = Order.incr) = GremlinScala[End, Labels](traversal.order(scope).by(comparator))
 
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
 
