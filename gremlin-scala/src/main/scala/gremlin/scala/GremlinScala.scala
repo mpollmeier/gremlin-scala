@@ -156,9 +156,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
-  def orderBy[A <: AnyRef](by: End ⇒ A)(
-    implicit ev: End <:< Element): GremlinScala[End, Labels] =
-    GremlinScala[End, Labels](traversal.order()).by(by, Order.incr)
+  def orderBy[A <: AnyRef : Ordering](by: End ⇒ A) =
+    GremlinScala[End, Labels](
+      traversal.order().by(
+        new Comparator[End] {
+          override def compare(a: End, b: End) =
+            implicitly[Ordering[A]].compare(by(a), by(b))
+        }
+      )
+    )
 
   def orderBy[A](by: End ⇒ A, comparator: Comparator[A])(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
