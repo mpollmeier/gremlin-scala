@@ -19,11 +19,14 @@ import shapeless.syntax.std.product.productOps
 import scala.language.existentials
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
+import scala.collection.immutable
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
 
   def toList(): List[End] = traversal.toList.toList
+
+  def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A,B] = toList.toMap
 
   def toSet(): Set[End] = traversal.toList.toSet
 

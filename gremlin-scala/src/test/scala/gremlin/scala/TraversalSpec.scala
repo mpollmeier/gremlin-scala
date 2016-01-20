@@ -268,8 +268,7 @@ class TraversalSpec extends WordSpec with Matchers {
       favorite ← person.outE(likes).orderBy("weight", Order.decr).limit(1).inV
     } yield (person.value2(name), favorite.label)
 
-    val favorites = traversal.toList.toMap
-    favorites shouldBe Map(
+    traversal.toMap shouldBe Map(
       "michael" → "scala",
       "marko" → "groovy"
     )
