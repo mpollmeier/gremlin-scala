@@ -119,14 +119,71 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "order" can {
-    "sort by natural order" in new Fixture {
-      graph.V.values[Int]("age").order.toList shouldBe List(27, 29, 32, 35)
+    "sort" in new Fixture {
+      graph.V.has(Age)
+        .value(Age)
+        .order()
+        .toList shouldBe Seq(27, 29, 32, 35)
     }
 
-    "sort by provided comparator" in new Fixture {
-      graph.V.values[Int]("age").order.by(_ < _).toList shouldBe List(27, 29, 32, 35)
-      graph.V.values[Int]("age").order.by(_ > _).toList shouldBe List(35, 32, 29, 27)
+    "sort decr" in new Fixture {
+      graph.V.has(Age)
+        .value(Age)
+        .order(Order.decr)
+        .toList shouldBe Seq(35, 32, 29, 27)
     }
+  }
+
+  "orderBy" can {
+    "order by property" in new Fixture {
+      graph.V.has(Age)
+        .orderBy("age")
+        .value(Age)
+        .toList shouldBe Seq(27, 29, 32, 35)
+    }
+
+    "order by property decr" in new Fixture {
+      graph.V.has(Age)
+        .orderBy("age", Order.decr)
+        .value(Age)
+        .toList shouldBe Seq(35, 32, 29, 27)
+    }
+
+    "order by lambda" in new Fixture {
+      graph.V.has(Age)
+        .orderBy(_.value[Integer]("age"))
+        .value(Age)
+        .toList shouldBe Seq(27, 29, 32, 35)
+    }
+
+    "order by lambda decr" in new Fixture {
+      graph.V.has(Age)
+        .orderBy(_.value[Integer]("age"), Order.decr)
+        .value(Age)
+        .toList shouldBe Seq(35, 32, 29, 27)
+    }
+
+    "order non-elements" in new Fixture {
+      graph.V.has(Age)
+        .value[Integer]("age")
+        .orderBy(x ⇒ x)
+        .toList shouldBe Seq(27, 29, 32, 35)
+    }
+
+    "order non-elements decr" in new Fixture {
+      graph.V.has(Age)
+        .value[Integer]("age")
+        .orderBy(x ⇒ -x: Integer)
+        .toList shouldBe Seq(35, 32, 29, 27)
+    }
+
+    // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
+    // "allow primitive types" in new Fixture {
+    //     graph.V.has(Age)
+    //     .orderBy(_.value[Int]("age"))
+    //     .value(Age)
+    //     .toList shouldBe Seq(27, 29, 32, 35)
+    // }
   }
 
   "map" can {
@@ -208,7 +265,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val traversal = for {
       person ← graph.V.hasLabel(person)
-      favorite ← person.outE(likes).order.by("weight", Order.decr).limit(1).inV
+      favorite ← person.outE(likes).orderBy("weight", Order.decr).limit(1).inV
     } yield (person.value2(name), favorite.label)
 
     val favorites = traversal.toList.toMap
