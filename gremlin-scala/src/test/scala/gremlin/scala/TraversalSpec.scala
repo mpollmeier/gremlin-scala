@@ -246,6 +246,28 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "fold" can {
+    "gather elements in a list" in new Fixture {
+      graph.V.has(Age)
+        .orderBy("age", Order.decr)
+        .value(Age)
+        .fold().head().toSeq shouldBe Seq(35, 32, 29, 27)
+    }
+
+    "aggregate with arbitrary initial value and function" in new Fixture {
+      graph.V.has(Age)
+        .orderBy("age", Order.decr)
+        .value(Age)
+        .foldLeft(0)(_ + _).head() shouldBe 123
+
+      graph.V.has(Age)
+        .orderBy("age", Order.decr)
+        .value(Age)
+        .foldLeft("F")(_ + _ + "*").head() shouldBe "F35*32*29*27*"
+
+    }
+  }
+
   "limit in nested traversals" in {
     val graph = TinkerGraph.open.asScala
     val person = "person"
