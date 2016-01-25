@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
-import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer}
+import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiFunction ⇒ JBiFunction}
 import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
 import java.util.stream.{Stream ⇒ JStream}
 
@@ -325,6 +325,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
 
   def fold() = GremlinScala[JList[End], HNil](traversal.fold())
+
+  def foldLeft[Z](z: Z)(op: (Z, End) ⇒ Z) =
+    GremlinScala[Z, HNil](traversal.fold(z, new JBiFunction[Z, End, Z] {
+      override def apply(t: Z, u: End): Z = op(t, u)
+    }))
 
   def inject(injections: End*) = GremlinScala[End, Labels](traversal.inject(injections: _*))
 
