@@ -7,6 +7,7 @@ import org.scalatest.{WordSpec, Matchers}
 import shapeless.test.illTyped
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.P
+import shapeless._
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -351,6 +352,29 @@ class TraversalSpec extends WordSpec with Matchers {
 
       subGraph.V.count.head shouldBe 4
       subGraph.E.count.head shouldBe 4
+    }
+  }
+
+  "union" should {
+
+    "work for traversals with the same end type" in new Fixture {
+      val traversal = graph.V(4).union(
+        __[Vertex].in.value(Age),
+        __[Vertex].in.out.value(Age)
+      )
+
+      traversal.toSet shouldBe Set(27, 29, 32)
+    }
+
+    "work for traversals with the different end types" in new Fixture {
+      // TODO: make this work
+      val traversal = graph.V(4).union(
+        // val traversal: GremlinScala[Any, HNil] = graph.V(4).union(
+        __[Vertex].in.value(Age)//,
+        // __[Vertex].in.value(Name)
+      )
+
+      traversal.toSet shouldBe Set(29, "marko")
     }
   }
 
