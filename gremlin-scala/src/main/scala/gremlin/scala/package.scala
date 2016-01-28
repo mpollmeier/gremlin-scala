@@ -60,16 +60,12 @@ package object scala {
     def of(value: A): KeyValue[A] = KeyValue(key, value)
   }
 
-  // create a new anonymous traversal, e.g. `__.outE`
-  // only defined here so that user doesn't need to import it
-  def __[A](): GraphTraversal[A, A] = {
-    org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]()
-  }
+  // to create a new anonymous traversal, e.g. `__.outE`
+  def __[A](): GremlinScala[A, HNil] =
+    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
 
-  // only defined here so that user doesn't need to import it
-  def __[A](a: A): GraphTraversal[A, A] = {
-    org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](a)
-  }
+  def __[A](a: A): GremlinScala[A, HNil] = 
+    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](a))
 
   implicit def wrap(v: Vertex): ScalaVertex = ScalaVertex(v)
 
