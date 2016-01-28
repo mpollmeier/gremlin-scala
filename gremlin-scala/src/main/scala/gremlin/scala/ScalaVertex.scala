@@ -89,7 +89,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
   }
 
-  override def start() = GremlinScala[Vertex, HNil](__(vertex))
+  override def start(): GremlinScala[Vertex, HNil] = __(vertex)
 
   def vertices(direction: Direction, edgeLabels: String*): util.Iterator[Vertex] =
     vertex.vertices(direction, edgeLabels: _*)

@@ -476,9 +476,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def hasNot(key: Key[_]) = GremlinScala[End, Labels](traversal.hasNot(key.value))
 
-  def hasNot[A](key: KeyValue[A]) = GremlinScala[End, Labels](traversal.not(__.has(key.key.value, key.value)))
+  def hasNot[A](key: KeyValue[A]) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.key.value, key.value)))
 
-  def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.has(key.value, value)))
+  def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.value, value)))
 
   def and(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[End, _])*) =
     GremlinScala[End, Labels](traversal.and(traversals.map {
@@ -572,5 +572,5 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
 
-  protected def start[A] = GremlinScala[A, HNil](__[A]())
+  protected def start[A] = __[A]()
 }
