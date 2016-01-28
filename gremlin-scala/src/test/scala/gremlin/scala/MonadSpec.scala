@@ -1,12 +1,7 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.Order
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
-import shapeless.test.illTyped
-import collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.process.traversal.P
 import shapeless._
 
 class MonadSpec extends WordSpec with Matchers {
