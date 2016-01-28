@@ -11,8 +11,8 @@ class MonadSpec extends WordSpec with Matchers {
 
     val graph = TinkerGraph.open.asScala
 
-    val f: (Int ⇒ GremlinScala[Int, HNil]) = x ⇒ if (x < 10) __[Int]() else __(x * 2)
-    val g: (Int ⇒ GremlinScala[Int, HNil]) = x ⇒ if (x > 50) __(x + 1) else __[Int]()
+    def f(x: Int): GremlinScala[Int, HNil] = if (x < 10) __[Int]() else __(x * 2)
+    def g(x: Int): GremlinScala[Int, HNil] = if (x > 50) __(x + 1) else __[Int]()
 
     withClue("left identity") {
       val a = 30
