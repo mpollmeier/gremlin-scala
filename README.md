@@ -43,7 +43,6 @@ graph.E //all edges
 graph.V(1).outE("knows") //follow outgoing edges
 graph.V(1).out("knows") //follow outgoing edges to incoming vertex
 
-// gremlin-scala is a monad
 for {
   person <- graph.V.hasLabel("person")
   favorite <- person.outE("likes").orderBy("weight", Order.decr).limit(1).inV
