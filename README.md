@@ -53,7 +53,8 @@ val Age = Key[Int]("age")
 graph.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
 ```
 
-You can `filter`, `map`, `flatMap`, `collect` et cetera, just like in standard Scala collections. 
+Warning: GremlinScala is _not_ a monad, because the underlying Tinkerpop GraphTraversal is not. I.e. while GremlinScala offers `map`, `flatMap` etc. and you can use it in a for comprehension for syntactic sugar, it does not fulfil all monad laws. 
+
 More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
 
 ### Vertices and edges with type safe properties
