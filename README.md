@@ -133,7 +133,7 @@ val a = StepLabel[Vertex]()
 val b = StepLabel[Edge]()
 val c = StepLabel[Double]()
 
-g.V(1)
+g.V(1).as(a)
 .outE("created").as(b)
 .value("weight").as(c)
 .select((b, c)) //step labels parsed as tuple of any size
