@@ -254,5 +254,5 @@ Please note that while Gremlin-Scala is very close to the original Gremlin, ther
 
 Random links:
 * [Shortest path algorithm with Gremlin-Scala 3.0.0 (Michael
-  Pollmeier)](http://www.michaelpollmeier.com/2014/12/27/gremlin-scala-shortest-path/)
+  Pollmeier)](http://www.michaelpollmeier.com/2014/12/27/gremlin-scala-shortest-path)
 * [Shortest path algorithm with Gremlin-Scala 2.4.1 (Stefan Bleibinhaus)](http://bleibinha.us/blog/2013/10/scala-and-graph-databases-with-gremlin-scala)
