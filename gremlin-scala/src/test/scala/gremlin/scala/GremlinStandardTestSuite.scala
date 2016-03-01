@@ -496,8 +496,8 @@ object Tests {
     override def get_g_V_fold_countXlocalX =
       graph.asScala.V.fold.count(Scope.local)
 
-    override def get_g_V_repeatXoutX_timesX5X_asXaX_outXwrittenByX_asXbX_selectXa_bX_count =
-      graph.asScala.V.repeat(_.out()).times(5).as("a").out("writtenBy").as("b").select("a", "b").count
+    // override def get_g_V_repeatXoutX_timesX5X_asXaX_outXwrittenByX_asXbX_selectXa_bX_count =
+      // graph.asScala.V.repeat(_.out()).times(5).as("a").out("writtenBy").as("b").select("a", "b").count
   }
 
   // class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
