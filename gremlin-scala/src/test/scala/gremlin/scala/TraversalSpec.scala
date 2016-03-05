@@ -330,6 +330,30 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "subgraph" should {
+    "work in simple scenario" in new Fixture {
+      val stepLabel = StepLabel[Graph]("subGraph")
+      val subGraph: Graph = graph.E.hasLabel("knows")
+        .subgraph(stepLabel)
+        .cap(stepLabel)
+        .head
+
+      subGraph.V.count.head shouldBe 3
+      subGraph.E.count.head shouldBe 2
+    }
+
+    "get all of the graph structure surrounding a single vertex" in new Fixture {
+      val stepLabel = StepLabel[Graph]("subGraph")
+      val subGraph: Graph = graph.V(3)
+        .repeat(_.inE.subgraph(stepLabel).outV)
+        .times(3)
+        .cap(stepLabel).head
+
+      subGraph.V.count.head shouldBe 4
+      subGraph.E.count.head shouldBe 4
+    }
+  }
+
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")

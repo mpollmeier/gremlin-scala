@@ -47,6 +47,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def cap(sideEffectKey: String, sideEffectKeys: String*) =
     GremlinScala[End, Labels](traversal.cap(sideEffectKey, sideEffectKeys: _*))
 
+  def cap[A](stepLabel: StepLabel[A]) =
+    GremlinScala[A, Labels](traversal.cap(stepLabel.name))
+
   def option[A](optionTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = {
     val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
     GremlinScala[End, Labels](traversal.option(t))
@@ -250,8 +253,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         override def accept(t: Traverser[End]) = fun(t)
       }
     ))
-
-  def subgraph(sideEffectKey: String) = GremlinScala[Edge, Labels](traversal.subgraph(sideEffectKey))
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
@@ -547,6 +548,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def outV()(implicit ev: End <:< Edge) = GremlinScala[Vertex, Labels](traversal.outV)
   def bothV()(implicit ev: End <:< Edge) = GremlinScala[Vertex, Labels](traversal.bothV())
   def otherV()(implicit ev: End <:< Edge) = GremlinScala[Vertex, Labels](traversal.otherV())
+
+  // see usage in TraversalSpec.scala
+  def subgraph(stepLabel: StepLabel[Graph])(implicit ev: End <:< Edge) =
+    GremlinScala[Edge, Labels](traversal.subgraph(stepLabel.name))
   // EDGE STEPS END
   // -------------------
 
