@@ -88,6 +88,12 @@ paris.outE("Eurostar").value(Distance).head //495
 london.valueOption(Founded) //Some(43 AD)
 london.valueOption(Distance) //None
 paris.setProperty(Founded, "300 BC")
+
+val Name = Key[String]("name")
+val Age = Key[Int]("age")
+
+val v1 = graph + ("person", Name -> "marko", Age -> 29) asScala
+
 v1.keys // Set(Key("name"), Key("age"))
 v1.property(Name) // "marko"
 v1.valueMap // Map("name" → "marko", "age" → 29)
