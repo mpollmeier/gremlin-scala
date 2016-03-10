@@ -2,7 +2,7 @@ name := "root"
 organization := "com.michaelpollmeier"
 publishArtifact := false
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 
 val commonSettings = Seq(
   organization := "com.michaelpollmeier",
