@@ -4,10 +4,10 @@ import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
+import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import shapeless.test.illTyped
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.P
-import shapeless._
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -328,6 +328,33 @@ class TraversalSpec extends WordSpec with Matchers {
     graph.V.hasLabel("person").count.head shouldBe 2
     withClue("should remove corresponding edges as well") {
       graph.E.count.head shouldBe 2
+    }
+  }
+
+  "groupBy" should {
+
+    "work with label" in new Fixture {
+      val results: JMap[String, JCollection[Vertex]] =
+        graph.V.groupBy(_.label).head
+
+      results("software") should contain (graph.V(3).head)
+      results("software") should contain (graph.V(5).head)
+      results("person") should contain (graph.V(1).head)
+      results("person") should contain (graph.V(2).head)
+      results("person") should contain (graph.V(4).head)
+      results("person") should contain (graph.V(6).head)
+    }
+
+    "work with property" in new Fixture {
+      val results: JMap[Integer, JCollection[Vertex]] =
+        graph.V
+          .has(Age)
+          .groupBy(_.value[Integer]("age")).head
+
+      results(27) should contain (graph.V(2).head)
+      results(29) should contain (graph.V(1).head)
+      results(32) should contain (graph.V(4).head)
+      results(35) should contain (graph.V(6).head)
     }
   }
 
