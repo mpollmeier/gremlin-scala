@@ -356,22 +356,20 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "union" should {
-
     "work for traversals with the same end type" in new Fixture {
-      val traversal = graph.V(4).union(
-        __[Vertex].in.value(Age),
-        __[Vertex].in.out.value(Age)
-      )
+      val traversal: GremlinScala[Int, _] =
+        graph.V(4).union(
+          _.in.value(Age),
+          _.in.out.value(Age)
+        )
 
       traversal.toSet shouldBe Set(27, 29, 32)
     }
 
     "work for traversals with the different end types" in new Fixture {
-      // TODO: make this work
-      val traversal = graph.V(4).union(
-        // val traversal: GremlinScala[Any, HNil] = graph.V(4).union(
-        __[Vertex].in.value(Age)//,
-        // __[Vertex].in.value(Name)
+        val traversal: GremlinScala[Any, _] = graph.V(4).union(
+        _.in.value("age"),
+        _.in.value("name")
       )
 
       traversal.toSet shouldBe Set(29, "marko")

@@ -351,8 +351,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       fun(t): JCollection[String]
     })
 
-  def union[A](traversals: GremlinScala[A, _]*) =
-    GremlinScala[A, Labels](traversal.union(traversals map (_.traversal): _*))
+  def union[A](unionTraversals: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]*) = {
+    val mappedTraversals: Seq[GraphTraversal[_, A]] = unionTraversals.map(_.apply(start).traversal)
+    GremlinScala[A, Labels](traversal.union(mappedTraversals: _*))
+  }
 
   // repeats the provided anonymous traversal which starts at the current End
   // best combined with `times` or `until` step
