@@ -332,6 +332,12 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "groupBy" should {
+    // TODO: remove
+    // "foos" in new Fixture {
+    //   // val results: JMap[String, JCollection[Vertex]] =
+    //   graph.V.groupBy(_.label).head
+    //   graph.V.groupBy(_.label, _.value[Integer]("age")).head
+    // }
 
     "work with label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
@@ -355,6 +361,14 @@ class TraversalSpec extends WordSpec with Matchers {
       results(29) should contain (graph.V(1).head)
       results(32) should contain (graph.V(4).head)
       results(35) should contain (graph.V(6).head)
+    }
+
+    "optionally allow to transform the values" in new Fixture {
+      val results: JMap[String, Iterable[String]] =
+        graph.V.groupBy(_.label, _.value2(Name)).head
+
+      results("software").toSet shouldBe Set("lop", "ripple")
+      results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
     }
   }
 

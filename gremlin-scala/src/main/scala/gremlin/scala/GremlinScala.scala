@@ -264,7 +264,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
 
   def groupBy[A <: AnyRef](byFun: End ⇒ A): GremlinScala[JMap[A, JCollection[End]], Labels] =
-    GremlinScala[JMap[A, JCollection[End]], Labels](traversal.group().by(byFun: JFunction[End, AnyRef]))
+      GremlinScala[JMap[A, JCollection[End]], Labels](traversal.group().by(byFun: JFunction[End, AnyRef]))
+
+  def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
+    GremlinScala[JMap[A, JCollection[End]], Labels](
+      traversal.group().by(byFun: JFunction[End, AnyRef])
+    ).map(_.mapValues(_ map valueFun).toMap)
 
   def groupCount() = GremlinScala[JMap[End, JLong], Labels](traversal.groupCount())
 
