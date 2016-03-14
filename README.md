@@ -149,6 +149,27 @@ g.V(1).as(a)
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
+### Common and useful steps
+
+```scala
+// get a vertex by id
+graph.V(1).headOption
+
+// get all vertices
+graph.V.toList
+
+// group all vertices by their label
+graph.V.groupBy(_.label)
+
+// group vertices by a property
+graph.V.has("age").groupBy(_.value[Integer]("age"))
+
+// order by property decreasing
+graph.V.has("age").orderBy("age", Order.decr)
+```
+
+More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
+
 ### Mapping vertices from/to case classes
 You can save and load case classes as a vertex - implemented with a [blackbox macro](http://docs.scala-lang.org/overviews/macros/blackbox-whitebox.html). You can optionally annotate the id and label of your case class. Scala's `Option` types will be automatically unwrapped, i.e. a `Some[A]` will be stored as the value of type `A` in the database, or `null` if it's `None`. If we wouldn't unwrap it, the database would have to understand Scala's Option type itself. The same goes for value classes, i.e. a `case class ShoeSize(value: Int) extends AnyVal` will be stored as an Integer.
 
@@ -224,20 +245,20 @@ _What is the most liked movie in each decade?_
 ```
 // use :paste in Scala REPL
 g.V()
-  .hasLabel("movie")
-  .where(_.inE("rated").count().is(P.gt(10)))
-  .group { v ⇒
-    val year = v.value[Integer]("year")
+  .hasLabel(Movie)
+  .where(_.inE(Rated).count().is(P.gt(10)))
+  .groupBy { movie =>
+    val year = movie.value2(Year)
     val decade = (year / 10)
     (decade * 10): Integer
   }
   .map { moviesByDecade ⇒
     val highestRatedByDecade = moviesByDecade.mapValues { movies ⇒
       movies.toList
-        .sortBy { _.inE("rated").values("stars").mean().head }
+        .sortBy { _.inE(Rated).value(Stars).mean().head }
         .reverse.head //get the movie with the highest mean rating
     }
-    highestRatedByDecade.mapValues(_.value[String]("name"))
+    highestRatedByDecade.mapValues(_.value2(Name))
   }
   .order(Scope.local).by(Order.keyIncr)
   .head

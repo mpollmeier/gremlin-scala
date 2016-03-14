@@ -119,22 +119,6 @@ class TraversalSpec extends WordSpec with Matchers {
     graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
   }
 
-  "order" can {
-    "sort" in new Fixture {
-      graph.V.has(Age)
-        .value(Age)
-        .order()
-        .toList shouldBe Seq(27, 29, 32, 35)
-    }
-
-    "sort decr" in new Fixture {
-      graph.V.has(Age)
-        .value(Age)
-        .order(Order.decr)
-        .toList shouldBe Seq(35, 32, 29, 27)
-    }
-  }
-
   "orderBy" can {
     "order by property" in new Fixture {
       graph.V.has(Age)
@@ -332,13 +316,6 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "groupBy" should {
-    // TODO: remove
-    // "foos" in new Fixture {
-    //   // val results: JMap[String, JCollection[Vertex]] =
-    //   graph.V.groupBy(_.label).head
-    //   graph.V.groupBy(_.label, _.value[Integer]("age")).head
-    // }
-
     "work with label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V.groupBy(_.label).head
