@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
-import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiFunction ⇒ JBiFunction}
+import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiFunction ⇒ JBiFunction, Function => JFunction}
 import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
 import java.util.stream.{Stream ⇒ JStream}
 
@@ -262,6 +262,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[JMap[A, BulkSet[End]], Labels](traversal.group().by(byTraversal))
 
   def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
+
+  def groupBy[A <: AnyRef](byFun: End ⇒ A): GremlinScala[JMap[A, JCollection[End]], Labels] =
+      GremlinScala[JMap[A, JCollection[End]], Labels](traversal.group().by(byFun: JFunction[End, AnyRef]))
+
+  def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
+    GremlinScala[JMap[A, JCollection[End]], Labels](
+      traversal.group().by(byFun: JFunction[End, AnyRef])
+    ).map(_.mapValues(_ map valueFun).toMap)
 
   def groupCount() = GremlinScala[JMap[End, JLong], Labels](traversal.groupCount())
 
