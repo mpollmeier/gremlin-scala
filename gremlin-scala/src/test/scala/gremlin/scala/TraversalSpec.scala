@@ -407,6 +407,18 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "steps to add things" can {
+    "add an (unconnected) vertex for each path in the traversal" which {
+      "has a label and properties" in new Fixture {
+        val NewProperty = Key[String]("newProperty")
+
+        graph.V.outE("knows").addV("newLabel").property(NewProperty, "someValue").iterate()
+        graph.V.hasLabel("newLabel").count.head shouldBe 2
+        graph.V.has(NewProperty → "someValue").count.head shouldBe 2
+      }
+    }
+  }
+
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")

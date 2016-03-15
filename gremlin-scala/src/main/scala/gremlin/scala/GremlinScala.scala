@@ -394,8 +394,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
 
+  def addV() = GremlinScala[Vertex, Labels](traversal.addV())
+  def addV(label: String) = GremlinScala[Vertex, Labels](traversal.addV(label))
+
   // ELEMENT STEPS START
   // -------------------
+
+  def property[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.property(key.value, value))
+
   def properties(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[Property[Any], Labels](traversal.properties(keys: _*)
                                           .asInstanceOf[GraphTraversal[_, Property[Any]]])
