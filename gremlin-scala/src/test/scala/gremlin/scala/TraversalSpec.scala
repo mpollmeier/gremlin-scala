@@ -163,12 +163,16 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "order with sub-by" in new Fixture {
+      // add two more people with Age 29
+      graph + ("person", Age → 29, Name → "ZZZ")
+      graph + ("person", Age → 29, Name → "aaa")
+
       graph.V.has(Age).has(Name)
         .order()
         .by(Age.value, Order.incr)
         .by(Name.value, Order.decr)
         .value(Name)
-        .toList shouldBe Seq("vadas", "marko", "josh", "peter")
+        .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
     }
 
     // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
@@ -329,12 +333,12 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V.groupBy(_.label).head
 
-      results("software") should contain (graph.V(3).head)
-      results("software") should contain (graph.V(5).head)
-      results("person") should contain (graph.V(1).head)
-      results("person") should contain (graph.V(2).head)
-      results("person") should contain (graph.V(4).head)
-      results("person") should contain (graph.V(6).head)
+      results("software") should contain(graph.V(3).head)
+      results("software") should contain(graph.V(5).head)
+      results("person") should contain(graph.V(1).head)
+      results("person") should contain(graph.V(2).head)
+      results("person") should contain(graph.V(4).head)
+      results("person") should contain(graph.V(6).head)
     }
 
     "work with property" in new Fixture {
@@ -343,10 +347,10 @@ class TraversalSpec extends WordSpec with Matchers {
           .has(Age)
           .groupBy(_.value[Integer]("age")).head
 
-      results(27) should contain (graph.V(2).head)
-      results(29) should contain (graph.V(1).head)
-      results(32) should contain (graph.V(4).head)
-      results(35) should contain (graph.V(6).head)
+      results(27) should contain(graph.V(2).head)
+      results(29) should contain(graph.V(1).head)
+      results(32) should contain(graph.V(4).head)
+      results(35) should contain(graph.V(6).head)
     }
 
     "optionally allow to transform the values" in new Fixture {
@@ -394,7 +398,7 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "work for traversals with the different end types" in new Fixture {
-        val traversal: GremlinScala[Any, _] = graph.V(4).union(
+      val traversal: GremlinScala[Any, _] = graph.V(4).union(
         _.in.value("age"),
         _.in.value("name")
       )
