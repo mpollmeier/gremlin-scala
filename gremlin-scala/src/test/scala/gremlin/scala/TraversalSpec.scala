@@ -162,6 +162,14 @@ class TraversalSpec extends WordSpec with Matchers {
         .toList shouldBe Seq(35, 32, 29, 27)
     }
 
+    "order with sub-by" in new Fixture {
+      graph.V.has(Age).has(Name)
+        .order()
+        .by(Age.value, Order.incr)
+        .by(Name.value, Order.decr)
+        .toList shouldBe Seq.empty
+    }
+
     // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
     // "allow primitive types" in new Fixture {
     //     graph.V.has(Age)
