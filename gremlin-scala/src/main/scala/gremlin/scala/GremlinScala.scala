@@ -183,7 +183,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, comparator))
 
-  def order() = GremlinScala[End, Labels](traversal.order().by(Order.incr))
+  def order() = GremlinScala[End, Labels](traversal.order())
 
   def order(comparator: Order) = GremlinScala[End, Labels](traversal.order().by(comparator))
 
