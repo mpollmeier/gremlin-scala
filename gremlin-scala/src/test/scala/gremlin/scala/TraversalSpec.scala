@@ -167,7 +167,8 @@ class TraversalSpec extends WordSpec with Matchers {
         .order()
         .by(Age.value, Order.incr)
         .by(Name.value, Order.decr)
-        .toList shouldBe Seq.empty
+        .value(Name)
+        .toList shouldBe Seq("vadas", "marko", "josh", "peter")
     }
 
     // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
