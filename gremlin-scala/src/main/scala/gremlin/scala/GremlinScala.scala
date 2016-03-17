@@ -556,6 +556,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def bothE(labels: String*)(implicit ev: End <:< Vertex) =
     GremlinScala[Edge, Labels](traversal.bothE(labels: _*))
+
+  // may be used together with `from` / `to`, see TraversalSpec for examples
+  def addE(label: String)(implicit ev: End <:< Vertex): GremlinScala[Edge, Labels] =
+    GremlinScala[Edge, Labels](traversal.addE(label))
+
+  def from(label: String): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.from(label))
+  def to(label: String): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.to(label))
   // VERTEX STEPS END
   // -------------------
 
