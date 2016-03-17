@@ -424,8 +424,12 @@ class TraversalSpec extends WordSpec with Matchers {
 
       "reference the `from` vertex via StepLabel" in new Fixture {
         graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1.name)).addE(CoDeveloper).from(v1).iterate()
-
         graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      "reference the `to` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1.name)).addE(CoDeveloper).to(v1).iterate()
+        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
 
       // TODO: the `to` vertex
