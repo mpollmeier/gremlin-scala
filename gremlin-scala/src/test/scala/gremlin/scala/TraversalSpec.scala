@@ -419,11 +419,11 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "add edges" which {
-      val v1 = "v1"
+      val v1 = StepLabel[Vertex]("v1")
       val CoDeveloper = "co-developer"
 
       "reference the `from` vertex via StepLabel" in new Fixture {
-        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1)).addE(CoDeveloper).from(v1).iterate()
+        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1.name)).addE(CoDeveloper).from(v1).iterate()
 
         graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
