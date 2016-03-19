@@ -417,11 +417,25 @@ class TraversalSpec extends WordSpec with Matchers {
         graph.V.has(NewProperty → "someValue").count.head shouldBe 2
       }
     }
+
+    "add edges" which {
+      val v1 = "v1"
+      val CoDeveloper = "co-developer"
+
+      "reference the `from` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1)).addE(CoDeveloper).from(v1).iterate()
+
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      // TODO: the `to` vertex
+    }
   }
 
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
     val Age = Key[Int]("age")
+    val Created = "created"
   }
 }
