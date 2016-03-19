@@ -419,20 +419,28 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "add edges" which {
-      val v1 = StepLabel[Vertex]("v1")
+      val v1Label = StepLabel[Vertex]("v1")
       val CoDeveloper = "co-developer"
 
+      "don't use special steps" in new Fixture {
+        val traversal = for {
+          v1 ← graph.V(1)
+          coDeveloper ← v1.out(Created).in(Created).filterNot(_ == v1)
+        } yield v1 --- CoDeveloper --> coDeveloper
+        traversal.iterate()
+
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
       "reference the `from` vertex via StepLabel" in new Fixture {
-        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1.name)).addE(CoDeveloper).from(v1).iterate()
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).from(v1Label).iterate()
         graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
 
       "reference the `to` vertex via StepLabel" in new Fixture {
-        graph.V(1).as(v1).out(Created).in(Created).where(P.neq(v1.name)).addE(CoDeveloper).to(v1).iterate()
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).to(v1Label).iterate()
         graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
-
-      // TODO: the `to` vertex
     }
   }
 
