@@ -407,9 +407,47 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "steps to add things" can {
+    "add an (unconnected) vertex for each path in the traversal" which {
+      "has a label and properties" in new Fixture {
+        val NewProperty = Key[String]("newProperty")
+
+        graph.V.outE("knows").addV("newLabel").property(NewProperty, "someValue").iterate()
+        graph.V.hasLabel("newLabel").count.head shouldBe 2
+        graph.V.has(NewProperty → "someValue").count.head shouldBe 2
+      }
+    }
+
+    "add edges" which {
+      val v1Label = StepLabel[Vertex]("v1")
+      val CoDeveloper = "co-developer"
+
+      "don't use special steps" in new Fixture {
+        val traversal = for {
+          v1 ← graph.V(1)
+          coDeveloper ← v1.out(Created).in(Created).filterNot(_ == v1)
+        } yield v1 --- CoDeveloper --> coDeveloper
+        traversal.iterate()
+
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      "reference the `from` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).from(v1Label).iterate()
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      "reference the `to` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).to(v1Label).iterate()
+        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+    }
+  }
+
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
     val Age = Key[Int]("age")
+    val Created = "created"
   }
 }
