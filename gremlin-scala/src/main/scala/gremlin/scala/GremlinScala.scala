@@ -394,7 +394,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
 
-  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[Boolean, _]) =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
 
   def addV() = GremlinScala[Vertex, Labels](traversal.addV())
