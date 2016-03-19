@@ -401,7 +401,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal: GremlinScala[String, _] = graph
         .V.hasLabel("person")
         .choose(
-          _.value(Age).is(P.lte(30)).map(_ ⇒ true),
+          _.value2(Age) <= 30,
           onTrue = _.in(),
           onFalse = _.out()
         )
@@ -414,7 +414,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal: GremlinScala[String, _] = graph
         .V
         .choose(
-          _.hasLabel("person").map(_ ⇒ true),
+          _.label() == "person",
           onTrue = _.value(Name),
           onFalse = _.constant("inhuman")
         )

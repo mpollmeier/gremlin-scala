@@ -365,13 +365,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   }
 
   def choose[A](
-    predicate: GremlinScala[End, HNil] ⇒ GremlinScala[Boolean, _],
+    predicate: End ⇒ Boolean,
     onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[A, _],
     onFalse: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] = {
-    val p = predicate(start).traversal
     val t = onTrue(start).traversal
     val f = onFalse(start).traversal
-    GremlinScala[A, Labels](traversal.choose(p, t, f))
+    GremlinScala[A, Labels](traversal.choose(predicate, t, f))
   }
 
   def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
