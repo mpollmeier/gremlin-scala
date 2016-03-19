@@ -10,6 +10,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
+import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
@@ -34,6 +35,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def head(): End = toList.head
 
   def headOption(): Option[End] = toList.headOption
+
+  def explain(): TraversalExplanation = traversal.explain()
 
   def exists(): Boolean = headOption.isDefined
   def notExists(): Boolean = !exists()
