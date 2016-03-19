@@ -163,6 +163,19 @@ class TraversalSpec extends WordSpec with Matchers {
         .toList shouldBe Seq(35, 32, 29, 27)
     }
 
+    "order with sub-by" in new Fixture {
+      // add two more people with Age 29
+      graph + ("person", Age → 29, Name → "ZZZ")
+      graph + ("person", Age → 29, Name → "aaa")
+
+      graph.V.has(Age).has(Name)
+        .order()
+        .by(Age.value, Order.incr)
+        .by(Name.value, Order.decr)
+        .value(Name)
+        .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
+    }
+
     // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
     // "allow primitive types" in new Fixture {
     //     graph.V.has(Age)
@@ -321,12 +334,12 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V.groupBy(_.label).head
 
-      results("software") should contain (graph.V(3).head)
-      results("software") should contain (graph.V(5).head)
-      results("person") should contain (graph.V(1).head)
-      results("person") should contain (graph.V(2).head)
-      results("person") should contain (graph.V(4).head)
-      results("person") should contain (graph.V(6).head)
+      results("software") should contain(graph.V(3).head)
+      results("software") should contain(graph.V(5).head)
+      results("person") should contain(graph.V(1).head)
+      results("person") should contain(graph.V(2).head)
+      results("person") should contain(graph.V(4).head)
+      results("person") should contain(graph.V(6).head)
     }
 
     "work with property" in new Fixture {
@@ -335,10 +348,10 @@ class TraversalSpec extends WordSpec with Matchers {
           .has(Age)
           .groupBy(_.value[Integer]("age")).head
 
-      results(27) should contain (graph.V(2).head)
-      results(29) should contain (graph.V(1).head)
-      results(32) should contain (graph.V(4).head)
-      results(35) should contain (graph.V(6).head)
+      results(27) should contain(graph.V(2).head)
+      results(29) should contain(graph.V(1).head)
+      results(32) should contain(graph.V(4).head)
+      results(35) should contain(graph.V(6).head)
     }
 
     "optionally allow to transform the values" in new Fixture {
@@ -386,7 +399,7 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "work for traversals with the different end types" in new Fixture {
-        val traversal: GremlinScala[Any, _] = graph.V(4).union(
+      val traversal: GremlinScala[Any, _] = graph.V(4).union(
         _.in.value("age"),
         _.in.value("name")
       )
@@ -420,6 +433,44 @@ class TraversalSpec extends WordSpec with Matchers {
         )
 
       traversal.toSet() shouldBe Set("marko", "vadas", "inhuman", "josh", "peter")
+
+    }
+  }
+
+  "steps to add things" can {
+    "add an (unconnected) vertex for each path in the traversal" which {
+      "has a label and properties" in new Fixture {
+        val NewProperty = Key[String]("newProperty")
+
+        graph.V.outE("knows").addV("newLabel").property(NewProperty, "someValue").iterate()
+        graph.V.hasLabel("newLabel").count.head shouldBe 2
+        graph.V.has(NewProperty → "someValue").count.head shouldBe 2
+      }
+    }
+
+    "add edges" which {
+      val v1Label = StepLabel[Vertex]("v1")
+      val CoDeveloper = "co-developer"
+
+      "don't use special steps" in new Fixture {
+        val traversal = for {
+          v1 ← graph.V(1)
+          coDeveloper ← v1.out(Created).in(Created).filterNot(_ == v1)
+        } yield v1 --- CoDeveloper --> coDeveloper
+        traversal.iterate()
+
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      "reference the `from` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).from(v1Label).iterate()
+        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
+      "reference the `to` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).to(v1Label).iterate()
+        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
     }
   }
 
@@ -427,5 +478,6 @@ class TraversalSpec extends WordSpec with Matchers {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
     val Age = Key[Int]("age")
+    val Created = "created"
   }
 }

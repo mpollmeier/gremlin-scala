@@ -10,6 +10,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
+import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
@@ -34,6 +35,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def head(): End = toList.head
 
   def headOption(): Option[End] = toList.headOption
+
+  def explain(): TraversalExplanation = traversal.explain()
 
   def exists(): Boolean = headOption.isDefined
   def notExists(): Boolean = !exists()
@@ -183,7 +186,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, comparator))
 
-  def order() = GremlinScala[End, Labels](traversal.order().by(Order.incr))
+  def order() = GremlinScala[End, Labels](traversal.order())
 
   def order(comparator: Order) = GremlinScala[End, Labels](traversal.order().by(comparator))
 
@@ -402,11 +405,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
 
-  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[Boolean, _]) =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
+
+  def addV() = GremlinScala[Vertex, Labels](traversal.addV())
+  def addV(label: String) = GremlinScala[Vertex, Labels](traversal.addV(label))
 
   // ELEMENT STEPS START
   // -------------------
+
+  def property[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.property(key.value, value))
+
   def properties(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[Property[Any], Labels](traversal.properties(keys: _*)
                                           .asInstanceOf[GraphTraversal[_, Property[Any]]])
@@ -560,6 +570,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def bothE(labels: String*)(implicit ev: End <:< Vertex) =
     GremlinScala[Edge, Labels](traversal.bothE(labels: _*))
+
+  // may be used together with `from` / `to`, see TraversalSpec for examples
+  def addE(label: String)(implicit ev: End <:< Vertex): GremlinScala[Edge, Labels] =
+    GremlinScala[Edge, Labels](traversal.addE(label))
+  def addE(label: StepLabel[Vertex])(implicit ev: End <:< Vertex): GremlinScala[Edge, Labels] =
+    GremlinScala[Edge, Labels](traversal.addE(label.name))
+
+  def from(label: StepLabel[Vertex]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.from(label.name))
+  def to(label: StepLabel[Vertex]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.to(label.name))
   // VERTEX STEPS END
   // -------------------
 
