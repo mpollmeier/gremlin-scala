@@ -401,11 +401,11 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal: GremlinScala[String, _] = graph
         .V.hasLabel("person")
         .choose(
-          _.values("age").is(P.lte(30)),
-          _.in(),
-          _.out()
+          _.value(Age).is(P.lte(30)).map(_ ⇒ true),
+          onTrue = _.in(),
+          onFalse = _.out()
         )
-        .values("name")
+        .value(Name)
 
       traversal.toSet shouldBe Set("marko", "ripple", "lop", "lop")
     }
@@ -414,9 +414,9 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal: GremlinScala[String, _] = graph
         .V
         .choose(
-          _.hasLabel("person"),
-          _.values[String]("name"),
-          _.constant("inhuman")
+          _.hasLabel("person").map(_ ⇒ true),
+          onTrue = _.value(Name),
+          onFalse = _.constant("inhuman")
         )
 
       traversal.toSet() shouldBe Set("marko", "vadas", "inhuman", "josh", "peter")
