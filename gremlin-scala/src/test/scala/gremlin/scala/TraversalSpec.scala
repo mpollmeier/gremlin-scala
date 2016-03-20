@@ -1,13 +1,14 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.Order
+import org.apache.tinkerpop.gremlin.process.traversal.{Path, Order, P}
+import org.apache.tinkerpop.gremlin.process.traversal.step.util.ImmutablePath
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import shapeless.test.illTyped
 import collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.process.traversal.P
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -407,6 +408,56 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "coalesce" should {
+    "evaluate traversals and return first with value" in new Fixture {
+
+      def path2String(path: Path) = path.objects().map(_.toString)
+
+      val traversal1 = graph.V(1)
+        .coalesce(
+          _.outE("knows"),
+          _.outE("created")
+        )
+        .inV()
+        .path().by("name").by(T.label)
+
+      traversal1.toList().map(path2String) shouldBe
+        Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
+
+
+      val traversal2 = graph.V(1)
+        .coalesce(
+          _.outE("created"),
+          _.outE("knows")
+        )
+        .inV()
+        .path().by("name").by(T.label)
+
+      traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
+
+      graph.graph.V(1).property(Nickname, "okram").iterate()
+
+      val traversal3 = graph.V
+        .hasLabel("person")
+        .coalesce(
+          _.value(Nickname),
+          _.value(Name)
+        )
+
+      traversal3.toSet() shouldBe Set("okram", "vadas", "josh", "peter")
+    }
+
+    "allow constant as default" in new Fixture {
+      val traversal3 = graph.V
+        .coalesce(
+          _.value(Age).map(_.toString),
+          _.constant("ageless")
+        )
+
+      traversal3.toSet() shouldBe Set("35", "32", "27", "29", "ageless")
+    }
+  }
+
   "steps to add things" can {
     "add an (unconnected) vertex for each path in the traversal" which {
       "has a label and properties" in new Fixture {
@@ -447,6 +498,8 @@ class TraversalSpec extends WordSpec with Matchers {
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
+    val Nickname = Key[String]("nickname")
+    val Lang = Key[String]("lang")
     val Age = Key[Int]("age")
     val Created = "created"
   }
