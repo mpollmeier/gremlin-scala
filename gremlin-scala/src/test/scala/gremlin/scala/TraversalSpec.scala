@@ -5,6 +5,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
+import shapeless.HNil
 import shapeless.test.illTyped
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.P
@@ -404,6 +405,35 @@ class TraversalSpec extends WordSpec with Matchers {
       )
 
       traversal.toSet shouldBe Set(29, "marko")
+    }
+  }
+
+  "choose" should {
+    "work for if/then/else semantics" in new Fixture {
+
+      val traversal: GremlinScala[String, _] = graph
+        .V.hasLabel("person")
+        .choose(
+          _.value2(Age) <= 30,
+          onTrue = _.in(),
+          onFalse = _.out()
+        )
+        .value(Name)
+
+      traversal.toSet shouldBe Set("marko", "ripple", "lop", "lop")
+    }
+
+    "work with `constant`" in new Fixture {
+      val traversal: GremlinScala[String, _] = graph
+        .V
+        .choose(
+          _.label() == "person",
+          onTrue = _.value(Name),
+          onFalse = _.constant("inhuman")
+        )
+
+      traversal.toSet() shouldBe Set("marko", "vadas", "inhuman", "josh", "peter")
+
     }
   }
 

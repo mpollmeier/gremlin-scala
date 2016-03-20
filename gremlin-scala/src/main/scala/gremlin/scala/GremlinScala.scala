@@ -95,14 +95,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def flatMap[A](fun: End ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { t: Traverser[End] ⇒
-        fun(t.get).toList.toIterator: JIterator[A]
+        fun(t.get).toList().toIterator: JIterator[A]
       }
     )
 
   def flatMapWithTraverser[A](fun: Traverser[End] ⇒ GremlinScala[A, _]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { e: Traverser[End] ⇒
-        fun(e).toList.toIterator: JIterator[A]
+        fun(e).toList().toIterator: JIterator[A]
       }
     )
 
@@ -366,6 +366,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val mappedTraversals: Seq[GraphTraversal[_, A]] = unionTraversals.map(_.apply(start).traversal)
     GremlinScala[A, Labels](traversal.union(mappedTraversals: _*))
   }
+
+  def choose[A](
+    predicate: End ⇒ Boolean,
+    onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[A, _],
+    onFalse: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] = {
+    val t = onTrue(start).traversal
+    val f = onFalse(start).traversal
+    GremlinScala[A, Labels](traversal.choose(predicate, t, f))
+  }
+
+  def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
 
   // repeats the provided anonymous traversal which starts at the current End
   // best combined with `times` or `until` step
