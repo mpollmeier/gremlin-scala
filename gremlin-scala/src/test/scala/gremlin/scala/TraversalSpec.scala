@@ -409,32 +409,40 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "coalesce" should {
-    "evaluate traversals and return first with value" in new Fixture {
+    // Helper for testing path-based results
+    def path2String(path: Path) = path.objects().map(_.toString)
 
-      def path2String(path: Path) = path.objects().map(_.toString)
+    "evaluate traversals and return first with value" when {
 
-      val traversal1 = graph.V(1)
-        .coalesce(
-          _.outE("knows"),
-          _.outE("created")
-        )
-        .inV()
-        .path().by("name").by(T.label)
+      "relationship is first" in new Fixture {
+        val traversal1 = graph.V(1)
+          .coalesce(
+            _.outE("knows"),
+            _.outE("created")
+          )
+          .inV()
+          .path().by("name").by(T.label)
 
-      traversal1.toList().map(path2String) shouldBe
-        Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
+        traversal1.toList().map(path2String) shouldBe
+          Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
+      }
 
+      "created is first" in new Fixture {
+        val traversal2 = graph.V(1)
+          .coalesce(
+            _.outE("created"),
+            _.outE("knows")
+          )
+          .inV()
+          .path().by("name").by(T.label)
 
-      val traversal2 = graph.V(1)
-        .coalesce(
-          _.outE("created"),
-          _.outE("knows")
-        )
-        .inV()
-        .path().by("name").by(T.label)
+        traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
+      }
+    }
 
-      traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
+    "handle vertex-unique properties" in new Fixture {
 
+      // Add a new property on a specific vertex and test that it is picked up first.
       graph.graph.V(1).property(Nickname, "okram").iterate()
 
       val traversal3 = graph.V
