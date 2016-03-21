@@ -293,9 +293,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
-  def by[A](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
+  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
-      traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[Element, A]], comparator)
+      traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[Element, AnyRef]], comparator)
     )
 
   def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
