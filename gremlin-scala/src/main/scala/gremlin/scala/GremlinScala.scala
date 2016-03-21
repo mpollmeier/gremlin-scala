@@ -280,7 +280,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
   def groupCount(sideEffectKey: String) = GremlinScala[End, Labels](traversal.groupCount(sideEffectKey))
 
-  def profile() = GremlinScala[End, Labels](traversal.profile)
+  def profile(sideEffectKey: String) = GremlinScala[End, Labels](traversal.profile(sideEffectKey))
 
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
 
