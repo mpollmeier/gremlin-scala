@@ -6,8 +6,7 @@ import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JColl
 import java.util.stream.{Stream ⇒ JStream}
 
 import collection.JavaConversions._
-import org.apache.tinkerpop.gremlin.process.traversal.Order
-import org.apache.tinkerpop.gremlin.process.traversal.Pop
+import org.apache.tinkerpop.gremlin.process.traversal.{ Order, Pop }
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation

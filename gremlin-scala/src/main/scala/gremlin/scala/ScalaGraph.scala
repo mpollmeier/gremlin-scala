@@ -50,18 +50,18 @@ case class ScalaGraph[G <: Graph](graph: G) {
   def +(label: String, properties: KeyValue[_]*): Vertex =
     addVertex(label, properties.map(v ⇒ (v.key.value, v.value)).toMap )
 
-  // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
+  // start traversal with all vertices
+  def V = GremlinScala[Vertex, HNil](graph.traversal.V())
 
   // start traversal with all edges
-  def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
+  def E = GremlinScala[Edge, HNil](graph.traversal.E())
 
-  // start traversal with some vertices identified by given ids 
+  // start traversal with some vertices identified by given ids
   def V(vertexIds: Any*) =
     GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
       .asInstanceOf[GraphTraversal[_, Vertex]])
 
-  // start traversal with some edges identified by given ids 
+  // start traversal with some edges identified by given ids
   def E(edgeIds: Any*) =
     GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
       .asInstanceOf[GraphTraversal[_, Edge]])

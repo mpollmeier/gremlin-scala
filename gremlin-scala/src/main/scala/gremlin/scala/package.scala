@@ -4,6 +4,7 @@ import java.util.function.{BiPredicate, Function ⇒ JFunction, Predicate ⇒ JP
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
 import org.apache.tinkerpop.gremlin.structure
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
@@ -44,6 +45,10 @@ package object scala {
 
   implicit class VertexAsJava(v: ScalaVertex) {
     def asJava = v.vertex
+  }
+
+  implicit class GraphTraversalSourceAsScala(gts: GraphTraversalSource) {
+    def asScala = ScalaGraphTraversalSource(gts)
   }
 
   implicit class PropertyOps[A](property: Property[A]) {
