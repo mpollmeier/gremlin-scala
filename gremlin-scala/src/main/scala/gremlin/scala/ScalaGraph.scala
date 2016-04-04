@@ -43,6 +43,23 @@ case class ScalaGraph(graph: Graph) {
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
+  import io.github.netvl.picopickle.backends.collections.CollectionsPickler
+  import CollectionsPickler._
+  def PLUS_NEW[CC <: Product](cc: CC)(implicit w: Writer[CC]): Vertex = {
+    // TODO: get rid of cast e.g. by using Writer.Aux
+    val map = write(cc).asInstanceOf[Map[String, Any]]
+    // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
+    val label: String = cc match {
+      // case a: WithLabel ⇒ a.label
+      case _        ⇒ cc.getClass.getSimpleName
+    }
+    val labelParam = Seq(T.label, label)
+    val params = map.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    // graph.addVertex(idParam ++ labelParam ++ params: _*)
+    graph.addVertex(labelParam ++ params: _*)
+    // ???
+  }
+
   def +[CC <: Product: Marshallable](cc: CC): Vertex = addVertex(cc)
 
   def +(label: String): Vertex = addVertex(label)

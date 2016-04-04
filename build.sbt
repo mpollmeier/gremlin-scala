@@ -18,11 +18,12 @@ val commonSettings = Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion,
       "com.novocode" % "junit-interface" % "0.11" % "test->default",
       "com.chuusai" %% "shapeless" % "2.3.0",
+      "io.github.netvl.picopickle" %% "picopickle-core" % "0.2.1",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5", //just specified to eliminate sbt warnings
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test exclude("org.slf4j", "slf4j-log4j12"),
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
       "junit" % "junit" % "4.12" % Test,
-      "org.scalatest" %% "scalatest" % "2.2.5" % Test
+      "org.scalatest" %% "scalatest" % "2.2.6" % Test
     )
   },
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
