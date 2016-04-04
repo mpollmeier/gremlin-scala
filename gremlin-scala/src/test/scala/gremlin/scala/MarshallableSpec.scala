@@ -70,16 +70,16 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
 
     "contain value classes" should {
-      // "unwrap a simple value class" in new Fixture {
-      //   val cc = CCWithValueClass("some text", MyValueClass(42))
-      //   val persisted = graph PLUS_NEW cc
+      "unwrap a simple value class" in new Fixture {
+        val cc = CCWithValueClass("some text", MyValueClass(42))
+        val persisted = graph PLUS_NEW cc
 
-      //   val v = graph.V(persisted.id).head
-      //   v.label shouldBe cc.getClass.getSimpleName
-      //   v.valueMap should contain("s" → cc.s)
-      //   v.valueMap should contain("i" → cc.i.value)
-      //   v.toCC[CCWithValueClass] shouldBe cc
-      // }
+        val v = graph.V(persisted.id).head
+        v.label shouldBe cc.getClass.getSimpleName
+        v.valueMap should contain("s" → cc.s)
+        v.valueMap should contain("i" → cc.i.value)
+        v.toCC[CCWithValueClass] shouldBe cc
+      }
 
   //     "unwrap an optional value class" in new Fixture {
   //       val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
