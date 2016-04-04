@@ -50,7 +50,7 @@ case class ScalaGraph(graph: Graph) {
     val map = write(cc).asInstanceOf[Map[String, Any]]
     // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
     val label: String = cc match {
-      // case a: WithLabel ⇒ a.label
+      case a: WithLabel ⇒ a.label
       case _        ⇒ cc.getClass.getSimpleName
     }
     val labelParam = Seq(T.label, label)

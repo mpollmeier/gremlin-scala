@@ -15,8 +15,9 @@ case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 
-// @label("label_a")
-// case class CCWithLabel(s: String)
+case class CCWithLabel(i: Int) extends WithLabel {
+  def label = "my custom label"
+}
 
 // @label("the_label")
 // case class CCWithLabelAndId(
@@ -81,29 +82,30 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.toCC[CCWithValueClass] shouldBe cc
       }
 
-  //     "unwrap an optional value class" in new Fixture {
-  //       val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
-  //       val v = graph + cc
+      "unwrap an optional value class" in new Fixture {
+        val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
+        val persisted = graph PLUS_NEW cc
 
-  //       val vl = graph.V(v.id).head
-  //       vl.label shouldBe cc.getClass.getSimpleName
-  //       vl.valueMap should contain("s" → cc.s)
-  //       vl.valueMap should contain("i" → cc.i.get.value)
-  //       vl.toCC[CCWithOptionValueClass] shouldBe cc
-  //     }
+        val v = graph.V(persisted.id).head
+        v.label shouldBe cc.getClass.getSimpleName
+        v.valueMap should contain("s" → cc.s)
+        v.valueMap should contain("i" → cc.i.get.value)
+        v.toCC[CCWithOptionValueClass] shouldBe cc
+      }
 
-  //     "handle None value class" in new Fixture {
-  //       val cc = CCWithOptionValueClass("some text", None)
-  //       val v = graph + cc
+      "handle None value class" in new Fixture {
+        val cc = CCWithOptionValueClass("some text", None)
+        val persisted = graph PLUS_NEW cc
 
-  //       val vl = graph.V(v.id).head
-  //       vl.label shouldBe cc.getClass.getSimpleName
-  //       vl.valueMap should contain("s" → cc.s)
-  //       vl.valueMap.keySet should not contain("i")
-  //       vl.toCC[CCWithOptionValueClass] shouldBe cc
-  //     }
+        val v = graph.V(persisted.id).head
+        v.label shouldBe cc.getClass.getSimpleName
+        v.valueMap should contain("s" → cc.s)
+        v.valueMap.keySet should not contain("i")
+        v.toCC[CCWithOptionValueClass] shouldBe cc
+      }
     }
 
+    // TODO: 
   //   "define their custom marshaller" in new Fixture {
   //     val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
@@ -120,6 +122,16 @@ class MarshallableSpec extends WordSpec with Matchers {
   //     v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
   //   }
 
+    "specify a custom label" in new Fixture {
+      val cc = CCWithLabel(10)
+      val persisted = graph PLUS_NEW cc
+      val v = graph.V(persisted.id).head
+      v.label shouldBe "my custom label"
+      v.valueMap should contain("i" → cc.i)
+      v.toCC[CCWithLabel] shouldBe cc
+    }
+
+    // TODO: id fields
   //   "use @label and @id annotations" in new Fixture {
   //     val ccWithLabelAndId = CCWithLabelAndId(
   //       "some string",
