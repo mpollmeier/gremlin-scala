@@ -48,6 +48,9 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val v = graph.V(persisted.id).head
         v.value[String]("s") shouldBe ccWithOptionSome.s.get
+
+        import CollectionsPickler._
+        v.toCC_NEW[CCWithOption] shouldBe ccWithOptionSome
       }
 
       "map `None` to `null`" in new Fixture {
@@ -56,6 +59,9 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val v = graph.V(persisted.id).head
         v.keys should not contain "s" //None should be mapped to `null`
+
+        import CollectionsPickler._
+        v.toCC_NEW[CCWithOption] shouldBe ccWithOptionNone
       }
 
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
@@ -72,7 +78,9 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.label shouldBe cc.getClass.getSimpleName
         v.valueMap should contain("s" → cc.s)
         v.valueMap should contain("i" → cc.i.value)
-        v.toCC[CCWithValueClass] shouldBe cc
+
+        import CollectionsPickler._
+        v.toCC_NEW[CCWithValueClass] shouldBe cc
       }
 
       "unwrap an optional value class" in new Fixture {
@@ -83,7 +91,9 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.label shouldBe cc.getClass.getSimpleName
         v.valueMap should contain("s" → cc.s)
         v.valueMap should contain("i" → cc.i.get.value)
-        v.toCC[CCWithOptionValueClass] shouldBe cc
+
+        import CollectionsPickler._
+        v.toCC_NEW[CCWithOptionValueClass] shouldBe cc
       }
 
       "handle None value class" in new Fixture {
@@ -94,7 +104,9 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.label shouldBe cc.getClass.getSimpleName
         v.valueMap should contain("s" → cc.s)
         v.valueMap.keySet should not contain ("i")
-        v.toCC[CCWithOptionValueClass] shouldBe cc
+
+        import CollectionsPickler._
+        v.toCC_NEW[CCWithOptionValueClass] shouldBe cc
       }
     }
 
@@ -121,7 +133,9 @@ class MarshallableSpec extends WordSpec with Matchers {
       val v = graph.V(persisted.id).head
       v.label shouldBe "my custom label"
       v.valueMap should contain("i" → cc.i)
-      v.toCC[CCWithLabel] shouldBe cc
+
+      import CollectionsPickler._
+      v.toCC_NEW[CCWithLabel] shouldBe cc
     }
 
     // TODO: id fields
