@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import io.github.netvl.picopickle.backends.collections.CollectionsPickler
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
@@ -36,6 +37,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       v.valueMap should contain("s" → cc.s)
       v.valueMap should contain("i" → cc.i)
 
+      import CollectionsPickler._
       v.toCC_NEW[CCSimple] shouldBe cc
     }
 
