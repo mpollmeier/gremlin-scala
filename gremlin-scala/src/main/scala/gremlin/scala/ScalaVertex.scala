@@ -10,6 +10,12 @@ import scala.collection.JavaConversions._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
+  import io.github.netvl.picopickle.backends.collections.CollectionsPickler
+  import CollectionsPickler._
+  def toCC_NEW[CC <: Product]()(implicit r: Reader[CC]): CC = {
+    r.read(vertex.valueMap)
+  }
+
   def toCC[CC <: Product: Marshallable] =
     implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
 
