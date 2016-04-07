@@ -6,7 +6,7 @@ import shapeless._
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
 
-  def graph: ScalaGraph[Graph] = element.graph
+  def graph: ScalaGraph = element.graph
 
   def start(): GremlinScala[ElementType, HNil]
 

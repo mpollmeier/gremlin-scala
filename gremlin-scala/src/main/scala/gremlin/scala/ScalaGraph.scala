@@ -8,7 +8,7 @@ import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
 
-case class ScalaGraph[G <: Graph](graph: G) {
+case class ScalaGraph(graph: Graph) {
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
 

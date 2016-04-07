@@ -26,7 +26,7 @@ package object scala {
     def asScala = ScalaGraph(g)
   }
 
-  implicit class GraphAsJava[T <: structure.Graph](g: ScalaGraph[T]) {
+  implicit class GraphAsJava(g: ScalaGraph) {
     def asJava = g.graph
   }
 
@@ -71,7 +71,7 @@ package object scala {
 
   implicit def wrap(e: Edge): ScalaEdge = ScalaEdge(e)
 
-  implicit def wrap(g: Graph): ScalaGraph[Graph] = ScalaGraph(g)
+  implicit def wrap(g: Graph): ScalaGraph = ScalaGraph(g)
 
   implicit def wrap[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
 
