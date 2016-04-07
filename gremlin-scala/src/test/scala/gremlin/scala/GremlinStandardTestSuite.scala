@@ -474,31 +474,31 @@ object Tests {
       graph.asScala.V.out.aggregate("a").path
   }
 
-  class ScalaCountTest extends CountTest with StandardTest {
-    override def get_g_V_count =
-      graph.asScala.V.count
+  // class ScalaCountTest extends CountTest with StandardTest {
+  //   override def get_g_V_count =
+  //     graph.asScala.V.count
 
-    override def get_g_V_out_count =
-      graph.asScala.V.out.count
+  //   override def get_g_V_out_count =
+  //     graph.asScala.V.out.count
 
-    override def get_g_V_both_both_count =
-      graph.asScala.V.both.both.count
+  //   override def get_g_V_both_both_count =
+  //     graph.asScala.V.both.both.count
 
-    override def get_g_V_repeatXoutX_timesX3X_count =
-      graph.asScala.V.repeat(_.out).times(3).count
+  //   override def get_g_V_repeatXoutX_timesX3X_count =
+  //     graph.asScala.V.repeat(_.out).times(3).count
 
-    override def get_g_V_repeatXoutX_timesX8X_count =
-      graph.asScala.V.repeat(_.out).times(8).count
+  //   override def get_g_V_repeatXoutX_timesX8X_count =
+  //     graph.asScala.V.repeat(_.out).times(8).count
 
-    override def get_g_V_hasXnoX_count =
-      graph.asScala.V.has(Key("no")).count
+  //   override def get_g_V_hasXnoX_count =
+  //     graph.asScala.V.has(Key("no")).count
 
-    override def get_g_V_fold_countXlocalX =
-      graph.asScala.V.fold.count(Scope.local)
+  //   override def get_g_V_fold_countXlocalX =
+  //     graph.asScala.V.fold.count(Scope.local)
 
-    override def get_g_V_repeatXoutX_timesX5X_asXaX_outXwrittenByX_asXbX_selectXa_bX_count =
-      graph.asScala.V.repeat(_.out()).times(5).as("a").out("writtenBy").as("b").select("a", "b").count
-  }
+  //   override def get_g_V_repeatXoutX_timesX5X_asXaX_outXwrittenByX_asXbX_selectXa_bX_count =
+  //     graph.asScala.V.repeat(_.out()).times(5).as("a").out("writtenBy").as("b").select("a", "b").count
+  // }
 
   // class ScalaSideEffectTest extends sideEffect.SideEffectTest with StandardTest {
   // override def get_g_VX1X_sideEffectXstore_aX_name(v1Id: AnyRef) =
@@ -663,8 +663,8 @@ class GremlinScalaStandardSuite(clazz: Class[_], builder: RunnerBuilder)
       classOf[ScalaSimplePathTest],
       classOf[ScalaCyclicPathTest],
       classOf[ScalaCoinTest],
-      classOf[ScalaAggregateTest],
-      classOf[ScalaCountTest]
+      classOf[ScalaAggregateTest]
+      // classOf[ScalaCountTest]
 
     // classOf[ScalaMapTest],
     // classOf[ScalaVertexTest],

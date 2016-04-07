@@ -18,7 +18,7 @@ class SchemaSpec extends WordSpec with Matchers {
     object Weight extends Key[Int]("weight")
 
     "create vertices" in {
-      val g = TinkerGraph.open.asScala
+      val g: ScalaGraph[Integer] = TinkerGraph.open.asScala
 
       val v0 = g + (Software, Name → "blueprints" , Created → 2010)
       val v1 = g + (Software, Created → 2009, Name → "gremlin")

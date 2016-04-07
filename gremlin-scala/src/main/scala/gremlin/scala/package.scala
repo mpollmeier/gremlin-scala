@@ -23,10 +23,10 @@ package object scala {
   type Label = String
 
   implicit class GraphAsScala[G <: Graph](g: G) {
-    def asScala = ScalaGraph(g)
+    def asScala[IdType] = ScalaGraph[IdType](g)
   }
 
-  implicit class GraphAsJava(g: ScalaGraph) {
+  implicit class GraphAsJava[GraphIdType](g: ScalaGraph[GraphIdType]) {
     def asJava = g.graph
   }
 
@@ -71,7 +71,7 @@ package object scala {
 
   implicit def wrap(e: Edge): ScalaEdge = ScalaEdge(e)
 
-  implicit def wrap(g: Graph): ScalaGraph = ScalaGraph(g)
+  implicit def wrap[GraphIdType](g: Graph): ScalaGraph[GraphIdType] = ScalaGraph[GraphIdType](g)
 
   implicit def wrap[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
 

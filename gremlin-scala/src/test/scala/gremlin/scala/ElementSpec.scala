@@ -110,7 +110,7 @@ class ElementSpec extends TestBase {
     }
 
     it("adds a vertex with a given label with syntactic sugar") {
-      val graph = TinkerGraph.open.asScala
+      val graph: ScalaGraph[Integer] = TinkerGraph.open.asScala
       val label1 = "label1"
       val label2 = "label2"
 

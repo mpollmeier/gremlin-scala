@@ -8,7 +8,11 @@ import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
 
-case class ScalaGraph(graph: Graph) {
+// TODO: 
+// graph specific - e.g. Id[Integer] for Tinkergraph
+// case class Id[IdType](value: IdType)
+
+case class ScalaGraph[IdType](graph: Graph) {
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
 

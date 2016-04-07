@@ -22,7 +22,7 @@ import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.immutable
 
-case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
+case class GremlinScala[End, Labels <: HList, IdType](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
 
   def toList(): List[End] = traversal.toList.toList
@@ -44,18 +44,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // execute pipeline - applies all side effects
   def iterate() = {
     traversal.iterate()
-    GremlinScala[End, Labels](traversal)
+    GremlinScala[End, Labels, IdType](traversal)
   }
 
   def cap(sideEffectKey: String, sideEffectKeys: String*) =
-    GremlinScala[End, Labels](traversal.cap(sideEffectKey, sideEffectKeys: _*))
+    GremlinScala[End, Labels, IdType](traversal.cap(sideEffectKey, sideEffectKeys: _*))
 
   def cap[A](stepLabel: StepLabel[A]) =
-    GremlinScala[A, Labels](traversal.cap(stepLabel.name))
+    GremlinScala[A, Labels, IdType](traversal.cap(stepLabel.name))
 
-  def option[A](optionTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = {
+  def option[A](optionTraversal: GremlinScala[End, HNil, IdType] ⇒ GremlinScala[A, _, _]) = {
     val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
-    GremlinScala[End, Labels](traversal.option(t))
+    GremlinScala[End, Labels, IdType](traversal.option(t))
   }
 
   def option[A, M](pickToken: M, optionTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = {
