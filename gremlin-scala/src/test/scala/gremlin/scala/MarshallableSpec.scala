@@ -8,6 +8,7 @@ import shapeless.test.illTyped
 import GremlinPickler._
 
 case class CCSimple(s: String, i: Int)
+case class CCWithId(id: Option[Id[Int]], s: String) //id only set when adding to graph
 case class CCWithJavaTypes(i: Integer, l: JLong, d: JDouble)
 
 case class MyValueClass(value: Int) extends AnyVal
@@ -54,6 +55,24 @@ class MarshallableSpec extends WordSpec with Matchers {
       // v.valueMap should contain("d" → cc.d)
 
       // v.toCC_NEW[CCWithJavaTypes] shouldBe cc
+    }
+
+    "contain the vertex id" in new Fixture {
+
+      val cc = CCWithId(id = None, "some string")
+      val persisted = graph PLUS_NEW cc
+
+      val v = graph.V(persisted.id).head
+      println(v + " " + v.valueMap)
+
+      // TODO: replace CollectionsPickler with GremlinPickler everywhere - possible to have it in package object?
+      // import GremlinPickler._
+      val deserialised = v.toCC_NEW[CCWithId]
+      deserialised.s shouldBe cc.s
+      deserialised.id shouldBe Some(v.id)
+
+      // write(Id("id value")) shouldBe Map("__id" → "id value")
+      // read[Id[String]](Map("__id" → "id value")) shouldBe Id("id value")
     }
 
     "contain options" should {
