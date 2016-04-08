@@ -6,6 +6,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import shapeless.HNil
+import java.lang.{Long => JLong}
 import shapeless.test.illTyped
 import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.P
@@ -437,6 +438,29 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "repeat/until step" can {
+    "iterate until no moure outgoing edges" in new Fixture {
+      val traversal = graph.V(1)
+        .repeat(_.out)
+        .until(_.outE.count.is(JLong.valueOf(0)))
+        .path.by("name")
+
+      traversal.toSet.size shouldBe 4
+      // Set([marko, lop], [marko, vadas], [marko, josh, ripple], [marko, josh, lop])
+    }
+  }
+
+  "where step" can {
+    "limit results to find who's created more than one thing" in new Fixture {
+      val traversal =  graph.V.hasLabel(Person)
+        .where(_.outE(Created).count.is(P.gt(1)))
+
+      val results = traversal.toList
+      results.size shouldBe 1
+      results.head.value2(Name) shouldBe "josh"
+    }
+  }
+
   "steps to add things" can {
     "add an (unconnected) vertex for each path in the traversal" which {
       "has a label and properties" in new Fixture {
@@ -478,6 +502,7 @@ class TraversalSpec extends WordSpec with Matchers {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
     val Age = Key[Int]("age")
+    val Person = "person"
     val Created = "created"
   }
 }

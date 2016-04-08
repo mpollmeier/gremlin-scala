@@ -384,7 +384,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def repeat(repeatTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
     GremlinScala[End, Labels](traversal.repeat(repeatTraversal(start).traversal))
 
-  def until(untilTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) =
+  def until(untilTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.until(untilTraversal(start).traversal))
 
   def untilWithTraverser(predicate: Traverser[End] ⇒ Boolean) =
@@ -405,7 +405,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
 
-  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[Boolean, _]) =
+  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
 
   def addV() = GremlinScala[Vertex, Labels](traversal.addV())
