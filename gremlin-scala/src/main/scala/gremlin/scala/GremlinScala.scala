@@ -362,10 +362,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       fun(t): JCollection[String]
     })
 
-  def union[A](unionTraversals: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]*) = {
-    val mappedTraversals: Seq[GraphTraversal[_, A]] = unionTraversals.map(_.apply(start).traversal)
-    GremlinScala[A, Labels](traversal.union(mappedTraversals: _*))
-  }
+  private def asTraversals[S,E](trans: (GremlinScala[S, HNil] ⇒ GremlinScala[E, _])*) =
+    trans.map(_.apply(start).traversal)
+
+  def union[A](unionTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*) =
+    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals: _*): _*))
+
+  def coalesce[A](coalesceTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*): GremlinScala[A, Labels] =
+    GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
 
   def choose[A](
     predicate: End ⇒ Boolean,

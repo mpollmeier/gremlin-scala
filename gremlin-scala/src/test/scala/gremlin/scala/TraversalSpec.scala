@@ -1,6 +1,8 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.Order
+import org.apache.tinkerpop.gremlin.process.traversal.{Path, Order, P}
+import org.apache.tinkerpop.gremlin.process.traversal.step.util.ImmutablePath
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
@@ -409,6 +411,64 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "coalesce" should {
+    // Helper for testing path-based results
+    def path2String(path: Path) = path.objects().map(_.toString)
+
+    "evaluate traversals and return first with value" when {
+
+      "relationship is first" in new Fixture {
+        val traversal1 = graph.V(1)
+          .coalesce(
+            _.outE("knows"),
+            _.outE("created")
+          )
+          .inV()
+          .path().by("name").by(T.label)
+
+        traversal1.toList().map(path2String) shouldBe
+          Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
+      }
+
+      "created is first" in new Fixture {
+        val traversal2 = graph.V(1)
+          .coalesce(
+            _.outE("created"),
+            _.outE("knows")
+          )
+          .inV()
+          .path().by("name").by(T.label)
+
+        traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
+      }
+    }
+
+    "handle vertex-unique properties" in new Fixture {
+
+      // Add a new property on a specific vertex and test that it is picked up first.
+      graph.graph.V(1).property(Nickname, "okram").iterate()
+
+      val traversal3 = graph.V
+        .hasLabel("person")
+        .coalesce(
+          _.value(Nickname),
+          _.value(Name)
+        )
+
+      traversal3.toSet() shouldBe Set("okram", "vadas", "josh", "peter")
+    }
+
+    "allow constant as default" in new Fixture {
+      val traversal3 = graph.V
+        .coalesce(
+          _.value(Age).map(_.toString),
+          _.constant("ageless")
+        )
+
+      traversal3.toSet() shouldBe Set("35", "32", "27", "29", "ageless")
+    }
+  }
+
   "choose" should {
     "work for if/then/else semantics" in new Fixture {
 
@@ -501,6 +561,8 @@ class TraversalSpec extends WordSpec with Matchers {
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
+    val Nickname = Key[String]("nickname")
+    val Lang = Key[String]("lang")
     val Age = Key[Int]("age")
     val Person = "person"
     val Created = "created"
