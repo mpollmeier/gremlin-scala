@@ -10,9 +10,7 @@ import scala.collection.JavaConversions._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  import io.github.netvl.picopickle.backends.collections.CollectionsPickler
-  import CollectionsPickler._
-  def toCC_NEW[CC <: Product]()(implicit r: Reader[CC]): CC = {
+  def toCC_NEW[CC <: Product]()(implicit r: GremlinPickler.Reader[CC]): CC = {
     r.read(vertex.valueMap)
   }
 

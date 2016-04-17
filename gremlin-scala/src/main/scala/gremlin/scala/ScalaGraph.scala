@@ -43,11 +43,9 @@ case class ScalaGraph(graph: Graph) {
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
-  import io.github.netvl.picopickle.backends.collections.CollectionsPickler
-  import CollectionsPickler._
-  def PLUS_NEW[CC <: Product](cc: CC)(implicit w: Writer[CC]): Vertex = {
+  def PLUS_NEW[CC <: Product](cc: CC)(implicit w: GremlinPickler.Writer[CC]): Vertex = {
     // TODO: get rid of cast e.g. by using Writer.Aux
-    val map = write(cc).asInstanceOf[Map[String, Any]]
+    val map = GremlinPickler.write(cc).asInstanceOf[Map[String, Any]]
     // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
     val label: String = cc match {
       case a: WithLabel ⇒ a.label

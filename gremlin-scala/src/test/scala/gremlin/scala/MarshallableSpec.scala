@@ -1,10 +1,10 @@
 package gremlin.scala
 
-import io.github.netvl.picopickle.backends.collections.CollectionsPickler
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
 import shapeless.test.illTyped
+import GremlinPickler._
 
 case class CCSimple(s: String, i: Int)
 
@@ -37,7 +37,6 @@ class MarshallableSpec extends WordSpec with Matchers {
       v.valueMap should contain("s" → cc.s)
       v.valueMap should contain("i" → cc.i)
 
-      import CollectionsPickler._
       v.toCC_NEW[CCSimple] shouldBe cc
     }
 
@@ -49,7 +48,6 @@ class MarshallableSpec extends WordSpec with Matchers {
         val v = graph.V(persisted.id).head
         v.value[String]("s") shouldBe ccWithOptionSome.s.get
 
-        import CollectionsPickler._
         v.toCC_NEW[CCWithOption] shouldBe ccWithOptionSome
       }
 
@@ -60,7 +58,6 @@ class MarshallableSpec extends WordSpec with Matchers {
         val v = graph.V(persisted.id).head
         v.keys should not contain "s" //None should be mapped to `null`
 
-        import CollectionsPickler._
         v.toCC_NEW[CCWithOption] shouldBe ccWithOptionNone
       }
 
@@ -79,7 +76,6 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.valueMap should contain("s" → cc.s)
         v.valueMap should contain("i" → cc.i.value)
 
-        import CollectionsPickler._
         v.toCC_NEW[CCWithValueClass] shouldBe cc
       }
 
@@ -92,7 +88,6 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.valueMap should contain("s" → cc.s)
         v.valueMap should contain("i" → cc.i.get.value)
 
-        import CollectionsPickler._
         v.toCC_NEW[CCWithOptionValueClass] shouldBe cc
       }
 
@@ -105,7 +100,6 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.valueMap should contain("s" → cc.s)
         v.valueMap.keySet should not contain ("i")
 
-        import CollectionsPickler._
         v.toCC_NEW[CCWithOptionValueClass] shouldBe cc
       }
     }
@@ -134,7 +128,6 @@ class MarshallableSpec extends WordSpec with Matchers {
       v.label shouldBe "my custom label"
       v.valueMap should contain("i" → cc.i)
 
-      import CollectionsPickler._
       v.toCC_NEW[CCWithLabel] shouldBe cc
     }
 
