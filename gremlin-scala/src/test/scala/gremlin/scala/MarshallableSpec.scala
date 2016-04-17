@@ -3,10 +3,12 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
+import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
 import shapeless.test.illTyped
 import GremlinPickler._
 
 case class CCSimple(s: String, i: Int)
+case class CCWithJavaTypes(i: Integer, l: JLong, d: JDouble)
 
 case class MyValueClass(value: Int) extends AnyVal
 case class CCWithValueClass(s: String, i: MyValueClass)
@@ -38,6 +40,20 @@ class MarshallableSpec extends WordSpec with Matchers {
       v.valueMap should contain("i" → cc.i)
 
       v.toCC_NEW[CCSimple] shouldBe cc
+    }
+
+    "contain java types" ignore new Fixture {
+      val cc = CCWithJavaTypes(new Integer(12), new JLong(22l), new JDouble(3.3d))
+      // TODO: implement
+      // val persisted = graph PLUS_NEW cc
+
+      // val v = graph.V(persisted.id).head
+      // v.label shouldBe cc.getClass.getSimpleName
+      // v.valueMap should contain("i" → cc.i)
+      // v.valueMap should contain("l" → cc.l)
+      // v.valueMap should contain("d" → cc.d)
+
+      // v.toCC_NEW[CCWithJavaTypes] shouldBe cc
     }
 
     "contain options" should {
