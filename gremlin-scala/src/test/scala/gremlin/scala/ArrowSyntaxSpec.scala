@@ -27,18 +27,23 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
       paris.outE(Eurostar).value(Length).head shouldBe 100
     }
+
+    "has a label and multiple properties as Map " in new Fixture {
+      paris --- (Eurostar,properties) --> london
+      paris.out(Eurostar).head shouldBe london
+      paris.outE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.outE(Eurostar).value(Length).head shouldBe 100
+    }
   }
 
   "A <-- B creates an edge" which {
     "has a label" in new Fixture {
       paris <-- Eurostar --- london
-
       london.out(Eurostar).head shouldBe paris
     }
 
     "has a label and one property" in new Fixture {
       paris <-- (Eurostar, Name → "alpha") --- london
-
       paris.in(Eurostar).head shouldBe london
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
     }
@@ -50,6 +55,14 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
       paris.inE(Eurostar).value(Length).head shouldBe 100
     }
+
+ /*   "has a label and multiple properties as Map" in new Fixture {
+      paris <-- (Eurostar, properties) --- london
+
+      paris.in(Eurostar).head shouldBe london
+      paris.inE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.inE(Eurostar).value(Length).head shouldBe 100
+    }*/
   }
 
   "A <--> B create edges" which {
@@ -79,6 +92,17 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
       paris.inE(Eurostar).value(Length).head shouldBe 100
     }
+
+/*    "have labels and multiple properties as Map" in new Fixture {
+      paris <-- (Eurostar, properties) --> london
+
+      paris.out(Eurostar).head shouldBe london
+      paris.outE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.outE(Eurostar).value(Length).head shouldBe 100
+      paris.in(Eurostar).head shouldBe london
+      paris.inE(Eurostar).value(Name).head shouldBe "alpha"
+      paris.inE(Eurostar).value(Length).head shouldBe 100
+    }*/
   }
 
   // TODO: case class support
@@ -153,5 +177,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
 
     val Name = Key[String]("name")
     val Length = Key[Int]("length")
+
+    val properties: Map[String, Any] =List(("name" , "alpha"),( "length" , 100)).toMap
   }
 }
