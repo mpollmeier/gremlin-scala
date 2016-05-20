@@ -13,6 +13,13 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def toCC[CC <: Product: Marshallable] =
     implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
 
+  def updateWith[CC <: Product: Marshallable](update: CC) = {
+    val propMap = implicitly[Marshallable[CC]].fromCC(update).valueMap
+    propMap foreach {case (prop, value) => element.property(prop, value)}
+
+    vertex
+  }
+
   override def setProperty[A](key: Key[A], value: A): Vertex = {
     element.property(key.value, value)
     vertex

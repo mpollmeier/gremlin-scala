@@ -14,6 +14,7 @@ case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
+case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
 
 @label("label_a")
 case class CCWithLabel(s: String)
@@ -180,6 +181,18 @@ class MarshallableSpec extends WordSpec with Matchers {
     val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
     ccWithLabelVertices should have size 1
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
+  }
+
+  "update vertex via a case class" in new Fixture {
+    type CC = CCWithOptionIdNested
+    val ccInitial = CCWithOptionIdNested("string", None, MyValueClass(42))
+
+    val ccWithIdSet = (graph + ccInitial).toCC[CC]
+    val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
+
+    graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
+
+    graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
   }
 
   trait Fixture {
