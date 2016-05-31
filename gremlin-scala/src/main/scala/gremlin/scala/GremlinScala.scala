@@ -9,7 +9,7 @@ import collection.JavaConversions._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.process.traversal.step.util.BulkSet
+import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
@@ -395,6 +395,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.until(predicate))
 
   def times(maxLoops: Int) = GremlinScala[End, Labels](traversal.times(maxLoops))
+
+  def tree() = GremlinScala[Tree[_], Labels](traversal.tree())
 
   def tree(sideEffectKey: String) = GremlinScala[End, Labels](traversal.tree(sideEffectKey))
 

@@ -11,6 +11,7 @@ import shapeless.HNil
 import java.lang.{Long => JLong}
 import shapeless.test.illTyped
 import collection.JavaConversions._
+import collection.JavaConverters._
 import org.apache.tinkerpop.gremlin.process.traversal.P
 
 class TraversalSpec extends WordSpec with Matchers {
@@ -518,6 +519,37 @@ class TraversalSpec extends WordSpec with Matchers {
       val results = traversal.toList
       results.size shouldBe 1
       results.head.value2(Name) shouldBe "josh"
+    }
+  }
+
+  "tree step" can {
+    "generate a tree structure for a vertex" in {
+      val graph = TinkerGraph.open()
+      val vertices = (0 to 4).map(i => graph.addVertex(T.id, i.asInstanceOf[Integer]))
+      val edges = Seq(1 -> 2, 1 -> 3, 3 -> 4)
+        .map { case (from, to) => vertices(from).addEdge("knows", vertices(to)) }
+
+      val tree = graph.V(1).head.start()
+        .repeat(_.outE.inV).emit().tree().head
+
+      tree.keySet().asScala shouldBe Set(vertices(1))
+
+      val v1Edges = tree.values.asScala.head
+      v1Edges.keySet.asScala shouldBe Set(edges(0), edges(1))
+
+      val verticesUnderV1 = v1Edges.values.asScala.toSeq
+      verticesUnderV1.size shouldBe 2
+      verticesUnderV1(0).keySet.asScala shouldBe Set(vertices(2))
+      verticesUnderV1(0).values.asScala.head shouldBe empty
+      verticesUnderV1(1).keySet.asScala shouldBe Set(vertices(3))
+
+      val v3Edges = verticesUnderV1(1).values.asScala.head
+      v3Edges.keySet.asScala shouldBe Set(edges(2))
+
+      val verticesUnderV3 = v3Edges.values.asScala.toSeq
+      verticesUnderV3.size shouldBe 1
+      verticesUnderV3(0).keySet.asScala shouldBe Set(vertices(4))
+      verticesUnderV3(0).values.asScala.head shouldBe empty
     }
   }
 
