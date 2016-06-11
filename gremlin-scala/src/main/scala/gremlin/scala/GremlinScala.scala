@@ -63,6 +63,12 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.option(pickToken, t))
   }
 
+  def optional[A](optionalTraversal: Traversal[End, A]): GremlinScala[A, Labels] =
+    GremlinScala[A, Labels](traversal.optional(optionalTraversal))
+
+  def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
+    GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
+
   def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](
     traversal.filter(new JPredicate[Traverser[End]] {
       override def test(h: Traverser[End]): Boolean = p(h.get)
