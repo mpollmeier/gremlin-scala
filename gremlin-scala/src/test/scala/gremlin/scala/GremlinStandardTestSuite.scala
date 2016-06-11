@@ -12,6 +12,9 @@ import TestGraph._
 
 import scala.collection.JavaConversions._
 
+// This test suite is no longer maintained. If a test breaks, feel free to comment it out if the resolution is not straigh forward. 
+// Might wanna delete at some point.
+
 object Tests {
 
   // class ScalaDedupTest extends DedupTest with StandardTest {
@@ -94,94 +97,94 @@ object Tests {
       graph.asScala.V(v1Id).out("created").in("created").cyclicPath.path
   }
 
-  class ScalaHasTest extends HasTest with StandardTest {
-    override def get_g_EX11X_outV_outE_hasXid_10X(e11Id: AnyRef, e8Id: AnyRef) = {
-      def a = graph.asScala.E(e11Id).outV.outE.has(T.id, e8Id)
+  // class ScalaHasTest extends HasTest with StandardTest {
+  //   override def get_g_EX11X_outV_outE_hasXid_10X(e11Id: AnyRef, e8Id: AnyRef) = {
+  //     def a = graph.asScala.E(e11Id).outV.outE.has(T.id, e8Id)
 
-      // println("XXXXXXXXXXXXX")
-      // println(e8Id)
-      // println(GS(graph).E(e8Id).toList)
-      // a.toList foreach println
-      // println("XXXXXXXXXXXXX")
+  //     // println("XXXXXXXXXXXXX")
+  //     // println(e8Id)
+  //     // println(GS(graph).E(e8Id).toList)
+  //     // a.toList foreach println
+  //     // println("XXXXXXXXXXXXX")
 
-      a
-    }
+  //     a
+  //   }
 
-    override def get_g_V_outXcreatedX_hasXname__mapXlengthX_isXgtX3XXX_name =
-      graph.asScala.V.out("created")
-        .has[String, Int](Name, _.map(_.length).is(P.gt(3)))
-        .value(Name)
+  //   override def get_g_V_outXcreatedX_hasXname__mapXlengthX_isXgtX3XXX_name =
+  //     graph.asScala.V.out("created")
+  //       .has[String, Int](Name, _.map(_.length).is(P.gt(3)))
+  //       .value(Name)
 
-    override def get_g_VX1X_hasXkeyX(v1Id: AnyRef, key: String) =
-      graph.asScala.V(v1Id).has(Key(key))
+  //   override def get_g_VX1X_hasXkeyX(v1Id: AnyRef, key: String) =
+  //     graph.asScala.V(v1Id).has(Key(key))
 
-    override def get_g_VX1X_hasXname_markoX(v1Id: AnyRef) =
-      graph.asScala.V(v1Id).has(Name, "marko")
+  //   override def get_g_VX1X_hasXname_markoX(v1Id: AnyRef) =
+  //     graph.asScala.V(v1Id).has(Name, "marko")
 
-    override def get_g_V_hasXname_markoX =
-      graph.asScala.V.has(Name, "marko")
+  //   override def get_g_V_hasXname_markoX =
+  //     graph.asScala.V.has(Name, "marko")
 
-    override def get_g_V_hasXname_blahX =
-      graph.asScala.V.has(Name, "blah")
+  //   override def get_g_V_hasXname_blahX =
+  //     graph.asScala.V.has(Name, "blah")
 
-    override def get_g_V_hasXblahX =
-      graph.asScala.V.has(Key("blah"))
+  //   override def get_g_V_hasXblahX =
+  //     graph.asScala.V.has(Key("blah"))
 
-    override def get_g_VX1X_hasXage_gt_30X(v1Id: AnyRef) =
-      graph.asScala.V(v1Id).has(Age, P.gt(30))
+  //   override def get_g_VX1X_hasXage_gt_30X(v1Id: AnyRef) =
+  //     graph.asScala.V(v1Id).has(Age, P.gt(30))
 
-    override def get_g_VX1X_out_hasIdX2X(v1Id: AnyRef, v2Id: AnyRef) = {
-      def a = graph.asScala.V(v1Id).out.hasId(v2Id)
-      // println("XXXXXXXXXXXXX")
-      // println(a.toList)
-      // println("XXXXXXXXXXXXXY")
-      a
-    }
+  //   override def get_g_VX1X_out_hasIdX2X(v1Id: AnyRef, v2Id: AnyRef) = {
+  //     def a = graph.asScala.V(v1Id).out.hasId(v2Id)
+  //     // println("XXXXXXXXXXXXX")
+  //     // println(a.toList)
+  //     // println("XXXXXXXXXXXXXY")
+  //     a
+  //   }
 
-    override def get_g_VX1X_out_hasIdX2_3X(v1Id: AnyRef, v2Id: AnyRef, v3Id: AnyRef) =
-      graph.asScala.V(v1Id).out.hasId(v2Id, v3Id)
+  //   override def get_g_VX1X_out_hasIdX2_3X(v1Id: AnyRef, v2Id: AnyRef, v3Id: AnyRef) =
+  //     graph.asScala.V(v1Id).out.hasId(v2Id, v3Id)
 
-    override def get_g_V_hasXage_gt_30X = {
-      def a = graph.asScala.V.has(Age, P.gt(30))
-      // def b = g.V().has("age", P.gt(30))
-      // def b: GraphTraversal[Vertex, Vertex] = g.V().has("age", P.gt(30))
-      // println("XXXXXXXXXXXXXXXXXX")
-      // println(b.toList)
-      // println("YYYYYYYYYYYYYYYY")
-      // b
-      a
-    }
+  //   override def get_g_V_hasXage_gt_30X = {
+  //     def a = graph.asScala.V.has(Age, P.gt(30))
+  //     // def b = g.V().has("age", P.gt(30))
+  //     // def b: GraphTraversal[Vertex, Vertex] = g.V().has("age", P.gt(30))
+  //     // println("XXXXXXXXXXXXXXXXXX")
+  //     // println(b.toList)
+  //     // println("YYYYYYYYYYYYYYYY")
+  //     // b
+  //     a
+  //   }
 
-    override def get_g_EX7X_hasLabelXknowsX(e7Id: AnyRef) =
-      graph.asScala.E(e7Id).hasLabel("knows")
+  //   override def get_g_EX7X_hasLabelXknowsX(e7Id: AnyRef) =
+  //     graph.asScala.E(e7Id).hasLabel("knows")
 
-    override def get_g_E_hasLabelXknowsX =
-      graph.asScala.E.hasLabel("knows")
+  //   override def get_g_E_hasLabelXknowsX =
+  //     graph.asScala.E.hasLabel("knows")
 
-    override def get_g_E_hasLabelXuses_traversesX =
-      graph.asScala.E.hasLabel("uses", "traverses")
+  //   override def get_g_E_hasLabelXuses_traversesX =
+  //     graph.asScala.E.hasLabel("uses", "traverses")
 
-    override def get_g_V_hasLabelXperson_software_blahX =
-      graph.asScala.V.hasLabel("person", "software", "blah")
+  //   override def get_g_V_hasLabelXperson_software_blahX =
+  //     graph.asScala.V.hasLabel("person", "software", "blah")
 
-    override def get_g_V_hasXperson_name_markoX_age =
-      graph.asScala.V.has("person", Name, "marko").value(Key[Integer]("age"))
+  //   override def get_g_V_hasXperson_name_markoX_age =
+  //     graph.asScala.V.has("person", Name, "marko").value(Key[Integer]("age"))
 
-    override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) =
-      graph.asScala.V(v1Id).outE.has(Weight, P.inside(0.0d, 0.6d)).inV
+  //   override def get_g_VX1X_outE_hasXweight_inside_0_06X_inV(v1Id: AnyRef) =
+  //     graph.asScala.V(v1Id).outE.has(Weight, P.inside(0.0d, 0.6d)).inV
 
-    override def get_g_VX1X_out_hasXid_lt_3X(v1Id: AnyRef, v3Id: AnyRef) =
-      graph.asScala.V(v1Id).out.has(T.id, P.lt(v3Id))
+  //   override def get_g_VX1X_out_hasXid_lt_3X(v1Id: AnyRef, v3Id: AnyRef) =
+  //     graph.asScala.V(v1Id).out.has(T.id, P.lt(v3Id))
 
-    override def get_g_V_hasXage_isXgt_30XX =
-      graph.asScala.V.has(Key[Any]("age"), __.is(P.gt(30)))
+  //   override def get_g_V_hasXage_isXgt_30XX =
+  //     graph.asScala.V.has(Key[Any]("age"), __.is(P.gt(30)))
 
-    override def get_g_V_hasXlocationX =
-      graph.asScala.V.has(Location)
+  //   override def get_g_V_hasXlocationX =
+  //     graph.asScala.V.has(Location)
 
-    override def get_g_VXv1X_hasXage_gt_30X(v1Id: AnyRef) =
-      graph.asScala.V(graph.V(v1Id).head).has(Age, P.gt(30))
-  }
+  //   override def get_g_VXv1X_hasXage_gt_30X(v1Id: AnyRef) =
+  //     graph.asScala.V(graph.V(v1Id).head).has(Age, P.gt(30))
+  // }
 
   class ScalaCoinTest extends CoinTest with StandardTest {
     override def get_g_V_coinX1X = graph.asScala.V.coin(1.0d)

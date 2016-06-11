@@ -280,7 +280,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // https://groups.google.com/forum/#!topic/gremlin-users/5wXSizpqRxw
   def groupCount(sideEffectKey: String) = GremlinScala[End, Labels](traversal.groupCount(sideEffectKey))
 
-  def profile() = GremlinScala[End, Labels](traversal.profile)
+  def profile(sideEffectKey: String) = GremlinScala[End, Labels](traversal.profile(sideEffectKey))
 
   def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
 
@@ -291,18 +291,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by() = GremlinScala[End, Labels](traversal.by())
 
+  def by(comparator: Comparator[End]): GremlinScala[End, Labels] = GremlinScala[End, Labels](traversal.by(comparator))
+
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
-  def by[A](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
+  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
-      traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[Element, A]], comparator)
+      traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[_, AnyRef]] , comparator)
     )
 
   def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
 
   def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
 
-  def by(elementPropertyKey: String, order: Order) = GremlinScala[End, Labels](traversal.by(elementPropertyKey, order))
+  def by[A](elementPropertyKey: String, comparator: Comparator[A]) = GremlinScala[End, Labels](traversal.by(elementPropertyKey, comparator))
 
   def by(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
@@ -311,23 +313,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
         else 0
     }))
 
-  //TODO: rename to by (without P)
-  // type A is when the element property resolves to
-  // e.g. if the property "name" resolves to a String you gotta supply [String] there...
-  def byP[A](elementPropertyKey: String, lessThan: (A, A) ⇒ Boolean) =
-    GremlinScala[End, Labels](traversal.by(elementPropertyKey, new Comparator[A]() {
-      override def compare(a: A, b: A) =
-        if (lessThan(a, b)) -1
-        else 0
-    }))
-
   // provide arbitrary Traversal, e.g. by using `__.outE`
   // can't help much with the types as `by` can be used to address previously labelled steps, not just the last one
   def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
 
-  def by(byTraversal: Traversal[_, _], order: Order) = GremlinScala[End, Labels](traversal.by(byTraversal, order))
-
-  def by(order: Order) = GremlinScala[End, Labels](traversal.by(order))
+  def by[A](byTraversal: Traversal[_, A], comparator: Comparator[A]) = GremlinScala[End, Labels](traversal.by(byTraversal, comparator))
 
   def `match`[A](traversals: Traversal[End, _]*) =
     GremlinScala[JMap[String, A], Labels](
