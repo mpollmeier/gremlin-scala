@@ -553,6 +553,22 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "optional step" which {
+    "returns identity if optional traversal doesn't find anything" in new Fixture {
+      // vadas does not have an out "know" edge so vadas is returned
+      val results = graph.V(2).optional(_.out("knows")).toList
+      results should have size 1
+      results.head.value2(Name) shouldBe "vadas"
+    }
+
+    "returns result of optional traversal if it has one" in new Fixture {
+      // vadas does have an in "knows" edge so marko is returned.
+      val results = graph.V(2).optional(_.in("knows")).toList
+      results should have size 1
+      results.head.value2(Name) shouldBe "marko"
+    }
+  }
+
   "steps to add things" can {
     "add an (unconnected) vertex for each path in the traversal" which {
       "has a label and properties" in new Fixture {
@@ -589,6 +605,7 @@ class TraversalSpec extends WordSpec with Matchers {
       }
     }
   }
+
 
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala

@@ -63,8 +63,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.option(pickToken, t))
   }
 
-  def optional[A](optionalTraversal: Traversal[End, A]): GremlinScala[A, Labels] =
-    GremlinScala[A, Labels](traversal.optional(optionalTraversal))
+  def optional(optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) = {
+    val t = optionalTraversal(start).traversal
+    GremlinScala[End, Labels](traversal.optional(t))
+  }
 
   def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
