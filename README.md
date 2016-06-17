@@ -192,6 +192,9 @@ object Main {
 
   // find all vertices with the label of the case class `Example`
   graph.V.hasLabel[Example]
+  
+  // modify the vertex like a case class
+  v.updateAs[Example](_.copy(longValue = 0L))
 }
 ```
 
