@@ -20,6 +20,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex
   }
 
+  def updateAs[CC <: Product: Marshallable](f: CC => CC): Vertex = updateWith(f(toCC[CC]))
+
   override def setProperty[A](key: Key[A], value: A): Vertex = {
     element.property(key.value, value)
     vertex
