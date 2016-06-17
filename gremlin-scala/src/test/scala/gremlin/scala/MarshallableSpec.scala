@@ -183,26 +183,49 @@ class MarshallableSpec extends WordSpec with Matchers {
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
   }
 
-  "update vertex using a case-class template" in new CCUpdateFixture {
-    graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
-    graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+  "edge" should {
+    "update using a case-class template" in new CCEdgeUpdateFixture {
+      graph.E(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
+
+    "update as a case class" in new CCEdgeUpdateFixture {
+      graph.E(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
   }
 
-  "update vertex as a case class" in new CCUpdateFixture {
-    graph.V(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
-    graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+  "vertex" should {
+    "update using a case-class template" in new CCVertexUpdateFixture {
+      graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
+
+    "update as a case class" in new CCVertexUpdateFixture {
+      graph.V(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
   }
 
   trait Fixture {
     val graph = TinkerGraph.open.asScala
   }
 
-  trait CCUpdateFixture extends Fixture {
+  trait CCUpdateFixture[E <: Element] extends Fixture {
     type CC = CCWithOptionIdNested
     val ccInitial = CCWithOptionIdNested("string", None, MyValueClass(42))
 
+    def ccWithIdSet: CC
+    lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
+  }
+
+  trait CCVertexUpdateFixture extends CCUpdateFixture[Vertex] {
     val ccWithIdSet = (graph + ccInitial).toCC[CC]
-    val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
+  }
+
+  trait CCEdgeUpdateFixture extends CCUpdateFixture[Edge] {
+    private val testVertex = graph + "Huh"
+    val ccWithIdSet = testVertex.addEdge(testVertex, ccInitial).toCC[CC]
   }
 
   "can't persist a none product type (none case class or tuple)" in {

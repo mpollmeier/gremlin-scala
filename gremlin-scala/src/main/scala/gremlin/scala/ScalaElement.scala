@@ -52,4 +52,15 @@ trait ScalaElement[ElementType <: Element] {
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
     (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap
 
+  def toCC[CC <: Product: Marshallable]: CC
+
+  def updateWith[CC <: Product: Marshallable](update: CC): ElementType = {
+    val propMap = implicitly[Marshallable[CC]].fromCC(update).valueMap
+    propMap foreach {case (prop, value) => element.property(prop, value)}
+
+    element
+  }
+
+  def updateAs[CC <: Product: Marshallable](f: CC => CC): ElementType = updateWith(f(toCC[CC]))
+
 }
