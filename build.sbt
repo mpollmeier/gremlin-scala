@@ -12,7 +12,7 @@ val commonSettings = Seq(
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
 
   libraryDependencies <++= scalaVersion { scalaVersion =>
-    val gremlinVersion = "3.2.0-incubating"
+    val gremlinVersion = "3.2.1"
     Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
       "org.scala-lang" % "scala-reflect" % scalaVersion,

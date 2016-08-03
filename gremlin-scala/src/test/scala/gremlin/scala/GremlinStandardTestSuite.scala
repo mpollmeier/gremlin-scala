@@ -475,6 +475,10 @@ object Tests {
 
     override def get_g_V_out_aggregateXaX_path =
       graph.asScala.V.out.aggregate("a").path
+
+    override def get_g_V_hasLabelXpersonX_aggregateXxX_byXageX_capXxX_asXyX_selectXyX() =
+      graph.asScala.V.hasLabel("person").aggregate("x").by("age").cap("x").as("y").select("y")
+        .asInstanceOf[GremlinScala[JCollection[Integer], _]]
   }
 
   class ScalaCountTest extends CountTest with StandardTest {
