@@ -1,27 +1,27 @@
 name := "root"
-organization := "com.michaelpollmeier"
+val org = "com.michaelpollmeier"
+organization := org
 publishArtifact := false
 
-scalaVersion := "2.11.8"
+val scalaV = "2.11.8"
+scalaVersion := scalaV
 
 val commonSettings = Seq(
-  organization := "com.michaelpollmeier",
+  organization := org,
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
-  scalaVersion := "2.11.8",
+  scalaVersion := scalaV,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
 
   libraryDependencies <++= scalaVersion { scalaVersion =>
-    val gremlinVersion = "3.2.1"
+    val gremlinVersion = "3.2.2"
     Seq(
-      "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion exclude("org.slf4j", "slf4j-log4j12"),
+      "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion,
-      "com.novocode" % "junit-interface" % "0.11" % "test->default",
-      "com.chuusai" %% "shapeless" % "2.3.1",
+      "com.chuusai" %% "shapeless" % "2.3.2",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5", //just specified to eliminate sbt warnings
-      "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test exclude("org.slf4j", "slf4j-log4j12"),
+      "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "junit" % "junit" % "4.12" % Test,
       "org.scalatest" %% "scalatest" % "2.2.6" % Test
     )
   },

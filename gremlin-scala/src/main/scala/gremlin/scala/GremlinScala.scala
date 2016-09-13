@@ -479,11 +479,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def has[A](label: String, key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.has(label, key.value, predicate))
 
-  def hasId(ids: AnyRef*)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.hasId(ids: _*))
+  def hasId(id: AnyRef, ids: AnyRef*)(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.hasId(id, ids: _*))
 
-  def hasLabel(labels: String*)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.hasLabel(labels: _*))
+  def hasLabel(label: String, labels: String*)(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.hasLabel(label, labels: _*))
 
   def hasLabel[CC <: Product: ru.WeakTypeTag]()(implicit ev: End <:< Element): GremlinScala[End, Labels] = {
     val tpe = implicitly[ru.WeakTypeTag[CC]].tpe
@@ -506,9 +506,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     hasLabel(label)
   }
 
-  def hasKey(keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(keys.map(_.value): _*))
+  def hasKey(key: Key[_], keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(key.value, keys.map(_.value): _*))
 
-  def hasValue(values: String*) = GremlinScala[End, Labels](traversal.hasValue(values: _*))
+  def hasValue(value: String, values: String*) = GremlinScala[End, Labels](traversal.hasValue(value, values: _*))
 
   def hasNot(key: Key[_]) = GremlinScala[End, Labels](traversal.hasNot(key.value))
 
