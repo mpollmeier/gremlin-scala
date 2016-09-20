@@ -220,9 +220,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // keeps element on a probabilistic base - probability range: 0.0 (keep none) - 1.0 - keep all 
   def coin(probability: Double) = GremlinScala[End, Labels](traversal.coin(probability))
 
-  def range(low: Int, high: Int) = GremlinScala[End, Labels](traversal.range(low, high))
+  def range(low: Long, high: Long) = GremlinScala[End, Labels](traversal.range(low, high))
 
-  def range(scope: Scope, low: Int, high: Int) =
+  def range(scope: Scope, low: Long, high: Long) =
     GremlinScala[End, Labels](traversal.range(scope, low, high))
 
   def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
