@@ -4,7 +4,8 @@ organization := org
 publishArtifact := false
 
 // val scalaV = "2.11.8"
-val scalaV = "2.12.0"
+// val scalaV = "2.12.0"
+val scalaV = "2.12.0-RC2"
 scalaVersion := scalaV
 // crossScalaVersions := Seq("2.11.8", "2.12.0")
 
