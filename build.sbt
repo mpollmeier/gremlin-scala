@@ -22,7 +22,7 @@ val commonSettings = Seq(
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5", //just specified to eliminate sbt warnings
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "org.scalatest" %% "scalatest" % "2.2.6" % Test
+      "org.scalatest" %% "scalatest" % "3.0.0" % Test
     )
   },
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
