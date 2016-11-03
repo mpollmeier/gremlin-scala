@@ -3,6 +3,8 @@ val org = "com.michaelpollmeier"
 organization := org
 publishArtifact := false
 
+val gremlinVersion = "3.2.3"
+
 val defaultScalaV = "2.12.0"
 scalaVersion := defaultScalaV // if not using crossScalaVersions, i.e. prefixing sbt command with `+`
 crossScalaVersions := Seq("2.11.8", defaultScalaV)
@@ -13,18 +15,15 @@ val commonSettings = Seq(
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   scalaVersion := defaultScalaV,
-  libraryDependencies <++= scalaVersion { scalaVersion =>
-    val gremlinVersion = "3.2.3"
-    Seq(
+  libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion,
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "com.chuusai" %% "shapeless" % "2.3.2",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5", //just specified to eliminate sbt warnings
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
       "org.scalatest" %% "scalatest" % "3.0.0" % Test
-    )
-  },
+  ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
   scalacOptions ++= Seq(
     "-Xlint"
@@ -34,7 +33,6 @@ val commonSettings = Seq(
     // , "-Xlog-implicits"
     //"-Ydebug"
   ),
-  // testOptions in Test += Tests.Argument("-oF"), // full stack traces
   incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
   publishTo := {
     val sonatype = "https://oss.sonatype.org/"
