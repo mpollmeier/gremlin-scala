@@ -3,13 +3,16 @@ val org = "com.michaelpollmeier"
 organization := org
 publishArtifact := false
 
-crossScalaVersions := Seq("2.11.8", "2.12.0-RC2")
+val defaultScalaV = "2.12.0"
+scalaVersion := defaultScalaV // if not using crossScalaVersions, i.e. prefixing sbt command with `+`
+crossScalaVersions := Seq("2.11.8", defaultScalaV)
 
 val commonSettings = Seq(
   organization := org,
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  scalaVersion := defaultScalaV,
   libraryDependencies <++= scalaVersion { scalaVersion =>
     val gremlinVersion = "3.2.3"
     Seq(
