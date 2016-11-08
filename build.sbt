@@ -8,6 +8,7 @@ val gremlinVersion = "3.2.3"
 val defaultScalaV = "2.12.0"
 scalaVersion := defaultScalaV // if not using crossScalaVersions, i.e. prefixing sbt command with `+`
 crossScalaVersions := Seq("2.11.8", defaultScalaV)
+releaseCrossBuild := true
 
 val commonSettings = Seq(
   organization := org,
