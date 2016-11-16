@@ -5,6 +5,7 @@ import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
+import scala.meta.serialiser.ToMap
 
 object ScalaGraph {
   def apply(graph: Graph): ScalaGraph =
@@ -50,7 +51,28 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
+  /* Save an entity's values into a new vertex */
+  def addVertex[Entity: ToMap](entity: Entity): Vertex = {
+    val toMap = implicitly[ToMap[Entity]]
+    val valueMap: Map[String, Any] = toMap.apply(entity)
+    /* TODO: allow to provide id */
+    // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
+
+    // val label = toMap.params.getOrElse("_label", entity.getClass.getSimpleName)
+    // val x = toMap.pa
+    // Entity.params
+    val label = entity.getClass.getSimpleName
+    val labelParam = Seq(T.label, label)
+
+    val properties = valueMap.filter(_._2 != null) // null values don't matter when adding a vertex
+      .toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+
+    graph.addVertex(labelParam ++ properties: _*)
+  }
+
   def +[CC <: Product: Marshallable](cc: CC): Vertex = addVertex(cc)
+  /* TODO: rename to + */
+  def +-[Entity: ToMap](entity: Entity): Vertex = addVertex(entity)
 
   def +(label: String): Vertex = addVertex(label)
 
