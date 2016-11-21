@@ -67,11 +67,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
-  def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): ScalaEdge = {
+  def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
     val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
-    vertex.addEdge(label, inVertex.vertex, idParam ++ params: _*)
+    vertex.addEdge(fromCC.label, inVertex.vertex, idParam ++ params: _*)
   }
 
   def <--(se: SemiEdge): Edge = se.from.asScala.addEdge(se.label, vertex, se.properties)

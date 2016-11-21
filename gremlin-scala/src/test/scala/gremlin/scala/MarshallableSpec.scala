@@ -183,6 +183,40 @@ class MarshallableSpec extends WordSpec with Matchers {
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
   }
 
+  "add edges using case-class" which {
+    "have no id-annotation" in new CCEdgeAddFixture {
+      val ccEdgeWithLabelInitial = CCWithLabel("edge-property")
+
+      ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithLabelInitial).toCC[CCWithLabel]
+
+      val ccEdgesWithLabel = graph.E.hasLabel[CCWithLabel].toList
+      ccEdgesWithLabel should have size 1
+      ccEdgesWithLabel.head.toCC[CCWithLabel] shouldBe ccEdgeWithLabelInitial
+    }
+
+    "have id-annotation None" in new CCEdgeAddFixture {
+      val ccEdgeWithOptionIdNoneInitial = CCWithOptionId("edge-property", None)
+
+      val ccEdgeWithOptionIdNone = ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithOptionIdNoneInitial).toCC[CCWithOptionId]
+      ccEdgeWithOptionIdNone.id should not be empty
+
+      val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
+      ccEdgesWithOptionIdNone should have size 1
+      ccEdgesWithOptionIdNone.head.toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
+    }
+
+    "have id-annotation Some(123)" in new CCEdgeAddFixture {
+      val ccEdgeWithOptionIdSomeInitial = CCWithOptionId("edge-property", Some(123))
+
+      val ccEdgeWithOptionIdSome = ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithOptionIdSomeInitial).toCC[CCWithOptionId]
+      ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
+
+      val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
+      ccEdgesWithOptionIdSome should have size 1
+      ccEdgesWithOptionIdSome.head.toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
+    }
+  }
+
   "edge" should {
     "update using a case-class template" in new CCEdgeUpdateFixture {
       graph.E(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
@@ -221,6 +255,11 @@ class MarshallableSpec extends WordSpec with Matchers {
 
   trait CCVertexUpdateFixture extends CCUpdateFixture[Vertex] {
     val ccWithIdSet = (graph + ccInitial).toCC[CC]
+  }
+
+  trait CCEdgeAddFixture extends Fixture {
+    val ccVertexFrom = graph + "fromLabel"
+    val ccVertexTo = graph + "toLabel"
   }
 
   trait CCEdgeUpdateFixture extends CCUpdateFixture[Edge] {
