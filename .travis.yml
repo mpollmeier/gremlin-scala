@@ -3,7 +3,8 @@ after_script:
 - if [[ $TRAVIS_TEST_RESULT == 0 && "$TRAVIS_BRANCH" == "master" ]]; then sbt 'set credentials += Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", System.getenv("SONATYPE_USER"), System.getenv("SONATYPE_PASS"))' +publish;
   fi
 scala:
-- 2.11.7
+- 2.11.8
+- 2.12.0-RC2
 jdk:
 - oraclejdk8
 env:
