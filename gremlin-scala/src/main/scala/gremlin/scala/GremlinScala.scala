@@ -6,6 +6,7 @@ import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JColl
 import java.util.stream.{Stream ⇒ JStream}
 
 import collection.JavaConversions._
+import collection.JavaConverters._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -20,7 +21,7 @@ import shapeless.syntax.std.product.productOps
 import scala.language.existentials
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
@@ -30,6 +31,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A,B] = toList.toMap
 
   def toSet(): Set[End] = traversal.toList.toSet
+
+  def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
   // unsafe! this will throw a runtime exception if there is no element. better use `headOption`
   def head(): End = toList.head
