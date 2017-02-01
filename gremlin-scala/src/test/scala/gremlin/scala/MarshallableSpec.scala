@@ -241,6 +241,16 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
   }
 
+  "marshals a the end step of a traversal" in new Fixture {
+    val cc1 = CCSimple("text one", 1)
+    val cc2 = CCSimple("text two", 2)
+    graph + cc1
+    graph + cc2
+
+    val results: Set[CCSimple] = graph.V.toCC[CCSimple].toSet
+    results shouldBe Set(cc1, cc2)
+  }
+
   trait Fixture {
     val graph = TinkerGraph.open.asScala
   }
