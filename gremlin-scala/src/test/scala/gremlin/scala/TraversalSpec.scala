@@ -13,6 +13,7 @@ import shapeless.test.illTyped
 import collection.JavaConversions._
 import collection.JavaConverters._
 import org.apache.tinkerpop.gremlin.process.traversal.P
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -604,6 +605,20 @@ class TraversalSpec extends WordSpec with Matchers {
         graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
     }
+  }
+
+  "time limit is honored" ignore new Fixture {
+    val maxTime = FiniteDuration(50, MILLISECONDS)
+    val start = System.currentTimeMillis
+
+    graph.V(1)
+      .timeLimit(maxTime)
+      .repeat {_.sideEffect { _ => Thread.sleep(10) }}
+      .times(10)
+      .toList
+
+    val duration = System.currentTimeMillis - start
+    duration should be <= maxTime.toMillis
   }
 
 
