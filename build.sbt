@@ -5,7 +5,7 @@ publishArtifact := false
 
 val gremlinVersion = "3.2.3"
 
-val defaultScalaV = "2.12.0"
+val defaultScalaV = "2.12.1"
 scalaVersion := defaultScalaV // if not using crossScalaVersions, i.e. prefixing sbt command with `+`
 crossScalaVersions := Seq("2.11.8", defaultScalaV)
 releaseCrossBuild := true
@@ -20,10 +20,10 @@ val commonSettings = Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "com.chuusai" %% "shapeless" % "2.3.2",
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.5", //just specified to eliminate sbt warnings
+      "org.scala-lang.modules" %% "scala-xml" % "1.0.6", //just specified to eliminate sbt warnings
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "org.scalatest" %% "scalatest" % "3.0.0" % Test
+      "org.scalatest" %% "scalatest" % "3.0.1" % Test
   ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
   scalacOptions ++= Seq(
