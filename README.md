@@ -18,17 +18,14 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`. The latest version is displayed at the top of this readme in the maven badge. 
 
 ### Using the sbt console
-* tl;dr: `sbt gremlin-scala/console`
-* start `sbt` in the root project
+* `sbt gremlin-scala/test:console`
 ```
-> projects
-[info]     gremlin-scala
-[info]     macros
-[info]   * root
->
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+val g = TinkerFactory.createModern.asScala
+g.V.hasLabel("person").value[String]("name").toList
+// List(marko, vadas, josh, peter)
 ```
-* Next, change to the gremlin-scala project using `project gremlin-scala`
-* Finally, to test out the API in a REPL type `console` 
 
 ### Simple traversals
 
