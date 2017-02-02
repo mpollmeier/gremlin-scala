@@ -81,6 +81,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     })
   )
 
+  def withFilter(p: End ⇒ Boolean) = filter(p) //used in scala for comprehensions
+
   def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](
     traversal.filter(new JPredicate[Traverser[End]] {
     override def test(h: Traverser[End]): Boolean = p(h)
