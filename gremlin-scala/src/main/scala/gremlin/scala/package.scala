@@ -97,14 +97,14 @@ package object scala {
     /**
       * Load a vertex values into a case class
       */
-    def toCC[CC <: Product: Marshallable] = gs map (_.toCC[CC])
+    def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
       * Load a edge values into a case class
       */
-    def toCC[CC <: Product: Marshallable] = gs map (_.toCC[CC])
+    def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
   }
 
   // Arrow syntax implicits

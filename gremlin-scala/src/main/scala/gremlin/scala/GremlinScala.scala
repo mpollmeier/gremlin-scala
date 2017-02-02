@@ -18,6 +18,7 @@ import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
 import shapeless.syntax.std.product.productOps
+import scala.concurrent.duration.FiniteDuration
 import scala.language.existentials
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
@@ -79,6 +80,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       override def test(h: Traverser[End]): Boolean = p(h.get)
     })
   )
+
+  def withFilter(p: End ⇒ Boolean) = filter(p) //used in scala for comprehensions
 
   def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](
     traversal.filter(new JPredicate[Traverser[End]] {
@@ -231,6 +234,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
 
   def limit(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.limit(scope, limit))
+
+  def timeLimit(limit: FiniteDuration) = GremlinScala[End, Labels](traversal.timeLimit(limit.toMillis))
 
   def tail() = GremlinScala[End, Labels](traversal.tail())
 
