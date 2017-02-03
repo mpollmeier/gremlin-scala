@@ -29,6 +29,11 @@ case class ComplexCC(
     nested: NestedClass
 ) { def randomDef = ??? }
 
+@label("with_underlying")
+case class CCWithUnderlyingVertex(
+  @underlying underlying: Option[Vertex],
+  s: String)
+
 case class NestedClass(s: String)
 
 class NoneCaseClass(s: String)
@@ -114,9 +119,9 @@ class MarshallableSpec extends WordSpec with Matchers {
         def fromCC(cc: CCWithOption) =
           FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
-        def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
-          CCWithOption(i = valueMap("i").asInstanceOf[Int],
-                       s = valueMap.get("s").asInstanceOf[Option[String]])
+        def toCC(element: Element): CCWithOption = ???
+          // CCWithOption(i = valueMap("i").asInstanceOf[Int],
+          //              s = valueMap.get("s").asInstanceOf[Option[String]])
       }
 
       val v = graph.+(ccWithOptionNone)(marshaller)
@@ -154,6 +159,20 @@ class MarshallableSpec extends WordSpec with Matchers {
       val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" -> cc.s)
+    }
+
+    "have @underlying vertex" in new Fixture {
+      val cc = CCWithUnderlyingVertex(
+        underlying = None, //not known yet, not part of graph yet
+        "some string"
+      )
+
+      val vertex = graph + cc
+      val ccFromVertex = vertex.toCC[CCWithUnderlyingVertex]
+      ccFromVertex.s shouldBe cc.s
+      ccFromVertex.underlying shouldBe 'defined
+
+      graph.V(ccFromVertex.underlying.get.id).value[String]("s").head shouldBe cc.s
     }
 
   }

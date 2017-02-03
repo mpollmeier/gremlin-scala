@@ -33,7 +33,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   def toCC[CC <: Product: Marshallable] =
-    implicitly[Marshallable[CC]].toCC(edge.id, edge.valueMap)
+    implicitly[Marshallable[CC]].toCC(edge)
 
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
     edge.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream

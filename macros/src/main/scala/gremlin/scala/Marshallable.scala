@@ -1,6 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.structure.Graph.Hidden
+import org.apache.tinkerpop.gremlin.structure.Element
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
@@ -11,7 +12,7 @@ trait Marshallable[CC <: Product] {
   case class FromCC(id: Option[Id], label: Label, valueMap: ValueMap)
 
   def fromCC(cc: CC): FromCC
-  def toCC(id: Id, valueMap: ValueMap): CC
+  def toCC(element: Element): CC
 }
 
 object Marshallable {
@@ -133,7 +134,7 @@ object Marshallable {
       q"""
       new gremlin.scala.Marshallable[$tpe] {
         def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))
-        def toCC(id: AnyRef, valueMap: Map[String, Any]): $tpe = $companion(..$toCCParams)
+        def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
     """
     }
