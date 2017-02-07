@@ -48,7 +48,7 @@ case class ScalaGraph(graph: Graph) {
   def +(label: String): Vertex = addVertex(label)
 
   def +(label: String, properties: KeyValue[_]*): Vertex =
-    addVertex(label, properties.map(v ⇒ (v.key.value, v.value)).toMap )
+    addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap )
 
   // start traversal with all vertices 
   def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])

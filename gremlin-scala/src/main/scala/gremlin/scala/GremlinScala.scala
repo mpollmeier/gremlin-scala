@@ -427,7 +427,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // -------------------
 
   def property[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.property(key.value, value))
+    GremlinScala[End, Labels](traversal.property(key.name, value))
 
   def properties(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[Property[Any], Labels](traversal.properties(keys: _*)
@@ -439,13 +439,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def key()(implicit ev: End <:< Element) = GremlinScala[String, Labels](traversal.key)
 
   def value[A](key: Key[A])(implicit ev: End <:< Element) =
-    GremlinScala[A, Labels](traversal.values[A](key.value))
+    GremlinScala[A, Labels](traversal.values[A](key.name))
 
   def value[A](key: String)(implicit ev: End <:< Element) =
     GremlinScala[A, Labels](traversal.values[A](key))
 
   def valueOption[A](key: Key[A])(implicit ev: End <:< Element): GremlinScala[Option[A], Labels] =
-    this.properties(key.value).map(_.toOption.asInstanceOf[Option[A]])
+    this.properties(key.name).map(_.toOption.asInstanceOf[Option[A]])
 
   def valueOption[A](key: String)(implicit ev: End <:< Element): GremlinScala[Option[A], Labels] =
     this.properties(key).map(_.toOption.asInstanceOf[Option[A]])
@@ -457,19 +457,19 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap(keys: _*))
 
   def has(key: Key[_])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(key.value))
+    GremlinScala[End, Labels](traversal.has(key.name))
 
   def has[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(key.value, value))
+    GremlinScala[End, Labels](traversal.has(key.name, value))
 
-  def has[A](p: KeyValue[A])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(p.key.value, p.value))
+  def has[A](keyValue: KeyValue[A])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.has(keyValue.key.name, keyValue.value))
 
   def has[A](p: (Key[A], A))(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(p._1.value, p._2))
+    GremlinScala[End, Labels](traversal.has(p._1.name, p._2))
 
   def has[A](key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(key.value, predicate))
+    GremlinScala[End, Labels](traversal.has(key.name, predicate))
 
   def has(accessor: T, value: Any)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.has(accessor, value))
@@ -479,13 +479,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   // A: type of the property value
   def has[A, B](key: Key[A], propertyTraversal: GremlinScala[A, HNil] ⇒ GremlinScala[B, _])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(key.value, propertyTraversal(start).traversal))
+    GremlinScala[End, Labels](traversal.has(key.name, propertyTraversal(start).traversal))
 
   def has[A](label: String, key: Key[A], value: A)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(label, key.value, value))
+    GremlinScala[End, Labels](traversal.has(label, key.name, value))
 
   def has[A](label: String, key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.has(label, key.value, predicate))
+    GremlinScala[End, Labels](traversal.has(label, key.name, predicate))
 
   def hasId(id: AnyRef, ids: AnyRef*)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.hasId(id, ids: _*))
@@ -514,15 +514,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     hasLabel(label)
   }
 
-  def hasKey(key: Key[_], keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(key.value, keys.map(_.value): _*))
+  def hasKey(key: Key[_], keys: Key[_]*) = GremlinScala[End, Labels](traversal.hasKey(key.name, keys.map(_.name): _*))
 
   def hasValue(value: String, values: String*) = GremlinScala[End, Labels](traversal.hasValue(value, values: _*))
 
-  def hasNot(key: Key[_]) = GremlinScala[End, Labels](traversal.hasNot(key.value))
+  def hasNot(key: Key[_]) = GremlinScala[End, Labels](traversal.hasNot(key.name))
 
-  def hasNot[A](key: KeyValue[A]) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.key.value, key.value)))
+  def hasNot[A](keyValue: KeyValue[A]) = GremlinScala[End, Labels](traversal.not(__.traversal.has(keyValue.key.name, keyValue.value)))
 
-  def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.value, value)))
+  def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.name, value)))
 
   def and(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[End, _])*) =
     GremlinScala[End, Labels](traversal.and(traversals.map {

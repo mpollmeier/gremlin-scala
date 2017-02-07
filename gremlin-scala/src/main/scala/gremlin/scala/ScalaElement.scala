@@ -22,7 +22,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def removeProperties(keys: Key[_]*): ElementType
 
-  def property[A](key: Key[A]): Property[A] = element.property[A](key.value)
+  def property[A](key: Key[A]): Property[A] = element.property[A](key.name)
 
   def properties[A: DefaultsToAny]: Stream[Property[A]]
 
@@ -35,19 +35,19 @@ trait ScalaElement[ElementType <: Element] {
   // typesafe version of `value. have to call it `value2` because of a scala compiler bug :(
   // https://issues.scala-lang.org/browse/SI-9523
   def value2[A](key: Key[A]): A =
-    element.value[A](key.value)
+    element.value[A](key.name)
 
   def valueOption[A: DefaultsToAny](key: String): Option[A] =
     element.property[A](key).toOption
 
   def valueOption[A](key: Key[A]): Option[A] =
-    element.property[A](key.value).toOption
+    element.property[A](key.name).toOption
 
   // note: this may throw an IllegalStateException - better use `Property`
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =
     element.values[A](keys: _*)
 
-  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq.map(_.value): _*)
+  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq.map(_.name): _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
     (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap
