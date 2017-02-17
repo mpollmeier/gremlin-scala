@@ -1,6 +1,5 @@
-val org = "com.michaelpollmeier"
-
 name := "root"
+val org = "com.michaelpollmeier"
 organization := org
 
 val defaultScalaV = "2.12.1"
