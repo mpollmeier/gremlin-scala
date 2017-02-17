@@ -14,7 +14,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
 
   override def setProperty[A](key: Key[A], value: A): Vertex = {
-    element.property(key.value, value)
+    element.property(key.name, value)
     vertex
   }
 
@@ -63,7 +63,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     inVertex: Vertex,
     properties: Seq[KeyValue[_]] = Nil
   ): Edge = {
-    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair.key.value, pair.value.asInstanceOf[AnyRef]))
+    val params = properties.toSeq.flatMap(pair ⇒ Seq(pair.key.name, pair.value.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
@@ -101,10 +101,10 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.edges(direction, edgeLabels: _*)
 
   def property[A](cardinality: Cardinality, key: Key[A], value: A, keyValues: AnyRef*): VertexProperty[A] =
-    vertex.property(cardinality, key.value, value, keyValues: _*)
+    vertex.property(cardinality, key.name, value, keyValues: _*)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.map(_.value).toSeq: _*).toStream
+    vertex.properties[A](keys.map(_.name).toSeq: _*).toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
     vertex.properties[A](wantedKeys: _*).toStream

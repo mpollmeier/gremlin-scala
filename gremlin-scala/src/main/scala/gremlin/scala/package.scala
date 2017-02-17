@@ -52,14 +52,6 @@ package object scala {
       else None
   }
 
-  implicit class KeyOps[A](key: Key[A]) {
-    def →(value: A): KeyValue[A] = KeyValue(key, value)
-
-    def ->(value: A): KeyValue[A] = KeyValue(key, value)
-
-    def of(value: A): KeyValue[A] = KeyValue(key, value)
-  }
-
   // to create a new anonymous traversal, e.g. `__.outE`
   def __[A](): GremlinScala[A, HNil] =
     GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())

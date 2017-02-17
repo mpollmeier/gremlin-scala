@@ -175,8 +175,8 @@ class TraversalSpec extends WordSpec with Matchers {
 
       graph.V.has(Age).has(Name)
         .order()
-        .by(Age.value, Order.incr)
-        .by(Name.value, Order.decr)
+        .by(Age.name, Order.incr) // TODO: add by(Key[A]) step
+        .by(Name.name, Order.decr)
         .value(Name)
         .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
     }
