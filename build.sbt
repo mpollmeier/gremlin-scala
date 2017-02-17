@@ -1,15 +1,14 @@
-name := "root"
 val org = "com.michaelpollmeier"
-organization := org
-publishArtifact := false
 
-val gremlinVersion = "3.2.4"
+name := "root"
+organization := org
 
 val defaultScalaV = "2.12.1"
 scalaVersion := defaultScalaV // if not using crossScalaVersions, i.e. prefixing sbt command with `+`
 crossScalaVersions := Seq("2.11.8", defaultScalaV)
 releaseCrossBuild := true
 
+val gremlinVersion = "3.2.4"
 val commonSettings = Seq(
   organization := org,
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
@@ -70,3 +69,5 @@ lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
 // macros can't be in the same compilation unit according to joan: https://github.com/mpollmeier/gremlin-scala/issues/100
 lazy val macros = project.in(file("macros"))
   .settings(commonSettings: _*)
+
+publishArtifact := false
