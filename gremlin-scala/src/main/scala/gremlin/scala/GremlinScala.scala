@@ -101,6 +101,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def count(scope: Scope) = GremlinScala[JLong, HNil](traversal.count(scope))
 
+  def loops() = GremlinScala[Integer, HNil](traversal.loops())
+
   def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
