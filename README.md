@@ -288,3 +288,7 @@ Random links:
 # Release a new version
 * release  #will do a release for each crossScalaVersions
 * sonatypeRelease
+## next steps: upgrade gremlin-examples
+* find . -name build.sbt | xargs grep gremlin-scala
+* git grep -l 3.2.3.1 | xargs sed -i 's/3.2.3.1/3.2.4.0/g'
+* bash testAll.sh
