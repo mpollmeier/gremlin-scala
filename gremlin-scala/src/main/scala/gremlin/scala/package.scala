@@ -1,11 +1,10 @@
 package gremlin
 
-import java.util.function.{BiPredicate, BiFunction, Function ⇒ JFunction, Predicate ⇒ JPredicate}
+import java.util.function.{BiPredicate, BiFunction, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier}
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
-import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import shapeless._
 import shapeless.ops.hlist.IsHCons
 import shapeless.ops.hlist.{IsHCons, ToTraversable}
@@ -66,6 +65,10 @@ package object scala {
   implicit def wrap(g: Graph): ScalaGraph = ScalaGraph(g)
 
   implicit def wrap[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
+
+  implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
+    override def get(): A = f()
+  }
 
   implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] = new JFunction[A, B] {
     override def apply(a: A): B = f(a)

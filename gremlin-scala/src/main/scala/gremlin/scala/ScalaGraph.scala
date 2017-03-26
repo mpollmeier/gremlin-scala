@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import java.util.function.Supplier
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
@@ -13,12 +14,13 @@ case class ScalaGraph(graph: Graph) {
 
   /** Make the traverser carry a local data structure.
     * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
-  def withSack[A](value: A): ScalaGraph = {
-    val ts = traversalSource
-    new ScalaGraph(graph) {
-      override val traversalSource = ts.withSack(value)
-    }
-  }
+  def withSack[A](initialValue: A): ScalaGraph =
+    withNewTraversalSource(traversalSource.withSack(initialValue))
+
+  /** Make the traverser carry a local data structure.
+    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
+  def withSack[A](initialValue: () => A): ScalaGraph =
+    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A]))
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
 
@@ -96,4 +98,9 @@ case class ScalaGraph(graph: Graph) {
   def close(): Unit = graph.close()
 
   def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
+
+  private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =
+    new ScalaGraph(graph) {
+      override val traversalSource = ts
+    }
 }
