@@ -1,6 +1,6 @@
 package gremlin
 
-import java.util.function.{BiPredicate, Function ⇒ JFunction, Predicate ⇒ JPredicate}
+import java.util.function.{BiPredicate, BiFunction, Function ⇒ JFunction, Predicate ⇒ JPredicate}
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -71,11 +71,14 @@ package object scala {
     override def apply(a: A): B = f(a)
   }
 
+  implicit def toJavaBiFunction[A, B, C](f: (A, B) ⇒ C): BiFunction[A, B, C] = new BiFunction[A, B, C] {
+    override def apply(a: A, b: B): C = f(a, b)
+  }
+
   implicit def toJavaPredicate[A](f: A ⇒ Boolean): JPredicate[A] = new JPredicate[A] {
     override def test(a: A): Boolean = f(a)
   }
 
-  //converts e.g. `(i: Int, s: String) => true` into a BiPredicate
   implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
     new BiPredicate[A, B] {
       def test(a: A, b: B) = predicate(a, b)
