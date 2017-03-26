@@ -2,13 +2,23 @@ package gremlin.scala
 
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
 
 case class ScalaGraph(graph: Graph) {
+  val traversalSource: GraphTraversalSource = graph.traversal()
+
+  /** Make the traverser carry a local data structure.
+    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
+  def withSack[A](value: A): ScalaGraph = {
+    val ts = traversalSource
+    new ScalaGraph(graph) {
+      override val traversalSource = ts.withSack(value)
+    }
+  }
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
 
@@ -48,22 +58,22 @@ case class ScalaGraph(graph: Graph) {
   def +(label: String): Vertex = addVertex(label)
 
   def +(label: String, properties: KeyValue[_]*): Vertex =
-    addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap )
+    addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap)
 
   // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](graph.traversal.V().asInstanceOf[GraphTraversal[_, Vertex]])
+  def V = GremlinScala[Vertex, HNil](traversalSource.V().asInstanceOf[GraphTraversal[_, Vertex]])
 
   // start traversal with all edges
-  def E = GremlinScala[Edge, HNil](graph.traversal.E().asInstanceOf[GraphTraversal[_, Edge]])
+  def E = GremlinScala[Edge, HNil](traversalSource.E().asInstanceOf[GraphTraversal[_, Edge]])
 
   // start traversal with some vertices identified by given ids 
   def V(vertexIds: Any*) =
-    GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
+    GremlinScala[Vertex, HNil](traversalSource.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
       .asInstanceOf[GraphTraversal[_, Vertex]])
 
   // start traversal with some edges identified by given ids 
   def E(edgeIds: Any*) =
-    GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
+    GremlinScala[Edge, HNil](traversalSource.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
       .asInstanceOf[GraphTraversal[_, Edge]])
 
   def edges(edgeIds: Any*): Iterator[Edge] =
