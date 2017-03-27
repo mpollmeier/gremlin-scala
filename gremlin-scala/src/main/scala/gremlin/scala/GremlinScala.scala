@@ -300,7 +300,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def profile(sideEffectKey: String) = GremlinScala[End, Labels](traversal.profile(sideEffectKey))
 
-  def sack[A]() = GremlinScala[A, Labels](traversal.sack[A])
+  /** Take value out of the sack. 
+    * TODO: carry SackType as class type parameter (both ScalaGraph and GremlinScala) */
+  def sack[SackType]() = GremlinScala[SackType, Labels](traversal.sack[SackType]())
+
+  /** Modify the sack with the current End type. 
+    * TODO: carry SackType as class type parameter (both ScalaGraph and GremlinScala)
+    * [SideEffect] */
+  def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
 
