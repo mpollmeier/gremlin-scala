@@ -96,13 +96,18 @@ case class ScalaGraph(graph: Graph) {
 
   /** Make the traverser carry a local data structure.
     * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
-  def withSack[A](initialValue: A, splitOperator: UnaryOperator[A]): ScalaGraph =
+  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue, splitOperator: UnaryOperator[A]))
 
   /** Make the traverser carry a local data structure.
     * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
   def withSack[A](initialValue: () => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A]))
+
+  /** Make the traverser carry a local data structure.
+    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
+  def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
+    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
 
 
   private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =

@@ -1,6 +1,6 @@
 package gremlin
 
-import java.util.function.{BiPredicate, BiFunction, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier}
+import java.util.function.{BiPredicate, BiFunction, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier, UnaryOperator}
 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -72,6 +72,10 @@ package object scala {
 
   implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] = new JFunction[A, B] {
     override def apply(a: A): B = f(a)
+  }
+
+  implicit def toJavaUnaryOperator[A](f: A ⇒ A): UnaryOperator[A] = new UnaryOperator[A] {
+    override def apply(a: A): A = f(a)
   }
 
   implicit def toJavaBiFunction[A, B, C](f: (A, B) ⇒ C): BiFunction[A, B, C] = new BiFunction[A, B, C] {

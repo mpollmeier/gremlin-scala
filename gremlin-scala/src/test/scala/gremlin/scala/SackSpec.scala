@@ -31,17 +31,16 @@ class SackSpec extends WordSpec with Matchers {
   }
 
   "uses provided split operator when cloning sack" in new Fixture {
-import java.util.function.{Supplier, UnaryOperator}
     var counter = 0
-    val splitOperator = new UnaryOperator[Float] {
-      override def apply(value: Float): Float = {
-        counter += 1
-        value
-      }
+    val splitOperator = { value: Float => 
+      counter += 1
+      value
     }
 
     graph.withSack(1f, splitOperator).V.out.toList
     counter shouldBe 6
+    graph.withSack(() => 1f, splitOperator).V.out.toList
+    counter shouldBe 12
   }
 
   trait Fixture {
