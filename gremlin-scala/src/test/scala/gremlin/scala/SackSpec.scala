@@ -8,11 +8,11 @@ import scala.util.Random
 class SackSpec extends WordSpec with Matchers {
 
   "carries simple value" when {
-    "providing constant" in new Fixture {
+    "using constant for initial sack" in new Fixture {
       graph.withSack(1f).V.sack.toList shouldBe List(1f, 1f, 1f, 1f,1f, 1f)
     }
 
-    "providing function" in new Fixture {
+    "using function for initial sack" in new Fixture {
       graph.withSack(() => 1f).V.sack.toList shouldBe List(1f, 1f, 1f, 1f,1f, 1f)
 
       val randomValues = graph.withSack(() => Random.nextFloat).V.sack.toList
@@ -30,8 +30,24 @@ class SackSpec extends WordSpec with Matchers {
     result shouldBe Set(1d, 0.4d)
   }
 
+  "uses provided split operator when cloning sack" in new Fixture {
+import java.util.function.{Supplier, UnaryOperator}
+    var counter = 0
+    val splitOperator = new UnaryOperator[Float] {
+      override def apply(value: Float): Float = {
+        counter += 1
+        value
+      }
+    }
+
+    graph.withSack(1f, splitOperator).V.out.toList
+    counter shouldBe 6
+  }
+
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
+    val Name = Key[String]("name")
+    val Lang = Key[String]("lang")
     val Weight = Key[Double]("weight")
   }
 }
