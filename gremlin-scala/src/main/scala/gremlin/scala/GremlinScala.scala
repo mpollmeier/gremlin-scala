@@ -11,6 +11,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
+import org.apache.tinkerpop.gremlin.process.traversal.traverser.util.TraverserSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
@@ -312,6 +313,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
 
   def barrier(maxBarrierSize: Int) = GremlinScala[End, Labels](traversal.barrier(maxBarrierSize))
+
+  def barrier(consumer: TraverserSet[End] => Unit): GremlinScala[End, Labels] = {
+    val jConsumer: JConsumer[TraverserSet[End]] = consumer //invoke implicit conversion
+    val tp3Consumer = jConsumer.asInstanceOf[JConsumer[TraverserSet[AnyRef]]] // since type isn't properly defined in tp3, need to cast
+    GremlinScala[End, Labels](traversal.barrier(tp3Consumer))
+  }
+
+  def barrier(consumer: JConsumer[TraverserSet[AnyRef]]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.barrier(consumer))
 
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
   def by() = GremlinScala[End, Labels](traversal.by())
