@@ -396,6 +396,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def coalesce[A](coalesceTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
 
+  /** special case of branch step if there's only two options */
   def choose[A](
     predicate: End ⇒ Boolean,
     onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[A, _],
