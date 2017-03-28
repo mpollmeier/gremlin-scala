@@ -8,7 +8,7 @@ import scala.util.Random
 class BranchSpec extends WordSpec with Matchers {
 
   "choose is a special (simple) version of branch for boolean logic" in new Fixture {
-    graph.V.hasLabel(Person)
+    graph.V
       .choose(
         _.value(Age).is(P.gt(30)),
         onTrue = _.value(Height),
@@ -18,9 +18,18 @@ class BranchSpec extends WordSpec with Matchers {
         5) // Karlotta is <=30 - take her shoesize
   }
 
-  // "" in new Fixture {
-  //   // graph.withSack(1d).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
-  // }
+  "branch allows for switch case logic" in new Fixture {
+    graph.V
+      .branch(
+        on = _.value(Age),
+        BranchOption(P.eq(34), _.value(Height)),
+        BranchOption(P.gte(30), _.value(Shoesize)),
+        BranchOption(P.lt(30), _.value(YearOfBirth))
+      ).toSet shouldBe Set(
+        190,  // Michael is 34 - take his height
+        41,   //Steffi is >=30 - take her shoesize
+        2015) // Karlotta is <30 - take her year of birth
+  }
 
   trait Fixture {
     val graph = TinkerGraph.open.asScala
@@ -30,9 +39,10 @@ class BranchSpec extends WordSpec with Matchers {
     val Age = Key[Int]("age")
     val Height = Key[Int]("height")
     val Shoesize = Key[Int]("shoesize")
+    val YearOfBirth = Key[Int]("yearOfBirth")
 
-    graph + (Person, Name -> "Michael", Age -> 34, Height -> 190, Shoesize -> 44)
-    graph + (Person, Name -> "Steffi", Age -> 32, Height -> 176, Shoesize -> 41)
-    graph + (Person, Name -> "Karlotta", Age -> 1, Height -> 90, Shoesize -> 5)
+    graph + (Person, Name -> "Michael",  Age -> 34, Height -> 190, Shoesize -> 44, YearOfBirth -> 1983)
+    graph + (Person, Name -> "Steffi",   Age -> 32, Height -> 176, Shoesize -> 41, YearOfBirth -> 1984)
+    graph + (Person, Name -> "Karlotta", Age -> 1,  Height -> 90,  Shoesize -> 5,  YearOfBirth -> 2015)
   }
 }

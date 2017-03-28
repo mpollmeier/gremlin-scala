@@ -377,16 +377,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def emitWithTraverser(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
 
-  // def branch(fun: End ⇒ Iterable[String]) =
-  //   GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
-  //     fun(t.get): JCollection[String]
-  //   })
-
-  // def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) =
-  //   GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
-  //     fun(t): JCollection[String]
-  //   })
-
   private def asTraversals[S,E](trans: (GremlinScala[S, HNil] ⇒ GremlinScala[E, _])*) =
     trans.map(_.apply(start).traversal)
 
@@ -398,7 +388,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   /** special case of branch step if there's only two options - basically an if/else condition for traversals 
     * 
-    * you might think that should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
+    * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
     **/
   def choose[A](
@@ -409,6 +399,20 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val t = onTrue(start).traversal
     val f = onFalse(start).traversal
     GremlinScala[A, Labels](traversal.choose(p, t, f))
+  }
+
+  def branch[BranchOn, NewEnd](
+    on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
+    options: BranchOption[BranchOn, End, NewEnd]*
+  ): GremlinScala[NewEnd, Labels] = {
+    /* TODO: use fold instead? */
+    val tp3On = on(start).traversal
+    var tp3Traversal = traversal.branch(tp3On)
+    options.foreach { option =>
+      val tp3TraversalOption = option.onTrue(start).traversal.asInstanceOf[Traversal[Nothing, _]] /* TODO: can we remove this cast? */
+      tp3Traversal = tp3Traversal.option(option.pickToken, tp3TraversalOption)
+    }
+    GremlinScala[NewEnd, Labels](tp3Traversal.asInstanceOf[GraphTraversal[_, NewEnd]]) /* TODO: can we remove this cast? */
   }
 
   def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
