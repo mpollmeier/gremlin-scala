@@ -401,22 +401,19 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[A, Labels](traversal.choose(p, t, f))
   }
 
+  /** note that the traverser will go down all traversals in options if they pickToken matches
+    * if you need if/else semantic, use `choose` instead */
   def branch[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
-    options: BranchOption[End, NewEnd]*
+    options: BranchOption[BranchOn, End, NewEnd]*
   ): GremlinScala[NewEnd, Labels] = {
-    /* TODO: use fold instead? */
-    val jOn = on(start).traversal
-    var jTraversal = traversal.branch(jOn)
-    options.foreach {
-      case BranchCase(pickToken, optionTraversal) => 
-        val jTraversalOption = optionTraversal(start).traversal.asInstanceOf[Traversal[Nothing, _]] /* TODO: can we remove this cast? */
-        jTraversal = jTraversal.option(pickToken, jTraversalOption)
-      case BranchOtherwise(optionTraversal) =>
-        val jTraversalOption = optionTraversal(start).traversal.asInstanceOf[Traversal[Nothing, _]] /* TODO: can we remove this cast? */
-        jTraversal = jTraversal.option(jTraversalOption)
+    var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
+    options.foreach { option =>
+      /* cast needed because of the way types are defined in tp3 */
+      val jTraversalOption = option.onTrue(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
+      jTraversal = jTraversal.option(option.pickToken, jTraversalOption)
     }
-    GremlinScala[NewEnd, Labels](jTraversal.asInstanceOf[GraphTraversal[_, NewEnd]]) /* TODO: can we remove this cast? */
+    GremlinScala[NewEnd, Labels](jTraversal)
   }
 
   def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
