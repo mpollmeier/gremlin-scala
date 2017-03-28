@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import scala.util.Random
@@ -7,10 +8,9 @@ import scala.util.Random
 class BranchSpec extends WordSpec with Matchers {
 
   "choose is a special (simple) version of branch for boolean logic" in new Fixture {
-    /* TODO: should choose take a traversal => Boolean? */
     graph.V.hasLabel(Person)
       .choose(
-        _.value2(Age) > 30,
+        _.value(Age).is(P.gt(30)),
         onTrue = _.value(Height),
         onFalse = _.value(Shoesize)
       ).toSet shouldBe Set(

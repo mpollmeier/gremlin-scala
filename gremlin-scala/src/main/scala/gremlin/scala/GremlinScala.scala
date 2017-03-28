@@ -396,14 +396,19 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def coalesce[A](coalesceTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
 
-  /** special case of branch step if there's only two options */
+  /** special case of branch step if there's only two options - basically an if/else condition for traversals 
+    * 
+    * you might think that should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
+    * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
+    **/
   def choose[A](
-    predicate: End ⇒ Boolean,
+    predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _],
     onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[A, _],
     onFalse: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] = {
+    val p = predicate(start).traversal
     val t = onTrue(start).traversal
     val f = onFalse(start).traversal
-    GremlinScala[A, Labels](traversal.choose(predicate, t, f))
+    GremlinScala[A, Labels](traversal.choose(p, t, f))
   }
 
   def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
