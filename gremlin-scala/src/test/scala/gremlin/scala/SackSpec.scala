@@ -39,18 +39,14 @@ class SackSpec extends WordSpec with Matchers {
 
     graph.withSack(1d, splitOperator = identityWithCounterIncrease).V.out.toList
     counter shouldBe 6
-    graph.withSack(() => 1d, splitOperator = identityWithCounterIncrease).V.out.toList
-    counter shouldBe 12
   }
 
-  /* TODO: make work and make assertions once question is answered: https://groups.google.com/forum/#!topic/gremlin-users/BVrJP2Lwwck */
-  "uses provided merge operator when bulking sack" ignore new Fixture {
-    val identity = {f: Double => f}
-    val sum = {(f1: Double, f2: Double) => println("INVOKED"); f1 + f2 }
-    val normSack = org.apache.tinkerpop.gremlin.process.traversal.SackFunctions.Barrier.normSack
-    graph.withSack(1d, splitOperator = identity, mergeOperator = sum)
-      .V(1).local(_.outE("knows").barrier(normSack).inV).sack
-      .toList.foreach(println)
+  "uses provided merge operator when bulking sack" in new Fixture {
+    val sum = (f1: Double, f2: Double) => f1 + f2
+    graph.withSack(1d, mergeOperator = sum)
+      .V(1).out("knows").in("knows").sack
+      .toList shouldBe List(2d, 2d)
+    // without `sum` would be List(1d, 1d)
   }
 
   trait Fixture {
