@@ -9,7 +9,7 @@ import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
 import scala.collection.JavaConversions._
 
-case class ScalaGraph(graph: Graph) {
+case class ScalaGraph[SackType](graph: Graph) {
   val traversalSource: GraphTraversalSource = graph.traversal()
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
@@ -89,21 +89,21 @@ case class ScalaGraph(graph: Graph) {
 
   def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
 
-  def withSack[A](initialValue: () => A): ScalaGraph =
+  def withSack[A](initialValue: () => A): ScalaGraph[A] =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A]))
 
-  def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
+  def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph[A] =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
 
-  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph =
+  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph[A] =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A], mergeOperator: BinaryOperator[A]))
 
-  def withSack[A](initialValue: A): ScalaGraph = withSack(() => initialValue)
-  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph = withSack(() => initialValue, splitOperator)
-  def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, splitOperator, mergeOperator)
+  def withSack[A](initialValue: A): ScalaGraph[A] = withSack(() => initialValue)
+  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph[A] = withSack(() => initialValue, splitOperator)
+  def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph[A] = withSack(() => initialValue, splitOperator, mergeOperator)
 
-  private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =
-    new ScalaGraph(graph) {
+  private def withNewTraversalSource[A](ts: GraphTraversalSource) =
+    new ScalaGraph[A](graph) {
       override val traversalSource = ts
     }
 }

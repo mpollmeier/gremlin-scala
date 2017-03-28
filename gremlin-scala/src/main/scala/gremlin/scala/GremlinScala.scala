@@ -25,6 +25,55 @@ import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.{immutable, mutable}
 
+object Option1 {
+  // works, but has downsides:
+  // 1: using constr() makes things a bit harder to understand
+  // 2: can only go one level deep, hard to mix
+  // -> better go with trait mixins?
+  class A(val id: Int) {
+    type Self <: A
+    def constr(id: Int): Self = new A(id).asInstanceOf[A.this.Self]
+    def add(i: Int): Self = constr(id + i)
+  }
+
+  class B[SackType](override val id: Int) extends A(id) {
+    type Self = B[SackType]
+    override def constr(newId: Int) = new B[SackType](newId)
+    override def add(i: Int): Self = constr(id - i)
+  }
+}
+
+object Option2 {
+  /* TODO: make case class */
+  // class GStart {
+  //   def withSack[SackType] = new GStart with GStartWithSackType[SackType]
+  //   def start(): Gs[Int] = new Gs[Int](Seq(1,2))
+  // }
+
+  // trait GStartWithSackType[SackType] { self: GStart =>
+  //   /* TODO: rename to start */
+  //   // override def start: GsWithSackType[Int, SackType] = new Gs[Int](Seq(3,4)) with GsWithSackType[Int, SackType]
+  //   override def start: Gs[Int] = new Gs[Int](Seq(3,4)) with GsWithSackType[Int, SackType]
+  // }
+
+  class Gs[End](e: Seq[End]) {
+    def head(): End = e.head
+  }
+
+  trait SackCarrier[SackType] { self: Gs[_] =>
+    def sackHead(): SackType = 
+      self.head.asInstanceOf[SackType]
+  }
+
+  val gs = new Gs[Int](Seq(1,2,3))
+  val i: Int = gs.head
+
+  val gs2 = new Gs[Int](Seq(1,2,3)) with SackCarrier[Long]
+  val i2: Int = gs2.head
+  val l2: Long = gs2.sackHead
+}
+
+
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
 

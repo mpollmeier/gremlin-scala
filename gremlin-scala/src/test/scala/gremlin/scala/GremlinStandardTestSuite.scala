@@ -483,7 +483,7 @@ object Tests {
 
   class ScalaCountTest extends CountTest with StandardTest {
     override def get_g_V_count =
-      graph.asScala.V.count
+      graph.asScala.V.count()
 
     override def get_g_V_out_count =
       graph.asScala.V.out.count
