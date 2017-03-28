@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import java.util.function.{Supplier, UnaryOperator}
+import java.util.function.{BinaryOperator, Supplier, UnaryOperator}
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
@@ -89,26 +89,18 @@ case class ScalaGraph(graph: Graph) {
 
   def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
 
-  /** Make the traverser carry a local data structure.
-    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
-  def withSack[A](initialValue: A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue))
-
-  /** Make the traverser carry a local data structure.
-    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
-  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue, splitOperator: UnaryOperator[A]))
-
-  /** Make the traverser carry a local data structure.
-    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
   def withSack[A](initialValue: () => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A]))
 
-  /** Make the traverser carry a local data structure.
-    * See http://tinkerpop.apache.org/docs/current/reference/#sack-step */
   def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
 
+  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph =
+    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A], mergeOperator: BinaryOperator[A]))
+
+  def withSack[A](initialValue: A): ScalaGraph = withSack(() => initialValue)
+  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph = withSack(() => initialValue, splitOperator)
+  def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, splitOperator, mergeOperator)
 
   private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =
     new ScalaGraph(graph) {
