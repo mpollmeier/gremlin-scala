@@ -22,13 +22,13 @@ class BranchSpec extends WordSpec with Matchers {
     graph.V
       .branch(
         on = _.value(Age),
-        BranchOption(P.eq(34), _.value(Height)),
-        BranchOption(P.gte(30), _.value(Shoesize)),
-        BranchOption(P.lt(30), _.value(YearOfBirth))
+        BranchCase(34, _.value(Height)),
+        BranchCase(32, _.value(Shoesize)),
+        BranchOtherwise(_.value(YearOfBirth))
       ).toSet shouldBe Set(
         190,  // Michael is 34 - take his height
-        41,   //Steffi is >=30 - take her shoesize
-        2015) // Karlotta is <30 - take her year of birth
+        41,   //Steffi is 32 - take her shoesize
+        2015) // Karlotta is the case `Otherwise` - take her year of birth
   }
 
   trait Fixture {
