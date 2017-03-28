@@ -386,31 +386,43 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def coalesce[A](coalesceTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
 
-  /** special case of branch step if there's only two options - basically an if/else condition for traversals 
+  /** special case of choose step if there's only two options - basically an if/else condition for traversals 
     * 
     * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
     **/
-  def choose[A](
+  def choose[NewEnd](
     predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _],
-    onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[A, _],
-    onFalse: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] = {
+    onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[NewEnd, _],
+    onFalse: GremlinScala[End, HNil] ⇒ GremlinScala[NewEnd, _]): GremlinScala[NewEnd, Labels] = {
     val p = predicate(start).traversal
     val t = onTrue(start).traversal
     val f = onFalse(start).traversal
-    GremlinScala[A, Labels](traversal.choose(p, t, f))
+    GremlinScala[NewEnd, Labels](traversal.choose(p, t, f))
   }
 
-  /** note that the traverser will go down all traversals in options if they pickToken matches
-    * if you need if/else semantic, use `choose` instead */
-  def branch[BranchOn, NewEnd](
+  /** traverser will pick first option that has a matching pickToken **/
+  def choose[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
-    options: BranchOption[BranchOn, End, NewEnd]*
-  ): GremlinScala[NewEnd, Labels] = {
+    options: BranchCase[BranchOn, End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
     var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
     options.foreach { option =>
       /* cast needed because of the way types are defined in tp3 */
-      val jTraversalOption = option.onTrue(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
+      val jTraversalOption = option.traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
+      jTraversal = jTraversal.option(option.pickToken, jTraversalOption)
+    }
+    GremlinScala[NewEnd, Labels](jTraversal)
+  }
+
+  /** note that the traverser will go down all traversals in options if they pickToken matches
+    * if you need if/then/else semantic, use `choose` instead */
+  def branch[BranchOn, NewEnd](
+    on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
+    options: BranchCase[BranchOn, End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
+    var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
+    options.foreach { option =>
+      /* cast needed because of the way types are defined in tp3 */
+      val jTraversalOption = option.traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
       jTraversal = jTraversal.option(option.pickToken, jTraversalOption)
     }
     GremlinScala[NewEnd, Labels](jTraversal)
