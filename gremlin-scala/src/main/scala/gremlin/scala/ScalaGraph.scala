@@ -95,11 +95,15 @@ case class ScalaGraph(graph: Graph) {
   def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
 
+  def withSack[A](initialValue: () => A, mergeOperator: (A, A) => A): ScalaGraph =
+    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], mergeOperator: BinaryOperator[A]))
+
   def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph =
     withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A], mergeOperator: BinaryOperator[A]))
 
   def withSack[A](initialValue: A): ScalaGraph = withSack(() => initialValue)
   def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph = withSack(() => initialValue, splitOperator)
+  def withSack[A](initialValue: A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, mergeOperator)
   def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, splitOperator, mergeOperator)
 
   private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =
