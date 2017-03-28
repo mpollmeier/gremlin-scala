@@ -46,6 +46,19 @@ class BranchSpec extends WordSpec with Matchers {
           41,   //Steffi is 32 - take her shoesize
           2015) // Karlotta is 1 - take her year of birth
     }
+
+    "allow to use `matchAll` semantics" in new Fixture {
+      graph.V
+        .branch(
+          on = _.value(Age),
+          BranchCase(34, _.value(Height)),
+          BranchMatchAll(_.value(YearOfBirth))
+        ).toSet shouldBe Set(
+          190, 1983, // Michael's height (since he is 34) and year of birth
+          1984,      //Steffi's year of birth
+          2015)      // Karlotta's year of birth
+    }
+  
   }
 
   trait Fixture {

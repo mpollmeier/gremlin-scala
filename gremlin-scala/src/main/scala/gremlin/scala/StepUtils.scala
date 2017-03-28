@@ -12,4 +12,4 @@ trait BranchOption[End, NewEnd] {
 }
 
 case class BranchCase[BranchOn, End, NewEnd](pickToken: BranchOn, traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd]
-case class BranchOtherwise[End, NewEnd](traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd]
+case class BranchMatchAll[End, NewEnd](traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd]
