@@ -377,15 +377,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def emitWithTraverser(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](traversal.emit(predicate))
 
-  def branch(fun: End ⇒ Iterable[String]) =
-    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
-      fun(t.get): JCollection[String]
-    })
+  // def branch(fun: End ⇒ Iterable[String]) =
+  //   GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
+  //     fun(t.get): JCollection[String]
+  //   })
 
-  def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) =
-    GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
-      fun(t): JCollection[String]
-    })
+  // def branchWithTraverser(fun: Traverser[End] ⇒ Iterable[String]) =
+  //   GremlinScala[End, Labels](traversal.branch { t: Traverser[End] ⇒
+  //     fun(t): JCollection[String]
+  //   })
 
   private def asTraversals[S,E](trans: (GremlinScala[S, HNil] ⇒ GremlinScala[E, _])*) =
     trans.map(_.apply(start).traversal)
