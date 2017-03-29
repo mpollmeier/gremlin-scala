@@ -58,16 +58,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def cap[A](stepLabel: StepLabel[A]) =
     GremlinScala[A, Labels](traversal.cap(stepLabel.name))
 
-  def option[A](optionTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = {
-    val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
-    GremlinScala[End, Labels](traversal.option(t))
-  }
-
-  def option[A, M](pickToken: M, optionTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _]) = {
-    val t = optionTraversal(start).traversal.asInstanceOf[Traversal[End, A]]
-    GremlinScala[End, Labels](traversal.option(pickToken, t))
-  }
-
   def optional(optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) = {
     val t = optionalTraversal(start).traversal
     GremlinScala[End, Labels](traversal.optional(t))
