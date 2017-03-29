@@ -471,35 +471,6 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "choose" should {
-    "work for if/then/else semantics" in new Fixture {
-
-      val traversal: GremlinScala[String, _] = graph
-        .V.hasLabel("person")
-        .choose(
-          _.value2(Age) <= 30,
-          onTrue = _.in(),
-          onFalse = _.out()
-        )
-        .value(Name)
-
-      traversal.toSet shouldBe Set("marko", "ripple", "lop", "lop")
-    }
-
-    "work with `constant`" in new Fixture {
-      val traversal: GremlinScala[String, _] = graph
-        .V
-        .choose(
-          _.label() == "person",
-          onTrue = _.value(Name),
-          onFalse = _.constant("inhuman")
-        )
-
-      traversal.toSet() shouldBe Set("marko", "vadas", "inhuman", "josh", "peter")
-
-    }
-  }
-
   "repeat/until step" can {
     "iterate until no moure outgoing edges" in new Fixture {
       val traversal = graph.V(1)
