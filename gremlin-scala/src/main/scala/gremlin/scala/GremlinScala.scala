@@ -394,7 +394,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   /** traverser will pick first option that has a matching pickToken **/
   def choose[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
-    options: BranchCase[BranchOn, End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
+    options: BranchOption[End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
     var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
     options.foreach { option =>
       /* cast needed because of the way types are defined in tp3 */

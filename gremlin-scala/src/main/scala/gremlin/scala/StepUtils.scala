@@ -14,7 +14,13 @@ trait BranchOption[End, NewEnd] {
 }
 
 case class BranchCase[BranchOn, End, NewEnd](pickToken: BranchOn, traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd]
+
 case class BranchMatchAll[End, NewEnd](traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd] {
   override def pickToken = Pick.any
+}
+
+/* if nothing else matched in branch/choose step */
+case class BranchOtherwise[End, NewEnd](traversal: GremlinScala[End, _] => GremlinScala[NewEnd, _]) extends BranchOption[End, NewEnd] {
+  override def pickToken = Pick.none
 }
 
