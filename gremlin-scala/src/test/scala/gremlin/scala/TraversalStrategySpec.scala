@@ -51,9 +51,16 @@ class TraversalStrategySpec extends WordSpec with Matchers {
       // without `sum` would be List(1d, 1d)
     }
 
-    "be configured when starting with an element" in new Fixture {
-      val v1: Vertex = graph.V(1).head
-      v1.start(_.withSack(1d)).outE(Knows).sack.toList shouldBe List(1d, 1d)
+    "be configured when starting from an element" when {
+      "on a vertex" in new Fixture {
+        val v1: Vertex = graph.V(1).head
+        v1.start(_.withSack(1d)).outE(Knows).sack.toList shouldBe List(1d, 1d)
+      }
+
+      "on an edge" in new Fixture {
+        val e7: Edge = graph.E(7).head
+        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d, 1d)
+      }
     }
   }
 

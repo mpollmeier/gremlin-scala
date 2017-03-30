@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
 import scala.collection.JavaConversions._
 import shapeless._
 
@@ -8,7 +9,15 @@ trait ScalaElement[ElementType <: Element] {
 
   def graph: ScalaGraph = element.graph
 
-  def start(): GremlinScala[ElementType, HNil]
+  /** start a new traversal from this element */
+  def start(): GremlinScala[ElementType, HNil] = __(element)
+
+  /** start a new traversal from this element and configure it */
+  def start(configure: TraversalSource => TraversalSource): GremlinScala[ElementType, HNil] =
+    GremlinScala[ElementType, HNil](
+      configure(new TraversalSource(new GraphTraversalSource(element.graph)))
+      .underlying.inject(element)
+    )
 
   def id[A: DefaultsToAny]: A = element.id.asInstanceOf[A]
 
