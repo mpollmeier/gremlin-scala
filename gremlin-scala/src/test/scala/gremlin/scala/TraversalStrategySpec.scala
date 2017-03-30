@@ -50,6 +50,11 @@ class TraversalStrategySpec extends WordSpec with Matchers {
         .toList shouldBe List(2d, 2d)
       // without `sum` would be List(1d, 1d)
     }
+
+    "be configured when starting with an element" in new Fixture {
+      val v1: Vertex = graph.V(1).head
+      v1.start(_.withSack(1d)).outE(Knows).sack.toList shouldBe List(1d, 1d)
+    }
   }
 
   trait Fixture {
@@ -57,5 +62,6 @@ class TraversalStrategySpec extends WordSpec with Matchers {
     val Name = Key[String]("name")
     val Lang = Key[String]("lang")
     val Weight = Key[Double]("weight")
+    val Knows = "knows"
   }
 }

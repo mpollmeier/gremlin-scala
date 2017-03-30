@@ -592,7 +592,6 @@ class TraversalSpec extends WordSpec with Matchers {
     duration should be <= maxTime.toMillis
   }
 
-
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
