@@ -404,7 +404,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[NewEnd, Labels](jTraversal)
   }
 
-  /** note that the traverser will go down all traversals in options if they pickToken matches
+  /** note that the traverser will go down all traversals in options if the pickToken matches
     * if you need if/then/else semantic, use `choose` instead */
   def branch[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
