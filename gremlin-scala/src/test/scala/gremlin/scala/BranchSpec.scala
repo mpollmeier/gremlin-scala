@@ -25,7 +25,7 @@ class BranchSpec extends WordSpec with Matchers {
           on = _.value(Age),
           BranchCase(34, _.value(Height)),
           BranchCase(32, _.value(Shoesize)),
-          BranchCase(1, _.value(YearOfBirth)) //unfortunately TP3 choose doesn't support Otherwise
+          BranchOtherwise(_.value(YearOfBirth))
         ).toSet shouldBe Set(
           190,  // Michael is 34 - take his height
           41,   //Steffi is 32 - take her shoesize
