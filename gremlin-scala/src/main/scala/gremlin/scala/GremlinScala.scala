@@ -410,15 +410,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
     options: BranchOption[End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
     var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
-    options.foreach {
-      case BranchCase(pickToken, traversal) =>
-        /* cast needed because of the way types are defined in tp3 */
-        val jTraversalOption = traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
-        jTraversal = jTraversal.option(pickToken, jTraversalOption)
-      case BranchMatchAll(traversal) =>
-        /* cast needed because of the way types are defined in tp3 */
-        val jTraversalOption = traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
-        jTraversal = jTraversal.option(jTraversalOption)
+    options.foreach { option =>
+      /* cast needed because of the way types are defined in tp3 */
+      val jTraversalOption = option.traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
+      jTraversal = jTraversal.option(option.pickToken, jTraversalOption)
     }
     GremlinScala[NewEnd, Labels](jTraversal)
   }
