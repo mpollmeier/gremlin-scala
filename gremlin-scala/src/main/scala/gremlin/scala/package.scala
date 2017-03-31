@@ -22,7 +22,6 @@ package object scala {
 
   implicit class GraphAsScala[G <: Graph](g: G) {
     def asScala() = ScalaGraph(g)
-    def asScala(configure: GraphTraversalSource => GraphTraversalSource) = ScalaGraph(g, configure)
   }
 
   implicit class GraphAsJava(g: ScalaGraph) {

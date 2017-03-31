@@ -3,8 +3,14 @@ package gremlin.scala
 import java.util.function.{ BinaryOperator, Supplier, UnaryOperator }
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
 
+object TraversalSource {
+  def apply(graph: Graph): TraversalSource =
+    TraversalSource(new GraphTraversalSource(graph))
+}
+
 case class TraversalSource(underlying: GraphTraversalSource) {
-  
+  def graph: Graph = underlying.getGraph
+
   def withSack[A](initialValue: () => A) =
     TraversalSource(underlying.withSack(initialValue: Supplier[A]))
 

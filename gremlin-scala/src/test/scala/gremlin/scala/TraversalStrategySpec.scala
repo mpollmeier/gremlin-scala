@@ -11,19 +11,19 @@ class TraversalStrategySpec extends WordSpec with Matchers {
 
     "carry simple value" when {
       "using constant for initial sack" in new Fixture {
-        graph.withSack(1d).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
+        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
       }
 
       "using function for initial sack" in new Fixture {
-        graph.withSack(() => 1d).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
+        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
 
-        val randomValues = graph.withSack(() => Random.nextDouble).V.sack.toList
+        val randomValues = graph.configure(_.withSack(() => Random.nextDouble)).V.sack.toList
         randomValues.toSet.size shouldBe 6
       }
     }
 
     "transform the sack on the go" in new Fixture {
-      val result = graph.withSack(1d).V.repeat{
+      val result = graph.configure(_.withSack(1d)).V.repeat{
         _.outE
         .sack{(curr: Double, edge) => curr * edge.value2(Weight)}
         .inV
@@ -39,13 +39,13 @@ class TraversalStrategySpec extends WordSpec with Matchers {
         value
       }
 
-      graph.withSack(1d, splitOperator = identityWithCounterIncrease).V.out.toList
+      graph.configure(_.withSack(1d, splitOperator = identityWithCounterIncrease)).V.out.toList
       counter shouldBe 6
     }
 
     "use provided merge operator when bulking sack" in new Fixture {
       val sum = (f1: Double, f2: Double) => f1 + f2
-      graph.withSack(1d, mergeOperator = sum)
+      graph.configure(_.withSack(1d, mergeOperator = sum))
         .V(1).out("knows").in("knows").sack
         .toList shouldBe List(2d, 2d)
       // without `sum` would be List(1d, 1d)

@@ -15,7 +15,7 @@ trait ScalaElement[ElementType <: Element] {
   /** start a new traversal from this element and configure it */
   def start(configure: TraversalSource => TraversalSource): GremlinScala[ElementType, HNil] =
     GremlinScala[ElementType, HNil](
-      configure(new TraversalSource(new GraphTraversalSource(element.graph)))
+      configure(TraversalSource(element.graph))
       .underlying.inject(element)
     )
 

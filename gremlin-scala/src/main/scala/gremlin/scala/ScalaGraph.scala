@@ -1,20 +1,22 @@
 package gremlin.scala
 
-import java.util.function.{BinaryOperator, Supplier, UnaryOperator}
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
-import scala.collection.JavaConversions._
 
 object ScalaGraph {
-  def apply(graph: Graph, configure: GraphTraversalSource => GraphTraversalSource): ScalaGraph =
-    new ScalaGraph(configure(new GraphTraversalSource(graph)).getGraph)
+  def apply(graph: Graph): ScalaGraph =
+    ScalaGraph(TraversalSource(graph))
 }
 
-case class ScalaGraph(graph: Graph) {
+case class ScalaGraph(traversalSource: TraversalSource) {
+  lazy val graph = traversalSource.graph
+
+  def configure(conf: TraversalSource => TraversalSource) = 
+    ScalaGraph(conf(TraversalSource(graph)))
+
   def addVertex(label: String): Vertex = graph.addVertex(label)
 
   def addVertex(): Vertex = graph.addVertex()
@@ -57,18 +59,18 @@ case class ScalaGraph(graph: Graph) {
 
   // start traversal with all vertices 
   def V(): GremlinScala[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](graph.traversal.V())
+    GremlinScala[Vertex, HNil](traversalSource.underlying.V())
 
   // start traversal with all edges
-  def E(): GremlinScala[Edge, HNil] = GremlinScala[Edge, HNil](graph.traversal.E())
+  def E(): GremlinScala[Edge, HNil] = GremlinScala[Edge, HNil](traversalSource.underlying.E())
 
   // start traversal with some vertices identified by given ids 
   def V(vertexIds: Any*): GremlinScala[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
+    GremlinScala[Vertex, HNil](traversalSource.underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
 
-  // start traversal with some edges identified by given ids 
+  // start traversal with some edges identified by given ids
   def E(edgeIds: Any*): GremlinScala[Edge, HNil] =
-    GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
+    GremlinScala[Edge, HNil](traversalSource.underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def tx(): Transaction = graph.tx()
 
