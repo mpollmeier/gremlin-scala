@@ -1,16 +1,21 @@
 package gremlin.scala
 
-import java.util.function.{BinaryOperator, Supplier, UnaryOperator}
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
 import shapeless._
-import scala.collection.JavaConversions._
 
-case class ScalaGraph(graph: Graph) {
-  val traversalSource: GraphTraversalSource = graph.traversal()
+object ScalaGraph {
+  def apply(graph: Graph): ScalaGraph =
+    ScalaGraph(TraversalSource(graph))
+}
+
+case class ScalaGraph(traversalSource: TraversalSource) {
+  lazy val graph = traversalSource.graph
+
+  def configure(conf: TraversalSource => TraversalSource) = 
+    ScalaGraph(conf(TraversalSource(graph)))
 
   def addVertex(label: String): Vertex = graph.addVertex(label)
 
@@ -53,26 +58,19 @@ case class ScalaGraph(graph: Graph) {
     addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap)
 
   // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](traversalSource.V().asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](traversalSource.underlying.V())
 
   // start traversal with all edges
-  def E = GremlinScala[Edge, HNil](traversalSource.E().asInstanceOf[GraphTraversal[_, Edge]])
+  def E(): GremlinScala[Edge, HNil] = GremlinScala[Edge, HNil](traversalSource.underlying.E())
 
   // start traversal with some vertices identified by given ids 
-  def V(vertexIds: Any*) =
-    GremlinScala[Vertex, HNil](traversalSource.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
-      .asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(vertexIds: Any*): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](traversalSource.underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
 
-  // start traversal with some edges identified by given ids 
-  def E(edgeIds: Any*) =
-    GremlinScala[Edge, HNil](traversalSource.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
-      .asInstanceOf[GraphTraversal[_, Edge]])
-
-  def edges(edgeIds: Any*): Iterator[Edge] =
-    graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]])
-
-  def vertices(vertexIds: Any*): Iterator[Vertex] =
-    graph.vertices(vertexIds.asInstanceOf[Seq[AnyRef]])
+  // start traversal with some edges identified by given ids
+  def E(edgeIds: Any*): GremlinScala[Edge, HNil] =
+    GremlinScala[Edge, HNil](traversalSource.underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def tx(): Transaction = graph.tx()
 
@@ -88,26 +86,4 @@ case class ScalaGraph(graph: Graph) {
   def close(): Unit = graph.close()
 
   def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
-
-  def withSack[A](initialValue: () => A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A]))
-
-  def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
-
-  def withSack[A](initialValue: () => A, mergeOperator: (A, A) => A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], mergeOperator: BinaryOperator[A]))
-
-  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph =
-    withNewTraversalSource(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A], mergeOperator: BinaryOperator[A]))
-
-  def withSack[A](initialValue: A): ScalaGraph = withSack(() => initialValue)
-  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph = withSack(() => initialValue, splitOperator)
-  def withSack[A](initialValue: A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, mergeOperator)
-  def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, splitOperator, mergeOperator)
-
-  private def withNewTraversalSource(ts: GraphTraversalSource): ScalaGraph =
-    new ScalaGraph(graph) {
-      override val traversalSource = ts
-    }
 }

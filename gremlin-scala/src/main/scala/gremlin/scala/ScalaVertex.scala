@@ -1,7 +1,6 @@
 package gremlin.scala
 
 import java.util
-
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
 import shapeless._
@@ -91,8 +90,6 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r ⇒ Key[Any](r._1) → r._2 }.toSeq)
   }
-
-  override def start(): GremlinScala[Vertex, HNil] = __(vertex)
 
   def vertices(direction: Direction, edgeLabels: String*): util.Iterator[Vertex] =
     vertex.vertices(direction, edgeLabels: _*)

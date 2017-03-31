@@ -446,9 +446,8 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "handle vertex-unique properties" in new Fixture {
-
       // Add a new property on a specific vertex and test that it is picked up first.
-      graph.graph.V(1).property(Nickname, "okram").iterate()
+      graph.V(1).property(Nickname, "okram").iterate()
 
       val traversal3 = graph.V
         .hasLabel("person")
@@ -591,7 +590,6 @@ class TraversalSpec extends WordSpec with Matchers {
     val duration = System.currentTimeMillis - start
     duration should be <= maxTime.toMillis
   }
-
 
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala

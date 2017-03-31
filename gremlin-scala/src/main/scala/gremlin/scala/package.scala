@@ -2,7 +2,7 @@ package gremlin
 
 import java.util.function.{BiPredicate, BiFunction, BinaryOperator, Consumer, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier, UnaryOperator}
 import org.apache.tinkerpop.gremlin.process.traversal
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
 import org.apache.tinkerpop.gremlin.structure
 import shapeless._
 import shapeless.ops.hlist.IsHCons
@@ -21,27 +21,27 @@ package object scala {
   type Label = String
 
   implicit class GraphAsScala[G <: Graph](g: G) {
-    def asScala = ScalaGraph(g)
+    def asScala() = ScalaGraph(g)
   }
 
   implicit class GraphAsJava(g: ScalaGraph) {
-    def asJava = g.graph
+    def asJava() = g.graph
   }
 
   implicit class EdgeAsScala(e: Edge) {
-    def asScala = ScalaEdge(e)
+    def asScala() = ScalaEdge(e)
   }
 
   implicit class EdgeAsJava(e: ScalaEdge) {
-    def asJava = e.edge
+    def asJava() = e.edge
   }
 
   implicit class VertexAsScala(e: Vertex) {
-    def asScala = ScalaVertex(e)
+    def asScala() = ScalaVertex(e)
   }
 
   implicit class VertexAsJava(v: ScalaVertex) {
-    def asJava = v.vertex
+    def asJava() = v.vertex
   }
 
   implicit class PropertyOps[A](property: Property[A]) {
