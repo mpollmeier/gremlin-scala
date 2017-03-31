@@ -10,13 +10,11 @@ import shapeless._
 import scala.collection.JavaConversions._
 
 object ScalaGraph {
-  def apply(graph: Graph): ScalaGraph =
-    ScalaGraph(new GraphTraversalSource(graph))
+  def apply(graph: Graph, configure: GraphTraversalSource => GraphTraversalSource): ScalaGraph =
+    new ScalaGraph(configure(new GraphTraversalSource(graph)).getGraph)
 }
 
-case class ScalaGraph(traversalSource: GraphTraversalSource) {
-  lazy val graph = traversalSource.getGraph
-
+case class ScalaGraph(graph: Graph) {
   def addVertex(label: String): Vertex = graph.addVertex(label)
 
   def addVertex(): Vertex = graph.addVertex()
@@ -58,26 +56,19 @@ case class ScalaGraph(traversalSource: GraphTraversalSource) {
     addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap)
 
   // start traversal with all vertices 
-  def V = GremlinScala[Vertex, HNil](traversalSource.V().asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](graph.traversal.V())
 
   // start traversal with all edges
-  def E = GremlinScala[Edge, HNil](traversalSource.E().asInstanceOf[GraphTraversal[_, Edge]])
+  def E(): GremlinScala[Edge, HNil] = GremlinScala[Edge, HNil](graph.traversal.E())
 
   // start traversal with some vertices identified by given ids 
-  def V(vertexIds: Any*) =
-    GremlinScala[Vertex, HNil](traversalSource.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*)
-      .asInstanceOf[GraphTraversal[_, Vertex]])
+  def V(vertexIds: Any*): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](graph.traversal.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   // start traversal with some edges identified by given ids 
-  def E(edgeIds: Any*) =
-    GremlinScala[Edge, HNil](traversalSource.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*)
-      .asInstanceOf[GraphTraversal[_, Edge]])
-
-  def edges(edgeIds: Any*): Iterator[Edge] =
-    graph.edges(edgeIds.asInstanceOf[Seq[AnyRef]])
-
-  def vertices(vertexIds: Any*): Iterator[Vertex] =
-    graph.vertices(vertexIds.asInstanceOf[Seq[AnyRef]])
+  def E(edgeIds: Any*): GremlinScala[Edge, HNil] =
+    GremlinScala[Edge, HNil](graph.traversal.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def tx(): Transaction = graph.tx()
 
@@ -93,21 +84,4 @@ case class ScalaGraph(traversalSource: GraphTraversalSource) {
   def close(): Unit = graph.close()
 
   def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
-
-  def withSack[A](initialValue: () => A): ScalaGraph =
-    ScalaGraph(traversalSource.withSack(initialValue: Supplier[A]))
-
-  def withSack[A](initialValue: () => A, splitOperator: A => A): ScalaGraph =
-    ScalaGraph(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
-
-  def withSack[A](initialValue: () => A, mergeOperator: (A, A) => A): ScalaGraph =
-    ScalaGraph(traversalSource.withSack(initialValue: Supplier[A], mergeOperator: BinaryOperator[A]))
-
-  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph =
-    ScalaGraph(traversalSource.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A], mergeOperator: BinaryOperator[A]))
-
-  def withSack[A](initialValue: A): ScalaGraph = withSack(() => initialValue)
-  def withSack[A](initialValue: A, splitOperator: A => A): ScalaGraph = withSack(() => initialValue, splitOperator)
-  def withSack[A](initialValue: A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, mergeOperator)
-  def withSack[A](initialValue: A, splitOperator: A => A, mergeOperator: (A, A) => A): ScalaGraph = withSack(() => initialValue, splitOperator, mergeOperator)
 }
