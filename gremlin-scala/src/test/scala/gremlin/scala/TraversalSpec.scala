@@ -577,6 +577,13 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "local step" can {
+    "limit a local subquery" in new Fixture {
+      graph.V.outE.inV.count.head shouldBe 6
+      graph.V.local(_.outE.limit(1)).inV.limit(3).count.head shouldBe 3
+    }
+  }
+
   "time limit is honored" ignore new Fixture {
     val maxTime = FiniteDuration(50, MILLISECONDS)
     val start = System.currentTimeMillis
