@@ -81,7 +81,7 @@ class LogicalSpec extends TestBase {
     }
 
     it("returns false if no elements found") {
-      graph.V.filter(_ ⇒ false).exists shouldBe false
+      graph.V.filter(_.has(Key("nonExistingProperty"))).exists shouldBe false
     }
   }
 }

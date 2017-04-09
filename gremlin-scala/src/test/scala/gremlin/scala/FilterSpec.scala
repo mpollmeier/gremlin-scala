@@ -9,24 +9,17 @@ import org.scalatest.WordSpec
 
 class FilterSpec extends WordSpec with Matchers {
 
-  "filter" in new Fixture {
-    graph.V
-      .filter { _.property(Age).orElse(0) > 30 }
-      .value(Name)
-      .toSet should be(Set("josh", "peter"))
-  }
-
-  "filterNot" in new Fixture {
-    graph.V
-      .filterNot { _.property(Age).orElse(0) > 30 }
-      .value(Name)
-      .toSet should be(Set("marko", "vadas", "lop", "ripple"))
-  }
-
   "filterWithTraversal" in new Fixture {
     graph.V
-      .filterWithTraversal(_.value(Age).is(P.gt(30)))
+      .filter(_.value(Age).is(P.gt(30)))
       .value(Name).toSet should be(Set("josh", "peter"))
+  }
+
+  "filter on end type" in new Fixture {
+    graph.V
+      .filterOnEnd( _.property(Age).orElse(0) > 30)
+      .value(Name)
+      .toSet should be(Set("josh", "peter"))
   }
 
   "has" in new Fixture {

@@ -65,34 +65,38 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
 
-  def filter(p: End ⇒ Boolean) = GremlinScala[End, Labels](
-    traversal.filter(new JPredicate[Traverser[End]] {
-      override def test(h: Traverser[End]): Boolean = p(h.get)
-    })
-  )
-
-  /**
-    * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
+  /** Existing users please note: since 3.2.4.8 the `filter` step changed it's signature and now
+    * takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old 
+    * `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. 
+    * This change might affect your for comprehensions. 
+    * The reasoning for the change is that it's discouraged to use lambdas (see 
+    * http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating 
+    * anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary 
+    * for remote execution etc.
+    * The migration should be straightforward, e.g. here is the update to gremlin-examples: TODO
+    * 
+    * You might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
     **/
-  def filterWithTraversal(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
+  def filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.filter(predicate(start).traversal))
 
-  def withFilter(p: End ⇒ Boolean) = filter(p) //used in scala for comprehensions
+  /** used in scala for comprehensions */
+  def withFilter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) = filter(predicate) 
 
-  def filterWithTraverser(p: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](
+  def filterOnEnd(predicate: End ⇒ Boolean) = GremlinScala[End, Labels](
     traversal.filter(new JPredicate[Traverser[End]] {
-    override def test(h: Traverser[End]): Boolean = p(h)
-  }))
-
-  def filterNot(p: End ⇒ Boolean) = GremlinScala[End, Labels](
-    traversal.filter(new JPredicate[Traverser[End]] {
-      override def test(h: Traverser[End]): Boolean = !p(h.get)
+      override def test(h: Traverser[End]): Boolean = predicate(h.get)
     })
   )
 
+  def filterWithTraverser(predicate: Traverser[End] ⇒ Boolean) = GremlinScala[End, Labels](
+    traversal.filter(new JPredicate[Traverser[End]] {
+    override def test(h: Traverser[End]): Boolean = predicate(h)
+  }))
+
   def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
-    filter(pf.isDefinedAt).map(pf)
+    filterOnEnd(pf.isDefinedAt).map(pf)
 
   def count() = GremlinScala[JLong, HNil](traversal.count())
 
