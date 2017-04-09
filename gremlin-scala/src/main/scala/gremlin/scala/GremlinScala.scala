@@ -73,7 +73,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     * http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating 
     * anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary 
     * for remote execution etc.
-    * The migration should be straightforward, e.g. here is the update to gremlin-examples: TODO
     * 
     * You might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`

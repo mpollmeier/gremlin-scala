@@ -9,7 +9,7 @@ import org.scalatest.WordSpec
 
 class FilterSpec extends WordSpec with Matchers {
 
-  "filterWithTraversal" in new Fixture {
+  "filter" in new Fixture {
     graph.V
       .filter(_.value(Age).is(P.gt(30)))
       .value(Name).toSet should be(Set("josh", "peter"))

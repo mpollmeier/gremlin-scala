@@ -19,8 +19,6 @@ Please note: since 3.2.4.8 the `filter` step changed it's signature and now take
 
 The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
 
-The migration should be straightforward, e.g. here is the update to gremlin-examples: TODO
-
 ### Getting started
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`. The latest version is displayed at the top of this readme in the maven badge. 
 
