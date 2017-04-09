@@ -14,6 +14,13 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 * Minimal runtime overhead - only allocates additional instances if absolutely necessary
 * Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
+### Existing users 
+Please note: since 3.2.4.8 the `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
+
+The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
+
+The migration should be straightforward, e.g. here is the update to gremlin-examples: TODO
+
 ### Getting started
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`. The latest version is displayed at the top of this readme in the maven badge. 
 
@@ -22,8 +29,8 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 ```
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-val g = TinkerFactory.createModern.asScala
-g.V.hasLabel("person").value[String]("name").toList
+val graph = TinkerFactory.createModern.asScala
+graph.V.hasLabel("person").value[String]("name").toList
 // List(marko, vadas, josh, peter)
 ```
 
@@ -33,7 +40,10 @@ The below create traversals, which are lazy computations. To run a traversal, yo
 
 ```scala
 import gremlin.scala._
+import org.apache.tinkerpop.gremlin.process.traversal.{Order, P}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+
+val graph = TinkerFactory.createModern.asScala
 
 graph.V //all vertices
 graph.E //all edges
@@ -285,10 +295,10 @@ Random links:
 * [Shortest path algorithm with Gremlin-Scala 3.0.0 (Michael Pollmeier)](http://www.michaelpollmeier.com/2014/12/27/gremlin-scala-shortest-path)
 * [Shortest path algorithm with Gremlin-Scala 2.4.1 (Stefan Bleibinhaus)](http://bleibinha.us/blog/2013/10/scala-and-graph-databases-with-gremlin-scala)
 
-# Release a new version
+## Release a new version of gremlin-scala
 * release  #will do a release for each crossScalaVersions
 * sonatypeRelease
-## next steps: upgrade gremlin-examples
+### after release: upgrade gremlin-examples
 * find . -name build.sbt | xargs grep gremlin-scala
 * git grep -l 3.2.3.1 | xargs sed -i 's/3.2.3.1/3.2.4.0/g'
 * bash testAll.sh

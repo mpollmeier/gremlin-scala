@@ -1,13 +1,11 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.{Path, Order, P}
-import org.apache.tinkerpop.gremlin.process.traversal.step.util.ImmutablePath
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
-import shapeless.HNil
 import java.lang.{Long => JLong}
 import shapeless.test.illTyped
 import collection.JavaConversions._
@@ -106,7 +104,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "throw an exception if there is no result" in new Fixture {
       intercept[NoSuchElementException] {
-        graph.V.filter(_ ⇒ false).values[String]("name").head
+        graph.V.filter(_.has(Key("nonExistingProperty"))).values[String]("name").head
       }
     }
   }
@@ -117,7 +115,7 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "return None if there is no result" in new Fixture {
-      graph.V.filter(_ ⇒ false).values[String]("name").headOption shouldBe None
+      graph.V.filter(_.has(Key("nonExistingProperty"))).values[String]("name").headOption shouldBe None
     }
   }
 
@@ -320,7 +318,7 @@ class TraversalSpec extends WordSpec with Matchers {
     v0 <-- "e2" --> v2
 
     graph.E.count.head shouldBe 4
-    val v0v1Edges = v0.bothE.filter(_.bothVertices.contains(v1)).label.toSet
+    val v0v1Edges = v0.bothE.filter(_.bothV.is(v1)).label.toSet
     v0v1Edges shouldBe Set("e0", "e1")
   }
 
@@ -558,7 +556,7 @@ class TraversalSpec extends WordSpec with Matchers {
       "don't use special steps" in new Fixture {
         val traversal = for {
           v1 ← graph.V(1)
-          coDeveloper ← v1.out(Created).in(Created).filterNot(_ == v1)
+          coDeveloper ← v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
         } yield v1 --- CoDeveloper --> coDeveloper
         traversal.iterate()
 
