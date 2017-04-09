@@ -20,7 +20,6 @@ import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable
 import shapeless.ops.product.ToHList
 import shapeless.syntax.std.product.productOps
 import scala.concurrent.duration.FiniteDuration
-import scala.language.existentials
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.{immutable, mutable}
@@ -71,6 +70,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       override def test(h: Traverser[End]): Boolean = p(h.get)
     })
   )
+
+  /**
+    * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
+    * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
+    **/
+  def filterWithTraversal(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
+    GremlinScala[End, Labels](traversal.filter(predicate(start).traversal))
 
   def withFilter(p: End ⇒ Boolean) = filter(p) //used in scala for comprehensions
 

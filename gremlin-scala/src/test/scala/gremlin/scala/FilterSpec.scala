@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import TestGraph._
@@ -22,11 +23,11 @@ class FilterSpec extends WordSpec with Matchers {
       .toSet should be(Set("marko", "vadas", "lop", "ripple"))
   }
 
-  // "filterNot" in new Fixture {
-  //   graph.V
-  //     .filter { _.property("age").orElse(0) > 30 }
-  //     .values[String]("name").toSet should be(Set("josh", "peter"))
-  // }
+  "filterWithTraversal" in new Fixture {
+    graph.V
+      .filterWithTraversal(_.value(Age).is(P.gt(30)))
+      .value(Name).toSet should be(Set("josh", "peter"))
+  }
 
   "has" in new Fixture {
     graph.V.has(Age, 35).value(Name).toSet shouldBe Set("peter")
