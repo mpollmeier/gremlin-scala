@@ -13,7 +13,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.util.TraverserSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
-import org.apache.tinkerpop.gremlin.process.traversal.{P, Path, Scope, Traversal}
+import org.apache.tinkerpop.gremlin.process.traversal.P //this import leads to warning, but that's fine
+import org.apache.tinkerpop.gremlin.process.traversal.{Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}

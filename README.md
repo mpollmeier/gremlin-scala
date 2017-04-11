@@ -155,6 +155,11 @@ g.V(1).as(a)
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
+### A note about predicates
+tl;dr: use gremlin.scala.P to create predicates of type P. 
+
+Many steps in take a tinkerpop3 predicate of type `org.apache.tinkerpop.gremlin.process.traversal.P`. Creating Ps that take collection types is dangerous though, because you need to ensure you're creating the correct P. For example `P.within(Set("a", "b"))` would be calling the wrong overload (which checks if the value IS the given set). In that instance you actually wanted to create `P.within(Set("a", "b").asJava: java.util.Collection[String])`. To avoid that confusion, it's best to just `import gremlin.scala._` and create it as `P.within(Set("a", "b"))`.
+
 ### Common and useful steps
 
 ```scala
