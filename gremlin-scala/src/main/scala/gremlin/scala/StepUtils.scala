@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalOptionParent.Pick
 
 /** Define the traversal to run if the given predicate is true - used in branch step

@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.{Path, Order, P}
+import org.apache.tinkerpop.gremlin.process.traversal.{Path, Order}
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
@@ -10,7 +10,6 @@ import java.lang.{Long => JLong}
 import shapeless.test.illTyped
 import collection.JavaConversions._
 import collection.JavaConverters._
-import org.apache.tinkerpop.gremlin.process.traversal.P
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
 class TraversalSpec extends WordSpec with Matchers {

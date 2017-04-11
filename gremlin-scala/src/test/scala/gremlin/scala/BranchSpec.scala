@@ -1,9 +1,7 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
-import scala.util.Random
 
 class BranchSpec extends WordSpec with Matchers {
 
