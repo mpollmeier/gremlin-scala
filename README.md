@@ -289,6 +289,9 @@ If you would like to help, here's a list of things that needs to be addressed:
 * ideas for more type safety in traversals
 * fill this readme and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
+## Why such a long version number?
+The first three digits is the TP3 version number, only the last digit is incremented on every release of gremlin-scala.
+
 ## Further reading
 For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
 Please note that while Gremlin-Scala is very close to the original Gremlin, there are differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
