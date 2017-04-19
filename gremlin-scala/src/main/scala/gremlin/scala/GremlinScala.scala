@@ -566,6 +566,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def hasNot[A](key: Key[A], value: A) = GremlinScala[End, Labels](traversal.not(__.traversal.has(key.name, value)))
 
+  def hasNot[A](key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.not(__.traversal.has(key.name, predicate)))
+  
   def and(traversals: (GremlinScala[End, HNil] ⇒ GremlinScala[_, _])*) =
     GremlinScala[End, Labels](traversal.and(traversals.map {
       _(start).traversal
