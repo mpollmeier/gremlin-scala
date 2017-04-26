@@ -57,7 +57,16 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def +(label: String, properties: KeyValue[_]*): Vertex =
     addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap)
 
-  // start traversal with all vertices 
+  def addV(): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](traversalSource.underlying.addV())
+
+  def addV(label: String): GremlinScala[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](traversalSource.underlying.addV(label))
+
+  def inject[S](starts: S*): GremlinScala[S, HNil] =
+    GremlinScala[S, HNil](traversalSource.underlying.inject(starts:_ *))
+
+  // start traversal with all vertices
   def V(): GremlinScala[Vertex, HNil] =
     GremlinScala[Vertex, HNil](traversalSource.underlying.V())
 

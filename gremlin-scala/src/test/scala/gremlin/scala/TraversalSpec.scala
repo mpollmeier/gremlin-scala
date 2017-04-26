@@ -7,7 +7,10 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import java.lang.{Long => JLong}
+
+import shapeless.HNil
 import shapeless.test.illTyped
+
 import collection.JavaConversions._
 import collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
@@ -572,12 +575,34 @@ class TraversalSpec extends WordSpec with Matchers {
         graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
     }
+
+    "use addV to start a traversal" in new Fixture {
+      graph.addV(Person).property(Name, "Joseph").property(Age, 39).property(Nickname, "Joe").head
+
+      graph.V.has(Name, "Joseph").count.head shouldBe 1
+    }
+
+    "use addV (without label) to start a traversal" in new Fixture {
+      graph.addV().property(Name, "Unlabeled").head
+
+      graph.V.has(Name, "Unlabeled").count.head shouldBe 1
+    }
   }
 
   "local step" can {
     "limit a local subquery" in new Fixture {
       graph.V.outE.inV.count.head shouldBe 6
       graph.V.local(_.outE.limit(1)).inV.limit(3).count.head shouldBe 3
+    }
+  }
+
+  "inject step" can {
+    "be used to start a traversal" in new Fixture {
+      graph.inject(1, 2).map(_ + 1).map(graph.V(_).value(Name).head).toList shouldEqual List("vadas", "lop")
+    }
+
+    "used to add values to traversal" in new Fixture {
+      graph.V(4).out().value(Name).inject("daniel").toList shouldEqual List("daniel", "ripple", "lop")
     }
   }
 
