@@ -673,6 +673,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // NUMBER STEPS END
   // -------------------
 
+  def V(vertexIdsOrElements: Any*)(implicit ev: End <:< Vertex): GremlinScala[Vertex, Labels] =
+    GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))
+
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
   protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
 
