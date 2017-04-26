@@ -581,6 +581,22 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "graph step" can {
+    "be used mid traversal" in new Fixture {
+      val a = StepLabel[Vertex]()
+      val b = StepLabel[Vertex]()
+      // visit marko (a), then vadas (b) and then connect the two
+      graph.V().has(Name, "marko").as(a)
+        .V().has(Name, "vadas").as(b)
+        .addE(Knows).from(a).to(b).property(StartTime, 2010)
+        .iterate
+
+      val names = graph.E().hasLabel(Knows).has(StartTime, 2010).bothV().value(Name).toList.sorted
+
+      names shouldEqual List("marko", "vadas")
+    }
+  }
+
   "time limit is honored" ignore new Fixture {
     val maxTime = FiniteDuration(50, MILLISECONDS)
     val start = System.currentTimeMillis
@@ -601,6 +617,8 @@ class TraversalSpec extends WordSpec with Matchers {
     val Nickname = Key[String]("nickname")
     val Lang = Key[String]("lang")
     val Age = Key[Int]("age")
+    val StartTime = Key[Int]("startTime")
+    val Knows = "knows"
     val Person = "person"
     val Created = "created"
   }
