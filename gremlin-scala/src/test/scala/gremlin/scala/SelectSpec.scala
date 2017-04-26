@@ -1,8 +1,7 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
-import java.lang.{Double ⇒ JDouble, Long ⇒ JLong}
 
 class SelectSpec extends WordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala
