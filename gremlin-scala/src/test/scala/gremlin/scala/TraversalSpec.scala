@@ -586,7 +586,10 @@ class TraversalSpec extends WordSpec with Matchers {
       val a = StepLabel[Vertex]()
       val b = StepLabel[Vertex]()
       // visit marko (a), then vadas (b) and then connect the two
-      graph.V().has(Name, "marko").as(a).V().has(Name, "vadas").as(b).addE(Knows).from(a).to(b).property(StartTime, 2010).iterate
+      graph.V().has(Name, "marko").as(a)
+        .V().has(Name, "vadas").as(b)
+        .addE(Knows).from(a).to(b).property(StartTime, 2010)
+        .iterate
 
       val names = graph.E().hasLabel(Knows).has(StartTime, 2010).bothV().value(Name).toList.sorted
 
