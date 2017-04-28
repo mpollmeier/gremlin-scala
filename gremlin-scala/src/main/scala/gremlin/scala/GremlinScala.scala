@@ -679,10 +679,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def promise[NewEnd](onComplete: GremlinScala[End, Labels] => NewEnd): Future[NewEnd] = {
     val promise = Promise[NewEnd]
     val wrapperFun = (t: Traversal[_, _]) => onComplete(GremlinScala(t.asInstanceOf[GraphTraversal[_, End]]))
-    this.traversal.promise(wrapperFun).whenComplete {
-      case (result, null) => promise.complete(Success(result))
-      case (_, t) => promise.failure(t)
-    }
+    this.traversal.promise(wrapperFun).whenComplete(toJavaBiConsumer((result: NewEnd, t: Throwable) =>
+      if (t != null) {
+        promise.failure(t)
+      } else {
+        promise.success(result)
+      })
+    )
     promise.future
   }
 
