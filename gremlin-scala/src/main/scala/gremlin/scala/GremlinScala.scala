@@ -4,6 +4,7 @@ import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
 import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiFunction ⇒ JBiFunction, Function => JFunction}
 import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
 import java.util.stream.{Stream ⇒ JStream}
+import java.util.concurrent.CompletableFuture
 
 import collection.JavaConversions._
 import collection.JavaConverters._
@@ -24,6 +25,8 @@ import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.{immutable, mutable}
+import scala.concurrent.{Future, Promise}
+import scala.util.Success
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
@@ -672,6 +675,16 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     this.map(toNumber).traversal
   // NUMBER STEPS END
   // -------------------
+
+  def promise[NewEnd](onComplete: GremlinScala[End, Labels] => NewEnd): Future[NewEnd] = {
+    val promise = Promise[NewEnd]
+    val wrapperFun = (t: Traversal[_, _]) => onComplete(GremlinScala(t.asInstanceOf[GraphTraversal[_, End]]))
+    this.traversal.promise(wrapperFun).whenComplete {
+      case (result, null) => promise.complete(Success(result))
+      case (_, t) => promise.failure(t)
+    }
+    promise.future
+  }
 
   def V(vertexIdsOrElements: Any*)(implicit ev: End <:< Vertex): GremlinScala[Vertex, Labels] =
     GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))

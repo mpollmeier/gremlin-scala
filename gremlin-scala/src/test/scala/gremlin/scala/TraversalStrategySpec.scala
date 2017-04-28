@@ -13,6 +13,8 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, WordSpec}
 
+import scala.concurrent.Await
+import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.util.Random
 
 class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
@@ -76,44 +78,17 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
   }
 
   "withRemote" should {
-    "cause Graph to use RemoteConnection" in {
-      val graph = EmptyGraph.instance().asScala()
-
-      // Stub out a remote connection that responds to g.V() with 2 vertices
-      val connection = stub[RemoteConnection]
-      val remoteGraph = graph.configure(_.withRemote(connection))
-
-      // effectively a g.V() bytecode
-      val expectedBytecode: Bytecode = new Bytecode()
-      expectedBytecode.addStep("V")
-
-      // data to return
-      val data = List[TVertex](
-        new DetachedVertex(1, "person", new util.LinkedHashMap[String,Object]()),
-        new DetachedVertex(2, "person", new util.LinkedHashMap[String,Object]())
-      )
-
-      // Create a future that completes immediately and provides a remote traversal providing vertices
-      val vertexResult = new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]()
-      val traversal = new AbstractRemoteTraversal[Int, TVertex]() {
-        val it = data.iterator
-
-        override def nextTraverser: Traverser.Admin[TVertex] = new DefaultRemoteTraverser[Vertex](it.next(), 1)
-
-        override def getSideEffects: RemoteTraversalSideEffects = null // not necessary for this test
-
-        override def next(): TVertex = nextTraverser().get()
-
-        override def hasNext: Boolean = it.hasNext
-      }
-      vertexResult.complete(traversal)
-
-      // when expected byte code provided, return vertex result.
-      connection.submitAsync[TVertex] _ when expectedBytecode returns vertexResult
-
+    "use RemoteConnection" in new RemoteGraphFixture {
       // Execute a traversal with provided vertices
       val result = remoteGraph.V().toList()
-      result shouldEqual data
+      result shouldEqual mockVertices
+    }
+
+    "support promise" in new RemoteGraphFixture {
+      // Execute a traversal using promise with the provided vertices
+      val future = remoteGraph.V().promise(_.toList())
+      val result = Await.result(future, FiniteDuration(1000, MILLISECONDS))
+      result shouldEqual mockVertices
     }
   }
 
@@ -123,5 +98,41 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     val Lang = Key[String]("lang")
     val Weight = Key[Double]("weight")
     val Knows = "knows"
+  }
+
+  trait RemoteGraphFixture {
+    val graph = EmptyGraph.instance().asScala()
+
+    // Stub out a remote connection that responds to g.V() with 2 vertices
+    val connection = stub[RemoteConnection]
+    val remoteGraph = graph.configure(_.withRemote(connection))
+
+    // effectively a g.V() bytecode
+    val expectedBytecode: Bytecode = new Bytecode()
+    expectedBytecode.addStep("V")
+
+    // data to return
+    val mockVertices = List[TVertex](
+      new DetachedVertex(1, "person", new util.LinkedHashMap[String,Object]()),
+      new DetachedVertex(2, "person", new util.LinkedHashMap[String,Object]())
+    )
+
+    // Create a future that completes immediately and provides a remote traversal providing vertices
+    val vertexResult = new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]()
+    val traversal = new AbstractRemoteTraversal[Int, TVertex]() {
+      val it = mockVertices.iterator
+
+      override def nextTraverser: Traverser.Admin[TVertex] = new DefaultRemoteTraverser[Vertex](it.next(), 1)
+
+      override def getSideEffects: RemoteTraversalSideEffects = null // not necessary for this test
+
+      override def next(): TVertex = nextTraverser().get()
+
+      override def hasNext: Boolean = it.hasNext
+    }
+    vertexResult.complete(traversal)
+
+    // when expected byte code provided, return vertex result.
+    connection.submitAsync[TVertex] _ when expectedBytecode returns vertexResult
   }
 }
