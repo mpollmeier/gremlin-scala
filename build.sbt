@@ -2,9 +2,9 @@ name := "root"
 val org = "com.michaelpollmeier"
 organization := org
 
-val defaultScalaV = "2.12.1"
+val defaultScalaV = "2.12.2"
 scalaVersion := defaultScalaV
-crossScalaVersions := Seq("2.11.8", defaultScalaV) //prefix sbt command with `+` to run it with these scala versions
+crossScalaVersions := Seq("2.11.11", defaultScalaV) //prefix sbt command with `+` to run it with these scala versions
 releaseCrossBuild := true
 
 val gremlinVersion = "3.2.4"
@@ -22,7 +22,7 @@ val commonSettings = Seq(
       "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.3" % Test,
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
   ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
@@ -66,7 +66,7 @@ lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
   .dependsOn(macros)
 
-// macros can't be in the same compilation unit according to joan: https://github.com/mpollmeier/gremlin-scala/issues/100
+// macros can't be in the same compilation unit
 lazy val macros = project.in(file("macros"))
   .settings(commonSettings: _*)
 
