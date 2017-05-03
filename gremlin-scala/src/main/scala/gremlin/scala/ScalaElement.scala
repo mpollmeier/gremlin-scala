@@ -1,8 +1,7 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
 import scala.collection.JavaConversions._
-import shapeless._
+import shapeless.HNil
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
