@@ -6,7 +6,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapStep
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
 import scala.collection.JavaConversions._
-import scala.language.postfixOps
 import shapeless._
 import shapeless.ops.hlist._
 

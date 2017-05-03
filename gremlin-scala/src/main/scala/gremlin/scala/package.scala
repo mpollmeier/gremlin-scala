@@ -2,7 +2,7 @@ package gremlin
 
 import java.util.function.{BiConsumer, BiPredicate, BiFunction, BinaryOperator, Consumer, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier, UnaryOperator}
 import org.apache.tinkerpop.gremlin.process.traversal
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{ GraphTraversal, GraphTraversalSource }
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
 import shapeless._
 import shapeless.ops.hlist.IsHCons

@@ -1,6 +1,5 @@
 package gremlin.scala
 
-import shapeless._
 import scala.collection.JavaConversions._
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {

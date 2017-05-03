@@ -3,7 +3,6 @@ package gremlin.scala
 import java.util
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
-import shapeless._
 import scala.collection.JavaConversions._
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
