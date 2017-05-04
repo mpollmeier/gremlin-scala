@@ -9,7 +9,7 @@ import collection.JavaConversions._
 import collection.JavaConverters._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{DefaultGraphTraversal, GraphTraversal}
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.util.TraverserSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
@@ -52,6 +52,16 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     traversal.iterate()
     GremlinScala[End, Labels](traversal)
   }
+
+  override def clone() = GremlinScala[End, Labels](
+    traversal match {
+      // clone is protected on Traversal, but DefaultGraphTraversal makes it public
+      case dgt: DefaultGraphTraversal[_, End] => dgt.clone
+      // unfortunately, structural types can't be checked in pattern match
+      // if more (and potentially yet unknown) Traversals need to be supported,
+      // we could either use type classes or reflection: http://stackoverflow.com/a/3434804/452762
+    }
+  )
 
   def cap(sideEffectKey: String, sideEffectKeys: String*) =
     GremlinScala[End, Labels](traversal.cap(sideEffectKey, sideEffectKeys: _*))
