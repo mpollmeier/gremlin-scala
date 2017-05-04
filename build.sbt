@@ -27,7 +27,7 @@ val commonSettings = Seq(
   ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
   scalacOptions ++= Seq(
-    "-Xlint"
+    // "-Xlint"
     // "-Xfatal-warnings",
     // "-feature"
     // "-deprecation", //hard to handle when supporting multiple scala versions...
