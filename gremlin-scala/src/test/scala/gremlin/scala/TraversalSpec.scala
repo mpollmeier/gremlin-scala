@@ -638,8 +638,12 @@ class TraversalSpec extends WordSpec with Matchers {
   "allows to be cloned" in new Fixture {
     val gs = graph.V(1).count
     import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph._
+
+    // clone is protected on Traversal, but DefaultGraphTraversal makes it public
+    // unfortunately, structural types can't be checked in pattern match
+    // if more (and potentially yet unknown) Traversals need to be supported,
+    // we could use either type classes or reflection: http://stackoverflow.com/a/3434804/452762
     val gsCloned = gs.traversal match {
-      /* TODO: use structural type check */
       case dgt: DefaultGraphTraversal[_, _] => GremlinScala(dgt.clone)
     }
     gs.head shouldBe 1
