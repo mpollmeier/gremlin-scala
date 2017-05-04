@@ -8,7 +8,6 @@ import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import java.lang.{Long => JLong}
 
-import shapeless.HNil
 import shapeless.test.illTyped
 
 import collection.JavaConversions._
@@ -634,6 +633,17 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val duration = System.currentTimeMillis - start
     duration should be <= maxTime.toMillis
+  }
+
+  "allows to be cloned" in new Fixture {
+    val gs = graph.V(1).count
+    import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph._
+    val gsCloned = gs.traversal match {
+      /* TODO: use structural type check */
+      case dgt: DefaultGraphTraversal[_, _] => GremlinScala(dgt.clone)
+    }
+    gs.head shouldBe 1
+    gsCloned.head shouldBe 1
   }
 
   trait Fixture {

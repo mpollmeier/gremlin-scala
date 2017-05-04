@@ -4,7 +4,6 @@ import java.lang.{Long ⇒ JLong, Double ⇒ JDouble}
 import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiFunction ⇒ JBiFunction, Function => JFunction}
 import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
 import java.util.stream.{Stream ⇒ JStream}
-import java.util.concurrent.CompletableFuture
 
 import collection.JavaConversions._
 import collection.JavaConverters._
@@ -26,7 +25,6 @@ import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
-import scala.util.Success
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
