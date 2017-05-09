@@ -16,8 +16,13 @@ object Converter {
   /* need to explicitly create these for the base types, otherwise it there would
    * be ambiguous implicits (given Converter.forDomainNode) */
   implicit val forString = identityConverter[String]
-  implicit val forInteger = identityConverter[Integer]
+  implicit val forInt = identityConverter[Int]
+  implicit val forDouble = identityConverter[Double]
+  implicit val forFloat = identityConverter[Float]
   implicit val forBoolean = identityConverter[Boolean]
+  implicit val forInteger = identityConverter[Integer]
+  implicit val forJDouble = identityConverter[java.lang.Double]
+  implicit val forJFloat = identityConverter[java.lang.Float]
   def identityConverter[A] = new Converter[A] {
     type GraphType = A
     def toGraph(value: A) = value
