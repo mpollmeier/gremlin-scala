@@ -21,6 +21,12 @@ object TestGraph {
   val Location = Key[String]("location")
   val Weight = Key[Double]("weight")
   val DoesNotExist = Key[Any]("doesnt_exist")
+
+  @label("person")
+  case class Person(name: String, age: Int)
+
+  @label("software")
+  case class Software(name: String, lang: String)
 }
 
 trait TestBase extends FunSpec with Matchers with TestGraph {

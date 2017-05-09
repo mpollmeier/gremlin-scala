@@ -14,11 +14,6 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 * Minimal runtime overhead - only allocates additional instances if absolutely necessary
 * Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
-### Existing users 
-Please note: since 3.2.4.8 the `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
-
-The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
-
 ### Getting started
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`. The latest version is displayed at the top of this readme in the maven badge. 
 
@@ -155,10 +150,22 @@ g.V(1).as(a)
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
-### A note about predicates
+### A note on predicates
 tl;dr: use gremlin.scala.P to create predicates of type P. 
 
 Many steps in take a tinkerpop3 predicate of type `org.apache.tinkerpop.gremlin.process.traversal.P`. Creating Ps that take collection types is dangerous though, because you need to ensure you're creating the correct P. For example `P.within(Set("a", "b"))` would be calling the wrong overload (which checks if the value IS the given set). In that instance you actually wanted to create `P.within(Set("a", "b").asJava: java.util.Collection[String])`. To avoid that confusion, it's best to just `import gremlin.scala._` and create it as `P.within(Set("a", "b"))`.
+
+### Build a DSL on top of Gremlin-Scala
+You can now build your own domain specific language, which is super helpful if you don't want to expose your users to the world of graphs and tinkerpop, but merely build an API for them. All you need to do is setup your ADT as case classes, define your DSL as Steps and create one implicit constructor (the only boilerplate code). The magic in gremlin.scala.dsl._ allows you to even write for comprehensions like this:
+
+```scala
+for {
+  person   <- new PersonSteps(graph.V.hasLabel[Person])
+  software <- person.created
+} yield (person.name, software)
+```
+
+See the full setup in [DslSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/dsl/DslSpec.scala).
 
 ### Common and useful steps
 
@@ -308,3 +315,9 @@ Random links:
 * find . -name build.sbt | xargs grep gremlin-scala
 * git grep -l 3.2.3.1 | xargs sed -i 's/3.2.3.1/3.2.4.0/g'
 * bash testAll.sh
+
+## Breaking changes
+### 3.2.4.8 
+The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
+
+The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
