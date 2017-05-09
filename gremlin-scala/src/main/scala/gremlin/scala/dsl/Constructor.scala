@@ -16,23 +16,20 @@ object Constructor {
     type StepsType = StepsTypeOut
   }
 
-  implicit val forString = new Constructor[String] {
-    type GraphType = String
-    type StepsType = Steps[String, String]
-    def apply(raw: GremlinScala[GraphType, HNil]): Steps[String, String] = new Steps[String, String](raw)
+  def forBaseType[A](implicit converter: Converter.Aux[A, A]) = new Constructor[A] {
+    type GraphType = A
+    type StepsType = Steps[A, A]
+    def apply(raw: GremlinScala[GraphType, HNil]) = new Steps[A, A](raw)
   }
 
-  implicit val forInteger = new Constructor[Integer] {
-    type GraphType = Integer
-    type StepsType = Steps[Integer, Integer]
-    def apply(raw: GremlinScala[GraphType, HNil]): Steps[Integer, Integer] = new Steps[Integer, Integer](raw)
-  }
-
-  implicit val forBoolean = new Constructor[Boolean] {
-    type GraphType = Boolean
-    type StepsType = Steps[Boolean, Boolean]
-    def apply(raw: GremlinScala[GraphType, HNil]): Steps[Boolean, Boolean] = new Steps[Boolean, Boolean](raw)
-  }
+  implicit val forString = forBaseType[String]
+  implicit val forInt = forBaseType[Int]
+  implicit val forDouble = forBaseType[Double]
+  implicit val forFloat = forBaseType[Float]
+  implicit val forBoolean = forBaseType[Boolean]
+  implicit val forInteger = forBaseType[Integer]
+  implicit val forJDouble = forBaseType[java.lang.Double]
+  implicit val forJFloat = forBaseType[java.lang.Float]
 
   def forDomainNode[DomainType <: DomainRoot, StepsTypeOut <: NodeSteps[DomainType]](
     constr: GremlinScala[Vertex, HNil] => StepsTypeOut) = new Constructor[DomainType] {
