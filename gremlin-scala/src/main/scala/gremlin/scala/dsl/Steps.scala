@@ -33,6 +33,9 @@ class Steps[EndDomain, EndGraph](val raw: GremlinScala[EndGraph, HNil])(
     constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps =
     constr(raw.hasId(id))
 
+  def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps =
+    constr(raw.dedup())
+
   def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain ⇒ NewEndDomain)(
     implicit
     newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
@@ -70,6 +73,12 @@ class Steps[EndDomain, EndGraph](val raw: GremlinScala[EndGraph, HNil])(
     constr(rawWithFilter)
   }
 
+  // def or(traversals: (Self => Steps[_])*) : Self = {
+  //   val foo = traversals.map(
+  //     trav => { gs : GremlinScala[Vertex, HNil] => trav(construct(gs)).raw } )
+  //   construct(raw.or(foo :_*))
+  // }
+
 }
 
 /* Root class for all your vertex based DSL steps
@@ -98,15 +107,4 @@ class NodeSteps[EndDomain <: DomainRoot](override val raw: GremlinScala[Vertex, 
         predicate(v.toCC[EndDomain])
       }
     )
-
-  // def or(traversals: (Self => Steps[_])*) : Self = {
-  //   val foo = traversals.map(
-  //     trav => { gs : GremlinScala[Vertex, HNil] => trav(construct(gs)).raw } )
-  //   construct(raw.or(foo :_*))
-  // }
-
-  // def filterRaw(predicate: GremlinScala[EndGraph, _] => GremlinScala[_, _]): Self =
-  //   construct(raw.filter(predicate))
-
-  // def dedup(): Self = construct(raw.dedup())
 }

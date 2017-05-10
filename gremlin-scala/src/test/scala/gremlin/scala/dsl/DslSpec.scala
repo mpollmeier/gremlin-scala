@@ -10,8 +10,7 @@ class DslSpec extends WordSpec with Matchers {
   import TestDomain._
 
   "finds all persons" in {
-    val graph = TinkerFactory.createModern
-    val personSteps = PersonSteps(graph)
+    val personSteps = PersonSteps(TinkerFactory.createModern)
     personSteps.toSet shouldBe Set(
       Person(Some(1), "marko", 29),
       Person(Some(2), "vadas", 27),
@@ -43,10 +42,9 @@ class DslSpec extends WordSpec with Matchers {
 
   "filter with traversal on domain type" when {
     "domain type is a case class" in {
-      val graph = TinkerFactory.createModern
-
       val rippleDevelopers: PersonSteps =
-        PersonSteps(graph).filter(_.created.isRipple)
+        PersonSteps(TinkerFactory.createModern)
+          .filter(_.created.isRipple)
 
       rippleDevelopers.toList shouldBe List(
         Person(Some(4), "josh",  32)
@@ -55,9 +53,8 @@ class DslSpec extends WordSpec with Matchers {
   }
 
   "filter on domain type" in {
-    val graph = TinkerFactory.createModern
     val markos: List[Person] =
-      PersonSteps(graph)
+      PersonSteps(TinkerFactory.createModern)
         .filterOnEnd(_.name == "marko")
         .toList()
 
@@ -65,11 +62,9 @@ class DslSpec extends WordSpec with Matchers {
   }
 
   "aggregate intermediary results into a collection" in {
-    val graph = TinkerFactory.createModern
     val allPersons = mutable.ArrayBuffer.empty[Person]
-
     val markos: List[Person] =
-      PersonSteps(graph)
+      PersonSteps(TinkerFactory.createModern)
         .aggregate(allPersons)
         .filterOnEnd(_.name == "marko")
         .toList()
@@ -77,6 +72,17 @@ class DslSpec extends WordSpec with Matchers {
     markos.size shouldBe 1
     allPersons.size should be > 1
   }
+
+  "deduplicates" in {
+    val results: PersonSteps =
+      PersonSteps(TinkerFactory.createModern)
+        .created().createdBy()
+        .dedup()
+    results.toList.size shouldBe 3
+  }
+
+  // "supports `or` with multiple options" in {
+  // }
 
 }
 
