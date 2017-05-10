@@ -77,12 +77,19 @@ class NodeSteps[EndDomain <: DomainRoot](override val raw: GremlinScala[Vertex, 
       }
     )
 
-  // def filter(predicate: Self => Steps[_]): Self = {
-  //   val rawWithFilter: GremlinScala[EndGraph, HNil] =
-  //     /* TODO: remove cast */
-  //     raw.filter{ gs => predicate(construct(gs.asInstanceOf[GremlinScala[Vertex, HNil]])).raw }
-  //   construct(rawWithFilter)
-  // }
+  def filter[NewSteps](predicate: this.type => Steps[_, _])(
+    implicit constr: Constructor.Aux[EndDomain, Vertex, NewSteps]): NewSteps = {
+    val rawWithFilter: GremlinScala[Vertex, HNil] =
+      raw.filter{ gs =>
+        predicate(
+          constr(
+            gs.asInstanceOf[GremlinScala[Vertex, HNil]]
+          ).asInstanceOf[this.type]
+        ).raw
+      }
+    /* TODO: remove casts */
+    constr(rawWithFilter)
+  }
 
   def filterOnEnd[NewSteps](predicate: EndDomain => Boolean)(
     implicit constr: Constructor.Aux[EndDomain, Vertex, NewSteps]): NewSteps =

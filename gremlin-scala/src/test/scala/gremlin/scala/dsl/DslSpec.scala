@@ -41,6 +41,27 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
+  "filter on domain type" in {
+    val graph = TinkerFactory.createModern
+    val markos: List[Person] =
+      PersonSteps(graph)
+        .filterOnEnd(_.name == "marko")
+        .toList()
+
+    markos.size shouldBe 1
+  }
+
+  "filter with traversal on domain type" in {
+    val graph = TinkerFactory.createModern
+
+    val rippleDevelopers: PersonSteps =
+      PersonSteps(graph).filter(_.created.isRipple)
+
+    rippleDevelopers.toList shouldBe List(
+      Person(Some(4), "josh",  32)
+    )
+  }
+
   "aggregate intermediary results into a collection" in {
     val graph = TinkerFactory.createModern
     val allPersons = mutable.ArrayBuffer.empty[Person]
@@ -70,6 +91,7 @@ object TestDomain {
 
   class SoftwareSteps(override val raw: GremlinScala[Vertex, HNil]) extends NodeSteps[Software](raw) {
     def createdBy() = new PersonSteps(raw.in("created"))
+    def isRipple() = new SoftwareSteps(raw.has(Key("name") -> "ripple"))
   }
 
   implicit val personStepsConstructor: Constructor.Aux[Person, Vertex, PersonSteps] =
