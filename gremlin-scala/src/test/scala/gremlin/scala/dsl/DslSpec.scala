@@ -41,6 +41,19 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
+  "filter with traversal on domain type" when {
+    "domain type is a case class" in {
+      val graph = TinkerFactory.createModern
+
+      val rippleDevelopers: PersonSteps =
+        PersonSteps(graph).filter(_.created.isRipple)
+
+      rippleDevelopers.toList shouldBe List(
+        Person(Some(4), "josh",  32)
+      )
+    }
+  }
+
   "filter on domain type" in {
     val graph = TinkerFactory.createModern
     val markos: List[Person] =
@@ -49,17 +62,6 @@ class DslSpec extends WordSpec with Matchers {
         .toList()
 
     markos.size shouldBe 1
-  }
-
-  "filter with traversal on domain type" in {
-    val graph = TinkerFactory.createModern
-
-    val rippleDevelopers: PersonSteps =
-      PersonSteps(graph).filter(_.created.isRipple)
-
-    rippleDevelopers.toList shouldBe List(
-      Person(Some(4), "josh",  32)
-    )
   }
 
   "aggregate intermediary results into a collection" in {
