@@ -27,14 +27,13 @@ class Steps[EndDomain, EndGraph](val raw: GremlinScala[EndGraph, HNil])(
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
 
-  def hasId[NewSteps](id: AnyRef)(
-    implicit
-    isElement: EndGraph <:< Element,
-    constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps =
-    constr(raw.hasId(id))
-
   def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps =
     constr(raw.dedup())
+
+  /* access all gremlin-scala methods that don't modify the EndGraph type, e.g. `has` */
+  def onRaw[NewSteps](fun: GremlinScala[EndGraph, HNil] => GremlinScala[EndGraph, HNil])(
+    implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps =
+    constr(fun(raw))
 
   def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain ⇒ NewEndDomain)(
     implicit

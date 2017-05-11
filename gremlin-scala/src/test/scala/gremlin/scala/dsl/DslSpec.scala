@@ -19,12 +19,6 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
-  "traverses from person to software" in {
-    val graph = TinkerFactory.createModern
-    val personSteps = PersonSteps(graph).hasId(1: Integer)
-    personSteps.created.toSet shouldBe Set(Software("lop", "java"))
-  }
-
   "finds combination of person/software in for comprehension" in {
     implicit val graph = TinkerFactory.createModern
     val traversal = for {
@@ -79,6 +73,20 @@ class DslSpec extends WordSpec with Matchers {
         .created().createdBy()
         .dedup()
     results.toList.size shouldBe 3
+  }
+
+  "allows to use underlying gremlin-scala steps" in {
+    val steps: PersonSteps =
+      PersonSteps(TinkerFactory.createModern)
+        .onRaw(_.hasId(1: Integer))
+    steps.toList.size shouldBe 1
+  }
+
+  "traverses from person to software" in {
+    val personSteps =
+      PersonSteps(TinkerFactory.createModern)
+        .onRaw(_.hasId(1: Integer))
+    personSteps.created.toSet shouldBe Set(Software("lop", "java"))
   }
 
   // "supports `or` with multiple options" in {
