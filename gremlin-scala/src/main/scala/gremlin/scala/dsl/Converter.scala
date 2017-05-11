@@ -23,6 +23,7 @@ object Converter {
   implicit val forInteger = identityConverter[Integer]
   implicit val forJDouble = identityConverter[java.lang.Double]
   implicit val forJFloat = identityConverter[java.lang.Float]
+  implicit val forJBoolean = identityConverter[java.lang.Boolean]
   def identityConverter[A] = new Converter[A] {
     type GraphType = A
     def toGraph(value: A) = value
