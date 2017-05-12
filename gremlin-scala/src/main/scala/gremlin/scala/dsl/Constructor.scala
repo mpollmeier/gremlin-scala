@@ -10,6 +10,7 @@ trait Constructor[DomainType] {
   type StepsType
   def apply(raw: GremlinScala[GraphType, HNil]): StepsType
 }
+
 object Constructor {
   type Aux[DomainType, GraphTypeOut, StepsTypeOut] = Constructor[DomainType] {
     type GraphType = GraphTypeOut

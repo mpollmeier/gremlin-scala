@@ -32,6 +32,7 @@ class DslSpec extends WordSpec with Matchers {
       ("peter", Software("lop", "java")),
       ("josh", Software("ripple", "java"))
     )
+
   }
 
   "filter with traversal on domain type" when {
