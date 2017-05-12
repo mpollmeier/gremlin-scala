@@ -15,6 +15,7 @@ object Converter {
   type Aux[DomainType, Out0] = Converter[DomainType] { type GraphType = Out0 }
   /* need to explicitly create these for the base types, otherwise it there would
    * be ambiguous implicits (given Converter.forDomainNode) */
+  implicit def forUnit = identityConverter[Unit]
   implicit val forString = identityConverter[String]
   implicit val forInt = identityConverter[Int]
   implicit val forDouble = identityConverter[Double]

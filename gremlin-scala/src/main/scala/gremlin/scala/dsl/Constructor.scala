@@ -22,6 +22,7 @@ object Constructor {
     def apply(raw: GremlinScala[GraphType, HNil]) = new Steps[A, A](raw)
   }
 
+  implicit def forUnit = forBaseType[Unit]
   implicit val forString = forBaseType[String]
   implicit val forInt = forBaseType[Int]
   implicit val forDouble = forBaseType[Double]
