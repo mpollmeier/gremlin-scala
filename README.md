@@ -155,14 +155,27 @@ tl;dr: use gremlin.scala.P to create predicates of type P.
 
 Many steps in take a tinkerpop3 predicate of type `org.apache.tinkerpop.gremlin.process.traversal.P`. Creating Ps that take collection types is dangerous though, because you need to ensure you're creating the correct P. For example `P.within(Set("a", "b"))` would be calling the wrong overload (which checks if the value IS the given set). In that instance you actually wanted to create `P.within(Set("a", "b").asJava: java.util.Collection[String])`. To avoid that confusion, it's best to just `import gremlin.scala._` and create it as `P.within(Set("a", "b"))`.
 
-### Build a DSL on top of Gremlin-Scala
-You can now build your own domain specific language, which is super helpful if you don't want to expose your users to the world of graphs and tinkerpop, but merely build an API for them. All you need to do is setup your ADT as case classes, define your DSL as Steps and create one implicit constructor (the only boilerplate code). The magic in gremlin.scala.dsl._ allows you to even write for comprehensions like this:
+### Build a custom DSL on top of Gremlin-Scala
+You can now build your own domain specific language, which is super helpful if you don't want to expose your users to the world of graphs and tinkerpop, but merely build an API for them. All you need to do is setup your ADT as case classes, define your DSL as Steps and create one implicit constructor (the only boilerplate code). The magic in gremlin.scala.dsl._ allows you to even write for comprehensions like this (DSL for tinkerpop testgraph):
 
 ```scala
-for {
-  person   <- new PersonSteps(graph.V.hasLabel[Person])
+case class Person  (name: String, age: Integer) extends DomainRoot
+case class Software(name: String, lang: String) extends DomainRoot
+
+val traversal = for {
+  person   <- PersonSteps(graph)
   software <- person.created
 } yield (person.name, software)
+
+// note: `traversal` is inferred by the compiler as `gremlin.scala.dsl.Steps[(String, Software)]`
+
+traversal.toSet // returns: 
+Set(
+  ("marko", Software("lop", "java")),
+  ("josh", Software("lop", "java")),
+  ("peter", Software("lop", "java")),
+  ("josh", Software("ripple", "java"))
+)
 ```
 
 See the full setup in [DslSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/dsl/DslSpec.scala).
