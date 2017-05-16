@@ -321,6 +321,9 @@ Random links:
 * [Shortest path algorithm with Gremlin-Scala 3.0.0 (Michael Pollmeier)](http://www.michaelpollmeier.com/2014/12/27/gremlin-scala-shortest-path)
 * [Shortest path algorithm with Gremlin-Scala 2.4.1 (Stefan Bleibinhaus)](http://bleibinha.us/blog/2013/10/scala-and-graph-databases-with-gremlin-scala)
 
+## Random things worth knowing
+* `org.apache.tinkerpop.gremlin.structure.Transaction` is not thread-safe. It's implemented with Apache's ThreadLocal class, see https://github.com/mpollmeier/gremlin-scala/issues/196#issuecomment-301625679
+
 ## Release a new version of gremlin-scala
 * release  #will do a release for each crossScalaVersions
 * sonatypeRelease
