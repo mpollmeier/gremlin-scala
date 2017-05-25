@@ -41,6 +41,13 @@ object Constructor {
     def apply(raw: GremlinScala[GraphType, HNil]): StepsTypeOut = constr(raw)
   }
 
+  implicit def forList[A, AGraphType, AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[List[A]] {
+    type GraphType = List[AGraphType]
+    type StepsType = Steps[List[A], List[AGraphType]]
+    def apply(raw: GremlinScala[GraphType, HNil]) =
+      new Steps[List[A], List[AGraphType]](raw)
+  }
+
   implicit val forHNil = new Constructor[HNil] {
     type GraphType = HNil
     type StepsType = Steps[HNil, HNil]

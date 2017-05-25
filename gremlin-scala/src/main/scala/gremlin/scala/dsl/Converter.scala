@@ -37,6 +37,12 @@ object Converter {
     def toGraph(dt: DomainType): Vertex = AnonymousVertex(dt)
   }
 
+  implicit def forList[A, AGraphType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Converter[List[A]] {
+    type GraphType = List[AGraphType]
+    def toDomain(aGraphs: List[AGraphType]): List[A] = aGraphs.map(aConverter.toDomain)
+    def toGraph(as: List[A]): List[AGraphType] = as.map(aConverter.toGraph)
+  }
+
   implicit val forHNil = new Converter[HNil] {
     type GraphType = HNil
     def toGraph(value: HNil) = HNil
