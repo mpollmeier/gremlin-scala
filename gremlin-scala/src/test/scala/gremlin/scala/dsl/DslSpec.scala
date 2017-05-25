@@ -90,17 +90,28 @@ class DslSpec extends WordSpec with Matchers {
     personSteps.created.toSet shouldBe Set(Software("lop", "java"))
   }
 
-  "supports lists in map/flatMap" in {
+  "supports collections in map/flatMap" when {
     import Converter.forDomainNode /* TODO: prefer forDomainNode by default! */
     implicit val graph = TinkerFactory.createModern
+    def personSteps = PersonSteps(graph)
 
-    val personSteps = PersonSteps(graph)
-    val query = personSteps.map { person =>
-      (person.name, person.created.toList)
+    "using List" in {
+      val query = personSteps.map { person =>
+        (person.name, person.created.toList)
+      }
+
+      val results: List[(String, List[Software])] = query.toList
+      results.size shouldBe 4
     }
 
-    val results: List[(String, List[Software])] = query.toList
-    results.size shouldBe 4
+    "using Set" in {
+      val query = personSteps.map { person =>
+        (person.name, person.created.toSet)
+      }
+
+      val results: List[(String, Set[Software])] = query.toList
+      results.size shouldBe 4
+    }
   }
 
 }
