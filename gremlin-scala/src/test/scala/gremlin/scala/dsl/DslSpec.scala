@@ -51,7 +51,7 @@ class DslSpec extends WordSpec with Matchers {
     val markos: List[Person] =
       PersonSteps(TinkerFactory.createModern)
         .filterOnEnd(_.name == "marko")
-        .toList()
+        .toList
 
     markos.size shouldBe 1
   }
@@ -62,7 +62,7 @@ class DslSpec extends WordSpec with Matchers {
       PersonSteps(TinkerFactory.createModern)
         .aggregate(allPersons)
         .filterOnEnd(_.name == "marko")
-        .toList()
+        .toList
 
     markos.size shouldBe 1
     allPersons.size should be > 1
@@ -71,7 +71,7 @@ class DslSpec extends WordSpec with Matchers {
   "deduplicates" in {
     val results: PersonSteps =
       PersonSteps(TinkerFactory.createModern)
-        .created().createdBy()
+        .created.createdBy
         .dedup()
     results.toList.size shouldBe 3
   }
@@ -90,8 +90,29 @@ class DslSpec extends WordSpec with Matchers {
     personSteps.created.toSet shouldBe Set(Software("lop", "java"))
   }
 
-  // "supports `or` with multiple options" in {
-  // }
+  "supports collections in map/flatMap" when {
+    import Converter.forDomainNode /* TODO: prefer forDomainNode by default! */
+    implicit val graph = TinkerFactory.createModern
+    def personSteps = PersonSteps(graph)
+
+    "using List" in {
+      val query = personSteps.map { person =>
+        (person.name, person.created.toList)
+      }
+
+      val results: List[(String, List[Software])] = query.toList
+      results.size shouldBe 4
+    }
+
+    "using Set" in {
+      val query = personSteps.map { person =>
+        (person.name, person.created.toSet)
+      }
+
+      val results: List[(String, Set[Software])] = query.toList
+      results.size shouldBe 4
+    }
+  }
 
 }
 
@@ -103,12 +124,12 @@ object TestDomain {
     def apply(graph: Graph) = new PersonSteps(graph.V.hasLabel[Person])
   }
   class PersonSteps(override val raw: GremlinScala[Vertex, HNil]) extends NodeSteps[Person](raw) {
-    def created() = new SoftwareSteps(raw.out("created"))
+    def created = new SoftwareSteps(raw.out("created"))
   }
 
   class SoftwareSteps(override val raw: GremlinScala[Vertex, HNil]) extends NodeSteps[Software](raw) {
-    def createdBy() = new PersonSteps(raw.in("created"))
-    def isRipple() = new SoftwareSteps(raw.has(Key("name") -> "ripple"))
+    def createdBy = new PersonSteps(raw.in("created"))
+    def isRipple = new SoftwareSteps(raw.has(Key("name") -> "ripple"))
   }
 
   implicit val personStepsConstructor: Constructor.Aux[Person, Vertex, PersonSteps] =
