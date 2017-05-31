@@ -51,6 +51,11 @@ trait ScalaElement[ElementType <: Element] {
   def valueOption[A](key: Key[A]): Option[A] =
     element.property[A](key.name).toOption
 
+  def valueOption[A](key: Key[A], value: Option[A]): ElementType = value match {
+    case Some(v) => setProperty(key, v)
+    case None => removeProperty(key)
+  }
+
   // note: this may throw an IllegalStateException - better use `Property`
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =
     element.values[A](keys: _*)
