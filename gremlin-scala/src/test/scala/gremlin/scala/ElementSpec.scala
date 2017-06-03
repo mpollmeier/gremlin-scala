@@ -58,6 +58,18 @@ class ElementSpec extends TestBase {
       v1.valueOption(DoesNotExist) shouldBe None
     }
 
+    it("sets an optional value") {
+      v1.valueOption(TestProperty, None)
+      v1.property(TestProperty).isPresent shouldBe false
+      v1.valueOption(TestProperty, Some("test"))
+      v1.property(TestProperty).value shouldBe "test"
+
+      e7.valueOption(TestProperty, None)
+      e7.property(TestProperty).isPresent shouldBe false
+      e7.valueOption(TestProperty, Some("test"))
+      e7.property(TestProperty).value shouldBe "test"
+    }
+
     it("throws an exception if it doesn't exist") {
       intercept[IllegalStateException] { v1.value2(DoesNotExist) }
     }
