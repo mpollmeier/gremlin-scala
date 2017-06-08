@@ -33,7 +33,7 @@ object Converter {
 
   implicit def forDomainNode[DomainType <: DomainRoot](implicit marshaller: Marshallable[DomainType], graph: Graph) = new Converter[DomainType] {
     type GraphType = Vertex
-    def toDomain(v: Vertex): DomainType = marshaller.toCC(v.id, v.valueMap) 
+    def toDomain(vertex: Vertex): DomainType = marshaller.toCC(vertex) 
     def toGraph(dt: DomainType): Vertex = AnonymousVertex(dt)
   }
 

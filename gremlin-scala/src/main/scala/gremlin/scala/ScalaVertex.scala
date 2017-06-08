@@ -8,8 +8,7 @@ import scala.collection.JavaConversions._
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
-  def toCC[CC <: Product: Marshallable] =
-    implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
+  def toCC[CC <: Product: Marshallable] = implicitly[Marshallable[CC]].toCC(vertex)
 
   override def setProperty[A](key: Key[A], value: A): Vertex = {
     element.property(key.name, value)
