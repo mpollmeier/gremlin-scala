@@ -109,15 +109,26 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def loops() = GremlinScala[Integer, HNil](traversal.loops())
 
-  def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
+  // def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
+  /* TODO: take over labels from `fun` into the result type */
+  def map[A](fun: GremlinScala[End, Labels] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
+    GremlinScala[A, Labels](
+      traversal.map[A] { 
+        /* TODO: don't start new traversal? check tp3 docs for example */
+        // val anonymousTrav = GremlinScala[End, Labels](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[End]())
+        // fun(anonymousTrav).traversal
+      }
+    )
 
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
 
-  def flatMap[A](fun: End ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
+  /* TODO: take over labels from `fun` into the result type */
+  def flatMap[A](fun: GremlinScala[End, Labels] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] = 
     GremlinScala[A, Labels](
-      traversal.flatMap[A] { t: Traverser[End] ⇒
-        fun(t.get).toList().toIterator: JIterator[A]
+      traversal.flatMap[A] { 
+        val anonymousTrav = GremlinScala[End, Labels](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[End]())
+        fun(anonymousTrav).traversal
       }
     )
 

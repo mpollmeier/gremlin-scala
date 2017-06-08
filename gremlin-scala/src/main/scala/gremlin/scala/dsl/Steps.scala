@@ -49,16 +49,17 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
         }
       }
 
-  /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def flatMap[NewSteps <: StepsRoot](fun: EndDomain ⇒ NewSteps)(
+  def flatMap[NewSteps <: StepsRoot](fun: Steps[EndDomain, EndGraph] ⇒ NewSteps)(
     implicit
     constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
     newConverter: Converter[NewSteps#EndDomain0]
   ): NewSteps =
       constr {
-        raw.flatMap { endGraph: EndGraph =>
-          val newSteps: NewSteps = fun(converter.toDomain(endGraph))
-          newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, _]]
+        raw.flatMap { gs: GremlinScala[EndGraph, shapeless.HNil] =>
+          val gs = GremlinScala[EndGraph, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[EndGraph]())
+          val steps = new Steps[EndDomain, EndGraph](gs)
+          val newSteps: NewSteps = fun(steps)
+          newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, HNil]]
           // not sure why I need the cast here - should be safe though
         }
       }
@@ -131,4 +132,41 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
         predicate(v.toCC[EndDomain])
       }
     )
+}
+
+/* TODO: removeme */
+object Usage {
+  val graph: ScalaGraph = ???
+  // val gs: GremlinScala[Vertex, HNil] = ???
+  // val x: GremlinScala[Edge, HNil] = gs.flatMap { v =>
+  //   v.outE
+  // }
+  // new Fixture {
+  //   val CoDeveloper = "co-developer"
+  //   val coDevelopers: GremlinScala[Vertex, _] = for {
+  //     v1 ← graph.V(1)
+  //     coDeveloper ← v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
+  //   } yield coDeveloper
+
+  //   val a: GremlinScala[Vertex, _] = for {
+  //     v1 ← graph.V(1)
+  //   } yield v1
+
+  //   // val x: Int = coDevelopers.toList
+  //   // coDevelopers.toList.foreach { case (v1: Vertex, coDeveloper: Vertex) =>
+  //   //   v1 --- CoDeveloper --> coDeveloper
+  //   // }
+  // }
+
+  trait Fixture {
+    val graph: ScalaGraph = ???
+    val Name = Key[String]("name")
+    val Nickname = Key[String]("nickname")
+    val Lang = Key[String]("lang")
+    val Age = Key[Int]("age")
+    val StartTime = Key[Int]("startTime")
+    val Knows = "knows"
+    val Person = "person"
+    val Created = "created"
+  }
 }
