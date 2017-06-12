@@ -40,17 +40,18 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
   implicit def forJDouble[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[java.lang.Double, LabelsDomain, LabelsGraph]
   implicit def forJFloat[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[java.lang.Float, LabelsDomain, LabelsGraph]
 
-  // def forDomainNode[
-  //   DomainType <: DomainRoot,
-  //   LabelsDomain <: HList,
-  //   LabelsGraph <: HList,
-  //   StepsTypeOut <: NodeSteps[DomainType, LabelsDomain, LabelsGraph]](
-  //   constr: GremlinScala[Vertex, LabelsGraph] => StepsTypeOut) = new Constructor[DomainType, LabelsGraph] {
-  //   type GraphType = Vertex
-  //   type StepsType = StepsTypeOut
+  def forDomainNode[
+    DomainType <: DomainRoot,
+    LabelsDomain <: HList,
+    LabelsGraph1 <: HList,
+    StepsTypeOut <: NodeSteps[DomainType, LabelsDomain, LabelsGraph1]](
+    constr: GremlinScala[Vertex, LabelsGraph1] => StepsTypeOut) = new Constructor[DomainType, LabelsDomain] {
+    type GraphType = Vertex
+    type StepsType = StepsTypeOut
+    type LabelsGraph = LabelsGraph1
 
-  //   def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsTypeOut = constr(raw)
-  // }
+    def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsTypeOut = constr(raw)
+  }
 
   // implicit def forList[
   //   A,

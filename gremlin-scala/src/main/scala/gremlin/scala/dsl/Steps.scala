@@ -69,29 +69,29 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
         }
       }
 
-  def filter[NewSteps](predicate: this.type => Steps[_, _, _, _])(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps = {
-    val rawWithFilter: GremlinScala[EndGraph, LabelsGraph] =
-      raw.filter{ gs =>
-        predicate(
-          constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
-        ).raw
-      }
-    /* TODO: remove casts */
-    constr(rawWithFilter)
-  }
+  // def filter[NewSteps](predicate: this.type => Steps[_, _, _, _])(
+  //   implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps = {
+  //   val rawWithFilter: GremlinScala[EndGraph, LabelsGraph] =
+  //     raw.filter{ gs =>
+  //       predicate(
+  //         constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
+  //       ).raw
+  //     }
+  //   /* TODO: remove casts */
+  //   constr(rawWithFilter)
+  // }
 
-  def filterNot[NewSteps](predicate: this.type => Steps[_, _])(
-    implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps = {
-    val rawWithFilter: GremlinScala[EndGraph, HNil] =
-      raw.filterNot{ gs =>
-        predicate(
-          constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
-        ).raw
-      }
-    /* TODO: remove casts */
-    constr(rawWithFilter)
-  }
+  // def filterNot[NewSteps](predicate: this.type => Steps[_, _])(
+  //   implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps = {
+  //   val rawWithFilter: GremlinScala[EndGraph, HNil] =
+  //     raw.filterNot{ gs =>
+  //       predicate(
+  //         constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
+  //       ).raw
+  //     }
+  //   /* TODO: remove casts */
+  //   constr(rawWithFilter)
+  // }
 
   // def or(traversals: (Self => Steps[_])*) : Self = {
   //   val foo = traversals.map(
