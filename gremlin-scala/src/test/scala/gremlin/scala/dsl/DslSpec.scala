@@ -31,6 +31,9 @@ class DslSpec extends WordSpec with Matchers {
 
     implicit val graph = TinkerFactory.createModern
     // implicit def constr: Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]] = implicitly[Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]]]
+    val personSteps = PersonSteps(graph)
+    import personSteps._
+    // implicit val constr = implicitly[Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]]]
     /* TODO: should find the above implicitly... */
     PersonSteps(graph).flatMap { person =>
       val personStepsInner = new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
