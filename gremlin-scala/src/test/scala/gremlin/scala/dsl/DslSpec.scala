@@ -19,27 +19,14 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
-  /* TODO: remove me */
+  /* TODO: transform to a proper test */
   "FOO" in {
-    // val personSteps = PersonSteps(TinkerFactory.createModern)
-    // val a: Steps[String, String, HNil, HNil] = personSteps.name
-    // val b: Steps[String, String, String :: HNil, String :: HNil] = a.as(StepLabel[String]("a"))
-    // val c: Steps[String, String, String :: HNil, String :: HNil] = b.map{ name => name.toLowerCase}
-    // c.toList
-
-    // personSteps.map { person => person.name}.toList
-
     implicit val graph = TinkerFactory.createModern
-    // implicit def constr: Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]] = implicitly[Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]]]
-    val personSteps = PersonSteps(graph)
-    import personSteps._
-    // implicit val constr = implicitly[Constructor.Aux[Software,HNil,Vertex,HNil,SoftwareSteps[HNil,HNil]]]
-    /* TODO: should find the above implicitly... */
-    PersonSteps(graph).flatMap { person =>
-      val personStepsInner = new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
-      personStepsInner.created
-    }
-    //.map{software => software}
+
+    val a: PersonSteps[Person :: HNil, Vertex :: HNil] = PersonSteps(graph).as(StepLabel[Person]("p"))
+    val b: SoftwareSteps[Person :: HNil, Vertex :: HNil] = a.created
+    val c: SoftwareSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] = b.as(StepLabel[Software]("s"))
+    val d: PersonSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] = c.createdBy
   }
 
   // "finds combination of person/software in for comprehension" in {
@@ -154,7 +141,7 @@ object TestDomain {
     def apply(graph: Graph) = new PersonSteps[HNil, HNil](graph.V.hasLabel[Person])
   }
   class PersonSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
-      extends NodeSteps[Person, LabelsDomain, LabelsGraph](raw) with CustomStepsImplicits[LabelsDomain, LabelsGraph] {
+      extends NodeSteps[Person, LabelsDomain, LabelsGraph](raw) {
 
     def created = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.out("created"))
 
@@ -162,34 +149,21 @@ object TestDomain {
   }
 
   class SoftwareSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
-      extends NodeSteps[Software, LabelsDomain, LabelsGraph](raw) with CustomStepsImplicits[LabelsDomain, LabelsGraph] {
+      extends NodeSteps[Software, LabelsDomain, LabelsGraph](raw) {
 
     def createdBy = new PersonSteps[LabelsDomain, LabelsGraph](raw.in("created"))
 
     def isRipple = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.has(Key("name") -> "ripple"))
   }
 
-  trait CustomStepsImplicits[LabelsDomain <: HList, LabelsGraph <: HList] {
-  // implicit val personStepsConstructor: Constructor.Aux[Person, Vertex, PersonSteps] =
-  //   Constructor.forDomainNode(new PersonSteps(_))
+  implicit def personStepsConstructor[LabelsDomain <: HList, LabelsGraph <: HList]
+    : Constructor.Aux[Person, LabelsDomain, Vertex, LabelsGraph, PersonSteps[LabelsDomain, LabelsGraph]] =
+    Constructor.forDomainNode[Person, LabelsDomain, LabelsGraph, PersonSteps[LabelsDomain, LabelsGraph]](new PersonSteps[LabelsDomain, LabelsGraph](_))
 
-    implicit val softwareStepsConstructor: Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]] =
-      Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
-  }
+  implicit def softwareStepsConstructor[LabelsDomain <: HList, LabelsGraph <: HList]
+    : Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]] =
+    Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
 
   // implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps =
   //   new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
-}
-
-object TypeLevelProofs {
-  // val x: Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]] = Constructor.forString[HNil, HNil]
-  // val x: Constructor[String, HNil] = the[Constructor[String, HNil]]
-  the[Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]]]
-  // the[Constructor.Aux[String, String :: HNil, String, HNil, Steps[String, String, String :: HNil, String :: HNil]]]
-}
-
-
-object AsSteps {
-  /* TODO: move to main tests */
-
 }
