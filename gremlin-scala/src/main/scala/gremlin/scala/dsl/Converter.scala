@@ -11,8 +11,11 @@ trait Converter[DomainType] {
   def toDomain(graphType: GraphType): DomainType
 }
 
-object Converter {
+object Converter extends LowPriorityConverterImplicits {
   type Aux[DomainType, Out0] = Converter[DomainType] { type GraphType = Out0 }
+}
+
+trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
   /* need to explicitly create these for the base types, otherwise it there would
    * be ambiguous implicits (given Converter.forDomainNode) */
   implicit def forUnit = identityConverter[Unit]
@@ -70,7 +73,9 @@ object Converter {
         case h :: t => hConverter.toDomain(h) :: tConverter.toDomain(t)
       }
     }
+}
 
+trait LowestPriorityConverterImplicits  {
   // for all Products, e.g. tuples, case classes etc
   implicit def forGeneric[T, Repr <: HList, GraphType <: HList, GraphTypeTuple <: Product](
     implicit

@@ -12,12 +12,15 @@ trait Constructor[DomainType, LabelsDomain <: HList] {
   def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsType
 }
 
-object Constructor {
+object Constructor extends LowPriorityConstructorImplicits {
   type Aux[DomainType, LabelsDomain <: HList, GraphTypeOut, LabelsGraphOut <: HList, StepsTypeOut] = Constructor[DomainType, LabelsDomain] {
     type GraphType = GraphTypeOut
     type LabelsGraph = LabelsGraphOut 
     type StepsType = StepsTypeOut
   }
+}
+
+trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
   /* TODO: derive LabelsGraph via implicit: labelsConverter: Converter.Aux[LabelsDomain, LabelsGraph] */
   def forBaseType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsDomain] {
@@ -100,7 +103,9 @@ object Constructor {
   //       def apply(raw: GremlinScala[GraphType, HLabelsGraph :: TLabelsGraph]): StepsType =
   //         new Steps[H :: T, HGraphType :: TGraphType, HLabelsDomain :: TLabelsDomain, HLabelsGraph :: TLabelsGraph](raw)
   //   }
+}
 
+trait LowestPriorityConstructorImplicits {
   // for all Products, e.g. tuples, case classes etc
   // implicit def forGeneric[
   //   T, Repr <: HList,
