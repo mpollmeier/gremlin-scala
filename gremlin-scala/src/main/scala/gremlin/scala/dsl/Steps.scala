@@ -63,9 +63,19 @@ class Steps[EndDomain, EndGraph](val raw: GremlinScala[EndGraph, HNil])(
     val rawWithFilter: GremlinScala[EndGraph, HNil] =
       raw.filter{ gs =>
         predicate(
-          constr(
-            gs.asInstanceOf[GremlinScala[EndGraph, HNil]]
-          ).asInstanceOf[this.type]
+          constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
+        ).raw
+      }
+    /* TODO: remove casts */
+    constr(rawWithFilter)
+  }
+
+  def filterNot[NewSteps](predicate: this.type => Steps[_, _])(
+    implicit constr: Constructor.Aux[EndDomain, EndGraph, NewSteps]): NewSteps = {
+    val rawWithFilter: GremlinScala[EndGraph, HNil] =
+      raw.filterNot{ gs =>
+        predicate(
+          constr(gs.asInstanceOf[GremlinScala[EndGraph, HNil]]).asInstanceOf[this.type]
         ).raw
       }
     /* TODO: remove casts */

@@ -77,20 +77,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
 
-  /** Existing users please note: since 3.2.4.8 the `filter` step changed it's signature and now
-    * takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old 
-    * `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. 
-    * This change might affect your for comprehensions. 
-    * The reasoning for the change is that it's discouraged to use lambdas (see 
-    * http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating 
-    * anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary 
-    * for remote execution etc.
-    * 
-    * You might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
+  /** You might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
     **/
   def filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.filter(predicate(start).traversal))
+
+  def filterNot(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
+    GremlinScala[End, Labels](traversal.filter(predicate(start).traversal.count.is(P.eq(0))))
 
   /** used in scala for comprehensions */
   def withFilter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) = filter(predicate) 

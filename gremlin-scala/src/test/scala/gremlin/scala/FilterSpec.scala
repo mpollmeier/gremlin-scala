@@ -14,6 +14,12 @@ class FilterSpec extends WordSpec with Matchers {
       .value(Name).toSet should be(Set("josh", "peter"))
   }
 
+  "filterNot" in new Fixture {
+    graph.V
+      .filterNot(_.value(Age).is(P.gt(30)))
+      .value(Name).toSet should be(Set("lop", "marko", "vadas", "ripple"))
+  }
+
   "filter on end type" in new Fixture {
     graph.V
       .filterOnEnd( _.property(Age).orElse(0) > 30)

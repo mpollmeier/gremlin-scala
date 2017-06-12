@@ -47,6 +47,14 @@ class DslSpec extends WordSpec with Matchers {
     }
   }
 
+  "filterNot with traversal on domain type" in {
+    val rippleDevelopers: PersonSteps =
+      PersonSteps(TinkerFactory.createModern)
+        .filterNot(_.created.isRipple)
+
+    rippleDevelopers.toList.size shouldBe 3
+  }
+
   "filter on domain type" in {
     val markos: List[Person] =
       PersonSteps(TinkerFactory.createModern)
