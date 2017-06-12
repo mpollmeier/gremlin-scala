@@ -5,20 +5,24 @@ import shapeless._
 import shapeless.ops.hlist.Tupler
 import shapeless.ops.product.ToHList
 
-trait Constructor[DomainType, LabelsGraph <: HList] {
+trait Constructor[DomainType, LabelsDomain <: HList] {
   type GraphType
+  type LabelsGraph <: HList
   type StepsType
   def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsType
 }
 
 object Constructor {
-  type Aux[DomainType, LabelsGraph <: HList, GraphTypeOut, StepsTypeOut] = Constructor[DomainType, LabelsGraph] {
+  type Aux[DomainType, LabelsDomain <: HList, GraphTypeOut, LabelsGraphOut <: HList, StepsTypeOut] = Constructor[DomainType, LabelsDomain] {
     type GraphType = GraphTypeOut
+    type LabelsGraph = LabelsGraphOut 
     type StepsType = StepsTypeOut
   }
 
-  def forBaseType[A, LabelsDomain <: HList, LabelsGraph <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsGraph] {
+  /* TODO: derive LabelsGraph via implicit: labelsConverter: Converter.Aux[LabelsDomain, LabelsGraph] */
+  def forBaseType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsDomain] {
     type GraphType = A
+    type LabelsGraph = LabelsGraph1
     type StepsType = Steps[A, A, LabelsDomain, LabelsGraph]
     def apply(raw: GremlinScala[GraphType, LabelsGraph]) = new Steps[A, A, LabelsDomain, LabelsGraph](raw)
   }

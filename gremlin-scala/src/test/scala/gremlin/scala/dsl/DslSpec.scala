@@ -121,6 +121,15 @@ class DslSpec extends WordSpec with Matchers {
     }
   }
 =======
+=======
+  /* TODO: remove me */
+  "FOO" in {
+    val personSteps = PersonSteps(TinkerFactory.createModern)
+    // personSteps.name
+
+  }
+
+>>>>>>> add labels hlist everywhere
   // "finds combination of person/software in for comprehension" in {
   //   implicit val graph = TinkerFactory.createModern
   //   val traversal = for {
@@ -225,11 +234,15 @@ object TestDomain {
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps(graph.V.hasLabel[Person])
   }
-  class PersonSteps(override val raw: GremlinScala[Vertex, HNil]) extends NodeSteps[Person, HNil, HNil](raw) {
+  class PersonSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
+      extends NodeSteps[Person, LabelsDomain, LabelsGraph](raw) {
     def created = new SoftwareSteps(raw.out("created"))
+    def name[NewSteps](implicit constr: Constructor.Aux[String, LabelsDomain, String, LabelsGraph, NewSteps]): NewSteps =
+      constr(raw.map(_.value[String]("name")))
   }
 
-  class SoftwareSteps(override val raw: GremlinScala[Vertex, HNil]) extends NodeSteps[Software, HNil, HNil](raw) {
+  class SoftwareSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
+      extends NodeSteps[Software, LabelsDomain, LabelsGraph](raw) {
     def createdBy = new PersonSteps(raw.in("created"))
     def isRipple = new SoftwareSteps(raw.has(Key("name") -> "ripple"))
   }
@@ -241,11 +254,19 @@ object TestDomain {
   // implicit val softwareStepsConstructor: Constructor.Aux[Software, Vertex, SoftwareSteps] =
   //   Constructor.forDomainNode(new SoftwareSteps(_))
 
-  implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps =
-    new PersonSteps(graph.asScala.V(person.id.get))
+  // implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps =
+  //   new PersonSteps(graph.asScala.V(person.id.get))
 }
 
 object TypeLevelProofs {
-  the[Constructor.Aux[String, HNil, String, Steps[String, String, HNil, HNil]]]
-  // the[Constructor.Aux[String, String :: HNil, String, Steps[String, String, String :: HNil, String :: HNil]]]
+  // val x: Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]] = Constructor.forString[HNil, HNil]
+  // val x: Constructor[String, HNil] = the[Constructor[String, HNil]]
+  the[Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]]]
+  // the[Constructor.Aux[String, String :: HNil, String, HNil, Steps[String, String, String :: HNil, String :: HNil]]]
+}
+
+
+object AsSteps {
+  /* TODO: move to main tests */
+
 }
