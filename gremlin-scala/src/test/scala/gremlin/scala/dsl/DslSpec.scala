@@ -23,10 +23,12 @@ class DslSpec extends WordSpec with Matchers {
   "FOO" in {
     implicit val graph = TinkerFactory.createModern
 
-    val a: PersonSteps[Person :: HNil, Vertex :: HNil] = PersonSteps(graph).as(StepLabel[Person]("p"))
-    val b: SoftwareSteps[Person :: HNil, Vertex :: HNil] = a.created
-    val c: SoftwareSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] = b.as(StepLabel[Software]("s"))
-    val d: PersonSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] = c.createdBy
+    val personSteps: PersonSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] =
+      PersonSteps(graph)
+        .as(StepLabel[Person]("person"))
+        .created
+        .as(StepLabel[Software]("software"))
+        .createdBy
   }
 
   // "finds combination of person/software in for comprehension" in {
