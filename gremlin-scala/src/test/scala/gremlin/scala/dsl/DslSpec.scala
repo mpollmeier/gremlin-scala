@@ -125,8 +125,13 @@ class DslSpec extends WordSpec with Matchers {
   /* TODO: remove me */
   "FOO" in {
     val personSteps = PersonSteps(TinkerFactory.createModern)
-    // personSteps.name
+    val a: Steps[String, String, HNil, HNil] = personSteps.name
+    val b: Steps[String, String, String :: HNil, String :: HNil] = a.as(StepLabel[String]("a"))
+    val c: Steps[String, String, String :: HNil, String :: HNil] = b.map{ name => name.toLowerCase}
+    c.toList
 
+
+    personSteps.map { person => person.name}.toList
   }
 
 >>>>>>> add labels hlist everywhere
@@ -232,19 +237,23 @@ object TestDomain {
   @label("software") case class Software(name: String, lang: String) extends DomainRoot
 
   object PersonSteps {
-    def apply(graph: Graph) = new PersonSteps(graph.V.hasLabel[Person])
+    def apply(graph: Graph) = new PersonSteps[HNil, HNil](graph.V.hasLabel[Person])
   }
   class PersonSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
       extends NodeSteps[Person, LabelsDomain, LabelsGraph](raw) {
-    def created = new SoftwareSteps(raw.out("created"))
+
+    def created = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.out("created"))
+
     def name[NewSteps](implicit constr: Constructor.Aux[String, LabelsDomain, String, LabelsGraph, NewSteps]): NewSteps =
       constr(raw.map(_.value[String]("name")))
   }
 
   class SoftwareSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
       extends NodeSteps[Software, LabelsDomain, LabelsGraph](raw) {
-    def createdBy = new PersonSteps(raw.in("created"))
-    def isRipple = new SoftwareSteps(raw.has(Key("name") -> "ripple"))
+
+    def createdBy = new PersonSteps[LabelsDomain, LabelsGraph](raw.in("created"))
+
+    def isRipple = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.has(Key("name") -> "ripple"))
   }
 
 
