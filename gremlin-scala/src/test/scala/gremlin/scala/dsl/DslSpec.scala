@@ -134,21 +134,22 @@ class DslSpec extends WordSpec with Matchers {
     personSteps.map { person => person.name}.toList
   }
 
->>>>>>> add labels hlist everywhere
-  // "finds combination of person/software in for comprehension" in {
-  //   implicit val graph = TinkerFactory.createModern
-  //   val traversal = for {
-  //     person   <- PersonSteps(graph)
-  //     software <- person.created
-  //   } yield (person.name, software)
+  "finds combination of person/software in for comprehension" in {
+    implicit val graph = TinkerFactory.createModern
+    val traversal = for {
+      person   <- PersonSteps(graph)
+      // software <- person.created
+      software <- new PersonSteps(graph.asScala.V(person.id.get)).created
+    // } yield (person.name, software)
+    } yield software
 
-  //   val tuples = traversal.toSet shouldBe Set(
-  //     ("marko", Software("lop", "java")),
-  //     ("josh", Software("lop", "java")),
-  //     ("peter", Software("lop", "java")),
-  //     ("josh", Software("ripple", "java"))
-  //   )
-  // }
+    // val tuples = traversal.toSet shouldBe Set(
+    //   ("marko", Software("lop", "java")),
+    //   ("josh", Software("lop", "java")),
+    //   ("peter", Software("lop", "java")),
+    //   ("josh", Software("ripple", "java"))
+    // )
+  }
 
   // "filter with traversal on domain type" when {
   //   "domain type is a case class" in {
@@ -244,8 +245,7 @@ object TestDomain {
 
     def created = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.out("created"))
 
-    def name[NewSteps](implicit constr: Constructor.Aux[String, LabelsDomain, String, LabelsGraph, NewSteps]): NewSteps =
-      constr(raw.map(_.value[String]("name")))
+    def name = new Steps[String, String, LabelsDomain, LabelsGraph](raw.map(_.value[String]("name")))
   }
 
   class SoftwareSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
@@ -255,7 +255,6 @@ object TestDomain {
 
     def isRipple = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.has(Key("name") -> "ripple"))
   }
-
 
   // implicit val personStepsConstructor: Constructor.Aux[Person, Vertex, PersonSteps] =
   //   Constructor.forDomainNode(new PersonSteps(_))
