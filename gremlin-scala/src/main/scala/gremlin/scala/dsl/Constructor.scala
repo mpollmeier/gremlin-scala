@@ -113,19 +113,20 @@ trait LowestPriorityConstructorImplicits {
     GraphTypeHList <: HList,
     GraphTypeTuple <: Product,
     LabelsDomain <: HList,
-    LabelsGraph <: HList,
+    LabelsGraph1 <: HList,
     StepsType0 <: StepsRoot,
     EndDomainHList <: HList,
     EndDomainTuple <: Product
   ](implicit
     gen: Generic.Aux[T, Repr],
-    constr: Constructor.Aux[Repr, LabelsDomain, GraphTypeHList, LabelsGraph, StepsType0],  
+    constr: Constructor.Aux[Repr, LabelsDomain, GraphTypeHList, LabelsGraph1, StepsType0],  
     graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple], 
     eq: StepsType0#EndDomain0 =:= EndDomainHList,
     tupler: Tupler.Aux[EndDomainHList, EndDomainTuple],
     converter: Converter.Aux[T, GraphTypeTuple]) =
     new Constructor[T, LabelsDomain] {
       type GraphType = GraphTypeTuple
+      type LabelsGraph = LabelsGraph1
       type StepsType = Steps[T, GraphType, LabelsDomain, LabelsGraph]
       def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsType =
         new Steps[T, GraphType, LabelsDomain, LabelsGraph](raw)
