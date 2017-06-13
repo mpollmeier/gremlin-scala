@@ -31,9 +31,10 @@ class DslSpec extends WordSpec with Matchers {
         .toList
     personAndSoftware should have size 4
 
-    val softwareByCreator: Map[Person, Software] = personAndSoftware.toMap
-    val marko = PersonSteps(graph).hasName("marko").head
-    softwareByCreator(marko) shouldBe Software("lop", "java")
+    val softwareByCreator: Map[String, Software] = personAndSoftware
+      .map { case (person, software) => (person.name, software) }
+      .toMap
+    softwareByCreator("marko") shouldBe Software("lop", "java")
   }
 
   "finds combination of person/software in for comprehension" in {
