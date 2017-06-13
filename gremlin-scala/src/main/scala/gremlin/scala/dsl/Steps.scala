@@ -100,21 +100,11 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
     constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
     constr(raw.as(StepLabel[EndGraph](stepLabel.name)))
 
-  // def select[LabelsTuple]()(implicit tupler: Tupler.Aux[Labels, LabelsTuple]) =
-  //   GremlinScala[LabelsTuple, Labels](traversal.asAdmin.addStep(new SelectAllStep[End, Labels, LabelsTuple](traversal)))
-
-// class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](val raw: GremlinScala[EndGraph, LabelsGraph])(
-  /* TODO: convert LabelsGraph to LabelsDomain */
-  def select[LabelsGraphTuple](
-    implicit tupler: Tupler.Aux[LabelsGraph, LabelsGraphTuple])
-      : Steps[LabelsGraphTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph] = {
-
-    /* TODO: remove */
-    implicit val conv = Converter.identityConverter[LabelsGraphTuple]
-    new Steps[LabelsGraphTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](
-      raw.select()
-    )
-  }
+  def select[LabelsGraphTuple, LabelsDomainTuple](
+    implicit graphTupler: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
+    domainTupler: Tupler.Aux[LabelsDomain, LabelsDomainTuple],
+    conv: Converter.Aux[LabelsDomainTuple,LabelsGraphTuple]) = 
+    new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](raw.select())
 
   override def toString = s"${getClass.getSimpleName}($raw)"
 }

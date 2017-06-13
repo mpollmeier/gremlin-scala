@@ -19,20 +19,21 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
-  /* TODO: transform to a proper test */
   "label with `as` and typesafe `select` of domain types" in {
     implicit val graph = TinkerFactory.createModern
 
-    val personSteps: PersonSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] =
+    val personAndSoftware: List[(Person, Software)] =
       PersonSteps(graph)
         .as(StepLabel[Person]("person"))
         .created
         .as(StepLabel[Software]("software"))
-        .createdBy
+        .select
+        .toList
+    personAndSoftware should have size 4
 
-    val x = personSteps.select
-    val y = x.toList
-    println(y)
+    val softwareByCreator: Map[Person, Software] = personAndSoftware.toMap
+    val marko = PersonSteps(graph).hasName("marko").head
+    softwareByCreator(marko) shouldBe Software("lop", "java")
   }
 
   // "finds combination of person/software in for comprehension" in {
@@ -152,6 +153,8 @@ object TestDomain {
     def created = new SoftwareSteps[LabelsDomain, LabelsGraph](raw.out("created"))
 
     def name = new Steps[String, String, LabelsDomain, LabelsGraph](raw.map(_.value[String]("name")))
+
+    def hasName(name: String) = new PersonSteps[LabelsDomain, LabelsGraph](raw.has(Key("name") -> name))
   }
 
   class SoftwareSteps[LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])
