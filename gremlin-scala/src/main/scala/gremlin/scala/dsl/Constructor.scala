@@ -23,22 +23,12 @@ object Constructor extends LowPriorityConstructorImplicits {
 trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
   /* TODO: derive LabelsGraph via implicit: labelsConverter: Converter.Aux[LabelsDomain, LabelsGraph] */
-  def forBaseType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsDomain] {
+  implicit def forSimpleType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsDomain] {
     type GraphType = A
     type LabelsGraph = LabelsGraph1
     type StepsType = Steps[A, A, LabelsDomain, LabelsGraph]
     def apply(raw: GremlinScala[GraphType, LabelsGraph]) = new Steps[A, A, LabelsDomain, LabelsGraph](raw)
   }
-
-  implicit def forUnit[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Unit, LabelsDomain, LabelsGraph]
-  implicit def forString[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[String, LabelsDomain, LabelsGraph]
-  implicit def forInt[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Int, LabelsDomain, LabelsGraph]
-  implicit def forDouble[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Double, LabelsDomain, LabelsGraph]
-  implicit def forFloat[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Float, LabelsDomain, LabelsGraph]
-  implicit def forBoolean[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Boolean, LabelsDomain, LabelsGraph]
-  implicit def forInteger[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[Integer, LabelsDomain, LabelsGraph]
-  implicit def forJDouble[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[java.lang.Double, LabelsDomain, LabelsGraph]
-  implicit def forJFloat[LabelsDomain <: HList, LabelsGraph <: HList] = forBaseType[java.lang.Float, LabelsDomain, LabelsGraph]
 
   def forDomainNode[
     DomainType <: DomainRoot,
