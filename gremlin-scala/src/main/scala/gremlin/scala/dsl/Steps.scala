@@ -2,6 +2,7 @@ package gremlin.scala.dsl
 
 import gremlin.scala._
 import shapeless._
+import shapeless.ops.hlist.Tupler
 import scala.collection.mutable
 import shapeless.ops.hlist.Prepend
 
@@ -27,13 +28,6 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
-
-  // labels the current step and preserves the type - use together with `select` step
-  def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: StepLabel[EndDomain])(
-    implicit prependGraph: Prepend.Aux[LabelsGraph, EndGraph :: HNil, NewLabelsGraph],
-    prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
-    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
-    constr(raw.as(StepLabel[EndGraph](stepLabel.name)))
 
   def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps =
     constr(raw.dedup())
@@ -99,6 +93,30 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   //   construct(raw.or(foo :_*))
   // }
 
+  // labels the current step and preserves the type - use together with `select` step
+  def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: StepLabel[EndDomain])(
+    implicit prependGraph: Prepend.Aux[LabelsGraph, EndGraph :: HNil, NewLabelsGraph],
+    prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
+    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
+    constr(raw.as(StepLabel[EndGraph](stepLabel.name)))
+
+  // def select[LabelsTuple]()(implicit tupler: Tupler.Aux[Labels, LabelsTuple]) =
+  //   GremlinScala[LabelsTuple, Labels](traversal.asAdmin.addStep(new SelectAllStep[End, Labels, LabelsTuple](traversal)))
+
+// class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](val raw: GremlinScala[EndGraph, LabelsGraph])(
+  /* TODO: convert LabelsGraph to LabelsDomain */
+  def select[LabelsGraphTuple](
+    implicit tupler: Tupler.Aux[LabelsGraph, LabelsGraphTuple])
+      : Steps[LabelsGraphTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph] = {
+
+    /* TODO: remove */
+    implicit val conv = Converter.identityConverter[LabelsGraphTuple]
+    new Steps[LabelsGraphTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](
+      raw.select()
+    )
+  }
+
+  override def toString = s"${getClass.getSimpleName}($raw)"
 }
 
 /* Root class for all your vertex based DSL steps

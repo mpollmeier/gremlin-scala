@@ -20,7 +20,7 @@ class DslSpec extends WordSpec with Matchers {
   }
 
   /* TODO: transform to a proper test */
-  "FOO" in {
+  "label with `as` and typesafe `select` of domain types" in {
     implicit val graph = TinkerFactory.createModern
 
     val personSteps: PersonSteps[Person :: Software :: HNil, Vertex :: Vertex :: HNil] =
@@ -29,6 +29,10 @@ class DslSpec extends WordSpec with Matchers {
         .created
         .as(StepLabel[Software]("software"))
         .createdBy
+
+    val x = personSteps.select
+    val y = x.toList
+    println(y)
   }
 
   // "finds combination of person/software in for comprehension" in {
