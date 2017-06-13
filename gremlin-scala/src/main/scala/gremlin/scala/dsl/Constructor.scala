@@ -110,24 +110,26 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
 
 trait LowestPriorityConstructorImplicits {
   // for all Products, e.g. tuples, case classes etc
-  // implicit def forGeneric[
-  //   T, Repr <: HList,
-  //   GraphTypeHList <: HList,
-  //   GraphTypeTuple <: Product,
-  //   StepsType0 <: StepsRoot,
-  //   EndDomainHList <: HList,
-  //   EndDomainTuple <: Product
-  // ](implicit
-  //   gen: Generic.Aux[T, Repr],
-  //   constr: Constructor.Aux[Repr, GraphTypeHList, StepsType0],  
-  //   graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple], 
-  //   eq: StepsType0#EndDomain0 =:= EndDomainHList,
-  //   tupler: Tupler.Aux[EndDomainHList, EndDomainTuple],
-  //   converter: Converter.Aux[T, GraphTypeTuple]) =
-  //   new Constructor[T] {
-  //     type GraphType = GraphTypeTuple
-  //     type StepsType = Steps[T, GraphType]
-  //     def apply(raw: GremlinScala[GraphType, _]): StepsType =
-  //       new Steps[T, GraphType](raw)
-  //   }
+  implicit def forGeneric[
+    T, Repr <: HList,
+    GraphTypeHList <: HList,
+    GraphTypeTuple <: Product,
+    LabelsDomain <: HList,
+    LabelsGraph <: HList,
+    StepsType0 <: StepsRoot,
+    EndDomainHList <: HList,
+    EndDomainTuple <: Product
+  ](implicit
+    gen: Generic.Aux[T, Repr],
+    constr: Constructor.Aux[Repr, LabelsDomain, GraphTypeHList, LabelsGraph, StepsType0],  
+    graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple], 
+    eq: StepsType0#EndDomain0 =:= EndDomainHList,
+    tupler: Tupler.Aux[EndDomainHList, EndDomainTuple],
+    converter: Converter.Aux[T, GraphTypeTuple]) =
+    new Constructor[T, LabelsDomain] {
+      type GraphType = GraphTypeTuple
+      type StepsType = Steps[T, GraphType, LabelsDomain, LabelsGraph]
+      def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsType =
+        new Steps[T, GraphType, LabelsDomain, LabelsGraph](raw)
+    }
 }
