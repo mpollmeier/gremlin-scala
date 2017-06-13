@@ -23,12 +23,13 @@ object Constructor extends LowPriorityConstructorImplicits {
 trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
   /* TODO: derive LabelsGraph via implicit: labelsConverter: Converter.Aux[LabelsDomain, LabelsGraph] */
-  implicit def forSimpleType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) = new Constructor[A, LabelsDomain] {
-    type GraphType = A
-    type LabelsGraph = LabelsGraph1
-    type StepsType = Steps[A, A, LabelsDomain, LabelsGraph]
-    def apply(raw: GremlinScala[GraphType, LabelsGraph]) = new Steps[A, A, LabelsDomain, LabelsGraph](raw)
-  }
+  implicit def forSimpleType[A, LabelsDomain <: HList, LabelsGraph1 <: HList](implicit converter: Converter.Aux[A, A]) =
+    new Constructor[A, LabelsDomain] {
+      type GraphType = A
+      type LabelsGraph = LabelsGraph1
+      type StepsType = Steps[A, A, LabelsDomain, LabelsGraph]
+      def apply(raw: GremlinScala[GraphType, LabelsGraph]) = new Steps[A, A, LabelsDomain, LabelsGraph](raw)
+    }
 
   def forDomainNode[
     DomainType <: DomainRoot,
