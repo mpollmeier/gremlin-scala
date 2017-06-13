@@ -24,9 +24,9 @@ class DslSpec extends WordSpec with Matchers {
 
     val personAndSoftware: List[(Person, Software)] =
       PersonSteps(graph)
-        .as(StepLabel[Person]("person"))
+        .as("person")
         .created
-        .as(StepLabel[Software]("software"))
+        .as("software")
         .select
         .toList
     personAndSoftware should have size 4

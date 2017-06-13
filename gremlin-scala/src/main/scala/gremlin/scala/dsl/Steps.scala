@@ -87,18 +87,12 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
     constr(rawWithFilter)
   }
 
-  // def or(traversals: (Self => Steps[_])*) : Self = {
-  //   val foo = traversals.map(
-  //     trav => { gs : GremlinScala[Vertex, HNil] => trav(construct(gs)).raw } )
-  //   construct(raw.or(foo :_*))
-  // }
-
   // labels the current step and preserves the type - use together with `select` step
-  def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: StepLabel[EndDomain])(
+  def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: String)(
     implicit prependGraph: Prepend.Aux[LabelsGraph, EndGraph :: HNil, NewLabelsGraph],
     prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
     constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
-    constr(raw.as(StepLabel[EndGraph](stepLabel.name)))
+    constr(raw.as(stepLabel))
 
   def select[LabelsGraphTuple, LabelsDomainTuple](
     implicit graphTupler: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
@@ -107,6 +101,12 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
     new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](raw.select())
 
   override def toString = s"${getClass.getSimpleName}($raw)"
+
+  // def or(traversals: (Self => Steps[_])*) : Self = {
+  //   val foo = traversals.map(
+  //     trav => { gs : GremlinScala[Vertex, HNil] => trav(construct(gs)).raw } )
+  //   construct(raw.or(foo :_*))
+  // }
 }
 
 /* Root class for all your vertex based DSL steps
