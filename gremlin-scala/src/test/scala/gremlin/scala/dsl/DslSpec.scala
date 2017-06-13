@@ -49,7 +49,6 @@ class DslSpec extends WordSpec with Matchers {
   //     ("peter", Software("lop", "java")),
   //     ("josh", Software("ripple", "java"))
   //   )
-
   // }
 
   // "filter with traversal on domain type" when {
@@ -173,6 +172,6 @@ object TestDomain {
     : Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]] =
     Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
 
-  // implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps =
-  //   new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
+  implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil, HNil] =
+    new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
 }
