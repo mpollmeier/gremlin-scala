@@ -70,48 +70,50 @@ class DslSpec extends WordSpec with Matchers {
     notRipple.toList.size shouldBe 3
   }
 
-  // "filter on domain type" in {
-  //   val markos: List[Person] =
-  //     PersonSteps(TinkerFactory.createModern)
-  //       .filterOnEnd(_.name == "marko")
-  //       .toList
+  "filter on domain type" in {
+    val markos: List[Person] =
+      PersonSteps(TinkerFactory.createModern)
+        .filterOnEnd(_.name == "marko")
+        .toList
 
-  //   markos.size shouldBe 1
-  // }
+    markos.size shouldBe 1
+  }
 
-  // "aggregate intermediary results into a collection" in {
-  //   val allPersons = mutable.ArrayBuffer.empty[Person]
-  //   val markos: List[Person] =
-  //     PersonSteps(TinkerFactory.createModern)
-  //       .aggregate(allPersons)
-  //       .filterOnEnd(_.name == "marko")
-  //       .toList
+  "aggregate intermediary results into a collection" in {
+    val allPersons = mutable.ArrayBuffer.empty[Person]
+    val markos: List[Person] =
+      PersonSteps(TinkerFactory.createModern)
+        .aggregate(allPersons)
+        .filterOnEnd(_.name == "marko")
+        .toList
 
-  //   markos.size shouldBe 1
-  //   allPersons.size should be > 1
-  // }
+    markos.size shouldBe 1
+    allPersons.size should be > 1
+  }
 
-  // "deduplicates" in {
-  //   val results: PersonSteps =
-  //     PersonSteps(TinkerFactory.createModern)
-  //       .created.createdBy
-  //       .dedup()
-  //   results.toList.size shouldBe 3
-  // }
+  "deduplicates" in {
+    val results: List[Person] =
+      PersonSteps(TinkerFactory.createModern)
+        .created.createdBy
+        .dedup()
+        .toList
+    results.size shouldBe 3
+  }
 
-  // "allows to use underlying gremlin-scala steps" in {
-  //   val steps: PersonSteps =
-  //     PersonSteps(TinkerFactory.createModern)
-  //       .onRaw(_.hasId(1: Integer))
-  //   steps.toList.size shouldBe 1
-  // }
+  "allows to use underlying gremlin-scala steps" in {
+    val steps: PersonSteps[_, _] =
+      PersonSteps(TinkerFactory.createModern)
+        .onRaw(_.hasId(1: Integer))
+    steps.toList.size shouldBe 1
+  }
 
-  // "traverses from person to software" in {
-  //   val personSteps =
-  //     PersonSteps(TinkerFactory.createModern)
-  //       .onRaw(_.hasId(1: Integer))
-  //   personSteps.created.toSet shouldBe Set(Software("lop", "java"))
-  // }
+  "traverses from person to software" in {
+    val personSteps =
+      PersonSteps(TinkerFactory.createModern)
+        .onRaw(_.hasId(1: Integer))
+
+    personSteps.created.toSet shouldBe Set(Software("lop", "java"))
+  }
 
   // "supports collections in map/flatMap" when {
   //   import Converter.forDomainNode /* TODO: prefer forDomainNode by default! */
