@@ -36,20 +36,20 @@ class DslSpec extends WordSpec with Matchers {
     softwareByCreator(marko) shouldBe Software("lop", "java")
   }
 
-  // "finds combination of person/software in for comprehension" in {
-  //   implicit val graph = TinkerFactory.createModern
-  //   val traversal = for {
-  //     person   <- PersonSteps(graph)
-  //     software <- person.created
-  //   } yield (person.name, software)
+  "finds combination of person/software in for comprehension" in {
+    implicit val graph = TinkerFactory.createModern
+    val traversal = for {
+      person   <- PersonSteps(graph)
+      software <- person.created
+    } yield (person.name, software)
 
-  //   val tuples = traversal.toSet shouldBe Set(
-  //     ("marko", Software("lop", "java")),
-  //     ("josh", Software("lop", "java")),
-  //     ("peter", Software("lop", "java")),
-  //     ("josh", Software("ripple", "java"))
-  //   )
-  // }
+    val tuples = traversal.toSet shouldBe Set(
+      ("marko", Software("lop", "java")),
+      ("josh", Software("lop", "java")),
+      ("peter", Software("lop", "java")),
+      ("josh", Software("ripple", "java"))
+    )
+  }
 
   // "filter with traversal on domain type" when {
   //   "domain type is a case class" in {
