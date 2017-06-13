@@ -38,17 +38,36 @@ class DslSpec extends WordSpec with Matchers {
 
   "finds combination of person/software in for comprehension" in {
     implicit val graph = TinkerFactory.createModern
-    val traversal = for {
-      person   <- PersonSteps(graph)
-      software <- person.created
-    } yield (person.name, software)
 
-    val tuples = traversal.toSet shouldBe Set(
-      ("marko", Software("lop", "java")),
-      ("josh", Software("lop", "java")),
-      ("peter", Software("lop", "java")),
-      ("josh", Software("ripple", "java"))
-    )
+    // works:
+    implicitly[Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]]]
+    implicitly[Constructor.Aux[Software, HNil, Vertex, HNil, Steps[Software,  Vertex, HNil, HNil]]]
+    implicitly[Constructor.Aux[HNil, HNil, HNil, HNil, Steps[HNil, HNil, HNil, HNil]]]
+
+    // TODO:
+    implicitly[Constructor.Aux[String :: HNil, HNil, String :: HNil, HNil, Steps[String :: HNil, String :: HNil, HNil, HNil]]]
+
+    // implicitly[Constructor.Aux[String :: String :: HNil, HNil, String :: String :: HNil, HNil, Steps[String :: String :: HNil, String :: String :: HNil, HNil, HNil]]]
+    // implicitly[Constructor.Aux[(String, String), HNil, (String, String), HNil, Steps[(String, String), (String, String), HNil, HNil]]]
+
+    // val x: Constructor.Aux[Software, HNil, Vertex, HNil, Steps[Software,  Vertex, HNil, HNil]] = softwareStepsConstructor[HNil, HNil]
+    // val x: Constructor.Aux[Software, HNil, Vertex, HNil, SoftwareSteps[HNil, HNil]] = softwareStepsConstructor[HNil, HNil]
+    // implicitly[Constructor.Aux[Software, HNil, Vertex, HNil, Steps[Software, Vertex, HNil, HNil]]]
+
+    // implicitly[Constructor.Aux[(String, Software),HNil,(String, Vertex),HNil,NewSteps]]
+    // implicitly[Constructor.Aux[(String, Software),HNil,(String, Vertex),HNil,NewSteps]]
+
+    // val traversal = for {
+    //   person   <- PersonSteps(graph)
+    //   software <- person.created
+    // } yield (person.name, software)
+
+    // val tuples = traversal.toSet shouldBe Set(
+    //   ("marko", Software("lop", "java")),
+    //   ("josh", Software("lop", "java")),
+    //   ("peter", Software("lop", "java")),
+    //   ("josh", Software("ripple", "java"))
+    // )
   }
 
   // "filter with traversal on domain type" when {
@@ -168,9 +187,14 @@ object TestDomain {
     : Constructor.Aux[Person, LabelsDomain, Vertex, LabelsGraph, PersonSteps[LabelsDomain, LabelsGraph]] =
     Constructor.forDomainNode[Person, LabelsDomain, LabelsGraph, PersonSteps[LabelsDomain, LabelsGraph]](new PersonSteps[LabelsDomain, LabelsGraph](_))
 
-  implicit def softwareStepsConstructor[LabelsDomain <: HList, LabelsGraph <: HList]
-    : Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]] =
-    Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
+  // implicit def softwareStepsConstructor[LabelsDomain <: HList, LabelsGraph <: HList]
+  //   : Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]] =
+  //   Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
+
+  implicit def softwareStepsConstructor2[LabelsDomain <: HList, LabelsGraph <: HList]
+    : Constructor.Aux[Software, LabelsDomain, Vertex, LabelsGraph, Steps[Software, Vertex, LabelsDomain, LabelsGraph]] = ???
+    // Constructor.forDomainNode[Software, LabelsDomain, LabelsGraph, SoftwareSteps[LabelsDomain, LabelsGraph]](new SoftwareSteps[LabelsDomain, LabelsGraph](_))
+  // implicit def softwareStepsToSteps[LabelsDomain <: HList, LabelsGraph <: HList](softwareSteps: SoftwareSteps[LabelsDomain, LabelsGraph]): Steps[Software, Vertex, LabelsDomain, LabelsGraph] = ???
 
   implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil, HNil] =
     new PersonSteps[HNil, HNil](graph.asScala.V(person.id.get))
