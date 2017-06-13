@@ -116,7 +116,6 @@ class DslSpec extends WordSpec with Matchers {
   }
 
   "supports collections in map/flatMap" when {
-    import Converter.forDomainNode /* TODO: prefer forDomainNode by default! */
     implicit val graph = TinkerFactory.createModern
     def personSteps = PersonSteps(graph)
 
