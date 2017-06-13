@@ -87,24 +87,22 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
   implicit def forHList[
     H,
     HGraphType,
-    HLabelsDomain <: HList,
-    HLabelsGraph <: HList,
+    LabelsDomain <: HList,
+    LabelsGraph1 <: HList,
     HStepsType,
     T <: HList,
     TGraphType <: HList,
-    TLabelsDomain <: HList,
-    TLabelsGraph <: HList,
     TStepsType](
     implicit
-    hConstr: Constructor.Aux[H, HLabelsDomain, HGraphType, HLabelsGraph, HStepsType],
-    tConstr: Constructor.Aux[T, TLabelsDomain, TGraphType, TLabelsGraph, TStepsType],
+    hConstr: Constructor.Aux[H, LabelsDomain, HGraphType, LabelsGraph1, HStepsType],
+    tConstr: Constructor.Aux[T, LabelsDomain, TGraphType, LabelsGraph1, TStepsType],
     converter: Converter.Aux[H :: T, HGraphType :: TGraphType]) =
-      new Constructor[H :: T, HLabelsDomain :: TLabelsDomain] {
+      new Constructor[H :: T, LabelsDomain] {
         type GraphType = HGraphType :: TGraphType
-        type LabelsGraph = HLabelsGraph :: TLabelsGraph
-        type StepsType = Steps[H :: T, HGraphType :: TGraphType, HLabelsDomain :: TLabelsDomain, HLabelsGraph :: TLabelsGraph]
-        def apply(raw: GremlinScala[GraphType, HLabelsGraph :: TLabelsGraph]): StepsType =
-          new Steps[H :: T, HGraphType :: TGraphType, HLabelsDomain :: TLabelsDomain, HLabelsGraph :: TLabelsGraph](raw)
+        type LabelsGraph = LabelsGraph1
+        type StepsType = Steps[H :: T, HGraphType :: TGraphType, LabelsDomain, LabelsGraph]
+        def apply(raw: GremlinScala[GraphType, LabelsGraph]): StepsType =
+          new Steps[H :: T, HGraphType :: TGraphType, LabelsDomain, LabelsGraph](raw)
     }
 }
 

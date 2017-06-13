@@ -43,12 +43,11 @@ class DslSpec extends WordSpec with Matchers {
     implicitly[Constructor.Aux[String, HNil, String, HNil, Steps[String, String, HNil, HNil]]]
     implicitly[Constructor.Aux[Software, HNil, Vertex, HNil, Steps[Software,  Vertex, HNil, HNil]]]
     implicitly[Constructor.Aux[HNil, HNil, HNil, HNil, Steps[HNil, HNil, HNil, HNil]]]
+    implicitly[Constructor.Aux[String :: HNil, HNil, String :: HNil, HNil, Steps[String :: HNil, String :: HNil, HNil, HNil]]]
+    implicitly[Constructor.Aux[String :: String :: HNil, HNil, String :: String :: HNil, HNil, Steps[String :: String :: HNil, String :: String :: HNil, HNil, HNil]]]
 
     // TODO:
-    implicitly[Constructor.Aux[String :: HNil, HNil, String :: HNil, HNil, Steps[String :: HNil, String :: HNil, HNil, HNil]]]
-
-    // implicitly[Constructor.Aux[String :: String :: HNil, HNil, String :: String :: HNil, HNil, Steps[String :: String :: HNil, String :: String :: HNil, HNil, HNil]]]
-    // implicitly[Constructor.Aux[(String, String), HNil, (String, String), HNil, Steps[(String, String), (String, String), HNil, HNil]]]
+    implicitly[Constructor.Aux[(String, String), HNil, (String, String), HNil, Steps[(String, String), (String, String), HNil, HNil]]]
 
     // val x: Constructor.Aux[Software, HNil, Vertex, HNil, Steps[Software,  Vertex, HNil, HNil]] = softwareStepsConstructor[HNil, HNil]
     // val x: Constructor.Aux[Software, HNil, Vertex, HNil, SoftwareSteps[HNil, HNil]] = softwareStepsConstructor[HNil, HNil]
