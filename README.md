@@ -176,9 +176,18 @@ Set(
   ("peter", Software("lop", "java")),
   ("josh", Software("ripple", "java"))
 )
+
+// DSL also supports typesafe as/select:
+PersonSteps(graph)
+  .as("person")
+  .created
+  .as("software")
+  .select
+  .toList
+// inferred return type is `List[(Person, Software)]`
 ```
 
-See the full setup in [DslSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/dsl/DslSpec.scala).
+See the full setup and more tests in [DslSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/dsl/DslSpec.scala).
 
 ### Common and useful steps
 
