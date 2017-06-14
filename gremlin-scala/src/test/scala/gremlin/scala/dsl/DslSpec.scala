@@ -27,7 +27,7 @@ class DslSpec extends WordSpec with Matchers {
         .as("person")
         .created
         .as("software")
-        .select
+        .select2
         .toList
     personAndSoftware should have size 4
 

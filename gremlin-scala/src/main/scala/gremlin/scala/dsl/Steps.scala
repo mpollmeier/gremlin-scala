@@ -19,9 +19,10 @@ trait StepsRoot {
 }
 
 class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](val raw: GremlinScala[EndGraph, LabelsGraph])(
-  implicit converter: Converter.Aux[EndDomain, EndGraph]) extends StepsRoot {
+  implicit converter: Converter.Aux[EndDomain, EndGraph], val labelConverter: Converter[LabelsDomain]) extends StepsRoot {
   type EndDomain0 = EndDomain
   type EndGraph0 = EndGraph
+  type LabelsGraph2 = labelConverter.GraphType
 
   /* executes traversal and converts results into cpg domain type */
   def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
@@ -91,7 +92,8 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: String)(
     implicit prependGraph: Prepend.Aux[LabelsGraph, EndGraph :: HNil, NewLabelsGraph],
     prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
-    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
+    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps],
+    labelConverter: Converter[NewLabelsDomain]): NewSteps =
     constr(raw.as(stepLabel))
 
   def select[LabelsGraphTuple, LabelsDomainTuple](
@@ -99,6 +101,18 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
     domainTupler: Tupler.Aux[LabelsDomain, LabelsDomainTuple],
     conv: Converter.Aux[LabelsDomainTuple,LabelsGraphTuple]) = 
     new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](raw.select())
+
+
+  // def select2[LabelsGraph1, LabelsDomainTuple1, LabelsGraphTuple1](
+  //   implicit
+  //     // conv1: Converter.Aux[LabelsDomain, LabelsGraph1],
+  //     // conv2: Converter.Aux[LabelsDomainTuple1, LabelsGraphTuple1]
+  //     domainTupler: Tupler.Aux[LabelsDomain, LabelsDomainTuple1]
+  //     // conv: Converter.Aux[LabelsDomainTuple, LabelsGraphTuple]
+  //   ) =
+  //   new Steps[LabelsDomainTuple1, LabelsGraphTuple1, LabelsDomain, LabelsGraph1](
+  //     raw.asInstanceOf[GremlinScala[EndDomain, LabelsGraph1]].select()
+  //   )
 
   override def toString = s"${getClass.getSimpleName}($raw)"
 
@@ -113,8 +127,9 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
  * TODO: add support for using Edge instead of Vertex?
  */
 class NodeSteps[EndDomain <: DomainRoot, LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])(
-  implicit marshaller: Marshallable[EndDomain]) extends Steps[EndDomain, Vertex, LabelsDomain, LabelsGraph](raw)(
-  Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)) {
+  implicit marshaller: Marshallable[EndDomain], labelConverter: Converter[LabelsDomain])
+    extends Steps[EndDomain, Vertex, LabelsDomain, LabelsGraph](raw)(
+  Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get), labelConverter) {
 
   /** Aggregate all objects at this point into the given collection, e.g. `mutable.ArrayBuffer.empty[EndDomain]`
     * Uses eager evaluation (as opposed to `store`() which lazily fills a collection)
