@@ -18,7 +18,7 @@ trait StepsRoot {
   def raw: GremlinScala[EndGraph0, _]
 }
 
-class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](val raw: GremlinScala[EndGraph, LabelsGraph])(
+class Steps[EndDomain, EndGraph, LabelsDomain <: HList](val raw: GremlinScala[EndGraph, _])(
   implicit converter: Converter.Aux[EndDomain, EndGraph]) extends StepsRoot {
   type EndDomain0 = EndDomain
   type EndGraph0 = EndGraph
@@ -29,20 +29,20 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
 
-  def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps =
+  def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, NewSteps]): NewSteps =
     constr(raw.dedup())
 
   /* access all gremlin-scala methods that don't modify the EndGraph type, e.g. `has` */
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def onRaw[NewSteps](fun: GremlinScala[EndGraph, LabelsGraph] => GremlinScala[EndGraph, LabelsGraph])(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps =
+  def onRaw[NewSteps](fun: GremlinScala[EndGraph, _] => GremlinScala[EndGraph, _])(
+    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, NewSteps]): NewSteps =
     constr(fun(raw))
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
   def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain ⇒ NewEndDomain)(
     implicit
     newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
-    constr: Constructor.Aux[NewEndDomain, LabelsDomain, NewEndGraph, LabelsGraph, NewSteps]): NewSteps =
+    constr: Constructor.Aux[NewEndDomain, LabelsDomain, NewEndGraph, NewSteps]): NewSteps =
       constr {
         raw.map { endGraph: EndGraph =>
           newConverter.toGraph(fun(converter.toDomain(endGraph)))
@@ -52,35 +52,35 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   /* TODO: track/use NewLabelsGraph as given by `fun` */
   def flatMap[NewSteps <: StepsRoot](fun: EndDomain ⇒ NewSteps)(
     implicit
-    constr: Constructor.Aux[NewSteps#EndDomain0, LabelsDomain, NewSteps#EndGraph0, LabelsGraph, NewSteps],
+    constr: Constructor.Aux[NewSteps#EndDomain0, LabelsDomain, NewSteps#EndGraph0, NewSteps],
     newConverter: Converter[NewSteps#EndDomain0]
   ): NewSteps =
       constr {
         raw.flatMap { endGraph: EndGraph =>
           val newSteps: NewSteps = fun(converter.toDomain(endGraph))
-          newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, LabelsGraph]]
+          newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, _]]
           // not sure why I need the cast here - should be safe though
         }
       }
 
-  def filter[NewSteps](predicate: this.type => Steps[_, _, _, _])(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps = {
-    val rawWithFilter: GremlinScala[EndGraph, LabelsGraph] =
+  def filter[NewSteps](predicate: this.type => Steps[_, _, _])(
+    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, NewSteps]): NewSteps = {
+    val rawWithFilter: GremlinScala[EndGraph, _] =
       raw.filter{ gs =>
         predicate(
-          constr(gs.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]]).asInstanceOf[this.type]
+          constr(gs.asInstanceOf[GremlinScala[EndGraph, _]]).asInstanceOf[this.type]
           /* TODO: remove casts */
         ).raw
       }
     constr(rawWithFilter)
   }
 
-  def filterNot[NewSteps](predicate: this.type => Steps[_, _, _, _])(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, LabelsGraph, NewSteps]): NewSteps = {
-    val rawWithFilter: GremlinScala[EndGraph, LabelsGraph] =
+  def filterNot[NewSteps](predicate: this.type => Steps[_, _, _])(
+    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, EndGraph, NewSteps]): NewSteps = {
+    val rawWithFilter: GremlinScala[EndGraph, _] =
       raw.filterNot{ gs =>
         predicate(
-          constr(gs.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]]).asInstanceOf[this.type]
+          constr(gs.asInstanceOf[GremlinScala[EndGraph, _]]).asInstanceOf[this.type]
           /* TODO: remove casts */
         ).raw
       }
@@ -88,59 +88,36 @@ class Steps[EndDomain, EndGraph, LabelsDomain <: HList, LabelsGraph <: HList](va
   }
 
   // labels the current step and preserves the type - use together with `select` step
-  def as[NewLabelsDomain <: HList, NewLabelsGraph <: HList, NewSteps](stepLabel: String)(
-    implicit prependGraph: Prepend.Aux[LabelsGraph, EndGraph :: HNil, NewLabelsGraph],
-    prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
-    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewLabelsGraph, NewSteps]): NewSteps =
-    constr(raw.as(stepLabel))
+  def as[NewLabelsDomain <: HList, NewSteps](stepLabel: String)(
+    implicit prependDomain: Prepend.Aux[LabelsDomain, EndDomain :: HNil, NewLabelsDomain],
+    constr: Constructor.Aux[EndDomain, NewLabelsDomain, EndGraph, NewSteps]): NewSteps =
+    constr(raw.asInstanceOf[GremlinScala[EndGraph, HNil]].as(stepLabel))
 
-  def select[LabelsGraphTuple, LabelsDomainTuple](
-    implicit graphTupler: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
-    domainTupler: Tupler.Aux[LabelsDomain, LabelsDomainTuple],
-    conv: Converter.Aux[LabelsDomainTuple,LabelsGraphTuple]) = 
-    new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph](raw.select())
-
-  def select2[LabelsGraph1 <: HList, LabelsGraphTuple, LabelsDomainTuple](
+  def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsDomainTuple](
     implicit
-      conv1: Converter.Aux[LabelsDomain, LabelsGraph1],
-      tupler1: Tupler.Aux[LabelsGraph1, LabelsGraphTuple],
+      conv1: Converter.Aux[LabelsDomain, LabelsGraph],
+      tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
       tupler2: Tupler.Aux[LabelsDomain, LabelsDomainTuple],
       conv2: Converter.Aux[LabelsDomainTuple, LabelsGraphTuple]
-  ) = new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain, LabelsGraph1](
-    raw.asInstanceOf[GremlinScala[EndGraph, LabelsGraph1]].select()
+  ) = new Steps[LabelsDomainTuple, LabelsGraphTuple, LabelsDomain](
+    raw.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]].select()
   )
 
-  def select3[LabelsGraph1 <: HList](
-    implicit conv1: Converter.Aux[LabelsDomain, LabelsGraph1]
-  ): LabelsGraph1 = ???
-
-  def select4[LabelsGraph1 <: HList, LabelsGraphTuple](
-    implicit conv1: Converter.Aux[LabelsDomain, LabelsGraph1],
-    tupler1: Tupler.Aux[LabelsGraph1, LabelsGraphTuple]
-  ): LabelsGraphTuple = ???
-
-
   override def toString = s"${getClass.getSimpleName}($raw)"
-
-  // def or(traversals: (Self => Steps[_])*) : Self = {
-  //   val foo = traversals.map(
-  //     trav => { gs : GremlinScala[Vertex, HNil] => trav(construct(gs)).raw } )
-  //   construct(raw.or(foo :_*))
-  // }
 }
 
 /* Root class for all your vertex based DSL steps
  * TODO: add support for using Edge instead of Vertex?
  */
-class NodeSteps[EndDomain <: DomainRoot, LabelsDomain <: HList, LabelsGraph <: HList](override val raw: GremlinScala[Vertex, LabelsGraph])(
-  implicit marshaller: Marshallable[EndDomain]) extends Steps[EndDomain, Vertex, LabelsDomain, LabelsGraph](raw)(
+class NodeSteps[EndDomain <: DomainRoot, LabelsDomain <: HList](override val raw: GremlinScala[Vertex, _])(
+  implicit marshaller: Marshallable[EndDomain]) extends Steps[EndDomain, Vertex, LabelsDomain](raw)(
   Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)) {
 
   /** Aggregate all objects at this point into the given collection, e.g. `mutable.ArrayBuffer.empty[EndDomain]`
     * Uses eager evaluation (as opposed to `store`() which lazily fills a collection)
     */
   def aggregate[NewSteps](into: mutable.Buffer[EndDomain])(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, Vertex, LabelsGraph, NewSteps]): NewSteps =
+    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, Vertex, NewSteps]): NewSteps =
     constr(
       raw.sideEffect{ v: Vertex =>
         into += v.toCC[EndDomain]
@@ -148,7 +125,7 @@ class NodeSteps[EndDomain <: DomainRoot, LabelsDomain <: HList, LabelsGraph <: H
     )
 
   def filterOnEnd[NewSteps](predicate: EndDomain => Boolean)(
-    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, Vertex, LabelsGraph, NewSteps]): NewSteps =
+    implicit constr: Constructor.Aux[EndDomain, LabelsDomain, Vertex, NewSteps]): NewSteps =
     constr(
       raw.filterOnEnd { v: Vertex =>
         predicate(v.toCC[EndDomain])
