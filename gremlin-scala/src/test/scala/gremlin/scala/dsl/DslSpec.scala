@@ -147,31 +147,31 @@ object TestDomain {
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
   }
-  class PersonSteps[LabelsDomain <: HList](override val raw: GremlinScala[Vertex, _])
-      extends NodeSteps[Person, LabelsDomain](raw) {
+  class PersonSteps[Labels <: HList](override val raw: GremlinScala[Vertex, _])
+      extends NodeSteps[Person, Labels](raw) {
 
-    def created = new SoftwareSteps[LabelsDomain](raw.out("created"))
+    def created = new SoftwareSteps[Labels](raw.out("created"))
 
-    def name = new Steps[String, String, LabelsDomain](raw.map(_.value[String]("name")))
+    def name = new Steps[String, String, Labels](raw.map(_.value[String]("name")))
 
-    def hasName(name: String) = new PersonSteps[LabelsDomain](raw.has(Key("name") -> name))
+    def hasName(name: String) = new PersonSteps[Labels](raw.has(Key("name") -> name))
   }
 
-  class SoftwareSteps[LabelsDomain <: HList](override val raw: GremlinScala[Vertex, _])
-      extends NodeSteps[Software, LabelsDomain](raw) {
+  class SoftwareSteps[Labels <: HList](override val raw: GremlinScala[Vertex, _])
+      extends NodeSteps[Software, Labels](raw) {
 
-    def createdBy = new PersonSteps[LabelsDomain](raw.in("created"))
+    def createdBy = new PersonSteps[Labels](raw.in("created"))
 
-    def isRipple = new SoftwareSteps[LabelsDomain](raw.has(Key("name") -> "ripple"))
+    def isRipple = new SoftwareSteps[Labels](raw.has(Key("name") -> "ripple"))
   }
 
-  implicit def personStepsConstructor[LabelsDomain <: HList]
-    : Constructor.Aux[Person, LabelsDomain, Vertex, PersonSteps[LabelsDomain]] =
-    Constructor.forDomainNode[Person, LabelsDomain, PersonSteps[LabelsDomain]](new PersonSteps[LabelsDomain](_))
+  implicit def personStepsConstructor[Labels <: HList]
+    : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
+    Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](new PersonSteps[Labels](_))
 
-  implicit def softwareStepsConstructor[LabelsDomain <: HList]
-    : Constructor.Aux[Software, LabelsDomain, Vertex, SoftwareSteps[LabelsDomain]] =
-    Constructor.forDomainNode[Software, LabelsDomain, SoftwareSteps[LabelsDomain]](new SoftwareSteps[LabelsDomain](_))
+  implicit def softwareStepsConstructor[Labels <: HList]
+    : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
+    Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
   implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil] =
     new PersonSteps[HNil](graph.asScala.V(person.id.get))
