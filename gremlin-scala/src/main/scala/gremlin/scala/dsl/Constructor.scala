@@ -5,99 +5,108 @@ import shapeless._
 import shapeless.ops.hlist.Tupler
 import shapeless.ops.product.ToHList
 
-trait Constructor[DomainType] {
+trait Constructor[DomainType, Labels <: HList] {
   type GraphType
   type StepsType
-  def apply(raw: GremlinScala[GraphType, HNil]): StepsType
+  def apply(raw: GremlinScala[GraphType, _]): StepsType
 }
 
-object Constructor {
-  type Aux[DomainType, GraphTypeOut, StepsTypeOut] = Constructor[DomainType] {
+object Constructor extends LowPriorityConstructorImplicits {
+  type Aux[DomainType, Labels <: HList, GraphTypeOut, StepsTypeOut] = Constructor[DomainType, Labels] {
     type GraphType = GraphTypeOut
     type StepsType = StepsTypeOut
   }
+}
 
-  def forBaseType[A](implicit converter: Converter.Aux[A, A]) = new Constructor[A] {
-    type GraphType = A
-    type StepsType = Steps[A, A]
-    def apply(raw: GremlinScala[GraphType, HNil]) = new Steps[A, A](raw)
-  }
+trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
-  implicit def forUnit = forBaseType[Unit]
-  implicit val forString = forBaseType[String]
-  implicit val forInt = forBaseType[Int]
-  implicit val forDouble = forBaseType[Double]
-  implicit val forFloat = forBaseType[Float]
-  implicit val forBoolean = forBaseType[Boolean]
-  implicit val forInteger = forBaseType[Integer]
-  implicit val forJDouble = forBaseType[java.lang.Double]
-  implicit val forJFloat = forBaseType[java.lang.Float]
+  implicit def forSimpleType[A, Labels <: HList](implicit converter: Converter.Aux[A, A]) =
+    new Constructor[A, Labels] {
+      type GraphType = A
+      type StepsType = Steps[A, A, Labels]
+      def apply(raw: GremlinScala[GraphType, _]) = new Steps[A, A, Labels](raw)
+    }
 
-  def forDomainNode[DomainType <: DomainRoot, StepsTypeOut <: NodeSteps[DomainType]](
-    constr: GremlinScala[Vertex, HNil] => StepsTypeOut) = new Constructor[DomainType] {
+  def forDomainNode[
+    DomainType <: DomainRoot,
+    Labels <: HList,
+    StepsTypeOut <: NodeSteps[DomainType, Labels]](
+    constr: GremlinScala[Vertex, _] => StepsTypeOut) = new Constructor[DomainType, Labels] {
     type GraphType = Vertex
     type StepsType = StepsTypeOut
 
-    def apply(raw: GremlinScala[GraphType, HNil]): StepsTypeOut = constr(raw)
+    def apply(raw: GremlinScala[GraphType, _]): StepsTypeOut = constr(raw)
   }
 
-  implicit def forList[A, AGraphType, AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[List[A]] {
+  implicit def forList[
+    A,
+    AGraphType,
+    Labels <: HList,
+    AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[List[A], Labels] {
     type GraphType = List[AGraphType]
-    type StepsType = Steps[List[A], List[AGraphType]]
-    def apply(raw: GremlinScala[GraphType, HNil]) =
-      new Steps[List[A], List[AGraphType]](raw)
+    type StepsType = Steps[List[A], List[AGraphType], Labels]
+    def apply(raw: GremlinScala[GraphType, _]) =
+      new Steps[List[A], List[AGraphType], Labels](raw)
   }
 
-  implicit def forSet[A, AGraphType, AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[Set[A]] {
+  implicit def forSet[
+    A,
+    AGraphType,
+    Labels <: HList,
+    AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[Set[A], Labels] {
     type GraphType = Set[AGraphType]
-    type StepsType = Steps[Set[A], Set[AGraphType]]
-    def apply(raw: GremlinScala[GraphType, HNil]) =
-      new Steps[Set[A], Set[AGraphType]](raw)
+    type StepsType = Steps[Set[A], Set[AGraphType], Labels]
+    def apply(raw: GremlinScala[GraphType, _]) =
+      new Steps[Set[A], Set[AGraphType], Labels](raw)
   }
 
-  implicit val forHNil = new Constructor[HNil] {
+  implicit val forHNil = new Constructor[HNil, HNil] {
     type GraphType = HNil
-    type StepsType = Steps[HNil, HNil]
-    def apply(raw: GremlinScala[HNil, HNil]) = new Steps[HNil, HNil](raw)
+    type StepsType = Steps[HNil, HNil, HNil]
+    def apply(raw: GremlinScala[HNil, _]) = new Steps[HNil, HNil, HNil](raw)
   }
 
   implicit def forHList[
     H,
     HGraphType,
+    Labels <: HList,
     HStepsType,
     T <: HList,
     TGraphType <: HList,
     TStepsType](
     implicit
-    hConstr: Constructor.Aux[H, HGraphType, HStepsType],
-    tConstr: Constructor.Aux[T, TGraphType, TStepsType],
+    hConstr: Constructor.Aux[H, Labels, HGraphType, HStepsType],
+    tConstr: Constructor.Aux[T, Labels, TGraphType, TStepsType],
     converter: Converter.Aux[H :: T, HGraphType :: TGraphType]) =
-      new Constructor[H :: T] {
+      new Constructor[H :: T, Labels] {
         type GraphType = HGraphType :: TGraphType
-        type StepsType = Steps[H :: T, HGraphType :: TGraphType]
-        def apply(raw: GremlinScala[GraphType, HNil]): StepsType =
-          new Steps[H :: T, HGraphType :: TGraphType](raw)
+        type StepsType = Steps[H :: T, HGraphType :: TGraphType, Labels]
+        def apply(raw: GremlinScala[GraphType, _]): StepsType =
+          new Steps[H :: T, HGraphType :: TGraphType, Labels](raw)
     }
+}
 
+trait LowestPriorityConstructorImplicits {
   // for all Products, e.g. tuples, case classes etc
   implicit def forGeneric[
     T, Repr <: HList,
     GraphTypeHList <: HList,
     GraphTypeTuple <: Product,
+    Labels <: HList,
     StepsType0 <: StepsRoot,
     EndDomainHList <: HList,
     EndDomainTuple <: Product
   ](implicit
     gen: Generic.Aux[T, Repr],
-    constr: Constructor.Aux[Repr, GraphTypeHList, StepsType0],  
+    constr: Constructor.Aux[Repr, Labels, GraphTypeHList, StepsType0],  
     graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple], 
     eq: StepsType0#EndDomain0 =:= EndDomainHList,
     tupler: Tupler.Aux[EndDomainHList, EndDomainTuple],
     converter: Converter.Aux[T, GraphTypeTuple]) =
-    new Constructor[T] {
+    new Constructor[T, Labels] {
       type GraphType = GraphTypeTuple
-      type StepsType = Steps[T, GraphType]
-      def apply(raw: GremlinScala[GraphType, HNil]): StepsType =
-        new Steps[T, GraphType](raw)
+      type StepsType = Steps[T, GraphType, Labels]
+      def apply(raw: GremlinScala[GraphType, _]): StepsType =
+        new Steps[T, GraphType, Labels](raw)
     }
 }

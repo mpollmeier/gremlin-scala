@@ -79,7 +79,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   /** You might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
-    **/
+    */
   def filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.filter(predicate(start).traversal))
 
