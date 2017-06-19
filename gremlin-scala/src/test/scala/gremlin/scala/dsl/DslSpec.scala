@@ -9,145 +9,149 @@ import shapeless._
 class DslSpec extends WordSpec with Matchers {
   import TestDomain._
 
-  "finds all persons" in {
-    val personSteps = PersonSteps(TinkerFactory.createModern)
-    personSteps.toSet shouldBe Set(
-      Person(Some(1), "marko", 29),
-      Person(Some(2), "vadas", 27),
-      Person(Some(4), "josh",  32),
-      Person(Some(6), "peter", 35)
-    )
+  "todo uncomment everything" in {
+    ???
   }
 
-  "label with `as` and typesafe `select` of domain types" in {
-    implicit val graph = TinkerFactory.createModern
+  // "finds all persons" in {
+  //   val personSteps = PersonSteps(TinkerFactory.createModern)
+  //   personSteps.toSet shouldBe Set(
+  //     Person(Some(1), "marko", 29),
+  //     Person(Some(2), "vadas", 27),
+  //     Person(Some(4), "josh",  32),
+  //     Person(Some(6), "peter", 35)
+  //   )
+  // }
 
-    val personAndSoftware: List[(Person, Software)] =
-      PersonSteps(graph)
-        .as("person")
-        .created
-        .as("software")
-        .select
-        .toList
-    personAndSoftware should have size 4
+  // "label with `as` and typesafe `select` of domain types" in {
+  //   implicit val graph = TinkerFactory.createModern
 
-    val softwareByCreator: Map[String, Software] = personAndSoftware
-      .map { case (person, software) => (person.name, software) }
-      .toMap
-    softwareByCreator("marko") shouldBe Software("lop", "java")
-  }
+  //   val personAndSoftware: List[(Person, Software)] =
+  //     PersonSteps(graph)
+  //       .as("person")
+  //       .created
+  //       .as("software")
+  //       .select
+  //       .toList
+  //   personAndSoftware should have size 4
 
-  "finds combination of person/software in for comprehension" in {
-    implicit val graph = TinkerFactory.createModern
+  //   val softwareByCreator: Map[String, Software] = personAndSoftware
+  //     .map { case (person, software) => (person.name, software) }
+  //     .toMap
+  //   softwareByCreator("marko") shouldBe Software("lop", "java")
+  // }
 
-    val traversal = for {
-      person   <- PersonSteps(graph)
-      software <- person.created
-    } yield (person.name, software)
+  // "finds combination of person/software in for comprehension" in {
+  //   implicit val graph = TinkerFactory.createModern
 
-    val tuples = traversal.toSet shouldBe Set(
-      ("marko", Software("lop", "java")),
-      ("josh", Software("lop", "java")),
-      ("peter", Software("lop", "java")),
-      ("josh", Software("ripple", "java"))
-    )
-  }
+  //   val traversal = for {
+  //     person   <- PersonSteps(graph)
+  //     software <- person.created
+  //   } yield (person.name, software)
 
-  "filter with traversal on domain type" when {
-    "domain type is a case class" in {
-      val ripples = PersonSteps(TinkerFactory.createModern)
-          .filter(_.created.isRipple)
+  //   val tuples = traversal.toSet shouldBe Set(
+  //     ("marko", Software("lop", "java")),
+  //     ("josh", Software("lop", "java")),
+  //     ("peter", Software("lop", "java")),
+  //     ("josh", Software("ripple", "java"))
+  //   )
+  // }
 
-      ripples.toList shouldBe List(
-        Person(Some(4), "josh",  32)
-      )
-    }
-  }
+  // "filter with traversal on domain type" when {
+  //   "domain type is a case class" in {
+  //     val ripples = PersonSteps(TinkerFactory.createModern)
+  //         .filter(_.created.isRipple)
 
-  "filterNot with traversal on domain type" in {
-    val notRipple = PersonSteps(TinkerFactory.createModern)
-        .filterNot(_.created.isRipple)
+  //     ripples.toList shouldBe List(
+  //       Person(Some(4), "josh",  32)
+  //     )
+  //   }
+  // }
 
-    notRipple.toList.size shouldBe 3
-  }
+  // "filterNot with traversal on domain type" in {
+  //   val notRipple = PersonSteps(TinkerFactory.createModern)
+  //       .filterNot(_.created.isRipple)
 
-  "filter on domain type" in {
-    val markos: List[Person] =
-      PersonSteps(TinkerFactory.createModern)
-        .filterOnEnd(_.name == "marko")
-        .toList
+  //   notRipple.toList.size shouldBe 3
+  // }
 
-    markos.size shouldBe 1
-  }
+  // "filter on domain type" in {
+  //   val markos: List[Person] =
+  //     PersonSteps(TinkerFactory.createModern)
+  //       .filterOnEnd(_.name == "marko")
+  //       .toList
 
-  "aggregate intermediary results into a collection" in {
-    val allPersons = mutable.ArrayBuffer.empty[Person]
-    val markos: List[Person] =
-      PersonSteps(TinkerFactory.createModern)
-        .aggregate(allPersons)
-        .filterOnEnd(_.name == "marko")
-        .toList
+  //   markos.size shouldBe 1
+  // }
 
-    markos.size shouldBe 1
-    allPersons.size should be > 1
-  }
+  // "aggregate intermediary results into a collection" in {
+  //   val allPersons = mutable.ArrayBuffer.empty[Person]
+  //   val markos: List[Person] =
+  //     PersonSteps(TinkerFactory.createModern)
+  //       .aggregate(allPersons)
+  //       .filterOnEnd(_.name == "marko")
+  //       .toList
 
-  "deduplicates" in {
-    val results: List[Person] =
-      PersonSteps(TinkerFactory.createModern)
-        .created.createdBy
-        .dedup()
-        .toList
-    results.size shouldBe 3
-  }
+  //   markos.size shouldBe 1
+  //   allPersons.size should be > 1
+  // }
 
-  "allows to use underlying gremlin-scala steps" in {
-    val steps: PersonSteps[_] =
-      PersonSteps(TinkerFactory.createModern)
-        .onRaw(_.hasId(1: Integer))
-    steps.toList.size shouldBe 1
-  }
+  // "deduplicates" in {
+  //   val results: List[Person] =
+  //     PersonSteps(TinkerFactory.createModern)
+  //       .created.createdBy
+  //       .dedup()
+  //       .toList
+  //   results.size shouldBe 3
+  // }
 
-  "traverses from person to software" in {
-    val personSteps =
-      PersonSteps(TinkerFactory.createModern)
-        .onRaw(_.hasId(1: Integer))
+  // "allows to use underlying gremlin-scala steps" in {
+  //   val steps: PersonSteps[_] =
+  //     PersonSteps(TinkerFactory.createModern)
+  //       .onRaw(_.hasId(1: Integer))
+  //   steps.toList.size shouldBe 1
+  // }
 
-    personSteps.created.toSet shouldBe Set(Software("lop", "java"))
-  }
+  // "traverses from person to software" in {
+  //   val personSteps =
+  //     PersonSteps(TinkerFactory.createModern)
+  //       .onRaw(_.hasId(1: Integer))
 
-  "supports collections in map/flatMap" when {
-    implicit val graph = TinkerFactory.createModern
-    def personSteps = PersonSteps(graph)
+  //   personSteps.created.toSet shouldBe Set(Software("lop", "java"))
+  // }
 
-    "using List" in {
-      val query = personSteps.map { person =>
-        (person.name, person.created.toList)
-      }
+  // "supports collections in map/flatMap" when {
+  //   implicit val graph = TinkerFactory.createModern
+  //   def personSteps = PersonSteps(graph)
 
-      val results: List[(String, List[Software])] = query.toList
-      results.size shouldBe 4
-    }
+  //   "using List" in {
+  //     val query = personSteps.map { person =>
+  //       (person.name, person.created.toList)
+  //     }
 
-    "using Set" in {
-      val query = personSteps.map { person =>
-        (person.name, person.created.toSet)
-      }
+  //     val results: List[(String, List[Software])] = query.toList
+  //     results.size shouldBe 4
+  //   }
 
-      val results: List[(String, Set[Software])] = query.toList
-      results.size shouldBe 4
-    }
-  }
+  //   "using Set" in {
+  //     val query = personSteps.map { person =>
+  //       (person.name, person.created.toSet)
+  //     }
 
-  "allows to be cloned" in {
-    val graph = TinkerFactory.createModern
-    def personSteps = PersonSteps(graph)
+  //     val results: List[(String, Set[Software])] = query.toList
+  //     results.size shouldBe 4
+  //   }
+  // }
 
-    val query = personSteps.hasName("marko")
-    val queryCloned = query.clone()
-    query.toList.size shouldBe 1
-    queryCloned.toList.size shouldBe 1
-  }
+  // "allows to be cloned" in {
+  //   val graph = TinkerFactory.createModern
+  //   def personSteps = PersonSteps(graph)
+
+  //   val query = personSteps.hasName("marko")
+  //   val queryCloned = query.clone()
+  //   query.toList.size shouldBe 1
+  //   queryCloned.toList.size shouldBe 1
+  // }
 }
 
 object TestDomain {

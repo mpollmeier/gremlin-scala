@@ -6,7 +6,8 @@ import java.util.concurrent.CompletableFuture
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
 import org.apache.tinkerpop.gremlin.process.remote.traversal.{AbstractRemoteTraversal, DefaultRemoteTraverser, RemoteTraversal, RemoteTraversalSideEffects}
 import org.apache.tinkerpop.gremlin.structure.{Vertex => TVertex}
-import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Traverser}
+import org.apache.tinkerpop.gremlin.process.traversal.Bytecode
+import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
@@ -122,7 +123,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     val traversal = new AbstractRemoteTraversal[Int, TVertex]() {
       val it = mockVertices.iterator
 
-      override def nextTraverser: Traverser.Admin[TVertex] = new DefaultRemoteTraverser[Vertex](it.next(), 1)
+      override def nextTraverser: Admin[TVertex] = new DefaultRemoteTraverser[Vertex](it.next(), 1)
 
       override def getSideEffects: RemoteTraversalSideEffects = null // not necessary for this test
 

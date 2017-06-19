@@ -230,16 +230,17 @@ class TraversalSpec extends WordSpec with Matchers {
       }
 
       "using slightly more complex case" in new Fixture {
+        ???
         // what is the mean age of the developers for a given software?
-        val softwareAndDevAges = for {
-          software ← graph.V.hasLabel("software")
-          meanAge ← software.in("created").value(Age).mean
-        } yield (software.value2(Name), meanAge)
+        // val softwareAndDevAges = for {
+        //   software ← graph.V.hasLabel("software")
+        //   meanAge ← software.in("created").value(Age).mean
+        // } yield (software.value(Name), meanAge)
 
-        softwareAndDevAges.toSet shouldBe Set(
-          "lop" → 32d,
-          "ripple" → 32d
-        )
+        // softwareAndDevAges.toSet shouldBe Set(
+        //   "lop" → 32d,
+        //   "ripple" → 32d
+        // )
       }
     }
 
@@ -288,15 +289,16 @@ class TraversalSpec extends WordSpec with Matchers {
     marko --- (likes, weight → 4) --> groovy
     marko --- (likes, weight → 3) --> scala
 
-    val traversal = for {
-      person ← graph.V.hasLabel(person)
-      favorite ← person.outE(likes).orderBy("weight", Order.decr).limit(1).inV
-    } yield (person.value2(name), favorite.label)
+    ???
+    // val traversal = for {
+    //   person ← graph.V.hasLabel(person)
+    //   favorite ← person.outE(likes).orderBy("weight", Order.decr).limit(1).inV
+    // } yield (person.value2(name), favorite.label)
 
-    traversal.toMap shouldBe Map(
-      "michael" → "scala",
-      "marko" → "groovy"
-    )
+    // traversal.toMap shouldBe Map(
+    //   "michael" → "scala",
+    //   "marko" → "groovy"
+    // )
   }
 
   "collect" in new Fixture {
@@ -459,13 +461,14 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "allow constant as default" in new Fixture {
-      val traversal3 = graph.V
-        .coalesce(
-          _.value(Age).map(_.toString),
-          _.constant("ageless")
-        )
+      ???
+      // val traversal3 = graph.V
+      //   .coalesce(
+      //     _.value(Age).map(_.toString),
+      //     _.constant("ageless")
+      //   )
 
-      traversal3.toSet() shouldBe Set("35", "32", "27", "29", "ageless")
+      // traversal3.toSet() shouldBe Set("35", "32", "27", "29", "ageless")
     }
   }
 
@@ -555,13 +558,14 @@ class TraversalSpec extends WordSpec with Matchers {
       val CoDeveloper = "co-developer"
 
       "don't use special steps" in new Fixture {
-        val traversal = for {
-          v1 ← graph.V(1)
-          coDeveloper ← v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
-        } yield v1 --- CoDeveloper --> coDeveloper
-        traversal.iterate()
+        ???
+        // val traversal = for {
+        //   v1 ← graph.V(1)
+        //   coDeveloper ← v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
+        // } yield v1 --- CoDeveloper --> coDeveloper
+        // traversal.iterate()
 
-        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+        // graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
 
       "reference the `from` vertex via StepLabel" in new Fixture {
@@ -597,7 +601,8 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "inject step" can {
     "be used to start a traversal" in new Fixture {
-      graph.inject(1, 2).map(_ + 1).map(graph.V(_).value(Name).head).toList shouldEqual List("vadas", "lop")
+      // graph.inject(1, 2).map(_ + 1).map(graph.V(_).value(Name).head).toList shouldEqual List("vadas", "lop")
+      ???
     }
 
     "used to add values to traversal" in new Fixture {

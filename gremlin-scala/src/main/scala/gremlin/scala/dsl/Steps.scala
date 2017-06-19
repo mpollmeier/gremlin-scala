@@ -46,6 +46,13 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     new Steps[NewEndDomain, NewEndGraph, HNil](mappedRaw)
   }
 
+  // /* TODO: track/use NewLabelsGraph as given by `fun` */
+  def flatMap[NewEndDomain, NewEndGraph](fun: Steps[EndDomain, EndGraph, _] ⇒ Steps[NewEndDomain, NewEndGraph, _])(
+    implicit newConverter: Converter.Aux[NewEndDomain, NewEndGraph]): Steps[NewEndDomain, NewEndGraph, HNil] = {
+    val flatMappedRaw = fun(this).raw
+    new Steps[NewEndDomain, NewEndGraph, HNil](flatMappedRaw)
+  }
+
   // def flatMap[NewSteps <: StepsRoot](fun: Steps[EndDomain, EndGraph, _] ⇒ NewSteps): NewSteps = {
   //   val newRaw = __[EndGraph]
   //   val newDsl = new Steps[EndDomain, EndGraph, HNil](newRaw)
