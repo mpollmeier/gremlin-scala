@@ -28,6 +28,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
+  override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
 
   def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, Labels, EndGraph, NewSteps]): NewSteps =
     constr(raw.dedup())
