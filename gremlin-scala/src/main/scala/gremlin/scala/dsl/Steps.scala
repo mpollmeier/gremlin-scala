@@ -40,29 +40,26 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     constr(fun(raw))
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain ⇒ NewEndDomain)(
-    implicit
-    newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
-    constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
-      constr {
-        raw.map { endGraph: EndGraph =>
-          newConverter.toGraph(fun(converter.toDomain(endGraph)))
-        }
-      }
+  def map[NewSteps <: StepsRoot](fun: Steps[EndDomain, EndGraph, _] ⇒ NewSteps) : NewSteps = {
+    val newRaw = __[EndGraph]
+    val newDsl = new Steps[EndDomain, EndGraph, HNil](newRaw)
+    fun(newDsl)
+  }
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def flatMap[NewSteps <: StepsRoot](fun: EndDomain ⇒ NewSteps)(
-    implicit
-    constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
-    newConverter: Converter[NewSteps#EndDomain0]
-  ): NewSteps =
-      constr {
-        raw.flatMap { endGraph: EndGraph =>
-          val newSteps: NewSteps = fun(converter.toDomain(endGraph))
-          newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, _]]
-          // not sure why I need the cast here - should be safe though
-        }
-      }
+  // def flatMap[NewSteps <: StepsRoot](fun: EndDomain ⇒ NewSteps)(
+  //   implicit
+  //   constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
+  //   newConverter: Converter[NewSteps#EndDomain0]
+  // ): NewSteps =
+  //     constr {
+  //       raw.flatMap { traverser =>
+  //         val endGraph: EndGraph = traverser.get
+  //         val newSteps: NewSteps = fun(converter.toDomain(endGraph))
+  //         newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0, _]]
+  //         // not sure why I need the cast here - should be safe though
+  //       }
+  //     }
 
   def filter[NewSteps](predicate: this.type => Steps[_, _, _])(
     implicit constr: Constructor.Aux[EndDomain, Labels, EndGraph, NewSteps]): NewSteps = {
