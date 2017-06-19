@@ -101,7 +101,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   }))
 
   def collect[A](pf: PartialFunction[End, A]): GremlinScala[A, Labels] =
-    filterOnEnd(pf.isDefinedAt).map(pf)
+    filterOnEnd(pf.isDefinedAt).mapWithTraverser(traverser => pf(traverser.get))
 
   def count() = GremlinScala[JLong, HNil](traversal.count())
 
@@ -109,10 +109,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def loops() = GremlinScala[Integer, HNil](traversal.loops())
 
-  def map[A](fun: End ⇒ A) = GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] ⇒ fun(t.get) })
-
   /* TODO: take over labels from `fun` into the result type? */
-  def map1[A](fun: GremlinScala[End, _] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
+  def map[A](fun: GremlinScala[End, _] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](
       traversal.map[A] { 
         /* TODO: don't start new traversal? check tp3 docs for example */
@@ -124,15 +122,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def mapWithTraverser[A](fun: Traverser[End] ⇒ A) =
     GremlinScala[A, Labels](traversal.map[A](fun))
 
-  def flatMap[A](fun: End ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
-    GremlinScala[A, Labels](
-      traversal.flatMap[A] { t: Traverser[End] ⇒
-        fun(t.get).toList().toIterator: JIterator[A]
-      }
-    )
-
   /* TODO: take over labels from `fun` into the result type? */
-  def flatMap1[A](fun: GremlinScala[End, _] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
+  def flatMap[A](fun: GremlinScala[End, _] ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](
       traversal.flatMap[A] {
         fun(start[End]).traversal
@@ -184,7 +175,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     val remainder = labels.tail.tail
 
     val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
-    GremlinScala(selectTraversal).map { selectValues ⇒
+    GremlinScala(selectTraversal).mapWithTraverser { traverser ⇒
+      val selectValues = traverser.get
       val resultTuple = stepLabels.foldRight((HNil: HNil, selectValues))(combineLabelWithValue)
       val values: Values = resultTuple._1
       tupler(values)
@@ -314,7 +306,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
     GremlinScala[JMap[A, JCollection[End]], Labels](
       traversal.group().by(byFun: JFunction[End, AnyRef])
-    ).map(_.mapValues(_ map valueFun).toMap)
+    ).mapWithTraverser(_.get.mapValues(_ map valueFun).toMap)
 
   def groupCount() = GremlinScala[JMap[End, JLong], Labels](traversal.groupCount())
 
@@ -413,7 +405,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     * 
     * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
-    **/
+    */
   def choose[NewEnd](
     predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _],
     onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[NewEnd, _],
@@ -424,7 +416,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[NewEnd, Labels](traversal.choose(p, t, f))
   }
 
-  /** traverser will pick first option that has a matching pickToken **/
+  /** traverser will pick first option that has a matching pickToken */
   def choose[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
     options: BranchOption[End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
@@ -510,10 +502,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[A, Labels](traversal.values[A](key))
 
   def valueOption[A](key: Key[A])(implicit ev: End <:< Element): GremlinScala[Option[A], Labels] =
-    this.properties(key.name).map(_.toOption.asInstanceOf[Option[A]])
+    this.properties(key.name).mapWithTraverser(_.get.toOption.asInstanceOf[Option[A]])
 
   def valueOption[A](key: String)(implicit ev: End <:< Element): GremlinScala[Option[A], Labels] =
-    this.properties(key).map(_.toOption.asInstanceOf[Option[A]])
+    this.properties(key).mapWithTraverser(_.get.toOption.asInstanceOf[Option[A]])
 
   def values[A](key: String*)(implicit ev: End <:< Element) =
     GremlinScala[A, Labels](traversal.values[A](key: _*))
@@ -692,7 +684,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def mean[N <: Number](scope: Scope)(implicit toNumber: End ⇒ N) = GremlinScala[JDouble, HNil](traversalToNumber.mean(scope))
 
   private def traversalToNumber[N <: Number]()(implicit toNumber: End ⇒ N): GraphTraversal[_, N] =
-    this.map(toNumber).traversal
+    this.mapWithTraverser(traverser => toNumber(traverser.get)).traversal
   // NUMBER STEPS END
   // -------------------
 
