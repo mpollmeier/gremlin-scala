@@ -7,7 +7,7 @@ scalaVersion := defaultScalaV
 crossScalaVersions := Seq("2.11.11", defaultScalaV) //prefix sbt command with `+` to run it with these scala versions
 releaseCrossBuild := true
 
-val gremlinVersion = "3.2.4"
+val gremlinVersion = "3.2.5"
 val commonSettings = Seq(
   organization := org,
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
