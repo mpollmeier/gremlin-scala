@@ -12,6 +12,7 @@ import shapeless.syntax.std.product.productOps
 import _root_.scala.language.implicitConversions
 
 package object scala {
+  type P[A] = traversal.P[A]
   type Vertex = structure.Vertex
   type Edge = structure.Edge
   type Element = structure.Element
@@ -110,14 +111,14 @@ package object scala {
     /**
       * Load a vertex values into a case class
       */
-    def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
+    def toCC[CC <: Product: Marshallable] = gs.mapWithTraverser(_.get.toCC[CC])
   }
 
   implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
     /**
       * Load a edge values into a case class
       */
-    def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
+    def toCC[CC <: Product: Marshallable] = gs.mapWithTraverser(_.get.toCC[CC])
   }
 
   // Arrow syntax implicits
