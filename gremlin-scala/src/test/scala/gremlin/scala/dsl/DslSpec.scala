@@ -138,6 +138,16 @@ class DslSpec extends WordSpec with Matchers {
       results.size shouldBe 4
     }
   }
+
+  "allows to be cloned" in {
+    val graph = TinkerFactory.createModern
+    def personSteps = PersonSteps(graph)
+
+    val query = personSteps.hasName("marko")
+    val queryCloned = query.clone()
+    query.toList.size shouldBe 1
+    queryCloned.toList.size shouldBe 1
+  }
 }
 
 object TestDomain {
