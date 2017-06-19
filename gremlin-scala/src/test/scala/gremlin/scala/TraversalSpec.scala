@@ -191,11 +191,11 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "map" can {
     "transform the latest step" in new Fixture {
-      graph.V.map(_.label).toList shouldBe graph.V.label.toList
+      graph.V.map1(_.label).toList shouldBe graph.V.label.toList
     }
 
     "infer the right types" in new Fixture {
-      val labels: List[String] = graph.V.map(_.label).toList
+      val labels: List[String] = graph.V.map1(_.label).toList
     }
 
     "support for comprehension" in new Fixture {
@@ -212,11 +212,11 @@ class TraversalSpec extends WordSpec with Matchers {
       val v1outEdges = graph.V(1).outE.toList
       v1outEdges should have length 3
 
-      graph.V(1).flatMap(_.outE).toList shouldBe v1outEdges
+      graph.V(1).flatMap1(_.outE).toList shouldBe v1outEdges
     }
 
     "infers the right types" in new Fixture {
-      val edges: List[Edge] = graph.V(1).flatMap(_.outE).toList
+      val edges: List[Edge] = graph.V(1).flatMap1(_.outE).toList
     }
 
     "support for comprehension" when {
