@@ -16,6 +16,45 @@ import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
 class TraversalSpec extends WordSpec with Matchers {
 
+  /* TODO: merge those into the other tests, they are only here for discussion / demo purposes */
+
+  "use plain tp3 map/flatMap" in new Fixture {
+    import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{__ => __tp3}
+    import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
+
+    def v1: GraphTraversal[_, Vertex] = graph.V("1").traversal
+    def inE = __tp3.start[Vertex]().inE()
+    def outE = __tp3.start[Vertex]().outE()
+    def identity = __tp3.start[Vertex]()
+
+    println(v1.map(outE).toList)     //[e[9][1-created->3]]
+    println(v1.flatMap(outE).toList) //[e[9][1-created->3], e[7][1-knows->2], e[8][1-knows->4]]
+
+    // this is where things stop making sense
+    // 1a) identity traversal leads to empty results...
+    println(v1.map(identity).toList)     // expected: v[1], but getting: []
+    println(v1.flatMap(identity).toList)     // expected: v[1], but getting: []
+  }
+
+  "use gs map/flatMap" in new Fixture {
+    // 1b) identity traversal leads to empty results...
+    println(graph.V.hasLabel("software").flatMap { software => software }.toList) // List()
+
+    // 2) not the types one would expect - the below doesn't compile
+    // graph.V.hasLabel("software").flatMap { software => 
+    //   val creator = software.in("created")
+    //   val meanAge = creator.value(Age).mean()
+    //   (creator, meanAge)
+    // }
+
+
+    // ultimate goal would be to allow something like this:
+    // val softwareAndDevAges = for {
+    //   software ← graph.V.hasLabel("software")
+    //   meanAge ← software.in("created").value(Age).mean
+    // } yield (software.value(Name), meanAge)
+  }
+
   "vertex steps" can {
     "get all vertices" in new Fixture {
       graph.V.toList should have size 6
