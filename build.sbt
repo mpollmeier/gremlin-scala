@@ -7,8 +7,6 @@ scalaVersion := defaultScalaV
 crossScalaVersions := Seq("2.11.11", defaultScalaV) //prefix sbt command with `+` to run it with these scala versions
 releaseCrossBuild := true
 scalafmtOnCompile in ThisBuild := true
-// scalafmtFailBuildOnStyleIssue in ThisBuild := false
-scalafmtTestOnCompile in ThisBuild := true
 
 val gremlinVersion = "3.2.5"
 val commonSettings = Seq(
