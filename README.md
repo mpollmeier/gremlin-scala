@@ -15,7 +15,7 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 * Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
 ### Getting started
-The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt`. The latest version is displayed at the top of this readme in the maven badge. 
+The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt` (this readme assumes tinkergraph). The latest version is displayed at the top of this readme in the maven badge. 
 
 ### Using the sbt console
 * `sbt gremlin-scala/test:console`
