@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
@@ -36,10 +36,10 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
     implicitly[Marshallable[CC]].toCC(edge.id, edge.valueMap)
 
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
-    edge.properties[A](keys.map(_.name).toSeq: _*).toStream
+    edge.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
-    edge.properties[A](wantedKeys: _*).toStream
+    edge.properties[A](wantedKeys: _*).asScala.toStream
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist

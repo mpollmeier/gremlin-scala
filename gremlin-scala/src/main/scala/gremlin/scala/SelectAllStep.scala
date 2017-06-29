@@ -5,7 +5,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.process.traversal.step.TraversalParent
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapStep
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import shapeless._
 import shapeless.ops.hlist._
 
@@ -13,7 +13,7 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
   implicit tupler: Tupler.Aux[Labels, LabelsTuple])
     extends MapStep[S, LabelsTuple](traversal.asAdmin) with TraversalParent {
 
-  override def getRequirements = Set(TraverserRequirement.PATH)
+  override def getRequirements = Set(TraverserRequirement.PATH).asJava
 
   override def map(traverser: Admin[S]): LabelsTuple = {
     val labels: Labels = toHList(toList(traverser.path))
@@ -22,7 +22,7 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
 
   def toList(path: Path): List[Any] = {
     val labels = path.labels
-    def hasUserLabel(i: Int) = !labels(i).isEmpty
+    def hasUserLabel(i: Int) = !labels.get(i).isEmpty
 
     (0 until path.size).filter(hasUserLabel).map(path.get[Any]).toList
   }

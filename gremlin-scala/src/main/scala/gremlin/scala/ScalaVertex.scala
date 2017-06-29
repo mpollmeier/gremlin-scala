@@ -3,7 +3,7 @@ package gremlin.scala
 import java.util
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
@@ -100,8 +100,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.property(cardinality, key.name, value, keyValues: _*)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.map(_.name).toSeq: _*).toStream
+    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
-    vertex.properties[A](wantedKeys: _*).toStream
+    vertex.properties[A](wantedKeys: _*).asScala.toStream
 }

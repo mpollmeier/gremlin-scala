@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import shapeless.HNil
 
 trait ScalaElement[ElementType <: Element] {
@@ -22,7 +22,7 @@ trait ScalaElement[ElementType <: Element] {
 
   def label: String = element.label
 
-  def keys: Set[Key[Any]] = element.keys.toSet.map(Key.apply[Any])
+  def keys: Set[Key[Any]] = element.keys.asScala.toSet.map(Key.apply[Any])
 
   def setProperty[A](key: Key[A], value: A): ElementType
 
@@ -58,7 +58,7 @@ trait ScalaElement[ElementType <: Element] {
 
   // note: this may throw an IllegalStateException - better use `Property`
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =
-    element.values[A](keys: _*)
+    element.values[A](keys: _*).asScala
 
   def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq.map(_.name): _*)
 

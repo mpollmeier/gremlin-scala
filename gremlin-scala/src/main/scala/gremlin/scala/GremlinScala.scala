@@ -5,7 +5,6 @@ import java.util.function.{Predicate ⇒ JPredicate, Consumer ⇒ JConsumer, BiF
 import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JCollection, Iterator ⇒ JIterator}
 import java.util.stream.{Stream ⇒ JStream}
 
-import collection.JavaConversions._
 import collection.JavaConverters._
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
@@ -28,11 +27,11 @@ import scala.concurrent.{Future, Promise}
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
   def toStream(): JStream[End] = traversal.toStream
 
-  def toList(): List[End] = traversal.toList.toList
+  def toList(): List[End] = traversal.toList.asScala.toList
 
   def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A,B] = toList.toMap
 
-  def toSet(): Set[End] = traversal.toList.toSet
+  def toSet(): Set[End] = toList.toSet
 
   def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
@@ -116,14 +115,14 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def flatMap[A](fun: End ⇒ GremlinScala[A, _]): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { t: Traverser[End] ⇒
-        fun(t.get).toList().toIterator: JIterator[A]
+        fun(t.get).toList().toIterator.asJava: JIterator[A]
       }
     )
 
   def flatMapWithTraverser[A](fun: Traverser[End] ⇒ GremlinScala[A, _]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { e: Traverser[End] ⇒
-        fun(e).toList().toIterator: JIterator[A]
+        fun(e).toList().toIterator.asJava: JIterator[A]
       }
     )
 
@@ -295,7 +294,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
     GremlinScala[JMap[A, JCollection[End]], Labels](
       traversal.group().by(byFun: JFunction[End, AnyRef])
-    ).map(_.mapValues(_ map valueFun).toMap)
+    ).map(_.asScala.mapValues(_.asScala.map(valueFun)).toMap)
 
   def groupCount() = GremlinScala[JMap[End, JLong], Labels](traversal.groupCount())
 
@@ -691,7 +690,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))
 
   // would rather use asJavaCollection, but unfortunately there are some casts to java.util.List in the tinkerpop codebase...
-  protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList
+  protected def toJavaList[A](i: Iterable[A]): JList[A] = i.toList.asJava
 
   protected def start[A] = __[A]()
 }

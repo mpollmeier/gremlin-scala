@@ -30,9 +30,9 @@ val commonSettings = Seq(
     // "-Xlint"
     // "-Xfatal-warnings",
     // "-feature"
-    // "-deprecation", //hard to handle when supporting multiple scala versions...
     // , "-Xlog-implicits"
-    //"-Ydebug"
+    //"-Ydebug",
+    "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
   incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
   publishTo := {

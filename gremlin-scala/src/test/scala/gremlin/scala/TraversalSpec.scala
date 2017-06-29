@@ -10,7 +10,6 @@ import java.lang.{Long => JLong}
 
 import shapeless.test.illTyped
 
-import collection.JavaConversions._
 import collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
@@ -254,7 +253,7 @@ class TraversalSpec extends WordSpec with Matchers {
       graph.V.has(Age)
         .orderBy("age", Order.decr)
         .value(Age)
-        .fold().head().toSeq shouldBe Seq(35, 32, 29, 27)
+        .fold().head().asScala.toSeq shouldBe Seq(35, 32, 29, 27)
     }
 
     "aggregate with arbitrary initial value and function" in new Fixture {
@@ -338,12 +337,12 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V.groupBy(_.label).head
 
-      results("software") should contain(graph.V(3).head)
-      results("software") should contain(graph.V(5).head)
-      results("person") should contain(graph.V(1).head)
-      results("person") should contain(graph.V(2).head)
-      results("person") should contain(graph.V(4).head)
-      results("person") should contain(graph.V(6).head)
+      results.get("software") should contain(graph.V(3).head)
+      results.get("software") should contain(graph.V(5).head)
+      results.get("person") should contain(graph.V(1).head)
+      results.get("person") should contain(graph.V(2).head)
+      results.get("person") should contain(graph.V(4).head)
+      results.get("person") should contain(graph.V(6).head)
     }
 
     "work with property" in new Fixture {
@@ -352,18 +351,18 @@ class TraversalSpec extends WordSpec with Matchers {
           .has(Age)
           .groupBy(_.value[Integer]("age")).head
 
-      results(27) should contain(graph.V(2).head)
-      results(29) should contain(graph.V(1).head)
-      results(32) should contain(graph.V(4).head)
-      results(35) should contain(graph.V(6).head)
+      results.get(27) should contain(graph.V(2).head)
+      results.get(29) should contain(graph.V(1).head)
+      results.get(32) should contain(graph.V(4).head)
+      results.get(35) should contain(graph.V(6).head)
     }
 
     "optionally allow to transform the values" in new Fixture {
-      val results: JMap[String, Iterable[String]] =
+      val results: Map[String, Iterable[String]] =
         graph.V.groupBy(_.label, _.value2(Name)).head
 
-      results("software").toSet shouldBe Set("lop", "ripple")
-      results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
+      results.get("software").toSet shouldBe Set("lop", "ripple")
+      results.get("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
     }
   }
 
@@ -414,7 +413,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "coalesce" should {
     // Helper for testing path-based results
-    def path2String(path: Path) = path.objects().map(_.toString)
+    def path2String(path: Path) = path.objects().asScala.map(_.toString)
 
     "evaluate traversals and return first with value" when {
 
