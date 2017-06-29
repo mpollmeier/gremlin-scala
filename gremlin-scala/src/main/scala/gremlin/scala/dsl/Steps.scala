@@ -30,7 +30,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
   override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
 
-  def dedup[NewSteps]()(implicit constr: Constructor.Aux[EndDomain, Labels, EndGraph, NewSteps]): NewSteps =
+  def dedup[NewSteps](implicit constr: Constructor.Aux[EndDomain, Labels, EndGraph, NewSteps]): NewSteps =
     constr(raw.dedup())
 
   /* access all gremlin-scala methods that don't modify the EndGraph type, e.g. `has` */

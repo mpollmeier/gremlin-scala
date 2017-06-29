@@ -96,7 +96,7 @@ class DslSpec extends WordSpec with Matchers {
     val results: List[Person] =
       PersonSteps(TinkerFactory.createModern)
         .created.createdBy
-        .dedup()
+        .dedup
         .toList
     results.size shouldBe 3
   }
