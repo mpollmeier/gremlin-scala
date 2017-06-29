@@ -19,6 +19,7 @@ package object scala {
   type Property[A] = structure.Property[A]
   type Traverser[A] = traversal.Traverser[A]
   type Label = String
+  type P[A] = traversal.P[A]
 
   implicit class GraphAsScala[G <: Graph](g: G) {
     def asScala() = ScalaGraph(g)
