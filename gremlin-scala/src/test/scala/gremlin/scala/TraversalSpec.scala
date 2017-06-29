@@ -8,6 +8,7 @@ import org.scalatest.{WordSpec, Matchers}
 import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
 import java.lang.{Long => JLong}
 
+import scala.language.existentials
 import shapeless.test.illTyped
 
 import collection.JavaConverters._
@@ -361,8 +362,8 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: Map[String, Iterable[String]] =
         graph.V.groupBy(_.label, _.value2(Name)).head
 
-      results.get("software").toSet shouldBe Set("lop", "ripple")
-      results.get("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
+      results("software").toSet shouldBe Set("lop", "ripple")
+      results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
     }
   }
 

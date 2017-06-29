@@ -29,9 +29,10 @@ val commonSettings = Seq(
   scalacOptions ++= Seq(
     // "-Xlint"
     // "-Xfatal-warnings",
-    // "-feature"
     // , "-Xlog-implicits"
     //"-Ydebug",
+    "-language:implicitConversions",
+    "-feature",
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
   incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
