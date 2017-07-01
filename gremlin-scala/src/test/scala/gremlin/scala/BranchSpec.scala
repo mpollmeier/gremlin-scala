@@ -17,7 +17,7 @@ class BranchSpec extends WordSpec with Matchers {
           5) // Karlotta is <=30 - take her shoesize
     }
 
-    "provide if/elseif/elseif semantic for more options" in new Fixture {
+    "provide if/elseif/else semantic" in new Fixture {
       graph.V
         .choose(
           on = _.value(Age),

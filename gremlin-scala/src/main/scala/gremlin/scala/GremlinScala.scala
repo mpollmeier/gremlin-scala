@@ -393,7 +393,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     * 
     * you might think that predicate should be `GremlinScala[End, _] => GremlinScala[Boolean, _]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
-    **/
+    */
   def choose[NewEnd](
     predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _],
     onTrue: GremlinScala[End, HNil] ⇒ GremlinScala[NewEnd, _],
@@ -404,11 +404,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[NewEnd, Labels](traversal.choose(p, t, f))
   }
 
-  /** traverser will pick first option that has a matching pickToken **/
+  /** traverser will pick first option that has a matching pickToken */
   def choose[BranchOn, NewEnd](
     on: GremlinScala[End, _] => GremlinScala[BranchOn, _],
     options: BranchOption[End, NewEnd]*): GremlinScala[NewEnd, Labels] = {
-    var jTraversal: GraphTraversal[_, NewEnd] = traversal.branch(on(start).traversal)
+    var jTraversal: GraphTraversal[_, NewEnd] = traversal.choose(on(start).traversal)
     options.foreach { option =>
       /* cast needed because of the way types are defined in tp3 */
       val jTraversalOption = option.traversal(start).traversal.asInstanceOf[Traversal[NewEnd, _]]
