@@ -66,6 +66,36 @@ class BranchSpec extends WordSpec with Matchers {
     ).toList shouldBe List("very old", "old", "young")
   }
 
+  "and step" should {
+    "return results if all conditions are met" in new Fixture {
+      graph.V.and(
+        _.label.is(Person),
+        _.out().has(Name -> "Karlotta")
+      ).value(Name)
+      .toSet shouldBe Set("Michael", "Steffi")
+    }
+  }
+
+  "or step" should {
+    "return results if at least one condition is met" in new Fixture {
+      graph.V.or(
+        _.label.is("does not exist"),
+        _.has(Age -> 34)
+      ).value(Name)
+      .toSet shouldBe Set("Michael")
+    }
+  }
+
+  "exists" should {
+    "return true if one or more elements found" in new Fixture {
+      graph.V.exists shouldBe true
+    }
+
+    "return false if no elements found" in new Fixture {
+      graph.V.filter(_.has(Key("nonExistingProperty"))).exists shouldBe false
+    }
+  }
+
   trait Fixture {
     val graph = TinkerGraph.open.asScala
 
@@ -76,9 +106,14 @@ class BranchSpec extends WordSpec with Matchers {
     val Shoesize = Key[Int]("shoesize")
     val YearOfBirth = Key[Int]("yearOfBirth")
     val StreetNumber = Key[Int]("streetNumber")
+    val parentOf = "parentOf"
+    val marriedTo = "marriedTo"
 
-    graph + (Person, Name -> "Michael",  Age -> 34, Height -> 190, Shoesize -> 44, YearOfBirth -> 1983, StreetNumber -> 3)
-    graph + (Person, Name -> "Steffi",   Age -> 32, Height -> 176, Shoesize -> 41, YearOfBirth -> 1984, StreetNumber -> 3)
-    graph + (Person, Name -> "Karlotta", Age -> 1,  Height -> 90,  Shoesize -> 5,  YearOfBirth -> 2015, StreetNumber -> 3)
+    val michael =  graph + (Person, Name -> "Michael",  Age -> 34, Height -> 190, Shoesize -> 44, YearOfBirth -> 1983, StreetNumber -> 3)
+    val steffi =   graph + (Person, Name -> "Steffi",   Age -> 32, Height -> 176, Shoesize -> 41, YearOfBirth -> 1984, StreetNumber -> 3)
+    val karlotta = graph + (Person, Name -> "Karlotta", Age -> 1,  Height -> 90,  Shoesize -> 5,  YearOfBirth -> 2015, StreetNumber -> 3)
+    michael <-- marriedTo --> steffi
+    michael --- parentOf --> karlotta
+    steffi --- parentOf --> karlotta
   }
 }
