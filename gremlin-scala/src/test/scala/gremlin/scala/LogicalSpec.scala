@@ -3,7 +3,7 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
 
-class BranchSpec extends WordSpec with Matchers {
+class LogicalSpec extends WordSpec with Matchers {
 
   "choose" should {
     "provide simple version for if/else semantic" in new Fixture {
