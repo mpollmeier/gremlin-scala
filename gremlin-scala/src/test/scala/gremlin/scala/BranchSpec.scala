@@ -56,7 +56,14 @@ class BranchSpec extends WordSpec with Matchers {
           1984,      //Steffi's year of birth
           2015)      // Karlotta's year of birth
     }
-  
+  }
+
+  "coalesce provides if/elseif/else semantics" in new Fixture {
+    graph.V.value(Age).coalesce(
+      _.is(P.lt(31)).constant("young"),
+      _.is(P.lt(34)).constant("old"),
+      _.constant("very old")
+    ).toList shouldBe List("very old", "old", "young")
   }
 
   trait Fixture {
