@@ -18,6 +18,7 @@ class LogicalSpec extends WordSpec with Matchers {
     }
 
     "provide if/elseif/else semantic" in new Fixture {
+      // note: this is only if/elseif/else semantic because the PickToken is enforced to be unique
       graph.V
         .choose(
           on = _.value(Age),
@@ -29,6 +30,14 @@ class LogicalSpec extends WordSpec with Matchers {
           41,   //Steffi is 32 - take her shoesize
           2015) // Karlotta is case `Otherwise` - take her year of birth
     }
+  }
+
+  "coalesce provides if/elseif/else semantics" in new Fixture {
+    graph.V.value(Age).coalesce(
+      _.is(P.lt(31)).constant("young"),
+      _.is(P.lt(34)).constant("old"),
+      _.constant("very old")
+    ).toList shouldBe List("very old", "old", "young")
   }
 
   "branch" should {
@@ -58,32 +67,20 @@ class LogicalSpec extends WordSpec with Matchers {
     }
   }
 
-  "coalesce provides if/elseif/else semantics" in new Fixture {
-    graph.V.value(Age).coalesce(
-      _.is(P.lt(31)).constant("young"),
-      _.is(P.lt(34)).constant("old"),
-      _.constant("very old")
-    ).toList shouldBe List("very old", "old", "young")
+  "and step returns results if all conditions are met" in new Fixture {
+    graph.V.and(
+      _.label.is(Person),
+      _.out().has(Name -> "Karlotta")
+    ).value(Name)
+    .toSet shouldBe Set("Michael", "Steffi")
   }
 
-  "and step" should {
-    "return results if all conditions are met" in new Fixture {
-      graph.V.and(
-        _.label.is(Person),
-        _.out().has(Name -> "Karlotta")
-      ).value(Name)
-      .toSet shouldBe Set("Michael", "Steffi")
-    }
-  }
-
-  "or step" should {
-    "return results if at least one condition is met" in new Fixture {
-      graph.V.or(
-        _.label.is("does not exist"),
-        _.has(Age -> 34)
-      ).value(Name)
-      .toSet shouldBe Set("Michael")
-    }
+  "or step returns results if at least one condition is met" in new Fixture {
+    graph.V.or(
+      _.label.is("does not exist"),
+      _.has(Age -> 34)
+    ).value(Name)
+    .toSet shouldBe Set("Michael")
   }
 
   "exists" should {

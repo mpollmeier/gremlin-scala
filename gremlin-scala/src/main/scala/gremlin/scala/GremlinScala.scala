@@ -386,6 +386,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def union[A](unionTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*) =
     GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals: _*): _*))
 
+  /* evaluates the provided traversals in order and returns the first traversal that emits at least one element 
+   * useful e.g. for if/elseif/else semantics */
   def coalesce[A](coalesceTraversals: (GremlinScala[End, HNil] ⇒ GremlinScala[A, _])*): GremlinScala[A, Labels] =
     GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
 
