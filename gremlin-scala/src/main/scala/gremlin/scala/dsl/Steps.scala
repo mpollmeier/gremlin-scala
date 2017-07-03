@@ -3,7 +3,7 @@ package gremlin.scala.dsl
 import gremlin.scala._
 import scala.collection.mutable
 import shapeless._
-import shapeless.ops.hlist.Tupler
+import shapeless.ops.hlist.{IsHCons, Tupler}
 import shapeless.ops.hlist.Prepend
 import shapeless.ops.product.ToHList
 
@@ -124,23 +124,32 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     SelectedGraphTypes <: HList,
     SelectedGraphTypesTuple <: Product,
     StepLabelsGraphTypes <: HList,
-    StepLabelsGraphTypesTuple <: Product](labels: StepLabelsTuple)(
+    StepLabelsGraphTypesTuple <: Product,
+
+    // type params needed for call to `raw.select`
+    StepLabels0 <: HList,
+    H0, T0 <: HList,
+  ](labels: StepLabelsTuple)(
     implicit toHList: ToHList.Aux[StepLabelsTuple, StepLabels],
       extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
       tupler1: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
       conv: Converter.Aux[SelectedTypesTuple, SelectedGraphTypesTuple],
       toGraphStepLabel: StepLabel.ToGraph.Aux[StepLabels, StepLabelsGraphTypes],
-      tupler2: Tupler.Aux[StepLabelsGraphTypes, StepLabelsGraphTypesTuple]
+      tupler2: Tupler.Aux[StepLabelsGraphTypes, StepLabelsGraphTypesTuple],
+      // implicits needed for call to `raw.select`
+      toHList2: ToHList.Aux[StepLabelsGraphTypesTuple, StepLabels0],
+      hasOne: IsHCons.Aux[StepLabels0, H0, T0], hasTwo: IsHCons[T0] // witnesses that stepLabels has > 1 elements
+
   ) =
     new Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels]({
-      val a: StepLabels = toHList(labels)
-      val b: StepLabelsGraphTypes = toGraphStepLabel(a)
+      // val a: StepLabels = toHList(labels)
+      // val b: StepLabelsGraphTypes = toGraphStepLabel(a)
       // val t: SelectedTypes = extractLabelType(a)
       // val v: SelectedGraphTypes = conv.toGraph(t)
       // val w: StepLabelsGraphTypes = wrapper(v)
-      val x: StepLabelsGraphTypesTuple = tupler2(b)
-      raw.select(x)
-      // raw.select(labels.asInstanceOf[StepLabelsGraphTypesTuple]) // dirty abuse of type erasure :)
+      // val x: StepLabelsGraphTypesTuple = tupler2(b)
+      // raw.select(x)
+      raw.select(labels.asInstanceOf[StepLabelsGraphTypesTuple]) // dirty abuse of type erasure :)
       // ???
     })
 
