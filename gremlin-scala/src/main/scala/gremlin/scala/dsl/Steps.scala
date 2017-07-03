@@ -94,7 +94,27 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     constr: Constructor.Aux[EndDomain, NewLabels, EndGraph, NewSteps]): NewSteps =
     constr(raw.asInstanceOf[GremlinScala[EndGraph, HNil]].as(stepLabel))
 
-  def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple](
+  def as[NewLabels <: HList, NewSteps](stepLabel: StepLabel[EndDomain])(
+    implicit prependDomain: Prepend.Aux[Labels, EndDomain :: HNil, NewLabels],
+    constr: Constructor.Aux[EndDomain, NewLabels, EndGraph, NewSteps]): NewSteps =
+    constr(raw.asInstanceOf[GremlinScala[EndGraph, HNil]].as(stepLabel.name))
+
+  // def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
+  //   implicit
+  //     conv1: Converter.Aux[Labels, LabelsGraph],
+  //     tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
+  //     tupler2: Tupler.Aux[Labels, LabelsTuple],
+  //     conv2: Converter.Aux[LabelsTuple, LabelsGraphTuple]
+  // ) = new Steps[LabelsTuple, LabelsGraphTuple, Labels](
+  //   raw.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]].select()
+  // )
+
+  // select one specific label
+  def select[Label, LabelGraph](stepLabel: StepLabel[Label])(implicit conv1: Converter.Aux[Label, LabelGraph]) =
+    new Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](stepLabel.name)))
+
+  // select all labels
+  def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
     implicit
       conv1: Converter.Aux[Labels, LabelsGraph],
       tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],

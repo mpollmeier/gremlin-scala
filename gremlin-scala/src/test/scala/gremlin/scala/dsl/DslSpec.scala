@@ -19,22 +19,40 @@ class DslSpec extends WordSpec with Matchers {
     )
   }
 
-  "label with `as` and typesafe `select` of domain types" in {
-    implicit val graph = TinkerFactory.createModern
+  "label with `as` and typesafe `select` of domain types" should {
 
-    val personAndSoftware: List[(Person, Software)] =
-      PersonSteps(graph)
-        .as("person")
-        .created
-        .as("software")
-        .select
-        .toList
-    personAndSoftware should have size 4
+    "select all labelled steps by default" in {
+      implicit val graph = TinkerFactory.createModern
 
-    val softwareByCreator: Map[String, Software] = personAndSoftware
-      .map { case (person, software) => (person.name, software) }
-      .toMap
-    softwareByCreator("marko") shouldBe Software("lop", "java")
+      val personAndSoftware: List[(Person, Software)] =
+        PersonSteps(graph)
+          .as("person")
+          .created
+          .as("software")
+          .select
+          .toList
+      personAndSoftware should have size 4
+
+      val softwareByCreator: Map[String, Software] = personAndSoftware
+        .map { case (person, software) => (person.name, software) }
+        .toMap
+      softwareByCreator("marko") shouldBe Software("lop", "java")
+    }
+
+    "allow to select one labelled step only" in {
+      implicit val graph = TinkerFactory.createModern
+      val labelPerson = StepLabel[Person]("p")
+      val labelSoftware = StepLabel[Software]("s")
+
+      val personAndSoftware: Set[Software] =
+        PersonSteps(graph)
+          .as(labelPerson)
+          .created
+          .as(labelSoftware)
+          .select(labelSoftware)
+          .toSet
+      personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
+    }
   }
 
   "finds combination of person/software in for comprehension" in {
