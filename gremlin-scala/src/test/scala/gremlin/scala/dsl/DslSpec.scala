@@ -53,6 +53,26 @@ class DslSpec extends WordSpec with Matchers {
           .toSet
       personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
     }
+
+    "allow to select multiple labelled steps" in {
+      implicit val graph = TinkerFactory.createModern
+      val labelPerson = StepLabel[Person]("p")
+      val labelSoftware = StepLabel[Software]("s")
+
+      val personAndSoftware: List[(Software, Person)] =
+        PersonSteps(graph)
+          .as(labelPerson)
+          .created
+          .as(labelSoftware)
+          .select((labelSoftware, labelPerson))
+          .toList
+      personAndSoftware should have size 4
+
+      val softwareByCreator: Map[String, Software] = personAndSoftware
+        .map { case (software, person) => (person.name, software) }
+        .toMap
+      softwareByCreator("marko") shouldBe Software("lop", "java")
+    }
   }
 
   "finds combination of person/software in for comprehension" in {

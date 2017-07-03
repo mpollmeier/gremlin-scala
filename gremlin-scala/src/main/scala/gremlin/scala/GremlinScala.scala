@@ -157,7 +157,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     folder: RightFolder.Aux[StepLabels, (HNil, JMap[String, Any]), combineLabelWithValue.type, (Values, Z)],
     tupler: Tupler.Aux[Values, ValueTuples]
   ): GremlinScala[ValueTuples, Labels] = {
-    val stepLabels: StepLabels = stepLabelsTuple.toHList
+    val stepLabels: StepLabels = toHList(stepLabelsTuple)
     val labels: List[String] = stepLabels.map(GetLabelName).toList
     val label1 = labels.head
     val label2 = labels.tail.head
