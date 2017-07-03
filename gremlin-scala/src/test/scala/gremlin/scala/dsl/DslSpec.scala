@@ -53,6 +53,45 @@ class DslSpec extends WordSpec with Matchers {
           .toSet
       personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
     }
+
+    "allow to select multiple labelled steps" in {
+      implicit val graph = TinkerFactory.createModern
+      val labelPerson = StepLabel[Person]("p")
+      val labelSoftware = StepLabel[Software]("s")
+
+      import shapeless._
+      import shapeless.ops.hlist.Tupler
+      import shapeless.ops.hlist.Prepend
+      import shapeless.ops.product.ToHList
+
+      val toHList = implicitly[ToHList.Aux[(StepLabel[Software], StepLabel[Person]), StepLabel[Software] :: StepLabel[Person] :: HNil]]
+      val extractLabelType = implicitly[StepLabel.ExtractLabelType.Aux[StepLabel[Software] :: StepLabel[Person] :: HNil, Software :: Person :: HNil]]
+      val tupler1 = implicitly[Tupler.Aux[Software :: Person :: HNil, (Software, Person)]]
+      val conv = implicitly[Converter.Aux[(Software, Person), (Vertex, Vertex)]]
+      val toGraphStepLabel = implicitly[StepLabel.ToGraph.Aux[StepLabel[Software] :: StepLabel[Person] :: HNil, StepLabel[Vertex] :: StepLabel[Vertex] :: HNil]]
+      // val wrapper = implicitly[StepLabel.Wrap.Aux[Vertex :: Vertex :: HNil, StepLabel[Vertex] :: StepLabel[Vertex] :: HNil]]
+      val tupler2 =  implicitly[Tupler.Aux[StepLabel[Vertex] :: StepLabel[Vertex] :: HNil, (StepLabel[Vertex], StepLabel[Vertex])]]
+
+      // val toGraph4: StepLabel.ToGraph.Aux[StepLabel[Person] :: HNil, StepLabel[Vertex] :: HNil] = StepLabel.ToGraph.forHList[Person, Vertex, HNil, HNil]
+
+      // val personAndSoftware: Set[(Software, Person)] =
+        PersonSteps(graph)
+          .as(labelPerson)
+          .created
+          .as(labelSoftware)
+          // .select((labelSoftware, labelPerson))
+          .select((labelSoftware, labelPerson))(
+            toHList,
+            extractLabelType,
+            tupler1,
+            conv,
+            toGraphStepLabel,
+            tupler2
+          )
+          // .toSet
+
+      // personAndSoftware shouldBe "fixme"
+    }
   }
 
   "finds combination of person/software in for comprehension" in {

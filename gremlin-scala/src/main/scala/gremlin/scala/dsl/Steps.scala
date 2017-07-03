@@ -1,10 +1,11 @@
 package gremlin.scala.dsl
 
 import gremlin.scala._
+import scala.collection.mutable
 import shapeless._
 import shapeless.ops.hlist.Tupler
-import scala.collection.mutable
 import shapeless.ops.hlist.Prepend
+import shapeless.ops.product.ToHList
 
 /** root type for all domain types */
 trait DomainRoot extends Product {
@@ -99,20 +100,6 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     constr: Constructor.Aux[EndDomain, NewLabels, EndGraph, NewSteps]): NewSteps =
     constr(raw.asInstanceOf[GremlinScala[EndGraph, HNil]].as(stepLabel.name))
 
-  // def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
-  //   implicit
-  //     conv1: Converter.Aux[Labels, LabelsGraph],
-  //     tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
-  //     tupler2: Tupler.Aux[Labels, LabelsTuple],
-  //     conv2: Converter.Aux[LabelsTuple, LabelsGraphTuple]
-  // ) = new Steps[LabelsTuple, LabelsGraphTuple, Labels](
-  //   raw.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]].select()
-  // )
-
-  // select one specific label
-  def select[Label, LabelGraph](stepLabel: StepLabel[Label])(implicit conv1: Converter.Aux[Label, LabelGraph]) =
-    new Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](stepLabel.name)))
-
   // select all labels
   def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
     implicit
@@ -123,6 +110,39 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   ) = new Steps[LabelsTuple, LabelsGraphTuple, Labels](
     raw.asInstanceOf[GremlinScala[EndGraph, LabelsGraph]].select()
   )
+
+  // select one specific label
+  def select[Label, LabelGraph](label: StepLabel[Label])(implicit conv1: Converter.Aux[Label, LabelGraph]) =
+    new Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](label.name)))
+
+  // select multiple specific labels
+  def select[
+    StepLabelsTuple <: Product,
+    StepLabels <: HList,
+    SelectedTypes <: HList,
+    SelectedTypesTuple <: Product,
+    SelectedGraphTypes <: HList,
+    SelectedGraphTypesTuple <: Product,
+    StepLabelsGraphTypes <: HList,
+    StepLabelsGraphTypesTuple <: Product](labels: StepLabelsTuple)(
+    implicit toHList: ToHList.Aux[StepLabelsTuple, StepLabels],
+      extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
+      tupler1: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
+      conv: Converter.Aux[SelectedTypesTuple, SelectedGraphTypesTuple],
+      toGraphStepLabel: StepLabel.ToGraph.Aux[StepLabels, StepLabelsGraphTypes],
+      tupler2: Tupler.Aux[StepLabelsGraphTypes, StepLabelsGraphTypesTuple]
+  ) =
+    new Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels]({
+      val a: StepLabels = toHList(labels)
+      val b: StepLabelsGraphTypes = toGraphStepLabel(a)
+      // val t: SelectedTypes = extractLabelType(a)
+      // val v: SelectedGraphTypes = conv.toGraph(t)
+      // val w: StepLabelsGraphTypes = wrapper(v)
+      val x: StepLabelsGraphTypesTuple = tupler2(b)
+      raw.select(x)
+      // raw.select(labels.asInstanceOf[StepLabelsGraphTypesTuple]) // dirty abuse of type erasure :)
+      // ???
+    })
 
   override def toString = s"${getClass.getSimpleName}($raw)"
 }
