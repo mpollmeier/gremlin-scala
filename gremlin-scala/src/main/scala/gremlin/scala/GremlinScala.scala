@@ -73,7 +73,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.optional(t))
   }
 
-  /* returns the result of the specified traversal if it yields a result else it returns the provided default value */
+  /* returns the result of the specified traversal if it yields a result else it returns the provided default value
+   * note: uses coalesce internally, which is a flatMap step, which affects `as` and `traverser` behaviour
+   */
   def optional[A](optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], default: A) =
     coalesce(optionalTraversal, _.constant(default))
 
