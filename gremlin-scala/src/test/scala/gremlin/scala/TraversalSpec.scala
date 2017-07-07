@@ -525,25 +525,31 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "optional step" which {
     "doesn't take a default value" should {
-      "return identity if optional traversal doesn't find anything" in new Fixture {
-        // vadas does not have an out "know" edge so vadas is returned
-        val results = graph.V(2).optional(_.out("knows")).toList
-        results should have size 1
-        results.head.value2(Name) shouldBe "vadas"
+      "return result of optional traversal if it has one" in new Fixture {
+        val results = graph.V(1).optional(_.out("knows")).value(Name).toList
+        results shouldBe List("vadas", "josh")
       }
 
-      "return result of optional traversal if it has one" in new Fixture {
-        // vadas does have an in "knows" edge so marko is returned.
-        val results = graph.V(2).optional(_.in("knows")).toList
-        results should have size 1
-        results.head.value2(Name) shouldBe "marko"
+      "return identity if optional traversal doesn't find anything" in new Fixture {
+        val results = graph.V(1).optional(_.out("doesnt exist")).value(Name).toList
+        results shouldBe List("marko")
       }
     }
 
-    // "takes a default value" should {
-    //   ???
-    // }
+    "takes a default value" should {
+      import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex
+      val anonymousVertex = new DetachedVertex("anonymous", "anonymous", Map.empty[String, AnyRef].asJava)
 
+      "return result of optional traversal if it has one" in new Fixture {
+        val results = graph.V(1).optional(_.out("knows"), anonymousVertex).value(Name).toList
+        results shouldBe List("vadas", "josh")
+      }
+
+      "return identity if optional traversal doesn't find anything" in new Fixture {
+        val results = graph.V(1).optional(_.out("doesnt exist"), anonymousVertex).value(Name).toList
+        results shouldBe List()
+      }
+    }
   }
 
   "steps to add things" can {

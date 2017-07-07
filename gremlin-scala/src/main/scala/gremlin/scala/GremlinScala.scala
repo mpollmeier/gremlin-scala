@@ -74,11 +74,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   }
 
   /* returns the result of the specified traversal if it yields a result else it returns the provided default value */
-  // def optional[A](optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], default: A) = {
-    // val t = optionalTraversal(start).traversal
-    // GremlinScala[End, Labels](traversal.optional(t))
-  //   ???
-  // }
+  def optional[A](optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], default: A) =
+    coalesce(optionalTraversal, _.constant(default))
 
   def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
