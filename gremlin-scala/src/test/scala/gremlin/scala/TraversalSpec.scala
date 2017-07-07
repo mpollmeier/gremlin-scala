@@ -537,16 +537,13 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "takes a default value" should {
-      import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex
-      val anonymousVertex = new DetachedVertex("anonymous", "anonymous", Map.empty[String, AnyRef].asJava)
-
       "return result of optional traversal if it has one" in new Fixture {
-        val results = graph.V(1).optional(_.out("knows"), anonymousVertex).value(Name).toList
+        val results = graph.V(1).optional(_.out("knows"), DetachedVertex()).value(Name).toList
         results shouldBe List("vadas", "josh")
       }
 
       "return identity if optional traversal doesn't find anything" in new Fixture {
-        val results = graph.V(1).optional(_.out("doesnt exist"), anonymousVertex).value(Name).toList
+        val results = graph.V(1).optional(_.out("doesnt exist"), DetachedVertex()).value(Name).toList
         results shouldBe List()
       }
     }
