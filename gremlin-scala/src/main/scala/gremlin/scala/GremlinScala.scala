@@ -67,10 +67,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def cap[A](stepLabel: StepLabel[A]) =
     GremlinScala[A, Labels](traversal.cap(stepLabel.name))
 
+  /* returns the result of the specified traversal if it yields a result else it returns the calling element, i.e. the identity(). */
   def optional(optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[End, _]) = {
     val t = optionalTraversal(start).traversal
     GremlinScala[End, Labels](traversal.optional(t))
   }
+
+  /* returns the result of the specified traversal if it yields a result else it returns the provided default value */
+  // def optional[A](optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], default: A) = {
+    // val t = optionalTraversal(start).traversal
+    // GremlinScala[End, Labels](traversal.optional(t))
+  //   ???
+  // }
 
   def project[A](projectKey: String, otherProjectKeys: String*): GremlinScala[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))

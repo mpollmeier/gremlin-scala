@@ -524,19 +524,26 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "optional step" which {
-    "returns identity if optional traversal doesn't find anything" in new Fixture {
-      // vadas does not have an out "know" edge so vadas is returned
-      val results = graph.V(2).optional(_.out("knows")).toList
-      results should have size 1
-      results.head.value2(Name) shouldBe "vadas"
+    "doesn't take a default value" should {
+      "return identity if optional traversal doesn't find anything" in new Fixture {
+        // vadas does not have an out "know" edge so vadas is returned
+        val results = graph.V(2).optional(_.out("knows")).toList
+        results should have size 1
+        results.head.value2(Name) shouldBe "vadas"
+      }
+
+      "return result of optional traversal if it has one" in new Fixture {
+        // vadas does have an in "knows" edge so marko is returned.
+        val results = graph.V(2).optional(_.in("knows")).toList
+        results should have size 1
+        results.head.value2(Name) shouldBe "marko"
+      }
     }
 
-    "returns result of optional traversal if it has one" in new Fixture {
-      // vadas does have an in "knows" edge so marko is returned.
-      val results = graph.V(2).optional(_.in("knows")).toList
-      results should have size 1
-      results.head.value2(Name) shouldBe "marko"
-    }
+    // "takes a default value" should {
+    //   ???
+    // }
+
   }
 
   "steps to add things" can {
