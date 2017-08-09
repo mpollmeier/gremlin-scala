@@ -37,11 +37,8 @@ val commonSettings = Seq(
   ),
   incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
   publishTo := {
-    val sonatype = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at sonatype + "content/repositories/snapshots")
-    else
-      Some("releases" at sonatype + "service/local/staging/deploy/maven2")
+    if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+    else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
   },
   publishMavenStyle := true,
   publishArtifact in Test := false,
