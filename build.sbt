@@ -6,6 +6,7 @@ val defaultScalaV = "2.12.3"
 scalaVersion := defaultScalaV
 crossScalaVersions := Seq("2.11.11")
 releaseCrossBuild := true
+import ReleaseTransformations._
 
 val gremlinVersion = "3.2.5"
 val commonSettings = Seq(
@@ -36,7 +37,7 @@ val commonSettings = Seq(
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
   incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
-  publishTo := {
+  publishTo := { // format: off
     if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
     else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
   },
@@ -54,8 +55,25 @@ val commonSettings = Seq(
           <name>Michael Pollmeier</name>
           <url>http://www.michaelpollmeier.com</url>
         </developer>
-      </developers>
+    </developers>, // format: on
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    ReleaseStep(action = Command.process("publishSigned", _)),
+    setNextVersion,
+    commitNextVersion,
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    pushChanges
+  )
 )
+
 
 lazy val root = project.in(file("."))
   .aggregate(`gremlin-scala`, macros)
