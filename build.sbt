@@ -4,7 +4,7 @@ organization := org
 
 val defaultScalaV = "2.12.3"
 scalaVersion := defaultScalaV
-crossScalaVersions := Seq("2.11.11", defaultScalaV) //prefix sbt command with `+` to run it with these scala versions
+crossScalaVersions := Seq("2.11.11")
 releaseCrossBuild := true
 
 val gremlinVersion = "3.2.5"
