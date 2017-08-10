@@ -11,9 +11,6 @@ import ReleaseTransformations._
 val gremlinVersion = "3.2.5"
 val commonSettings = Seq(
   organization := org,
-  licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
-  homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   scalaVersion := defaultScalaV,
   libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
@@ -41,6 +38,8 @@ val commonSettings = Seq(
     if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
     else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
   },
+  homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
+  licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
