@@ -33,7 +33,6 @@ val commonSettings = Seq(
     "-feature",
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
-  incOptions := incOptions.value.withNameHashing(true), // doesn't work on travis ;(
   publishTo := { // format: off
     if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
     else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
@@ -65,10 +64,10 @@ val commonSettings = Seq(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    ReleaseStep(action = Command.process("publishSigned", _)),
+    releaseStepCommand("publishSigned"),
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    releaseStepCommand("sonatypeReleaseAll"),
     pushChanges
   )
 )
