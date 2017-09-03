@@ -8,7 +8,7 @@ crossScalaVersions := Seq("2.11.11")
 releaseCrossBuild := true
 import ReleaseTransformations._
 
-val gremlinVersion = "3.2.5"
+val gremlinVersion = "3.3.0"
 val commonSettings = Seq(
   organization := org,
   scalaVersion := defaultScalaV,
@@ -75,6 +75,7 @@ val commonSettings = Seq(
 
 lazy val root = project.in(file("."))
   .aggregate(`gremlin-scala`, macros)
+  .settings(publishArtifact := false)
 
 lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
@@ -83,5 +84,3 @@ lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
 // macros can't be in the same compilation unit
 lazy val macros = project.in(file("macros"))
   .settings(commonSettings: _*)
-
-publishArtifact := false

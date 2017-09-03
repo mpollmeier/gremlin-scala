@@ -94,5 +94,6 @@ case class ScalaGraph(traversalSource: TraversalSource) {
 
   def close(): Unit = graph.close()
 
-  def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
+  /* TODO: reimplement with createThreadedTx, if the underlying graph supports it */
+  // def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
 }
