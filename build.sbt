@@ -5,9 +5,8 @@ organization := org
 val defaultScalaV = "2.12.3"
 scalaVersion := defaultScalaV
 crossScalaVersions := Seq("2.11.11")
-releaseCrossBuild := true
-import ReleaseTransformations._
 
+import ReleaseTransformations._
 val gremlinVersion = "3.3.0"
 val commonSettings = Seq(
   organization := org,
@@ -54,7 +53,6 @@ val commonSettings = Seq(
           <url>http://www.michaelpollmeier.com</url>
         </developer>
     </developers>, // format: on
-  releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
@@ -64,7 +62,7 @@ val commonSettings = Seq(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    releaseStepCommand("publishSigned"),
+    releaseStepCommand("+publishSigned"),
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),
