@@ -25,13 +25,16 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
 
 case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End]) {
-  def toStream(): JStream[End] = traversal.toStream
 
+  /** alias for `toList`, because typing kills */
+  def l(): List[End] = toList
   def toList(): List[End] = traversal.toList.asScala.toList
 
-  def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A,B] = toList.toMap
+  def toStream(): JStream[End] = traversal.toStream
 
   def toSet(): Set[End] = toList.toSet
+
+  def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A,B] = toList.toMap
 
   def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
