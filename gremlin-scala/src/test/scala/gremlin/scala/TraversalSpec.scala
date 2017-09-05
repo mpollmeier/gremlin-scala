@@ -333,24 +333,29 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "groupBy" should {
-    "work with label" in new Fixture {
-      val results: JMap[String, JCollection[Vertex]] =
-        graph.V.groupBy(_.label).head
+  "group" should {
+    // "modulate by (T)oken" in new Fixture {
+    //   val results: JMap[String, JCollection[Vertex]] =
+    //     graph.V.group2(by(T.label)).head
 
-      results.get("software") should contain(graph.V(3).head)
-      results.get("software") should contain(graph.V(5).head)
-      results.get("person") should contain(graph.V(1).head)
-      results.get("person") should contain(graph.V(2).head)
-      results.get("person") should contain(graph.V(4).head)
-      results.get("person") should contain(graph.V(6).head)
-    }
+    //   results.get("software") should contain(graph.V(3).head)
+    //   results.get("software") should contain(graph.V(5).head)
+    //   results.get("person") should contain(graph.V(1).head)
+    //   results.get("person") should contain(graph.V(2).head)
+    //   results.get("person") should contain(graph.V(4).head)
+    //   results.get("person") should contain(graph.V(6).head)
+    // }
 
-    "work with property" in new Fixture {
-      val results: JMap[Integer, JCollection[Vertex]] =
-        graph.V
-          .has(Age)
-          .groupBy(_.value[Integer]("age")).head
+    "modulate by property key" in new Fixture {
+      // val by2: By[] = by[Int, JMap[Int, JCollection[Vertex]]](Age) //works
+      // val by2 = by[Int, JMap[Int, JCollection[Vertex]]](Age)
+
+      val results: JMap[Int, JCollection[Vertex]] =
+        graph.V.has(Age)
+          // .group2[Int](by(Age)) //works
+          // .group2(by[Int, JMap[Int, JCollection[Vertex]]](Age)) //works
+          .group2(by(Age)) // why not?
+          .head
 
       results.get(27) should contain(graph.V(2).head)
       results.get(29) should contain(graph.V(1).head)

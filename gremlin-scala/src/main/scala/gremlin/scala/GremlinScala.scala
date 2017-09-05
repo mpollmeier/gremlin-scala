@@ -291,16 +291,31 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
+  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
+    * by modulators which help specify how the grouping should occur.
+    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
   def group[A: DefaultsToAny]() = GremlinScala[JMap[String, A], Labels](traversal.group())
 
+  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
+    * by modulators which help specify how the grouping should occur.
+    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
+  def group2[ByWhat](by: By[ByWhat, JMap[ByWhat, JCollection[End]]]) =
+    GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
+
+  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
+    * by modulators which help specify how the grouping should occur.
+    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
+  def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
+
+  @deprecated("use group(by(...))", "3.0.0.1")
   def group[A <: AnyRef](byTraversal: End ⇒ A) =
     GremlinScala[JMap[A, BulkSet[End]], Labels](traversal.group().by(byTraversal))
 
-  def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
-
+  @deprecated("use group(by(...))", "3.0.0.1")
   def groupBy[A <: AnyRef](byFun: End ⇒ A): GremlinScala[JMap[A, JCollection[End]], Labels] =
       GremlinScala[JMap[A, JCollection[End]], Labels](traversal.group().by(byFun: JFunction[End, AnyRef]))
 
+  @deprecated("use group(by(...))", "3.0.0.1")
   def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
     GremlinScala[JMap[A, JCollection[End]], Labels](
       traversal.group().by(byFun: JFunction[End, AnyRef])
