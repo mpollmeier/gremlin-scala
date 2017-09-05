@@ -318,13 +318,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     * TODO: carry SackType as class type parameter (both ScalaGraph and GremlinScala) */
   def sack[SackType]() = GremlinScala[SackType, Labels](traversal.sack[SackType]())
 
-  /** Modify the sack with the current End type. 
-    * TODO: carry SackType as class type parameter (both ScalaGraph and GremlinScala)
-    * [SideEffect] */
+  /** Modify the sack with the current End type. [SideEffect] */
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   /** sack with by modulator */
-  def sack[SackType, ByProperty](func: (SackType, ByProperty) => SackType, by: By[ByProperty]) =
+  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat, End]) =
     GremlinScala[End, Labels](by(traversal.sack(func)))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())

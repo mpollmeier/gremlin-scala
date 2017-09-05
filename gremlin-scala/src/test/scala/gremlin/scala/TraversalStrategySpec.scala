@@ -45,15 +45,25 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
       result shouldBe Set(1d, 0.4d)
     }
 
-    "be modulated with by operator" in new Fixture {
+    "be modulated with by operator" when {
+      "modulating by property" in new Fixture {
+        val result = graph.configure(_.withSack(1d))
+          .V(1).outE
+          .sack(multiply, by(Weight))
+          .inV.sack.toSet
+
+        result shouldBe Set(0.4d, 0.5d, 1d)
+      }
+
+      "modulating by traversal" in new Fixture {
+        val result = graph.configure(_.withSack(1d))
+          .V(1).outE
+          .sack(multiply, by(_.value(Weight)))
+          .inV.sack.toSet
+
+        result shouldBe Set(0.4d, 0.5d, 1d)
+      }
       def multiply(a: Double, b: Double): Double = a * b
-
-      val result = graph.configure(_.withSack(1d))
-        .V(1).outE
-        .sack(multiply, by(Weight))
-        .inV.sack.toSet
-
-      result shouldBe Set(0.4d, 0.5d, 1d)
     }
 
     "use provided split operator when cloning sack" in new Fixture {
