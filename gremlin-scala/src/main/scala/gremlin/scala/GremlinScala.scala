@@ -299,7 +299,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
     * by modulators which help specify how the grouping should occur.
     * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  def group2[ByWhat](by: By[ByWhat, JMap[ByWhat, JCollection[End]]]) =
+  def group2[ByWhat](by: By[ByWhat]) =
     GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
 
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
@@ -337,7 +337,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   /** sack with by modulator */
-  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat, End]) =
+  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat]) =
     GremlinScala[End, Labels](by(traversal.sack(func)))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
@@ -360,7 +360,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
-  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
+  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
       traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[_, AnyRef]] , comparator)
     )
