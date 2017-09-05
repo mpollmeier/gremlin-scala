@@ -8,7 +8,6 @@ import org.apache.tinkerpop.gremlin.process.remote.traversal.{AbstractRemoteTrav
 import org.apache.tinkerpop.gremlin.structure.{Vertex => TVertex}
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
-import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedVertex
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalamock.scalatest.MockFactory
@@ -114,8 +113,8 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
     // data to return
     val mockVertices = List[TVertex](
-      new DetachedVertex(1, "person", new util.LinkedHashMap[String,Object]()),
-      new DetachedVertex(2, "person", new util.LinkedHashMap[String,Object]())
+      DetachedVertex(id = 1: Integer, label = "person"),
+      DetachedVertex(id = 2: Integer, label = "person")
     )
 
     // Create a future that completes immediately and provides a remote traversal providing vertices
