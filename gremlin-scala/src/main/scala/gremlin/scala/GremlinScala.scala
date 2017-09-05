@@ -323,6 +323,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     * [SideEffect] */
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
+  /** sack with by modulator */
+  def sack[SackType, ByProperty](func: (SackType, ByProperty) => SackType, by: By[ByProperty]) =
+    GremlinScala[End, Labels](by(traversal.sack(func)))
+
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
 
   def barrier(maxBarrierSize: Int) = GremlinScala[End, Labels](traversal.barrier(maxBarrierSize))
