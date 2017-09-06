@@ -372,7 +372,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "modulate by function" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.group(by.function{v: Vertex => v.label}).head
+        graph.V.group(by{v: Vertex => v.label}).head
 
       results.get("software") should contain(graph.V(3).head)
       results.get("software") should contain(graph.V(5).head)
