@@ -124,61 +124,61 @@ class TraversalSpec extends WordSpec with Matchers {
     graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
   }
 
-  "orderBy" can {
+  "order" can {
     "order by property" in new Fixture {
       graph.V.has(Age)
-        .orderBy("age")
+        .order(by(Age))
         .value(Age)
         .toList shouldBe Seq(27, 29, 32, 35)
     }
 
     "order by property decr" in new Fixture {
       graph.V.has(Age)
-        .orderBy("age", Order.decr)
+        .order(by(Age, Order.decr))
         .value(Age)
         .toList shouldBe Seq(35, 32, 29, 27)
     }
 
-    "order by lambda" in new Fixture {
-      graph.V.has(Age)
-        .orderBy(_.value[Integer]("age"))
-        .value(Age)
-        .toList shouldBe Seq(27, 29, 32, 35)
-    }
+    // "order by lambda" in new Fixture {
+    //   graph.V.has(Age)
+    //     .orderBy(_.value[Integer]("age"))
+    //     .value(Age)
+    //     .toList shouldBe Seq(27, 29, 32, 35)
+    // }
 
-    "order by lambda decr" in new Fixture {
-      graph.V.has(Age)
-        .orderBy(_.value[Integer]("age"), Order.decr)
-        .value(Age)
-        .toList shouldBe Seq(35, 32, 29, 27)
-    }
+    // "order by lambda decr" in new Fixture {
+    //   graph.V.has(Age)
+    //     .orderBy(_.value[Integer]("age"), Order.decr)
+    //     .value(Age)
+    //     .toList shouldBe Seq(35, 32, 29, 27)
+    // }
 
-    "order non-elements" in new Fixture {
-      graph.V.has(Age)
-        .value[Integer]("age")
-        .orderBy(x ⇒ x)
-        .toList shouldBe Seq(27, 29, 32, 35)
-    }
+    // "order non-elements" in new Fixture {
+    //   graph.V.has(Age)
+    //     .value[Integer]("age")
+    //     .orderBy(x ⇒ x)
+    //     .toList shouldBe Seq(27, 29, 32, 35)
+    // }
 
-    "order non-elements decr" in new Fixture {
-      graph.V.has(Age)
-        .value[Integer]("age")
-        .orderBy(x ⇒ -x: Integer)
-        .toList shouldBe Seq(35, 32, 29, 27)
-    }
+    // "order non-elements decr" in new Fixture {
+    //   graph.V.has(Age)
+    //     .value[Integer]("age")
+    //     .orderBy(x ⇒ -x: Integer)
+    //     .toList shouldBe Seq(35, 32, 29, 27)
+    // }
 
-    "order with sub-by" in new Fixture {
-      // add two more people with Age 29
-      graph + ("person", Age → 29, Name → "ZZZ")
-      graph + ("person", Age → 29, Name → "aaa")
+    // "order with sub-by" in new Fixture {
+    //   // add two more people with Age 29
+    //   graph + ("person", Age → 29, Name → "ZZZ")
+    //   graph + ("person", Age → 29, Name → "aaa")
 
-      graph.V.has(Age).has(Name)
-        .order()
-        .by(Age.name, Order.incr) // TODO: add by(Key[A]) step
-        .by(Name.name, Order.decr)
-        .value(Name)
-        .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
-    }
+    //   graph.V.has(Age).has(Name)
+    //     .order()
+    //     .by(Age.name, Order.incr) // TODO: add by(Key[A]) step
+    //     .by(Name.name, Order.decr)
+    //     .value(Name)
+    //     .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
+    // }
 
     // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
     // "allow primitive types" in new Fixture {

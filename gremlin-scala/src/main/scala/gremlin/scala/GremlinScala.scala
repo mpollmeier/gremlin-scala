@@ -223,6 +223,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def order(scope: Scope, comparator: Order = Order.incr) = GremlinScala[End, Labels](traversal.order(scope).by(comparator))
 
+  def order[Modulated](by: By[Modulated]) = GremlinScala[End, Labels](by(traversal.order()))
+
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
 
   def cyclicPath() = GremlinScala[End, Labels](traversal.cyclicPath())

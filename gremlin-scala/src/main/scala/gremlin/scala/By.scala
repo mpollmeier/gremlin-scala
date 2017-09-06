@@ -1,13 +1,14 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.T
 import java.util.function.{Function ⇒ JFunction}
 
 /**
-  * by step can be used in combination with all sorts of other steps, e.g. group, order, dedup, sack, ...
-  * http://tinkerpop.apache.org/docs/current/reference/#by-step
-  */
+  * by step can be used in combination with all sorts of other steps
+  * e.g. group, groupCount, order, dedup, sack, ...
+  * http://tinkerpop.apache.org/docs/current/reference/#by-step */
 trait By[Modulated] {
   def apply[End](traversal: GraphTraversal[_, End]): GraphTraversal[_, End]
 }
@@ -17,6 +18,11 @@ object by {
   /* modulate by property */
   def apply[Modulated](key: Key[Modulated]) = new By[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(key.name)
+  }
+
+  /* modulate by property and order */
+  def apply[Modulated](key: Key[Modulated], order: Order) = new By[Modulated] {
+    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(key.name, order)
   }
 
   /* modulate by label - alias for `apply[String](T.label)` */
