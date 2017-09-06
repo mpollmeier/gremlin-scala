@@ -17,7 +17,6 @@ import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
-import shapeless.syntax.std.product.productOps
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
