@@ -349,7 +349,7 @@ class TraversalSpec extends WordSpec with Matchers {
     "modulate by traversal" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V.has(Age)
-          .group(by(__[Vertex].value(Age)))
+          .group(by(__.value(Age)))
           .head
 
       results.get(27) should contain(graph.V(2).head)
