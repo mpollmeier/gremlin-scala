@@ -33,9 +33,9 @@ object by {
    * n.b. cast here is a dirty hack, but we can't connect then End type of the start of byTraversal and `End`, 
    * so the calling site would have to specify type params which looks ugly and superfluous. only risk here is 
    * that caller is not restricted from doing non-element steps (e.g. call `.has()` on an integer). */
-  def apply[Modulated](byTraversal: GremlinScala[Element, _] => GremlinScala[Modulated, _]) = new By[Modulated] {
+  def apply[Modulated](byTraversal: GremlinScala[Vertex, _] => GremlinScala[Modulated, _]) = new By[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) =
-      traversal.by(byTraversal(__[End].asInstanceOf[GremlinScala[Element, _]]).traversal)
+      traversal.by(byTraversal(__[End].asInstanceOf[GremlinScala[Vertex, _]]).traversal)
   }
 
   /* modulate by function
