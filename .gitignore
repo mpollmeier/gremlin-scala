@@ -1,31 +1,5 @@
-*.class
-*.log
-classes
-.cache
-tags
-.tags
-
-# sbt specific
-dist/*
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-.lib
-
-# Scala-IDE specific
-.scala_dependencies
-
-# eclipse files
-.classpath
-.project
-.settings
-*.swp
-.lib-src
-
-#intellij IDEA
-.idea
-
-.ensime
-.ensime_cache
+/target/
+gremlin-scala/target/
+macros/target/
+project/project/
+project/target/
