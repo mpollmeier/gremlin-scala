@@ -299,8 +299,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
     * by modulators which help specify how the grouping should occur.
     * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  // def group2[ByWhat](by: By[ByWhat]) =
-  //   GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
+  def group2[ByWhat](by: By[ByWhat]) =
+    GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
 
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
     * by modulators which help specify how the grouping should occur.
@@ -337,8 +337,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   /** sack with by modulator */
-  // def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat]) =
-  //   GremlinScala[End, Labels](by(traversal.sack(func)))
+  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat]) =
+    GremlinScala[End, Labels](by(traversal.sack(func)))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
 
