@@ -334,32 +334,6 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "group" should {
-    "modulate by function" in new Fixture {
-      val results: JMap[String, JCollection[Vertex]] =
-        // graph.V.group2(by(T.label)).head
-        graph.V.group2(by(toJavaFunction{v: Vertex => v.label})).head
-
-      results.get("software") should contain(graph.V(3).head)
-      results.get("software") should contain(graph.V(5).head)
-      results.get("person") should contain(graph.V(1).head)
-      results.get("person") should contain(graph.V(2).head)
-      results.get("person") should contain(graph.V(4).head)
-      results.get("person") should contain(graph.V(6).head)
-    }
-
-    "modulate by (T)oken" in new Fixture {
-      val results: JMap[String, JCollection[Vertex]] =
-        ???
-        // graph.V.group2(by(T.label)).head
-
-      results.get("software") should contain(graph.V(3).head)
-      results.get("software") should contain(graph.V(5).head)
-      results.get("person") should contain(graph.V(1).head)
-      results.get("person") should contain(graph.V(2).head)
-      results.get("person") should contain(graph.V(4).head)
-      results.get("person") should contain(graph.V(6).head)
-    }
-
     "modulate by property key" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V.has(Age)
@@ -371,6 +345,45 @@ class TraversalSpec extends WordSpec with Matchers {
       results.get(32) should contain(graph.V(4).head)
       results.get(35) should contain(graph.V(6).head)
     }
+
+    "modulate by traversal" in new Fixture {
+      val results: JMap[Int, JCollection[Vertex]] =
+        graph.V.has(Age)
+          .group2(by(_.value(Age)))
+          .head
+
+      results.get(27) should contain(graph.V(2).head)
+      results.get(29) should contain(graph.V(1).head)
+      results.get(32) should contain(graph.V(4).head)
+      results.get(35) should contain(graph.V(6).head)
+    }
+
+    // "modulate by function" in new Fixture {
+    //   val results: JMap[String, JCollection[Vertex]] =
+    //     // graph.V.group2(by(T.label)).head
+    //     graph.V.group2(by(toJavaFunction{v: Vertex => v.label})).head
+
+    //   results.get("software") should contain(graph.V(3).head)
+    //   results.get("software") should contain(graph.V(5).head)
+    //   results.get("person") should contain(graph.V(1).head)
+    //   results.get("person") should contain(graph.V(2).head)
+    //   results.get("person") should contain(graph.V(4).head)
+    //   results.get("person") should contain(graph.V(6).head)
+    // }
+
+    // "modulate by (T)oken" in new Fixture {
+    //   val results: JMap[String, JCollection[Vertex]] =
+    //     ???
+    //     // graph.V.group2(by(T.label)).head
+
+    //   results.get("software") should contain(graph.V(3).head)
+    //   results.get("software") should contain(graph.V(5).head)
+    //   results.get("person") should contain(graph.V(1).head)
+    //   results.get("person") should contain(graph.V(2).head)
+    //   results.get("person") should contain(graph.V(4).head)
+    //   results.get("person") should contain(graph.V(6).head)
+    // }
+
 
     "optionally allow to transform the values" in new Fixture {
       val results: Map[String, Iterable[String]] =
