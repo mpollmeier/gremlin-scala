@@ -358,23 +358,21 @@ class TraversalSpec extends WordSpec with Matchers {
       results.get(35) should contain(graph.V(6).head)
     }
 
-    // "modulate by function" in new Fixture {
-    //   val results: JMap[String, JCollection[Vertex]] =
-    //     // graph.V.group2(by(T.label)).head
-    //     graph.V.group2(by(toJavaFunction{v: Vertex => v.label})).head
+    "modulate by function" in new Fixture {
+      val results: JMap[String, JCollection[Vertex]] =
+        graph.V.group2(by.function(toJavaFunction{v: Vertex => v.label})).head
 
-    //   results.get("software") should contain(graph.V(3).head)
-    //   results.get("software") should contain(graph.V(5).head)
-    //   results.get("person") should contain(graph.V(1).head)
-    //   results.get("person") should contain(graph.V(2).head)
-    //   results.get("person") should contain(graph.V(4).head)
-    //   results.get("person") should contain(graph.V(6).head)
-    // }
+      results.get("software") should contain(graph.V(3).head)
+      results.get("software") should contain(graph.V(5).head)
+      results.get("person") should contain(graph.V(1).head)
+      results.get("person") should contain(graph.V(2).head)
+      results.get("person") should contain(graph.V(4).head)
+      results.get("person") should contain(graph.V(6).head)
+    }
 
     // "modulate by (T)oken" in new Fixture {
     //   val results: JMap[String, JCollection[Vertex]] =
-    //     ???
-    //     // graph.V.group2(by(T.label)).head
+    //     graph.V.group2(by[String](T.label)).head
 
     //   results.get("software") should contain(graph.V(3).head)
     //   results.get("software") should contain(graph.V(5).head)
@@ -383,7 +381,6 @@ class TraversalSpec extends WordSpec with Matchers {
     //   results.get("person") should contain(graph.V(4).head)
     //   results.get("person") should contain(graph.V(6).head)
     // }
-
 
     "optionally allow to transform the values" in new Fixture {
       val results: Map[String, Iterable[String]] =
@@ -393,6 +390,7 @@ class TraversalSpec extends WordSpec with Matchers {
       results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
     }
   }
+
 
   "subgraph" should {
     "work in simple scenario" in new Fixture {
