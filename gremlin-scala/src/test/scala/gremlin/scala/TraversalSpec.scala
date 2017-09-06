@@ -374,9 +374,7 @@ class TraversalSpec extends WordSpec with Matchers {
       type Label = String
       type Name = String
       val results: JMap[Label, JCollection[Name]] =
-        graph.V.has(Age)
-          .group(by.label, by(Name))
-          .head
+        graph.V.group(by.label, by(Name)).head
 
       results.get("software") should contain("lop")
       results.get("software") should contain("ripple")
