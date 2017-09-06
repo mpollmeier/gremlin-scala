@@ -58,7 +58,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
       "modulating by traversal" in new Fixture {
         val result = graph.configure(_.withSack(1d))
           .V(1).outE
-          .sack(multiply, by(_.value(Weight)))
+          .sack(multiply, by(__[Edge].value(Weight)))
           .inV.sack.toSet
 
         result shouldBe Set(0.4d, 0.5d, 1d)
