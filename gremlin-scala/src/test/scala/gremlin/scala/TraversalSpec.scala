@@ -370,20 +370,6 @@ class TraversalSpec extends WordSpec with Matchers {
       results.get("person") should contain(graph.V(6).head)
     }
 
-    "modulate key and value" in new Fixture {
-      type Label = String
-      type Name = String
-      val results: JMap[Label, JCollection[Name]] =
-        graph.V.group(by.label, by(Name)).head
-
-      results.get("software") should contain("lop")
-      results.get("software") should contain("ripple")
-      results.get("person") should contain("marko")
-      results.get("person") should contain("vadas")
-      results.get("person") should contain("josh")
-      results.get("person") should contain("peter")
-    }
-
     "modulate by function" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V.group(by.function{v: Vertex => v.label}).head
@@ -396,12 +382,18 @@ class TraversalSpec extends WordSpec with Matchers {
       results.get("person") should contain(graph.V(6).head)
     }
 
-    "optionally allow to transform the values" in new Fixture {
-      val results: Map[String, Iterable[String]] =
-        graph.V.groupBy(_.label, _.value2(Name)).head
+    "modulate key and value" in new Fixture {
+      type Label = String
+      type Name = String
+      val results: JMap[Label, JCollection[Name]] =
+        graph.V.group(by.label, by(Name)).head
 
-      results("software").toSet shouldBe Set("lop", "ripple")
-      results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
+      results.get("software") should contain("lop")
+      results.get("software") should contain("ripple")
+      results.get("person") should contain("marko")
+      results.get("person") should contain("vadas")
+      results.get("person") should contain("josh")
+      results.get("person") should contain("peter")
     }
   }
 
