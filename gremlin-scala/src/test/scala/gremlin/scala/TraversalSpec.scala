@@ -337,7 +337,7 @@ class TraversalSpec extends WordSpec with Matchers {
     "modulate by property key" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V.has(Age)
-          .group2(by(Age))
+          .group(by(Age))
           .head
 
       results.get(27) should contain(graph.V(2).head)
@@ -349,7 +349,7 @@ class TraversalSpec extends WordSpec with Matchers {
     "modulate by traversal" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V.has(Age)
-          .group2(by(_.value(Age)))
+          .group(by(_.value(Age)))
           .head
 
       results.get(27) should contain(graph.V(2).head)
@@ -360,7 +360,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "modulate by label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.group2(by.label).head
+        graph.V.group(by.label).head
 
       results.get("software") should contain(graph.V(3).head)
       results.get("software") should contain(graph.V(5).head)
@@ -372,7 +372,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "modulate by function" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.group2(by.function{v: Vertex => v.label}).head
+        graph.V.group(by.function{v: Vertex => v.label}).head
 
       results.get("software") should contain(graph.V(3).head)
       results.get("software") should contain(graph.V(5).head)

@@ -299,7 +299,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
     * by modulators which help specify how the grouping should occur.
     * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  def group2[ByWhat](by: By[ByWhat]) =
+  def group[ByWhat](by: By[ByWhat]) =
     GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
 
   /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
