@@ -291,16 +291,27 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
-  def group[A: DefaultsToAny]() = GremlinScala[JMap[String, A], Labels](traversal.group())
+  /** Organize objects in the stream into a Map. */
+  def group[A: DefaultsToAny]() =
+    GremlinScala[JMap[String, A], Labels](traversal.group())
 
+  /** Organize objects in the stream into a Map, group keys with a modulator */
+  def group[Modulated](keysBy: By[Modulated]) =
+    GremlinScala[JMap[Modulated, JCollection[End]], Labels](keysBy(traversal.group()))
+
+  /** Organize objects in the stream into a Map, group keys and values with a modulator */
+  def group[ModulatedKeys, ModulatedValues](keysBy: By[ModulatedKeys], valuesBy: By[ModulatedValues]) =
+    GremlinScala[JMap[ModulatedKeys, JCollection[ModulatedValues]], Labels](valuesBy(keysBy(traversal.group())))
+
+  @deprecated("use group(by(...))", "3.0.0.1")
   def group[A <: AnyRef](byTraversal: End ⇒ A) =
     GremlinScala[JMap[A, BulkSet[End]], Labels](traversal.group().by(byTraversal))
 
-  def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
-
+  @deprecated("use group(by(...))", "3.0.0.1")
   def groupBy[A <: AnyRef](byFun: End ⇒ A): GremlinScala[JMap[A, JCollection[End]], Labels] =
       GremlinScala[JMap[A, JCollection[End]], Labels](traversal.group().by(byFun: JFunction[End, AnyRef]))
 
+  @deprecated("use group(by(...))", "3.0.0.1")
   def groupBy[A <: AnyRef, B](byFun: End ⇒ A, valueFun: End ⇒ B): GremlinScala[Map[A, Iterable[B]], Labels] =
     GremlinScala[JMap[A, JCollection[End]], Labels](
       traversal.group().by(byFun: JFunction[End, AnyRef])
@@ -322,7 +333,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   /** sack with by modulator */
-  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat, End]) =
+  def sack[SackType, Modulated](func: (SackType, Modulated) => SackType, by: By[Modulated]) =
     GremlinScala[End, Labels](by(traversal.sack(func)))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
@@ -345,7 +356,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
-  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr)(implicit ev: End <:< Element): GremlinScala[End, Labels] =
+  def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
       traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[_, AnyRef]] , comparator)
     )

@@ -333,10 +333,34 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "groupBy" should {
-    "work with label" in new Fixture {
+  "group" should {
+    "modulate by property key" in new Fixture {
+      val results: JMap[Int, JCollection[Vertex]] =
+        graph.V.has(Age)
+          .group(by(Age))
+          .head
+
+      results.get(27) should contain(graph.V(2).head)
+      results.get(29) should contain(graph.V(1).head)
+      results.get(32) should contain(graph.V(4).head)
+      results.get(35) should contain(graph.V(6).head)
+    }
+
+    "modulate by traversal" in new Fixture {
+      val results: JMap[Int, JCollection[Vertex]] =
+        graph.V.has(Age)
+          .group(by(_.value(Age)))
+          .head
+
+      results.get(27) should contain(graph.V(2).head)
+      results.get(29) should contain(graph.V(1).head)
+      results.get(32) should contain(graph.V(4).head)
+      results.get(35) should contain(graph.V(6).head)
+    }
+
+    "modulate by label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.groupBy(_.label).head
+        graph.V.group(by.label).head
 
       results.get("software") should contain(graph.V(3).head)
       results.get("software") should contain(graph.V(5).head)
@@ -346,16 +370,30 @@ class TraversalSpec extends WordSpec with Matchers {
       results.get("person") should contain(graph.V(6).head)
     }
 
-    "work with property" in new Fixture {
-      val results: JMap[Integer, JCollection[Vertex]] =
-        graph.V
-          .has(Age)
-          .groupBy(_.value[Integer]("age")).head
+    "modulate key and value" in new Fixture {
+      type Label = String
+      type Name = String
+      val results: JMap[Label, JCollection[Name]] =
+        graph.V.group(by.label, by(Name)).head
 
-      results.get(27) should contain(graph.V(2).head)
-      results.get(29) should contain(graph.V(1).head)
-      results.get(32) should contain(graph.V(4).head)
-      results.get(35) should contain(graph.V(6).head)
+      results.get("software") should contain("lop")
+      results.get("software") should contain("ripple")
+      results.get("person") should contain("marko")
+      results.get("person") should contain("vadas")
+      results.get("person") should contain("josh")
+      results.get("person") should contain("peter")
+    }
+
+    "modulate by function" in new Fixture {
+      val results: JMap[String, JCollection[Vertex]] =
+        graph.V.group(by.function{v: Vertex => v.label}).head
+
+      results.get("software") should contain(graph.V(3).head)
+      results.get("software") should contain(graph.V(5).head)
+      results.get("person") should contain(graph.V(1).head)
+      results.get("person") should contain(graph.V(2).head)
+      results.get("person") should contain(graph.V(4).head)
+      results.get("person") should contain(graph.V(6).head)
     }
 
     "optionally allow to transform the values" in new Fixture {
@@ -366,6 +404,7 @@ class TraversalSpec extends WordSpec with Matchers {
       results("person").toSet shouldBe Set("marko", "vadas", "josh", "peter")
     }
   }
+
 
   "subgraph" should {
     "work in simple scenario" in new Fixture {
