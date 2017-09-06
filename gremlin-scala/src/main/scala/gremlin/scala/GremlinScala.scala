@@ -291,21 +291,17 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def aggregate(sideEffectKey: String) = GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
-  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
-    * by modulators which help specify how the grouping should occur.
-    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  def group[A: DefaultsToAny]() = GremlinScala[JMap[String, A], Labels](traversal.group())
+  /** Organize objects in the stream into a Map. */
+  def group[A: DefaultsToAny]() =
+    GremlinScala[JMap[String, A], Labels](traversal.group())
 
-  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
-    * by modulators which help specify how the grouping should occur.
-    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  def group[ByWhat](by: By[ByWhat]) =
-    GremlinScala[JMap[ByWhat, JCollection[End]], Labels](by(traversal.group()))
+  /** Organize objects in the stream into a Map, group keys with a modulator */
+  def group[Modulated](keysBy: By[Modulated]) =
+    GremlinScala[JMap[Modulated, JCollection[End]], Labels](keysBy(traversal.group()))
 
-  /** Organize objects in the stream into a Map. Calls to {@code group()} are typically accompanied with
-    * by modulators which help specify how the grouping should occur.
-    * @param sideEffectKey the name of the side-effect key that will hold the aggregated grouping */
-  def group(sideEffectKey: String) = GremlinScala[End, Labels](traversal.group(sideEffectKey))
+  /** Organize objects in the stream into a Map, group keys and values with a modulator */
+  def group[ModulatedKeys, ModulatedValues](keysBy: By[ModulatedKeys], valuesBy: By[ModulatedValues]) =
+    GremlinScala[JMap[ModulatedKeys, JCollection[ModulatedValues]], Labels](valuesBy(keysBy(traversal.group())))
 
   @deprecated("use group(by(...))", "3.0.0.1")
   def group[A <: AnyRef](byTraversal: End ⇒ A) =
@@ -337,7 +333,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def sack[SackType](func: (SackType, End) => SackType) = GremlinScala[End, Labels](traversal.sack(func))
 
   /** sack with by modulator */
-  def sack[SackType, ByWhat](func: (SackType, ByWhat) => SackType, by: By[ByWhat]) =
+  def sack[SackType, Modulated](func: (SackType, Modulated) => SackType, by: By[Modulated]) =
     GremlinScala[End, Labels](by(traversal.sack(func)))
 
   def barrier() = GremlinScala[End, Labels](traversal.barrier())
