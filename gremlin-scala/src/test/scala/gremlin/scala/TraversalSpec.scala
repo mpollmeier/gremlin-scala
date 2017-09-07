@@ -471,8 +471,8 @@ class TraversalSpec extends WordSpec with Matchers {
             _.outE("knows"),
             _.outE("created")
           )
-          .inV()
-          .path().by("name").by(T.label)
+          .inV
+          .path(by(Name), by.label)
 
         traversal1.toList().map(path2String) shouldBe
           Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
@@ -485,7 +485,7 @@ class TraversalSpec extends WordSpec with Matchers {
             _.outE("knows")
           )
           .inV()
-          .path().by("name").by(T.label)
+          .path(by(Name), by.label)
 
         traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
       }
@@ -521,7 +521,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal = graph.V(1)
         .repeat(_.out)
         .until(_.outE.count.is(JLong.valueOf(0)))
-        .path.by("name")
+        .path(by(Name))
 
       traversal.toSet.size shouldBe 4
       // Set([marko, lop], [marko, vadas], [marko, josh, ripple], [marko, josh, lop])

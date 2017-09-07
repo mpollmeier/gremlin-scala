@@ -30,7 +30,7 @@ object by {
   }
 
   /* modulate by label - alias for `apply[String](T.label)` */
-  def label[Modulated]() = new By[String] {
+  def label[Modulated] = new By[String] {
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(T.label)
   }
 
