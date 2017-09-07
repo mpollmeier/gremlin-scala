@@ -243,25 +243,25 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "limit in nested traversals" in {
     val graph = TinkerGraph.open.asScala
-    val person = "person"
-    val likes = "likes"
-    val name = Key[String]("name")
-    val weight = Key[Float]("weight")
+    val Person = "person"
+    val Likes = "likes"
+    val Name = Key[String]("name")
+    val Weight = Key[Float]("weight")
 
     val scala = graph + "scala"
     val groovy = graph + "groovy"
-    val michael = graph + (person, name → "michael")
-    val marko = graph + (person, name → "marko")
+    val michael = graph + (Person, Name → "michael")
+    val marko = graph + (Person, Name → "marko")
 
-    michael --- (likes, weight → 3) --> groovy
-    michael --- (likes, weight → 5) --> scala
-    marko --- (likes, weight → 4) --> groovy
-    marko --- (likes, weight → 3) --> scala
+    michael --- (Likes, Weight → 3) --> groovy
+    michael --- (Likes, Weight → 5) --> scala
+    marko --- (Likes, Weight → 4) --> groovy
+    marko --- (Likes, Weight → 3) --> scala
 
     val traversal = for {
-      person ← graph.V.hasLabel(person)
-      favorite ← person.outE(likes).orderBy("weight", Order.decr).limit(1).inV
-    } yield (person.value2(name), favorite.label)
+      person ← graph.V.hasLabel(Person)
+      favorite ← person.outE(Likes).order(by(Weight, Order.decr)).limit(1).inV
+    } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(
       "michael" → "scala",
