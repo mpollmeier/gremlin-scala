@@ -373,6 +373,19 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "groupCount" should {
+    "work on values" in new Fixture {
+      val results: JMap[Int, JLong] =
+        graph.V.hasLabel(Person).value(Age).groupCount().head
+      results.asScala shouldBe Map(32 -> 1, 35 -> 1, 27 -> 1, 29 -> 1)
+    }
+
+    "work with modulator on Elements" in new Fixture {
+      val results: JMap[Int, JLong] =
+        graph.V.hasLabel(Person).groupCount(by(Age)).head
+      results.asScala shouldBe Map(32 -> 1, 35 -> 1, 27 -> 1, 29 -> 1)
+    }
+  }
 
   "subgraph" should {
     "work in simple scenario" in new Fixture {
