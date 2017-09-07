@@ -442,10 +442,27 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "coalesce" should {
-    // Helper for testing path-based results
-    def path2String(path: Path) = path.objects().asScala.map(_.toString)
+  "path" should {
+    "include every step in the traversal" in new Fixture {
+      val results: List[Path] = graph.V.out.out.value(Name).path.toList
+      results.size shouldBe 2
+      path2String(results(0)) shouldBe List("v[1]", "v[4]", "v[5]", "ripple")
+      path2String(results(1)) shouldBe List("v[1]", "v[4]", "v[3]", "lop")
+    }
 
+    "allow to be modulated" in new Fixture {
+      val results: List[Path] =
+        graph.V.out.out
+          .path(by(Name), by(Age))
+          .toList
+
+      results.size shouldBe 2
+      path2String(results(0)) shouldBe List("marko", "32", "ripple")
+      path2String(results(1)) shouldBe List("marko", "32", "lop")
+    }
+  }
+
+  "coalesce" should {
     "evaluate traversals and return first with value" when {
 
       "relationship is first" in new Fixture {
@@ -693,4 +710,7 @@ class TraversalSpec extends WordSpec with Matchers {
     val Person = "person"
     val Created = "created"
   }
+
+  // Helper for testing path-based results
+  def path2String(path: Path): List[String] = path.objects().asScala.map(_.toString).toList
 }

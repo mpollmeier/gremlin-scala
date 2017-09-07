@@ -135,7 +135,15 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       }
     )
 
+  /* track every step in the traversal */
   def path() = GremlinScala[Path, Labels](traversal.path())
+
+  /* track every step in the traversal, modulate elements in round robin fashion */
+  def path(bys: By[_]*) = {
+    var newTrav: GraphTraversal[_, Path] = traversal.path()
+    bys.foreach { by => newTrav = by(newTrav)}
+    GremlinScala[Path, Labels](newTrav)
+  }
 
   // select all labelled steps - see `as` step and `SelectSpec`
   def select[LabelsTuple]()(implicit tupler: Tupler.Aux[Labels, LabelsTuple]) =
