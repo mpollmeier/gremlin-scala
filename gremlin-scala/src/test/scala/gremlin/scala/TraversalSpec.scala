@@ -5,7 +5,7 @@ import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{WordSpec, Matchers}
-import java.util.{Map ⇒ JMap, Collection ⇒ JCollection}
+import java.util.{List => JList, Map ⇒ JMap, Collection ⇒ JCollection}
 import java.lang.{Long => JLong}
 
 import scala.language.existentials
@@ -227,23 +227,17 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "fold" can {
     "gather elements in a list" in new Fixture {
-      graph.V.has(Age)
-        .orderBy("age", Order.decr)
-        .value(Age)
-        .fold().head().asScala.toSeq shouldBe Seq(35, 32, 29, 27)
+      val result: JList[String] = graph.V(1).out(Knows).value(Name).fold.head
+      result shouldBe List("vadas", "josh").asJava
     }
 
     "aggregate with arbitrary initial value and function" in new Fixture {
-      graph.V.has(Age)
-        .orderBy("age", Order.decr)
-        .value(Age)
+      graph.V.value(Age)
         .foldLeft(0)(_ + _).head() shouldBe 123
 
-      graph.V.has(Age)
-        .orderBy("age", Order.decr)
-        .value(Age)
+      graph.V.value(Age)
+        .order(by(Order.decr))
         .foldLeft("F")(_ + _ + "*").head() shouldBe "F35*32*29*27*"
-
     }
   }
 
