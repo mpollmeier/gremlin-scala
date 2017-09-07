@@ -387,6 +387,22 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "dedup" can {
+    "simply deduplicate" in new Fixture {
+      graph.V.value(Lang).dedup.count.head shouldBe 1
+    }
+
+    "use by modulator" in new Fixture {
+      graph.V.dedup(by.label).value(Name).toSet shouldBe Set("marko", "lop")
+    }
+
+    "deduplicate labeled steps" in new Fixture {
+        graph.V.as("a").out(Created).as("b").in(Created).as("c")
+          .dedup("a", "b")
+          .count.head shouldBe 4
+    }
+  }
+
   "subgraph" should {
     "work in simple scenario" in new Fixture {
       val stepLabel = StepLabel[Graph]("subGraph")

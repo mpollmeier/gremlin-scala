@@ -54,45 +54,6 @@ class FilterSpec extends WordSpec with Matchers {
     graph.V.hasNot(Age, 35).value(Name).toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
   }
 
-  "dedup" should {
-    "dedup" in new Fixture {
-      graph.V(1).out.in.dedup().toList shouldBe graph.V(1).out.in.toSet.toList
-    }
-
-    // TODO: fix
-    // ignore("dedups by a given uniqueness function") {
-    //   v(1).out.in
-    //     .dedup().by(_.property[String]("lang").orElse(null))
-    //     .values[String]("name").toList should be(List("marko"))
-    // }
-  }
-
-  //TODO redo with where step
-  // describe("except") {
-  //   it("emits everything but a given object") {
-  //     v(1).out.except(v(2).vertex).values[String]("name")
-  //       .toSet should be(Set("lop", "josh"))
-  //   }
-
-  //   it("emits everything but an 'except' list") { 
-  //     v(1).out.except(List(v(2).vertex)).values[String]("name")
-  //       .toSet should be(Set("lop", "josh"))
-  //   }
-
-  //   it("emits everything unless the vertex is in a given aggregate variable") {
-  //     v(1).out.aggregate("x")
-  //       .out.exceptVar("x")
-  //       .values[String]("name").toSet should be (Set("ripple"))
-  //   }
-
-  //   it("emits everything unless a property is in a given aggregate variable") {
-  //     v(1).out
-  //       .aggregate("x").by(_.value[String]("name"))
-  //       .out.values[String]("name").exceptVar("x")
-  //       .toSet should be (Set("ripple"))
-  //   }
-  // }
-
   trait Fixture {
     val graph = TinkerFactory.createClassic.asScala
   }

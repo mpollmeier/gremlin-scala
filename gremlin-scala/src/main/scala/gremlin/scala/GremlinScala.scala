@@ -254,6 +254,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   /* removes elements/properties from the graph */
   def drop() = GremlinScala[End, Labels](traversal.drop())
 
+  def dedup() = GremlinScala[End, Labels](traversal.dedup())
+
+  def dedup(by: By[_]) = GremlinScala[End, Labels](by(traversal.dedup()))
+
   def dedup(dedupLabels: String*) = GremlinScala[End, Labels](traversal.dedup(dedupLabels: _*))
 
   def dedup(scope: Scope, dedupLabels: String*) = GremlinScala[End, Labels](traversal.dedup(scope, dedupLabels: _*))
@@ -372,23 +376,32 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
     GremlinScala[End, Labels](traversal.barrier(consumer))
 
   // by steps can be used in combination with all sorts of other steps, e.g. group, order, dedup, ...
+  
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by() = GremlinScala[End, Labels](traversal.by())
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by(comparator: Comparator[End]): GremlinScala[End, Labels] = GremlinScala[End, Labels](traversal.by(comparator))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by[A <: AnyRef](funProjection: End ⇒ A) = GremlinScala[End, Labels](traversal.by(funProjection))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by[A <: AnyRef](funProjection: End ⇒ A, comparator: Comparator[A] = Order.incr): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
       traversal.by(toJavaFunction(funProjection).asInstanceOf[java.util.function.Function[_, AnyRef]] , comparator)
     )
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by(tokenProjection: T) = GremlinScala[End, Labels](traversal.by(tokenProjection))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by(elementPropertyKey: String) = GremlinScala[End, Labels](traversal.by(elementPropertyKey))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by[A](elementPropertyKey: String, comparator: Comparator[A]) = GremlinScala[End, Labels](traversal.by(elementPropertyKey, comparator))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by(lessThan: (End, End) ⇒ Boolean) =
     GremlinScala[End, Labels](traversal.by(new Comparator[End]() {
       override def compare(a: End, b: End) =
@@ -398,8 +411,10 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   // provide arbitrary Traversal, e.g. by using `__.outE`
   // can't help much with the types as `by` can be used to address previously labelled steps, not just the last one
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by(byTraversal: Traversal[_, _]) = GremlinScala[End, Labels](traversal.by(byTraversal))
 
+  @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument", "3.0.0.1")
   def by[A](byTraversal: Traversal[_, A], comparator: Comparator[A]) = GremlinScala[End, Labels](traversal.by(byTraversal, comparator))
 
   def `match`[A](traversals: Traversal[End, _]*) =
