@@ -125,68 +125,44 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "order" can {
+    "order naturally" in new Fixture {
+      val results: List[Int] = 
+        graph.V.value(Age).order.toList
+      results shouldBe Seq(27, 29, 32, 35)
+    }
+
+    "order naturally decr" in new Fixture {
+      val results: List[Int] = 
+        graph.V.value(Age).order(by(Order.decr)).toList
+      results shouldBe List(35, 32, 29, 27)
+    }
+
     "order by property" in new Fixture {
-      graph.V.has(Age)
-        .order(by(Age))
-        .value(Age)
-        .toList shouldBe Seq(27, 29, 32, 35)
+      val results: List[Int] = 
+        graph.V.has(Age)
+          .order(by(Age))
+          .value(Age)
+          .toList
+      results shouldBe Seq(27, 29, 32, 35)
     }
 
     "order by property decr" in new Fixture {
-      graph.V.has(Age)
-        .order(by(Age, Order.decr))
-        .value(Age)
-        .toList shouldBe Seq(35, 32, 29, 27)
+      val results: List[Int] = 
+        graph.V.has(Age)
+          .order(by(Age, Order.decr))
+          .value(Age)
+          .toList
+      results shouldBe List(35, 32, 29, 27)
     }
 
-    // "order by lambda" in new Fixture {
-    //   graph.V.has(Age)
-    //     .orderBy(_.value[Integer]("age"))
-    //     .value(Age)
-    //     .toList shouldBe Seq(27, 29, 32, 35)
-    // }
-
-    // "order by lambda decr" in new Fixture {
-    //   graph.V.has(Age)
-    //     .orderBy(_.value[Integer]("age"), Order.decr)
-    //     .value(Age)
-    //     .toList shouldBe Seq(35, 32, 29, 27)
-    // }
-
-    // "order non-elements" in new Fixture {
-    //   graph.V.has(Age)
-    //     .value[Integer]("age")
-    //     .orderBy(x ⇒ x)
-    //     .toList shouldBe Seq(27, 29, 32, 35)
-    // }
-
-    // "order non-elements decr" in new Fixture {
-    //   graph.V.has(Age)
-    //     .value[Integer]("age")
-    //     .orderBy(x ⇒ -x: Integer)
-    //     .toList shouldBe Seq(35, 32, 29, 27)
-    // }
-
-    // "order with sub-by" in new Fixture {
-    //   // add two more people with Age 29
-    //   graph + ("person", Age → 29, Name → "ZZZ")
-    //   graph + ("person", Age → 29, Name → "aaa")
-
-    //   graph.V.has(Age).has(Name)
-    //     .order()
-    //     .by(Age.name, Order.incr) // TODO: add by(Key[A]) step
-    //     .by(Name.name, Order.decr)
-    //     .value(Name)
-    //     .toList shouldBe Seq("vadas", "marko", "aaa", "ZZZ", "josh", "peter")
-    // }
-
-    // TODO: does not work because tinkerpop's Order.java enforces to be on Object, and that's because it's an enum in java can't take type parameters
-    // "allow primitive types" in new Fixture {
-    //     graph.V.has(Age)
-    //     .orderBy(_.value[Int]("age"))
-    //     .value(Age)
-    //     .toList shouldBe Seq(27, 29, 32, 35)
-    // }
+    "order by multiple modulators" in new Fixture {
+      val results: List[String] = 
+        graph.V.hasLabel("person")
+          .order(by(__.outE(Created).count), by(Age, Order.decr))
+          .value(Name)
+          .toList
+      results shouldBe Seq("vadas" , "peter", "marko", "josh")
+    }
   }
 
   "map" can {
