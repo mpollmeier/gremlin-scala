@@ -17,7 +17,6 @@ import org.apache.tinkerpop.gremlin.structure.{T, Direction}
 import shapeless.{HList, HNil, ::}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
-import shapeless.syntax.std.product.productOps
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{universe => ru}
 import StepLabel.{combineLabelWithValue, GetLabelName}
@@ -195,9 +194,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
+  @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy[A <: AnyRef : Ordering](by: End ⇒ A): GremlinScala[End, Labels] =
     orderBy(by, implicitly[Ordering[A]])
 
+  @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy[A <: AnyRef](by: End ⇒ A, comparator: Comparator[A]): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](
       traversal.order().by(
@@ -208,21 +209,39 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
       )
     )
 
+  @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy(elementPropertyKey: String)(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, Order.incr))
 
+  @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy(elementPropertyKey: String, comparator: Order)(
     implicit ev: End <:< Element): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, comparator))
 
   def order() = GremlinScala[End, Labels](traversal.order())
 
+  @deprecated("use order(by(Order))", "3.0.0.1")
   def order(comparator: Order) = GremlinScala[End, Labels](traversal.order().by(comparator))
 
   def order(scope: Scope) = GremlinScala[End, Labels](traversal.order(scope).by(Order.incr))
 
+  @deprecated("use order(by(...))", "3.0.0.1")
   def order(scope: Scope, comparator: Order = Order.incr) = GremlinScala[End, Labels](traversal.order(scope).by(comparator))
+
+  /* n.b. `By` can be used in place of `OrderBy` */
+  def order(orderBys: OrderBy[_]*) = {
+    var newTrav: GraphTraversal[_, End] = traversal.order()
+    orderBys.foreach { orderBy => newTrav = orderBy(newTrav)}
+    GremlinScala[End, Labels](newTrav)
+  }
+
+  /* n.b. `By` can be used in place of `OrderBy` */
+  def order(scope: Scope, orderBys: OrderBy[_]*) = {
+    var newTrav: GraphTraversal[_, End] = traversal.order(scope)
+    orderBys.foreach { orderBy => newTrav = orderBy(newTrav)}
+    GremlinScala[End, Labels](newTrav)
+  }
 
   def simplePath() = GremlinScala[End, Labels](traversal.simplePath())
 
