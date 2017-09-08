@@ -631,17 +631,25 @@ class TraversalSpec extends WordSpec with Matchers {
         graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
     }
+  }
 
-    "use addV to start a traversal" in new Fixture {
-      graph.addV(Person).property(Name, "Joseph").property(Age, 39).property(Nickname, "Joe").head
-
+  "set properties" which {
+    "have a given value" in new Fixture {
+      graph.addV(Person).property(Name, "Joseph").iterate
       graph.V.has(Name, "Joseph").count.head shouldBe 1
     }
 
-    "use addV (without label) to start a traversal" in new Fixture {
-      graph.addV().property(Name, "Unlabeled").head
+    "derive the value from a traversal" in new Fixture {
+      val CreatedCount = Key[JLong]("createdCount")
+      graph.V.hasLabel(Person).property(CreatedCount)(_.outE("created").count).iterate
 
-      graph.V.has(Name, "Unlabeled").count.head shouldBe 1
+      val results = graph.V.hasLabel(Person).group(by(Name), by(CreatedCount)).head
+      /* TODO: find a nicer way to embed tuples in the pipeline */
+      def get(name: String): JLong = results.get(name).iterator.next
+      
+      get("marko") shouldBe 1
+      get("josh") shouldBe 2
+      get("peter") shouldBe 1
     }
   }
 

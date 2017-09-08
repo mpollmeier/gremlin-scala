@@ -541,12 +541,18 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   // ELEMENT STEPS START
   // -------------------
 
+  /* set the property to the given value */
   def property[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.property(key.name, value))
 
+  /* set the property to the value determined by the given traversal */
+  def property[A](key: Key[A])(value: GremlinScala[End, _] => GremlinScala[A, Labels])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.property(key.name, value(start).traversal))
+
   def properties(keys: String*)(implicit ev: End <:< Element) =
-    GremlinScala[Property[Any], Labels](traversal.properties(keys: _*)
-                                          .asInstanceOf[GraphTraversal[_, Property[Any]]])
+    GremlinScala[Property[Any], Labels](
+      traversal.properties(keys: _*).asInstanceOf[GraphTraversal[_, Property[Any]]]
+    )
 
   def propertyMap(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[JMap[String, Any], Labels](traversal.propertyMap(keys: _*))
@@ -567,6 +573,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def values[A](key: String*)(implicit ev: End <:< Element) =
     GremlinScala[A, Labels](traversal.values[A](key: _*))
+
+  def valueMap(implicit ev: End <:< Element) =
+    GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap())
 
   def valueMap(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap(keys: _*))
