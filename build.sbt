@@ -53,6 +53,7 @@ val commonSettings = Seq(
           <url>http://www.michaelpollmeier.com</url>
         </developer>
     </developers>, // format: on
+  releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
