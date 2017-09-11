@@ -621,14 +621,32 @@ class TraversalSpec extends WordSpec with Matchers {
         graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
 
+      "reference the `to` vertex via StepLabel" in new Fixture {
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).to(v1Label).iterate
+        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      }
+
       "reference the `from` vertex via StepLabel" in new Fixture {
-        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).from(v1Label).iterate()
+        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).from(v1Label).iterate
         graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
       }
 
-      "reference the `to` vertex via StepLabel" in new Fixture {
-        graph.V(1).as(v1Label).out(Created).in(Created).where(P.neq(v1Label.name)).addE(CoDeveloper).to(v1Label).iterate()
-        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+      "reference the `to` vertex via traversal" in new Fixture {
+        val KnowsCreator = "knowsCreator"
+        graph.V(1).addE(KnowsCreator).to(_.out(Knows).out(Created)).iterate
+
+        // note: when using with addE, it only selects the first vertex! 
+        // https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs
+        graph.V(1).outE(KnowsCreator).count.head shouldBe 1
+      }
+
+      "reference the `from` vertex via traversal" in new Fixture {
+        val CreatorKnows = "creatorKnows"
+        graph.V(1).addE(CreatorKnows).from(_.out(Knows).out(Created)).iterate
+
+        // note: when using with addE, it only selects the first vertex! 
+        // https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs
+        graph.V(1).inE(CreatorKnows).count.head shouldBe 1
       }
     }
   }
