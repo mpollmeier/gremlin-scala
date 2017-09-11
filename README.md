@@ -337,7 +337,7 @@ Random links:
 
 ## Release a new version of gremlin-scala
 * release  #will do a release for each crossScalaVersions
-* sonatypeRelease
+* sonatypeReleaseAll
 ### after release: upgrade gremlin-examples
 * find . -name build.sbt | xargs grep gremlin-scala
 * git grep -l 3.2.3.1 | xargs sed -i 's/3.2.3.1/3.2.4.0/g'

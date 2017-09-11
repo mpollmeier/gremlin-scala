@@ -54,21 +54,21 @@ val commonSettings = Seq(
         </developer>
     </developers>, // format: on
   releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    releaseStepCommand("+publishSigned"),
-    setNextVersion,
-    commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
-    pushChanges
-  )
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value
+  // releaseProcess := Seq[ReleaseStep](
+  //   checkSnapshotDependencies,
+  //   inquireVersions,
+  //   runClean,
+  //   runTest,
+  //   setReleaseVersion,
+  //   commitReleaseVersion,
+  //   tagRelease,
+  //   releaseStepCommand("+publishSigned"),
+  //   setNextVersion,
+  //   commitNextVersion,
+  //   releaseStepCommand("sonatypeReleaseAll"),
+  //   pushChanges
+  // )
 )
 
 
