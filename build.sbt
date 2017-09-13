@@ -30,6 +30,7 @@ val commonSettings = Seq(
     // , "-Xlog-implicits"
     //"-Ydebug",
     "-language:implicitConversions",
+    "-language:existentials",
     "-feature",
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
