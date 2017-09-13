@@ -303,9 +303,6 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def identity() = GremlinScala[End, Labels](traversal.identity())
 
-  def to(direction: Direction, edgeLabels: String*) =
-    GremlinScala[Vertex, Labels](traversal.to(direction, edgeLabels: _*))
-
   def sideEffect(fun: End ⇒ Any) =
     GremlinScala[End, Labels](traversal.sideEffect(
       new JConsumer[Traverser[End]] {
@@ -716,10 +713,35 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def addE(label: StepLabel[Vertex])(implicit ev: End <:< Vertex): GremlinScala[Edge, Labels] =
     GremlinScala[Edge, Labels](traversal.addE(label.name))
 
+  /* modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
+   * http://tinkerpop.apache.org/docs/current/reference/#from-step */
   def from(label: StepLabel[Vertex]): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.from(label.name))
+
+  /* modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
+   * TODO: make this a standalone modulator like By that may only be used with the above mentioned steps
+   * note: when using with addE, it only selects the first vertex! 
+   * http://tinkerpop.apache.org/docs/current/reference/#from-step
+   * https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs */
+  def from(fromTraversal: GremlinScala[Vertex, _] => GremlinScala[Vertex, _]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.from(fromTraversal(start).traversal.asInstanceOf[GraphTraversal[End, Vertex]]))
+
+  /* modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
+   * http://tinkerpop.apache.org/docs/current/reference/#from-step */
   def to(label: StepLabel[Vertex]): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.to(label.name))
+
+  /* modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
+   * TODO: make this a standalone modulator like By that may only be used with the above mentioned steps
+   * note: when using with addE, it only selects the first vertex! 
+   * http://tinkerpop.apache.org/docs/current/reference/#from-step
+   * https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs */
+  def to(toTraversal: GremlinScala[Vertex, _] => GremlinScala[Vertex, _]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.to(toTraversal(start).traversal.asInstanceOf[GraphTraversal[End, Vertex]]))
+
+  def to(direction: Direction, edgeLabels: String*) =
+    GremlinScala[Vertex, Labels](traversal.to(direction, edgeLabels: _*))
+
   // VERTEX STEPS END
   // -------------------
 
