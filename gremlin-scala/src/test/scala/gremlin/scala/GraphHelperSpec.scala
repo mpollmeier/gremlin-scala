@@ -7,7 +7,6 @@ class GraphHelperSpec extends WordSpec with Matchers {
 
   "deep clone graph" in {
     val original = TinkerGraph.open.asScala
-    val clone = TinkerGraph.open.asScala
     val testProperty = Key[String]("testProperty")
 
     {
@@ -17,7 +16,7 @@ class GraphHelperSpec extends WordSpec with Matchers {
     }
 
     {
-      GraphHelper.cloneElements(original, clone)
+      val clone = GraphHelper.cloneElements(original, TinkerGraph.open.asScala)
       val stephen = clone.V.hasLabel("stephen").head
       val michael = clone + "michael"
       michael --- "knows" --> stephen
