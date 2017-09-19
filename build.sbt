@@ -25,7 +25,8 @@ val commonSettings = Seq(
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
   ),
   addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
-  resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
+  resolvers += "Apache public" at "https://repository.apache.org/content/groups/public",
+  resolvers += "Sonatype OSS" at "https://oss.sonatype.org/content/repositories/public",
   scalacOptions ++= Seq(
     // "-Xlint"
     // "-Xfatal-warnings",

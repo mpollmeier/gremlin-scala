@@ -6,14 +6,7 @@ import org.scalatest.Matchers
 import shapeless.test.illTyped
 import scala.meta.serialiser.mappable
 
-/* note: to print out the generated code to the console, just define @mappable(List("_debug" -> "true")) */
-object MarshallableNewSpec {
-  @mappable case class CCSimple(s: String, i: Int)
-  @mappable case class CCWithOption(i: Int, s: Option[String])
-
-  @mappable(List("_label" -> "CustomLabel"))
-  case class CCWithLabel(s: String)
-
+// object MarshallableNewSpec {
   // case class CCWithOptionId(@id id: Option[String], s: String)
   // case class CCWithOptionIdAndOptionValueClass(@id id: Option[Int], s: String, i: MyValueClass)
 
@@ -36,14 +29,14 @@ object MarshallableNewSpec {
 
   // case class NestedClass(s: String)
   // class NoneCaseClass(s: String)
-}
+// }
 
-// TODO: replace old MarshallableSpec
+/* note: to print out the generated code to the console, just define @mappable(List("_debug" -> "true")) */
+// TODO: replace old MarshallableSpec with this
 class MarshallableNewSpec extends WordSpec with Matchers {
-  import MarshallableNewSpec._
-
   "marshals / unmarshals case classes" which {
 
+    @mappable case class CCSimple(s: String, i: Int)
     "only have simple members" in new Fixture {
       val cc = CCSimple("text", 12)
       val v = graph +- cc
@@ -60,6 +53,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
       // https://github.com/mpollmeier/gremlin-scala/issues/98
 
+      @mappable case class CCWithOption(i: Int, s: Option[String])
       "map `Some[A]` to `A`" in new Fixture {
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
         val v = graph +- ccWithOptionSome
@@ -79,6 +73,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       }
     }
 
+    @mappable(Map("_label" -> "CustomLabel")) case class CCWithLabel(s: String)
     "define a custom label" in new Fixture {
       val cc = CCWithLabel("some string")
       val v = graph +- cc
