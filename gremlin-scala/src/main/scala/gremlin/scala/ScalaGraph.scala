@@ -58,10 +58,7 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     /* TODO: allow to provide id */
     // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
 
-    // val label = toMap.params.getOrElse("_label", entity.getClass.getSimpleName)
-    // val x = toMap.pa
-    // Entity.params
-    val label = entity.getClass.getSimpleName
+    val label = toMap.annotationParams.getOrElse("_label", entity.getClass.getSimpleName).asInstanceOf[String]
     val labelParam = Seq(T.label, label)
 
     val properties = valueMap.filter(_._2 != null) // null values don't matter when adding a vertex
