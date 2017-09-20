@@ -11,3 +11,8 @@ case class Key[A](name: String) {
 
 
 case class KeyValue[A](key: Key[A], value: A)
+
+trait WithVertex[A] {
+  //returns a copy of itself with the underlying vertex set
+  def withVertex(vertex: Vertex): A
+}

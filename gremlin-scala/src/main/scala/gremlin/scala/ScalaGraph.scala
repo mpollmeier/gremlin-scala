@@ -55,9 +55,6 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def addVertex[Entity: ToMap](entity: Entity): Vertex = {
     val toMap = implicitly[ToMap[Entity]]
     val valueMap: Map[String, Any] = toMap.apply(entity)
-    /* TODO: allow to provide id */
-    // val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
-
     val label = toMap.annotationParams.getOrElse("_label", entity.getClass.getSimpleName).asInstanceOf[String]
     val labelParam = Seq(T.label, label)
 

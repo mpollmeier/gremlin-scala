@@ -12,11 +12,13 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def toCC[CC <: Product: Marshallable] =
     implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
+
   def toEntity[Entity: FromMap](): Entity = {
     val entity = implicitly[FromMap[Entity]].apply(vertex.valueMap).get
-    //.toCC(vertex.id, vertex.valueMap)
-    /* TODO: support setting of id */
-    entity
+    if (entity.isInstanceOf[WithVertex[Entity]])
+      entity.asInstanceOf[WithVertex[Entity]].withVertex(vertex)
+    else
+      entity
   }
 
   override def setProperty[A](key: Key[A], value: A): Vertex = {
