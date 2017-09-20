@@ -3,27 +3,11 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
-import scala.meta.serialiser.mappable
+import scala.meta.serialiser.{FromMap, mappable, ToMap}
+import scala.util.Try
 // import shapeless.test.illTyped
 
-  // object CCWithCompanion { def funcInCompanion: String = "function in companion object" }
-  // @mappable CCWithCompanion(s: String) { def funcInCC: String = "function in case class" }
-
-  // @label("the_label") case class CCWithLotsOfStuff(
-  //   @id id: Option[String],
-  //   s: String,
-  //   l: Long,
-  //   o: Option[String],
-  //   seq: Seq[String],
-  //   map: Map[String, String],
-  //   nested: NestedClass
-  // )
-
-  // case class NestedClass(s: String)
-  // class NoneCaseClass(s: String)
-
 /* note: to print out the generated code to the console, just define @mappable(List("_debug" -> "true")) */
-// TODO: replace old MarshallableSpec with this
 class MarshallableNewSpec extends WordSpec with Matchers {
   "marshals / unmarshals case classes" which {
 
@@ -88,21 +72,24 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       serialised.s shouldBe cc.s
     }
 
-    // "define their custom marshaller" in new Fixture {
-    //   val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
+    "define a custom marshaller" in new Fixture {
+      case class CCWithOption(i: Int, s: Option[String])
 
-    //   val marshaller = new Marshallable[CCWithOption] {
-    //     def fromCC(cc: CCWithOption) =
-    //       FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+      implicit val toMap = new ToMap[CCWithOption] {
+        override def apply(cc: CCWithOption) = Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined"))
+      }
+      implicit val fromMap = new FromMap[CCWithOption] {
+        override def apply(keyValues: Map[String, Any]) =
+          Try {
+            CCWithOption(i = keyValues("i").asInstanceOf[Int],
+                         s = keyValues.get("s").asInstanceOf[Option[String]])
+          }
+      }
 
-    //     def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
-    //       CCWithOption(i = valueMap("i").asInstanceOf[Int],
-    //                    s = valueMap.get("s").asInstanceOf[Option[String]])
-    //   }
-
-    //   val v = graph.+(ccWithOptionNone)(marshaller)
-    //   v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
-    // }
+      val cc = CCWithOption(Int.MaxValue, None)
+      val v = graph +- cc
+      v.toEntity[CCWithOption] shouldBe CCWithOption(Int.MaxValue, Some("undefined"))
+    }
   }
 
   // "find vertices by label" in new Fixture {
