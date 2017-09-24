@@ -19,3 +19,9 @@ notifications:
     on_failure: always
     on_start: never   
 
+cache:
+  directories:
+  - $HOME/.sbt/boot/scala*
+  - $HOME/.sbt/launchers
+  - $HOME/.ivy2/cache
+  - $HOME/.coursier
