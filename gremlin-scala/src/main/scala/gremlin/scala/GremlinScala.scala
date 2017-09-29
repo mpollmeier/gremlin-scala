@@ -611,6 +611,9 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def hasId(id: AnyRef, ids: AnyRef*)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.hasId(id, ids: _*))
 
+  def hasId(predicate: P[AnyRef])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.hasId(predicate))
+
   def hasLabel(label: String, labels: String*)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.hasLabel(label, labels: _*))
 
