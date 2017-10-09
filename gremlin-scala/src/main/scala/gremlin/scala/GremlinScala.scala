@@ -525,11 +525,23 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def not(notTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
     GremlinScala[End, Labels](traversal.not(notTraversal(start).traversal))
 
-  def where(predicate: P[String]) = GremlinScala[End, Labels](traversal.where(predicate))
+  // `predicate` refers to a step label
+  def where(predicate: P[String]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.where(predicate))
 
-  def where(startKey: String, predicate: P[String]) = GremlinScala[End, Labels](traversal.where(startKey, predicate))
+  // `predicate` refers to a step label
+  def where(predicate: P[String], by: By[_]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](by(traversal.where(predicate)))
 
-  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]) =
+  // `predicate` refers to a step label
+  def where(startKey: String, predicate: P[String]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](traversal.where(startKey, predicate))
+
+  // `predicate` refers to a step label
+  def where(startKey: String, predicate: P[String], by: By[_]): GremlinScala[End, Labels] =
+    GremlinScala[End, Labels](by(traversal.where(startKey, predicate)))
+
+  def where(whereTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[_, _]): GremlinScala[End, Labels] =
     GremlinScala[End, Labels](traversal.where(whereTraversal(start).traversal))
 
   def addV() = GremlinScala[Vertex, Labels](traversal.addV())

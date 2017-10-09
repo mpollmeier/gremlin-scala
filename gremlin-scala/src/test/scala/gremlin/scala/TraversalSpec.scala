@@ -529,13 +529,51 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "where step" can {
-    "limit results to find who's created more than one thing" in new Fixture {
-      val traversal =  graph.V.hasLabel(Person)
-        .where(_.outE(Created).count.is(P.gt(1)))
+    "filter based on label" in new Fixture {
+      // Who are marko’s collaborators, where marko can not be his own collaborator?
+      val traversal =
+        graph.V(1).as("a")
+          .out(Created).in(Created)
+          .where(P.neq("a"))
+          .value(Name)
 
-      val results = traversal.toList
-      results.size shouldBe 1
-      results.head.value2(Name) shouldBe "josh"
+      traversal.toSet shouldBe Set("josh", "peter")
+    }
+
+    "filter with traversal" in new Fixture {
+      // Which of marko’s collaborators have worked on more than 1 project?
+      val traversal =
+        graph.V(1).as("a")
+          .out(Created).in(Created)
+          .where(_.out(Created).count.is(P.gt(1)))
+          .value(Name)
+
+      traversal.toSet shouldBe Set("josh")
+    }
+
+    "be modulated with `by`" when {
+      "filtering on label" in new Fixture {
+        // who is older than marko?
+        val traversal =
+          graph.V(1).as("a")
+            .both.both
+            .hasLabel(Person)
+            .where(P.gt("a"), by(Age))
+            .value(Name)
+
+        traversal.toSet shouldBe Set("josh", "peter")
+      }
+
+      "comparing two labels" in new Fixture {
+        // Marko knows josh and vadas but is only older than vadas
+        val traversal =
+          graph.V.as("a")
+            .out(Knows).as("b")
+            .where("a", P.gt("b"), by(Age))
+            .value(Name)
+
+        traversal.toSet shouldBe Set("vadas")
+      }
     }
   }
 
