@@ -5,14 +5,14 @@ import org.scalatest.WordSpec
 import org.scalatest.Matchers
 import scala.meta.serialiser.{FromMap, mappable, ToMap}
 import scala.util.Try
-// import shapeless.test.illTyped
 
 /* note: to print out the generated code to the console, just define @mappable(List("_debug" -> "true")) */
 class MarshallableNewSpec extends WordSpec with Matchers {
   "marshals / unmarshals case classes" which {
 
     @mappable case class CCSimple(s: String, i: Int)
-    "only have simple members" in new Fixture {
+    "only have simple members" in {
+      val graph = TinkerGraph.open.asScala
       val cc = CCSimple("text", 12)
       val v = graph +- cc
 
@@ -29,7 +29,8 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       // https://github.com/mpollmeier/gremlin-scala/issues/98
 
       @mappable case class CCWithOption(i: Int, s: Option[String])
-      "map `Some[A]` to `A`" in new Fixture {
+      "map `Some[A]` to `A`" in {
+        val graph = TinkerGraph.open.asScala
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
         val v = graph +- ccWithOptionSome
         v.toEntity[CCWithOption] shouldBe ccWithOptionSome
@@ -38,7 +39,8 @@ class MarshallableNewSpec extends WordSpec with Matchers {
         vl.value[String]("s") shouldBe ccWithOptionSome.s.get
       }
 
-      "map `None` to `null`" in new Fixture {
+      "map `None` to `null`" in {
+        val graph = TinkerGraph.open.asScala
         val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
         val v = graph +- ccWithOptionNone
         v.toEntity[CCWithOption] shouldBe ccWithOptionNone
@@ -50,7 +52,8 @@ class MarshallableNewSpec extends WordSpec with Matchers {
 
     @mappable(Map("_label" -> "CustomLabel"))
     case class CCWithLabel(s: String)
-    "define a custom label" in new Fixture {
+    "define a custom label" in {
+      val graph = TinkerGraph.open.asScala
       val cc = CCWithLabel("some string")
       val v = graph +- cc
 
@@ -62,7 +65,8 @@ class MarshallableNewSpec extends WordSpec with Matchers {
     @mappable case class CCWithVertex(underlying: Option[Vertex] = None, s: String) extends WithVertex[CCWithVertex] {
       override def withVertex(vertex: Vertex) = this.copy(underlying = Some(vertex))
     }
-    "contain the underlying vertex as a member (when given a lens)" in new Fixture {
+    "contain the underlying vertex as a member (when given a lens)" in {
+      val graph = TinkerGraph.open.asScala
       val cc = CCWithVertex(s = "some string")
       val v = graph +- cc
 
@@ -72,7 +76,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       serialised.s shouldBe cc.s
     }
 
-    "define a custom marshaller" in new Fixture {
+    "define a custom marshaller" in {
       case class CCWithOption(i: Int, s: Option[String])
 
       implicit val toMap = new ToMap[CCWithOption] {
@@ -86,83 +90,26 @@ class MarshallableNewSpec extends WordSpec with Matchers {
           }
       }
 
+      val graph = TinkerGraph.open.asScala
       val cc = CCWithOption(Int.MaxValue, None)
       val v = graph +- cc
       v.toEntity[CCWithOption] shouldBe CCWithOption(Int.MaxValue, Some("undefined"))
     }
   }
 
-  // "find vertices by label" in new Fixture {
-  //   val ccSimple = CCSimple("a string", 42)
-  //   val ccWithOption = CCWithOption(52, Some("other string"))
-  //   val ccWithLabel = CCWithLabel("s")
-
-  //   graph + ccSimple
-  //   graph + ccWithOption
-  //   graph + ccWithLabel
-
-  //   graph.V.count.head shouldBe 3
-
-  //   val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
-  //   ccSimpleVertices should have size 1
-  //   ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
-
-  //   val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
-  //   ccWithLabelVertices should have size 1
-  //   ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
-  // }
-
-  // "edge" should {
-  //   "update using a case-class template" in new CCEdgeUpdateFixture {
-  //     graph.E(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
-  //     graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
-
-  //   "update as a case class" in new CCEdgeUpdateFixture {
-  //     graph.E(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
-  //     graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
-  // }
-
-  // "vertex" should {
-  //   "update using a case-class template" in new CCVertexUpdateFixture {
+  "vertex" should {
+    "update using a case-class template" in {
+      val initial = CCSimple("initial", 1)
+      // val ccWithIdSet = (graph + ccInitial).toCC[CCWithOptionIdNested]
+      // lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
   //     graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
   //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
+    }
 
   //   "update as a case class" in new CCVertexUpdateFixture {
   //     graph.V(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
   //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
   //   }
-  // }
-
-  trait Fixture {
-    val graph = TinkerGraph.open.asScala
   }
 
-  // trait CCUpdateFixture[E <: Element] extends Fixture {
-  //   type CC = CCWithOptionIdNested
-  //   val ccInitial = CCWithOptionIdNested("string", None, MyValueClass(42))
-
-  //   def ccWithIdSet: CC
-  //   lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
-  // }
-
-  // trait CCVertexUpdateFixture extends CCUpdateFixture[Vertex] {
-  //   val ccWithIdSet = (graph + ccInitial).toCC[CC]
-  // }
-
-  // trait CCEdgeUpdateFixture extends CCUpdateFixture[Edge] {
-  //   private val testVertex = graph + "Huh"
-  //   val ccWithIdSet = testVertex.addEdge(testVertex, ccInitial).toCC[CC]
-  // }
-
-  // "can't persist a none product type (none case class or tuple)" in {
-  //   illTyped {
-  //     """
-  //       val graph = TinkerGraph.open.asScala
-  //       graph + new NoneCaseClass("test")
-  //     """
-  //   }
-  // }
 }
