@@ -1,10 +1,10 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.WordSpec
-import org.scalatest.Matchers
+import org.scalatest.{Matchers, WordSpec}
 import scala.meta.serialiser.{FromMap, mappable, ToMap}
 import scala.util.Try
+import scala.collection.JavaConverters._
 
 /* note: to print out the generated code to the console, just define @mappable(List("_debug" -> "true")) */
 class MarshallableNewSpec extends WordSpec with Matchers {
@@ -20,7 +20,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       v.label shouldBe cc.getClass.getSimpleName
       v.valueMap should contain("s" → cc.s)
       v.valueMap should contain("i" → cc.i)
-      v.toEntity[CCSimple] shouldBe cc
+      v.asEntity[CCSimple] shouldBe cc
     }
 
     "contain options" should {
@@ -33,7 +33,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
         val graph = TinkerGraph.open.asScala
         val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
         val v = graph +- ccWithOptionSome
-        v.toEntity[CCWithOption] shouldBe ccWithOptionSome
+        v.asEntity[CCWithOption] shouldBe ccWithOptionSome
 
         val vl = graph.V(v.id).head
         vl.value[String]("s") shouldBe ccWithOptionSome.s.get
@@ -43,7 +43,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
         val graph = TinkerGraph.open.asScala
         val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
         val v = graph +- ccWithOptionNone
-        v.toEntity[CCWithOption] shouldBe ccWithOptionNone
+        v.asEntity[CCWithOption] shouldBe ccWithOptionNone
 
         val vl = graph.V(v.id).head
         vl.keys should not contain "s"  //None should be mapped to `null`
@@ -58,7 +58,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       val v = graph +- cc
 
       val vl = graph.V(v.id).head
-      v.toEntity[CCWithLabel] shouldBe cc
+      v.asEntity[CCWithLabel] shouldBe cc
       v.label shouldBe "CustomLabel"
     }
 
@@ -71,7 +71,7 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       val v = graph +- cc
 
       // now the underlying vertex should be set
-      val serialised = v.toEntity[CCWithVertex]
+      val serialised = v.asEntity[CCWithVertex]
       serialised.underlying.get shouldBe v
       serialised.s shouldBe cc.s
     }
@@ -93,23 +93,32 @@ class MarshallableNewSpec extends WordSpec with Matchers {
       val graph = TinkerGraph.open.asScala
       val cc = CCWithOption(Int.MaxValue, None)
       val v = graph +- cc
-      v.toEntity[CCWithOption] shouldBe CCWithOption(Int.MaxValue, Some("undefined"))
+      v.asEntity[CCWithOption] shouldBe CCWithOption(Int.MaxValue, Some("undefined"))
     }
   }
 
   "vertex" should {
-    "update using a case-class template" in {
+
+    @mappable case class CCSimple(s: String, i: Int)
+    "update using a new instance" in {
+      val graph = TinkerGraph.open.asScala
       val initial = CCSimple("initial", 1)
-      // val ccWithIdSet = (graph + ccInitial).toCC[CCWithOptionIdNested]
-      // lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
-  //     graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
-  //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+      graph +- initial
+
+      val update = CCSimple("updated", 2)
+      graph.V.head.updateWith1(update)
+      graph.V.head.asEntity[CCSimple] shouldBe update
     }
 
-  //   "update as a case class" in new CCVertexUpdateFixture {
-  //     graph.V(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
-  //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
+    "update using lambda" in {
+      val graph = TinkerGraph.open.asScala
+      val initial = CCSimple("initial", 1)
+      graph +- initial
+
+      val update = CCSimple("updated", 2)
+      graph.V.head.updateAs1[CCSimple](_ => update)
+      graph.V.head.asEntity[CCSimple] shouldBe update
+    }
   }
 
 }

@@ -6,20 +6,13 @@ import org.apache.tinkerpop.gremlin.structure.{Direction, VertexProperty, T}
 import scala.collection.JavaConverters._
 import scala.meta.serialiser.FromMap
 import shapeless._
+import scala.meta.serialiser.{FromMap, ToMap}
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
 
   def toCC[CC <: Product: Marshallable] =
     implicitly[Marshallable[CC]].toCC(vertex.id, vertex.valueMap)
-
-  def toEntity[Entity: FromMap](): Entity = {
-    val entity = implicitly[FromMap[Entity]].apply(vertex.valueMap).get
-    if (entity.isInstanceOf[WithVertex[Entity]])
-      entity.asInstanceOf[WithVertex[Entity]].withVertex(vertex)
-    else
-      entity
-  }
 
   override def setProperty[A](key: Key[A], value: A): Vertex = {
     element.property(key.name, value)
@@ -114,4 +107,27 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
     vertex.properties[A](wantedKeys: _*).asScala.toStream
+
+  def asEntity[Entity: FromMap](): Entity = {
+    val entity = implicitly[FromMap[Entity]].apply(vertex.valueMap).get
+    if (entity.isInstanceOf[WithVertex[_]])
+      entity.asInstanceOf[WithVertex[Entity]].withVertex(vertex)
+    else
+      entity
+  }
+
+  def updateWith1[Entity: ToMap](update: Entity): Vertex = {
+    val toMap = implicitly[ToMap[Entity]]
+    val propMap: Map[String, Any] = toMap.apply(update)
+
+    this.valueMap.keySet.diff(propMap.keySet) foreach { key =>
+      val prop = element.property(key)
+      if (prop.isPresent) prop.remove()
+    }
+    propMap foreach {case (key, value) => element.property(key, value)}
+
+    element
+  }
+
+  def updateAs1[Entity :ToMap :FromMap](fun: Entity => Entity): Vertex = updateWith1(fun(this.asEntity[Entity]))
 }
