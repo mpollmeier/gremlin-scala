@@ -2,7 +2,7 @@ name := "root"
 val org = "com.michaelpollmeier"
 organization := org
 
-val defaultScalaV = "2.12.3"
+val defaultScalaV = "2.12.4"
 scalaVersion := defaultScalaV
 crossScalaVersions := Seq(defaultScalaV, "2.11.11")
 releaseCrossBuild := true
