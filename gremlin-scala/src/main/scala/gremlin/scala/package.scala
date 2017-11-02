@@ -55,8 +55,8 @@ package object scala {
   def __[A](): GremlinScala[A, HNil] =
     GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
 
-  def __[A](a: A): GremlinScala[A, HNil] = 
-    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](a))
+  def __[A](starts: A*): GremlinScala[A, HNil] =
+    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](starts: _*))
 
   implicit def wrap(v: Vertex): ScalaVertex = ScalaVertex(v)
 
