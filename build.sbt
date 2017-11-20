@@ -1,6 +1,5 @@
 name := "root"
-val org = "com.michaelpollmeier"
-organization := org
+organization in ThisBuild := "com.michaelpollmeier"
 
 val defaultScalaV = "2.12.4"
 scalaVersion := defaultScalaV
@@ -10,7 +9,6 @@ releaseCrossBuild := true
 import ReleaseTransformations._
 val gremlinVersion = "3.3.0"
 val commonSettings = Seq(
-  organization := org,
   scalaVersion := defaultScalaV,
   libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
@@ -71,7 +69,6 @@ val commonSettings = Seq(
   //   pushChanges
   // )
 )
-
 
 lazy val root = project.in(file("."))
   .aggregate(`gremlin-scala`, macros)
