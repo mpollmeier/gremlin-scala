@@ -1,9 +1,8 @@
 name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
-val defaultScalaV = "2.12.4"
-scalaVersion in ThisBuild := defaultScalaV
-crossScalaVersions := Seq(defaultScalaV, "2.11.11")
+scalaVersion in ThisBuild := "2.12.4"
+crossScalaVersions := Seq(scalaVersion.value, "2.11.11")
 releaseCrossBuild := true
 
 import ReleaseTransformations._
@@ -71,12 +70,7 @@ val commonSettings = Seq(
 
 lazy val root = project.in(file("."))
   .aggregate(`gremlin-scala`, macros)
-  .settings(
-    publishArtifact := false,
-    publishTo := {
-      Some("publishMeNot" at "https://publish/me/not")
-    }
-  )
+  .settings(skip in publish := true)
 
 lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
