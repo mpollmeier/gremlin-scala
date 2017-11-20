@@ -2,14 +2,13 @@ name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
 val defaultScalaV = "2.12.4"
-scalaVersion := defaultScalaV
+scalaVersion in ThisBuild := defaultScalaV
 crossScalaVersions := Seq(defaultScalaV, "2.11.11")
 releaseCrossBuild := true
 
 import ReleaseTransformations._
 val gremlinVersion = "3.3.0"
 val commonSettings = Seq(
-  scalaVersion := defaultScalaV,
   libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
