@@ -547,6 +547,13 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def addV() = GremlinScala[Vertex, Labels](traversal.addV())
   def addV(label: String) = GremlinScala[Vertex, Labels](traversal.addV(label))
 
+  /* generic maths based on strings, see http://tinkerpop.apache.org/docs/3.3.1/reference/#math-step */
+  def math(expression: String, bys: By[_]*): GremlinScala[JDouble, Labels] = {
+    var newTrav: GraphTraversal[_, JDouble] = traversal.math(expression)
+    bys.foreach { by => newTrav = by(newTrav)}
+    GremlinScala[JDouble, Labels](newTrav)
+  }
+
   // ELEMENT STEPS START
   // -------------------
 
