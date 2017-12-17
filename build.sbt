@@ -6,7 +6,7 @@ crossScalaVersions := Seq(scalaVersion.value, "2.11.11")
 releaseCrossBuild := true
 
 import ReleaseTransformations._
-val gremlinVersion = "3.3.0"
+val gremlinVersion = "3.3.1"
 val commonSettings = Seq(
   libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
@@ -20,6 +20,7 @@ val commonSettings = Seq(
       "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
   ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
+  resolvers += Resolver.mavenLocal,
   scalacOptions ++= Seq(
     // "-Xlint"
     // "-Xfatal-warnings",
@@ -52,20 +53,6 @@ val commonSettings = Seq(
         </developer>
     </developers>, // format: on
   releasePublishArtifactsAction := PgpKeys.publishSigned.value
-  // releaseProcess := Seq[ReleaseStep](
-  //   checkSnapshotDependencies,
-  //   inquireVersions,
-  //   runClean,
-  //   runTest,
-  //   setReleaseVersion,
-  //   commitReleaseVersion,
-  //   tagRelease,
-  //   releaseStepCommand("+publishSigned"),
-  //   setNextVersion,
-  //   commitNextVersion,
-  //   releaseStepCommand("sonatypeReleaseAll"),
-  //   pushChanges
-  // )
 )
 
 lazy val root = project.in(file("."))
