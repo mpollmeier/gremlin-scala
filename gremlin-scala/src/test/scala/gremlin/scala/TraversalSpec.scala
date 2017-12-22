@@ -763,6 +763,23 @@ class TraversalSpec extends WordSpec with Matchers {
     gsCloned.head shouldBe 1
   }
 
+  "math step" can {
+    "work with `by` modulator" in new Fixture {
+      graph.V().as("a")
+        .out("knows").as("b")
+        .math("a + b", by(Age))
+        .toSet shouldBe Set(56d, 61d)
+    }
+
+    "work with sideeffect key and placeholder" in new Fixture {
+      graph
+        .configure(_.withSideEffect("x", 10))
+        .V.value(Age)
+        .math("_ / x")
+        .toSet shouldBe Set(2.9, 2.7, 3.2, 3.5)
+    }
+  }
+
   trait Fixture {
     val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
