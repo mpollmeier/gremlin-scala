@@ -57,7 +57,7 @@ val commonSettings = Seq(
 
 lazy val root = project.in(file("."))
   .aggregate(`gremlin-scala`, macros)
-  .settings(skip in publish := true)
+  .settings(skip in publish := true, publishTo := { Some("publishMeNot" at "https://publish/me/not") })
 
 lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
   .settings(commonSettings: _*)
