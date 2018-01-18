@@ -58,13 +58,13 @@ package object scala {
   def __[A](starts: A*): GremlinScala[A, HNil] =
     GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](starts: _*))
 
-  implicit def wrap(v: Vertex): ScalaVertex = ScalaVertex(v)
+  implicit def asScalaVertex(v: Vertex): ScalaVertex = ScalaVertex(v)
 
-  implicit def wrap(e: Edge): ScalaEdge = ScalaEdge(e)
+  implicit def asScalaEdge(e: Edge): ScalaEdge = ScalaEdge(e)
 
-  implicit def wrap(g: Graph): ScalaGraph = ScalaGraph(g)
+  implicit def asScalaGraph(g: Graph): ScalaGraph = ScalaGraph(g)
 
-  implicit def wrap[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
+  implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
 
   implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
     override def get(): A = f()
