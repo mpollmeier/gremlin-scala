@@ -37,7 +37,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
-  // unsafe! this will throw a runtime exception if there is no element. better use `headOption`
+  /* unsafe! this will throw a runtime exception if there is no element. better use `headOption` */
   def head(): End = toList.head
 
   def headOption(): Option[End] = toList.headOption
@@ -47,7 +47,7 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   def exists(): Boolean = headOption.isDefined
   def notExists(): Boolean = !exists()
 
-  // execute pipeline - applies all side effects
+  /* execute pipeline - applies all side effects */
   def iterate() = {
     traversal.iterate()
     GremlinScala[End, Labels](traversal)
@@ -76,8 +76,8 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
   }
 
   /* returns the result of the specified traversal if it yields a result else it returns the provided default value
-   * note: uses coalesce internally, which is a flatMap step, which affects `as` and `traverser` behaviour
-   */
+   * 
+   * note: uses coalesce internally, which is a flatMap step, which affects `as` and `traverser` behaviour */
   def optional[A](optionalTraversal: GremlinScala[End, HNil] ⇒ GremlinScala[A, _], default: A) =
     coalesce(optionalTraversal, _.constant(default))
 
