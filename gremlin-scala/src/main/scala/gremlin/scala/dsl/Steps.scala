@@ -6,7 +6,6 @@ import java.util.{Map ⇒ JMap}
 import scala.collection.mutable
 import shapeless._
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
-import shapeless.ops.hlist.Prepend
 import shapeless.ops.product.ToHList
 
 /** root type for all domain types */
