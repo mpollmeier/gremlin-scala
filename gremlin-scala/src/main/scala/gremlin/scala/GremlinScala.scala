@@ -6,6 +6,7 @@ import java.util.{Comparator, List ⇒ JList, Map ⇒ JMap, Collection ⇒ JColl
 import java.util.stream.{Stream ⇒ JStream}
 
 import collection.JavaConverters._
+import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{DefaultGraphTraversal, GraphTraversal}
@@ -19,7 +20,6 @@ import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable
 import shapeless.ops.product.ToHList
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{universe => ru}
-import StepLabel.{combineLabelWithValue, GetLabelName}
 import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
 
@@ -290,10 +290,11 @@ case class GremlinScala[End, Labels <: HList](traversal: GraphTraversal[_, End])
 
   def tail(scope: Scope, limit: Long) = GremlinScala[End, Labels](traversal.tail(scope, limit))
 
-  // labels the current step and preserves the type - see `select` step
+  /* labels the current step and preserves the type - see `select` step */
   def as(name: String, moreNames: String*)(implicit p: Prepend[Labels, End :: HNil]) =
     GremlinScala[End, p.Out](traversal.as(name, moreNames: _*))
 
+  /* labels the current step and preserves the type - see `select` step */
   def as(stepLabel: StepLabel[End])(implicit p: Prepend[Labels, End :: HNil]) =
     GremlinScala[End, p.Out](traversal.as(stepLabel.name))
 
