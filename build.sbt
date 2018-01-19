@@ -2,7 +2,7 @@ name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
 scalaVersion in ThisBuild := "2.12.4"
-crossScalaVersions := Seq(scalaVersion.value, "2.11.11")
+crossScalaVersions := Seq(scalaVersion.value, "2.11.12")
 releaseCrossBuild := true
 
 import ReleaseTransformations._
@@ -11,7 +11,7 @@ val commonSettings = Seq(
   libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.chuusai" %% "shapeless" % "2.3.2",
+      "com.chuusai" %% "shapeless" % "2.3.3",
       "org.scala-lang.modules" %% "scala-xml" % "1.0.6", //just specified to eliminate sbt warnings
       "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,

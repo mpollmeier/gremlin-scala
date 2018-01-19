@@ -50,12 +50,12 @@ object by {
   }
 
   /* modulate by anonymous traversal, e.g. __.inE.value(Name) */
-  def apply[Modulated](by: GremlinScala[Modulated, _]) = new By[Modulated] {
+  def apply[Modulated](by: GremlinScala[Modulated]) = new By[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(by.traversal)
   }
 
   /* modulate by anonymous traversal and order, e.g. (__.inE.value(Name), Order.decr) */
-  def apply[Modulated](by: GremlinScala[Modulated, _], order: Order) = new OrderBy[Modulated] {
+  def apply[Modulated](by: GremlinScala[Modulated], order: Order) = new OrderBy[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(by.traversal, order)
   }
 

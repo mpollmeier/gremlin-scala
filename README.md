@@ -345,6 +345,13 @@ Random links:
 * bash testAll.sh
 
 ## Breaking changes
+### 3.3.1.1
+The type signature of GremlinScala changed: the former type parameter `Labels` is now a type member, which shortens the type if you don't care about Labels. The Labels were only used in a small percentage of steps, but had to be written out by users all the time even if they didn't care.
+Rewrite rules (old -> new), using `Vertex` as an example:
+`GremlinScala[Vertex, _]` -> `GremlinScala[Vertex]` (existential type: most common, i.e the user doesn't use or care about the Labels)
+`GremlinScala[Vertex, HNil]` -> `GremlinScala.Aux[Vertex, HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = HNil}`)
+`GremlinScala[Vertex, Vertex :: HNil]` -> `GremlinScala.Aux[Vertex, Vertex :: HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = Vertex :: HNil}`)
+Notice: GremlinScala isn't a case class any more - it shouldn't have been in the first place.
 ### 3.2.4.8 
 The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
 

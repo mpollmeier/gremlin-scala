@@ -8,7 +8,7 @@ import shapeless.ops.product.ToHList
 trait Constructor[DomainType, Labels <: HList] {
   type GraphType
   type StepsType
-  def apply(raw: GremlinScala[GraphType, _]): StepsType
+  def apply(raw: GremlinScala[GraphType]): StepsType
 }
 
 object Constructor extends LowPriorityConstructorImplicits {
@@ -24,18 +24,18 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     new Constructor[A, Labels] {
       type GraphType = A
       type StepsType = Steps[A, A, Labels]
-      def apply(raw: GremlinScala[GraphType, _]) = new Steps[A, A, Labels](raw)
+      def apply(raw: GremlinScala[GraphType]) = new Steps[A, A, Labels](raw)
     }
 
   def forDomainNode[
     DomainType <: DomainRoot,
     Labels <: HList,
     StepsTypeOut <: NodeSteps[DomainType, Labels]](
-    constr: GremlinScala[Vertex, _] => StepsTypeOut) = new Constructor[DomainType, Labels] {
+    constr: GremlinScala[Vertex] => StepsTypeOut) = new Constructor[DomainType, Labels] {
     type GraphType = Vertex
     type StepsType = StepsTypeOut
 
-    def apply(raw: GremlinScala[GraphType, _]): StepsTypeOut = constr(raw)
+    def apply(raw: GremlinScala[GraphType]): StepsTypeOut = constr(raw)
   }
 
   implicit def forList[
@@ -45,7 +45,7 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[List[A], Labels] {
     type GraphType = List[AGraphType]
     type StepsType = Steps[List[A], List[AGraphType], Labels]
-    def apply(raw: GremlinScala[GraphType, _]) =
+    def apply(raw: GremlinScala[GraphType]) =
       new Steps[List[A], List[AGraphType], Labels](raw)
   }
 
@@ -56,14 +56,14 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     AStepsType](implicit aConverter: Converter.Aux[A, AGraphType]) = new Constructor[Set[A], Labels] {
     type GraphType = Set[AGraphType]
     type StepsType = Steps[Set[A], Set[AGraphType], Labels]
-    def apply(raw: GremlinScala[GraphType, _]) =
+    def apply(raw: GremlinScala[GraphType]) =
       new Steps[Set[A], Set[AGraphType], Labels](raw)
   }
 
   implicit val forHNil = new Constructor[HNil, HNil] {
     type GraphType = HNil
     type StepsType = Steps[HNil, HNil, HNil]
-    def apply(raw: GremlinScala[HNil, _]) = new Steps[HNil, HNil, HNil](raw)
+    def apply(raw: GremlinScala[HNil]) = new Steps[HNil, HNil, HNil](raw)
   }
 
   implicit def forHList[
@@ -81,7 +81,7 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
       new Constructor[H :: T, Labels] {
         type GraphType = HGraphType :: TGraphType
         type StepsType = Steps[H :: T, HGraphType :: TGraphType, Labels]
-        def apply(raw: GremlinScala[GraphType, _]): StepsType =
+        def apply(raw: GremlinScala[GraphType]): StepsType =
           new Steps[H :: T, HGraphType :: TGraphType, Labels](raw)
     }
 }
@@ -106,7 +106,7 @@ trait LowestPriorityConstructorImplicits {
     new Constructor[T, Labels] {
       type GraphType = GraphTypeTuple
       type StepsType = Steps[T, GraphType, Labels]
-      def apply(raw: GremlinScala[GraphType, _]): StepsType =
+      def apply(raw: GremlinScala[GraphType]): StepsType =
         new Steps[T, GraphType, Labels](raw)
     }
 }

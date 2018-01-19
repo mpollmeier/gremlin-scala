@@ -195,7 +195,7 @@ object TestDomain {
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
   }
-  class PersonSteps[Labels <: HList](override val raw: GremlinScala[Vertex, _])
+  class PersonSteps[Labels <: HList](override val raw: GremlinScala[Vertex])
       extends NodeSteps[Person, Labels](raw) {
 
     def created = new SoftwareSteps[Labels](raw.out("created"))
@@ -205,7 +205,7 @@ object TestDomain {
     def hasName(name: String) = new PersonSteps[Labels](raw.has(Key("name") -> name))
   }
 
-  class SoftwareSteps[Labels <: HList](override val raw: GremlinScala[Vertex, _])
+  class SoftwareSteps[Labels <: HList](override val raw: GremlinScala[Vertex])
       extends NodeSteps[Software, Labels](raw) {
 
     def createdBy = new PersonSteps[Labels](raw.in("created"))
