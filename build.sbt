@@ -66,3 +66,5 @@ lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
 // macros can't be in the same compilation unit
 lazy val macros = project.in(file("macros"))
   .settings(commonSettings: _*)
+
+ThisBuild/scalafmtOnCompile := true
