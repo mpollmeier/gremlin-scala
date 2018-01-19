@@ -11,7 +11,7 @@ trait TestGraph {
   def e(i: Int) = graph.E(i: Integer).head
 
 
-  def print(gs: GremlinScala[_, _]) = println(gs.toList)
+  def print(gs: GremlinScala[_]) = println(gs.toList)
 }
 
 object TestGraph {

@@ -2,6 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
+import shapeless.{::, HNil}
 
 class SelectSpec extends WordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala
@@ -43,8 +44,12 @@ class SelectSpec extends WordSpec with Matchers {
 
     val v1 = graph.V(1).head
     val e9 = graph.E(9).head
-    def traversal = graph.V(1).as(a).outE("created").as(b).value(TestGraph.Weight).as(c)
+
+    def newTraversal: GremlinScala.Aux[Double, Vertex :: Edge :: Double :: HNil] =
+      graph.V(1).as(a).outE("created").as(b).value(TestGraph.Weight).as(c)
+
     "derive types for a simple as/select" in {
+      val traversal = newTraversal
       val result: Vertex =
         traversal.select(a).head
 
@@ -52,6 +57,7 @@ class SelectSpec extends WordSpec with Matchers {
     }
 
     "derive types for as/select with two labels" in {
+      val traversal = newTraversal
       val result: (Vertex, Edge) =
         traversal.select((a, b)).head
 
@@ -59,6 +65,7 @@ class SelectSpec extends WordSpec with Matchers {
     }
 
     "derive types for as/select with three labels" in {
+      val traversal = newTraversal
       val result: (Vertex, Edge, Double) =
         traversal.select((a, b, c)).head
 

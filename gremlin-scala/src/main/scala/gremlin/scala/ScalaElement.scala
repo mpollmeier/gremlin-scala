@@ -9,10 +9,10 @@ trait ScalaElement[ElementType <: Element] {
   def graph: ScalaGraph = element.graph
 
   /** start a new traversal from this element */
-  def start(): GremlinScala[ElementType, HNil] = __(element)
+  def start(): GremlinScala.Aux[ElementType, HNil] = __(element)
 
   /** start a new traversal from this element and configure it */
-  def start(configure: TraversalSource => TraversalSource): GremlinScala[ElementType, HNil] =
+  def start(configure: TraversalSource => TraversalSource): GremlinScala.Aux[ElementType, HNil] =
     GremlinScala[ElementType, HNil](
       configure(TraversalSource(element.graph))
       .underlying.inject(element)

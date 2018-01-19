@@ -52,10 +52,10 @@ package object scala {
   }
 
   // to create a new anonymous traversal, e.g. `__.outE`
-  def __[A](): GremlinScala[A, HNil] =
+  def __[A](): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
 
-  def __[A](starts: A*): GremlinScala[A, HNil] =
+  def __[A](starts: A*): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](starts: _*))
 
   implicit def asScalaVertex(v: Vertex): ScalaVertex = ScalaVertex(v)
@@ -64,7 +64,8 @@ package object scala {
 
   implicit def asScalaGraph(g: Graph): ScalaGraph = ScalaGraph(g)
 
-  implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala[A, HNil] = GremlinScala[A, HNil](traversal)
+  implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
+    GremlinScala[A, HNil](traversal)
 
   implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
     override def get(): A = f()
@@ -107,14 +108,14 @@ package object scala {
     (t: Traverser[A]) ⇒ fun(t.get)
 
   // Marshalling implicits
-  implicit class GremlinScalaVertexFunctions(gs: GremlinScala[Vertex, _]) {
+  implicit class GremlinScalaVertexFunctions(val gs: GremlinScala[Vertex]) {
     /**
       * Load a vertex values into a case class
       */
     def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
   }
 
-  implicit class GremlinScalaEdgeFunctions(gs: GremlinScala[Edge, _]) {
+  implicit class GremlinScalaEdgeFunctions(val gs: GremlinScala[Edge]) {
     /**
       * Load a edge values into a case class
       */
