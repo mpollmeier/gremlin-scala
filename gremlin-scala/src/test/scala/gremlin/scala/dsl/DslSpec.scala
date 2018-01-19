@@ -14,7 +14,7 @@ class DslSpec extends WordSpec with Matchers {
     personSteps.toSet shouldBe Set(
       Person(Some(1), "marko", 29),
       Person(Some(2), "vadas", 27),
-      Person(Some(4), "josh",  32),
+      Person(Some(4), "josh", 32),
       Person(Some(6), "peter", 35)
     )
   }
@@ -33,9 +33,9 @@ class DslSpec extends WordSpec with Matchers {
           .toList
       personAndSoftware should have size 4
 
-      val softwareByCreator: Map[String, Software] = personAndSoftware
-        .map { case (person, software) => (person.name, software) }
-        .toMap
+      val softwareByCreator: Map[String, Software] = personAndSoftware.map {
+        case (person, software) => (person.name, software)
+      }.toMap
       softwareByCreator("marko") shouldBe Software("lop", "java")
     }
 
@@ -51,7 +51,8 @@ class DslSpec extends WordSpec with Matchers {
           .as(labelSoftware)
           .select(labelSoftware)
           .toSet
-      personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
+      personAndSoftware shouldBe Set(Software("lop", "java"),
+                                     Software("ripple", "java"))
     }
 
     "allow to select multiple labelled steps" in {
@@ -68,9 +69,9 @@ class DslSpec extends WordSpec with Matchers {
           .toList
       personAndSoftware should have size 4
 
-      val softwareByCreator: Map[String, Software] = personAndSoftware
-        .map { case (software, person) => (person.name, software) }
-        .toMap
+      val softwareByCreator: Map[String, Software] = personAndSoftware.map {
+        case (software, person) => (person.name, software)
+      }.toMap
       softwareByCreator("marko") shouldBe Software("lop", "java")
     }
   }
@@ -79,7 +80,7 @@ class DslSpec extends WordSpec with Matchers {
     implicit val graph = TinkerFactory.createModern
 
     val traversal = for {
-      person   <- PersonSteps(graph)
+      person <- PersonSteps(graph)
       software <- person.created
     } yield (person.name, software)
 
@@ -94,17 +95,17 @@ class DslSpec extends WordSpec with Matchers {
   "filter with traversal on domain type" when {
     "domain type is a case class" in {
       val ripples = PersonSteps(TinkerFactory.createModern)
-          .filter(_.created.isRipple)
+        .filter(_.created.isRipple)
 
       ripples.toList shouldBe List(
-        Person(Some(4), "josh",  32)
+        Person(Some(4), "josh", 32)
       )
     }
   }
 
   "filterNot with traversal on domain type" in {
     val notRipple = PersonSteps(TinkerFactory.createModern)
-        .filterNot(_.created.isRipple)
+      .filterNot(_.created.isRipple)
 
     notRipple.toList.size shouldBe 3
   }
@@ -132,10 +133,7 @@ class DslSpec extends WordSpec with Matchers {
 
   "deduplicates" in {
     val results: List[Person] =
-      PersonSteps(TinkerFactory.createModern)
-        .created.createdBy
-        .dedup
-        .toList
+      PersonSteps(TinkerFactory.createModern).created.createdBy.dedup.toList
     results.size shouldBe 3
   }
 
@@ -189,8 +187,12 @@ class DslSpec extends WordSpec with Matchers {
 }
 
 object TestDomain {
-  @label("person") case class Person(@id id: Option[Integer], name: String, age: Integer) extends DomainRoot
-  @label("software") case class Software(name: String, lang: String) extends DomainRoot
+  @label("person") case class Person(@id id: Option[Integer],
+                                     name: String,
+                                     age: Integer)
+      extends DomainRoot
+  @label("software") case class Software(name: String, lang: String)
+      extends DomainRoot
 
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
@@ -200,9 +202,11 @@ object TestDomain {
 
     def created = new SoftwareSteps[Labels](raw.out("created"))
 
-    def name = new Steps[String, String, Labels](raw.map(_.value[String]("name")))
+    def name =
+      new Steps[String, String, Labels](raw.map(_.value[String]("name")))
 
-    def hasName(name: String) = new PersonSteps[Labels](raw.has(Key("name") -> name))
+    def hasName(name: String) =
+      new PersonSteps[Labels](raw.has(Key("name") -> name))
   }
 
   class SoftwareSteps[Labels <: HList](override val raw: GremlinScala[Vertex])
@@ -215,12 +219,15 @@ object TestDomain {
 
   implicit def personStepsConstructor[Labels <: HList]
     : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
-    Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](new PersonSteps[Labels](_))
+    Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](
+      new PersonSteps[Labels](_))
 
   implicit def softwareStepsConstructor[Labels <: HList]
     : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
-    Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
+    Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](
+      new SoftwareSteps[Labels](_))
 
-  implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil] =
+  implicit def liftPerson(person: Person)(
+      implicit graph: Graph): PersonSteps[HNil] =
     new PersonSteps[HNil](graph.asScala.V(person.id.get))
 }

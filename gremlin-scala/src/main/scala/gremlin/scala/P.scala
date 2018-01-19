@@ -18,8 +18,11 @@ object P {
   def between[A](a1: A, a2: A) = JavaP.between(a1, a2)
   def inside[A](a1: A, a2: A) = JavaP.inside(a1, a2)
   def outside[A](a1: A, a2: A) = JavaP.outside(a1, a2)
-  def within[A](iterable: Iterable[A]) = JavaP.within(iterable.asJavaCollection: JCollection[A])
-  def without[A](iterable: Iterable[A]) = JavaP.without(iterable.asJavaCollection: JCollection[A])
+  def within[A](iterable: Iterable[A]) =
+    JavaP.within(iterable.asJavaCollection: JCollection[A])
+  def without[A](iterable: Iterable[A]) =
+    JavaP.without(iterable.asJavaCollection: JCollection[A])
 
-  def fromPredicate[A](predicate: (A, A) => Boolean, value: A) = new JavaP(toJavaBiPredicate(predicate), value)
+  def fromPredicate[A](predicate: (A, A) => Boolean, value: A) =
+    new JavaP(toJavaBiPredicate(predicate), value)
 }

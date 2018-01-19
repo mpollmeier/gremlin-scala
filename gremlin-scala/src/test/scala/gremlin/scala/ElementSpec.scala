@@ -151,10 +151,12 @@ class ElementSpec extends TestBase {
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.asScala.addEdge("testLabel", v2, Seq(TestProperty → "testValue"))
+      val e =
+        v1.asScala.addEdge("testLabel", v2, Seq(TestProperty → "testValue"))
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
-      e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name → "testValue")
+      e.valueMap(TestProperty.name) shouldBe Map(
+        TestProperty.name → "testValue")
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
@@ -171,4 +173,3 @@ class ElementSpec extends TestBase {
   def e7 = e(7).asScala
   val TestProperty = Key[String]("testProperty")
 }
-

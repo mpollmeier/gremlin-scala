@@ -61,4 +61,3 @@ class PSpec extends WordSpec with Matchers {
 
   case class TestCase[A](predicate: JavaP[A], value: A, expected: Boolean)
 }
-

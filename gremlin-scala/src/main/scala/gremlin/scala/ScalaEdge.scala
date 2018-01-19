@@ -38,7 +38,8 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
     edge.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
-  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
+  override def properties[A: DefaultsToAny](
+      wantedKeys: String*): Stream[Property[A]] =
     edge.properties[A](wantedKeys: _*).asScala.toStream
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge

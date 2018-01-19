@@ -4,7 +4,12 @@ import java.util
 import java.util.concurrent.CompletableFuture
 
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
-import org.apache.tinkerpop.gremlin.process.remote.traversal.{AbstractRemoteTraversal, DefaultRemoteTraverser, RemoteTraversal, RemoteTraversalSideEffects}
+import org.apache.tinkerpop.gremlin.process.remote.traversal.{
+  AbstractRemoteTraversal,
+  DefaultRemoteTraverser,
+  RemoteTraversal,
+  RemoteTraversalSideEffects
+}
 import org.apache.tinkerpop.gremlin.structure.{Vertex => TVertex}
 import org.apache.tinkerpop.gremlin.process.traversal.Bytecode
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
@@ -20,46 +25,63 @@ import scala.util.Random
 class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
   "sack step" can {
-    /** http://tinkerpop.apache.org/docs/current/reference/#sack-step */
 
+    /** http://tinkerpop.apache.org/docs/current/reference/#sack-step */
     "carry simple value" when {
       "using constant for initial sack" in new Fixture {
-        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
+        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d,
+          1d, 1d, 1d)
       }
 
       "using function for initial sack" in new Fixture {
-        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d,1d, 1d)
+        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d,
+          1d, 1d, 1d, 1d, 1d)
 
-        val randomValues = graph.configure(_.withSack(() => Random.nextDouble)).V.sack.toList
+        val randomValues =
+          graph.configure(_.withSack(() => Random.nextDouble)).V.sack.toList
         randomValues.toSet.size shouldBe 6
       }
     }
 
     "transform the sack on the go" in new Fixture {
-      val result = graph.configure(_.withSack(1d)).V.repeat{
-        _.outE
-        .sack{(curr: Double, edge) => curr * edge.value2(Weight)}
-        .inV
-      }.times(2).sack().toSet
+      val result = graph
+        .configure(_.withSack(1d))
+        .V
+        .repeat {
+          _.outE.sack { (curr: Double, edge) =>
+            curr * edge.value2(Weight)
+          }.inV
+        }
+        .times(2)
+        .sack()
+        .toSet
 
       result shouldBe Set(1d, 0.4d)
     }
 
     "be modulated with by operator" when {
       "modulating by property" in new Fixture {
-        val result = graph.configure(_.withSack(1d))
-          .V(1).outE
+        val result = graph
+          .configure(_.withSack(1d))
+          .V(1)
+          .outE
           .sack(multiply, by(Weight))
-          .inV.sack.toSet
+          .inV
+          .sack
+          .toSet
 
         result shouldBe Set(0.4d, 0.5d, 1d)
       }
 
       "modulating by traversal" in new Fixture {
-        val result = graph.configure(_.withSack(1d))
-          .V(1).outE
+        val result = graph
+          .configure(_.withSack(1d))
+          .V(1)
+          .outE
           .sack(multiply, by(__.value(Weight)))
-          .inV.sack.toSet
+          .inV
+          .sack
+          .toSet
 
         result shouldBe Set(0.4d, 0.5d, 1d)
       }
@@ -68,19 +90,27 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
     "use provided split operator when cloning sack" in new Fixture {
       var counter = 0
-      val identityWithCounterIncrease = { value: Double => 
+      val identityWithCounterIncrease = { value: Double =>
         counter += 1
         value
       }
 
-      graph.configure(_.withSack(1d, splitOperator = identityWithCounterIncrease)).V.out.toList
+      graph
+        .configure(_.withSack(1d, splitOperator = identityWithCounterIncrease))
+        .V
+        .out
+        .toList
       counter shouldBe 6
     }
 
     "use provided merge operator when bulking sack" in new Fixture {
       val sum = (f1: Double, f2: Double) => f1 + f2
-      graph.configure(_.withSack(1d, mergeOperator = sum))
-        .V(1).out("knows").in("knows").sack
+      graph
+        .configure(_.withSack(1d, mergeOperator = sum))
+        .V(1)
+        .out("knows")
+        .in("knows")
+        .sack
         .toList shouldBe List(2d, 2d)
       // without `sum` would be List(1d, 1d)
     }
@@ -93,7 +123,8 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
       "on an edge" in new Fixture {
         val e7: Edge = graph.E(7).head
-        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d, 1d)
+        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d,
+                                                                            1d)
       }
     }
   }
@@ -139,13 +170,16 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     )
 
     // Create a future that completes immediately and provides a remote traversal providing vertices
-    val vertexResult = new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]()
+    val vertexResult =
+      new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]()
     val traversal = new AbstractRemoteTraversal[Int, TVertex]() {
       val it = mockVertices.iterator
 
-      override def nextTraverser: Admin[TVertex] = new DefaultRemoteTraverser[Vertex](it.next(), 1)
+      override def nextTraverser: Admin[TVertex] =
+        new DefaultRemoteTraverser[Vertex](it.next(), 1)
 
-      override def getSideEffects: RemoteTraversalSideEffects = null // not necessary for this test
+      override def getSideEffects: RemoteTraversalSideEffects =
+        null // not necessary for this test
 
       override def next(): TVertex = nextTraverser().get()
 

@@ -10,8 +10,9 @@ import shapeless._
 import shapeless.ops.hlist._
 
 class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])(
-  implicit tupler: Tupler.Aux[Labels, LabelsTuple])
-    extends MapStep[S, LabelsTuple](traversal.asAdmin) with TraversalParent {
+    implicit tupler: Tupler.Aux[Labels, LabelsTuple])
+    extends MapStep[S, LabelsTuple](traversal.asAdmin)
+    with TraversalParent {
 
   override def getRequirements = Set(TraverserRequirement.PATH).asJava
 

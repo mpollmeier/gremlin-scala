@@ -15,55 +15,60 @@ trait Marshallable[CC <: Product] {
 }
 
 object Marshallable {
-  implicit def materializeMappable[CC <: Product]: Marshallable[CC] = macro materializeMappableImpl[CC]
+  implicit def materializeMappable[CC <: Product]: Marshallable[CC] =
+    macro materializeMappableImpl[CC]
 
-  def materializeMappableImpl[CC <: Product: c.WeakTypeTag](c: blackbox.Context): c.Expr[Marshallable[CC]] = {
+  def materializeMappableImpl[CC <: Product: c.WeakTypeTag](
+      c: blackbox.Context): c.Expr[Marshallable[CC]] = {
     import c.universe._
     val tpe = weakTypeOf[CC]
     val companion = tpe.typeSymbol.companion
 
     val (idParam, fromCCParams, toCCParams) = tpe.decls
       .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"None", Seq.empty, Seq.empty)) {
-        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol) if field.isCaseAccessor ⇒
+        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol)
+            if field.isCaseAccessor ⇒
           val name = field.name
           val decoded = name.decodedName.toString
           val returnType = field.returnType
 
           def idAsOption =
             (q"cc.$name.asInstanceOf[Option[AnyRef]]",
-              _fromCCParams,
-              _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
+             _fromCCParams,
+             _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
 
           def idAsAnyRef =
             (q"Option(cc.$name.asInstanceOf[AnyRef])",
-              _fromCCParams,
-              _toCCParams :+ q"id.asInstanceOf[$returnType]")
+             _fromCCParams,
+             _toCCParams :+ q"id.asInstanceOf[$returnType]")
 
           def optionProperty = {
             // check if the property is an Option[AnyVal] and try to extract everything we need to unwrap it
             val treesForOptionValue = for {
-              innerValueClassType ← returnType.typeArgs.headOption if innerValueClassType <:< typeOf[AnyVal]
+              innerValueClassType ← returnType.typeArgs.headOption
+              if innerValueClassType <:< typeOf[AnyVal]
               valueName ← valueGetter(innerValueClassType).map(_.name)
               wrappedType ← wrappedTypeMaybe(innerValueClassType)
             } yield {
               val valueClassCompanion = innerValueClassType.typeSymbol.companion
               (_idParam,
-                //TODO: setting the `__gs` property isn't necessary
-                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
-                _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[Option[$wrappedType]].map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+               //TODO: setting the `__gs` property isn't necessary
+               _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
+               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[Option[$wrappedType]].map($valueClassCompanion.apply).asInstanceOf[$returnType]")
             }
             treesForOptionValue.getOrElse { //normal option property
               (_idParam,
-                //TODO: setting the `__gs` property isn't necessary
-                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
-                _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+               //TODO: setting the `__gs` property isn't necessary
+               _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
+               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
             }
           }
 
           def property = {
             // check if the property is a value class and try to extract everything we need to unwrap it
             val treesForValueClass = for {
-              valueName <- valueGetter(returnType) if returnType <:< typeOf[AnyVal]
+              valueName <- valueGetter(returnType)
+              if returnType <:< typeOf[AnyVal]
               wrappedType ← wrappedTypeMaybe(returnType)
             } yield {
               val valueClassCompanion = returnType.typeSymbol.companion
@@ -78,22 +83,27 @@ object Marshallable {
             }
           }
 
-          def valueGetter(tpe: Type): Option[MethodSymbol] = tpe.declarations
-            .sorted
-            .filter(_.isMethod)
-            .map(_.asMethod)
-            .takeWhile(!_.isConstructor)
-            .filter(_.paramLists == Nil /* nullary */ )
-            .headOption
+          def valueGetter(tpe: Type): Option[MethodSymbol] =
+            tpe.declarations.sorted
+              .filter(_.isMethod)
+              .map(_.asMethod)
+              .takeWhile(!_.isConstructor)
+              .filter(_.paramLists == Nil /* nullary */ )
+              .headOption
 
           def valueClassConstructor(tpe: Type): Option[MethodSymbol] =
-            tpe.companion.decls.filter(_.name.toString == "apply").headOption match {
+            tpe.companion.decls
+              .filter(_.name.toString == "apply")
+              .headOption match {
               case Some(m: MethodSymbol) ⇒ Some(m)
-              case _                     ⇒ None
+              case _ ⇒ None
             }
 
           def wrappedTypeMaybe(tpe: Type): Option[Type] =
-            util.Try(valueClassConstructor(tpe).get.paramLists.head.head.typeSignature).toOption
+            util
+              .Try(
+                valueClassConstructor(tpe).get.paramLists.head.head.typeSignature)
+              .toOption
 
           if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
@@ -101,7 +111,9 @@ object Marshallable {
             else
               idAsAnyRef
           } else { // normal property member
-            assert(!Hidden.isHidden(decoded), s"The parameter name $decoded can't be used in the persistable case class $tpe")
+            assert(
+              !Hidden.isHidden(decoded),
+              s"The parameter name $decoded can't be used in the persistable case class $tpe")
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
               optionProperty
             else
@@ -111,7 +123,8 @@ object Marshallable {
         case (params, _) ⇒ params
       }
 
-    val label = tpe.typeSymbol.asClass.annotations find (_.tree.tpe =:= weakTypeOf[label]) map { annotation ⇒
+    val label = tpe.typeSymbol.asClass.annotations find (_.tree.tpe =:= weakTypeOf[
+      label]) map { annotation ⇒
       val label = annotation.tree.children.tail.head
       q"""$label"""
     } getOrElse q"cc.getClass.getSimpleName"

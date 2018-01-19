@@ -12,10 +12,10 @@ trait ScalaElement[ElementType <: Element] {
   def start(): GremlinScala.Aux[ElementType, HNil] = __(element)
 
   /** start a new traversal from this element and configure it */
-  def start(configure: TraversalSource => TraversalSource): GremlinScala.Aux[ElementType, HNil] =
+  def start(configure: TraversalSource => TraversalSource)
+    : GremlinScala.Aux[ElementType, HNil] =
     GremlinScala[ElementType, HNil](
-      configure(TraversalSource(element.graph))
-      .underlying.inject(element)
+      configure(TraversalSource(element.graph)).underlying.inject(element)
     )
 
   def id[A: DefaultsToAny]: A = element.id.asInstanceOf[A]
@@ -53,14 +53,15 @@ trait ScalaElement[ElementType <: Element] {
 
   def valueOption[A](key: Key[A], value: Option[A]): ElementType = value match {
     case Some(v) => setProperty(key, v)
-    case None => removeProperty(key)
+    case None    => removeProperty(key)
   }
 
   // note: this may throw an IllegalStateException - better use `Property`
   def values[A: DefaultsToAny](keys: String*): Iterator[A] =
     element.values[A](keys: _*).asScala
 
-  def valueMap[A: DefaultsToAny]: Map[String, A] = valueMap[A](keys.toSeq.map(_.name): _*)
+  def valueMap[A: DefaultsToAny]: Map[String, A] =
+    valueMap[A](keys.toSeq.map(_.name): _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
     (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap
@@ -73,11 +74,12 @@ trait ScalaElement[ElementType <: Element] {
       val prop = element.property(key)
       if (prop.isPresent) prop.remove()
     }
-    propMap foreach {case (key, value) => element.property(key, value)}
+    propMap foreach { case (key, value) => element.property(key, value) }
 
     element
   }
 
-  def updateAs[CC <: Product: Marshallable](f: CC => CC): ElementType = updateWith(f(toCC[CC]))
+  def updateAs[CC <: Product: Marshallable](f: CC => CC): ElementType =
+    updateWith(f(toCC[CC]))
 
 }

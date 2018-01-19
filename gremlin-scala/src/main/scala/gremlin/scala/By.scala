@@ -21,43 +21,53 @@ object by {
 
   /* modulate by property */
   def apply[Modulated](key: Key[Modulated]) = new By[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(key.name)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(key.name)
   }
 
   /* modulate by property and order */
-  def apply[Modulated](key: Key[Modulated], order: Order) = new OrderBy[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(key.name, order)
-  }
+  def apply[Modulated](key: Key[Modulated], order: Order) =
+    new OrderBy[Modulated] {
+      override def apply[End](traversal: GraphTraversal[_, End]) =
+        traversal.by(key.name, order)
+    }
 
   /* modulate by label - alias for `apply[String](T.label)` */
   def label[Modulated] = new By[String] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(T.label)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(T.label)
   }
 
   /* modulate by label and order - alias for `apply[String](T.label, Order)` */
   def label[Modulated](order: Order) = new OrderBy[String] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(T.label, order)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(T.label, order)
   }
 
   /* modulate by T(oken) */
   def apply[Modulated](token: T) = new By[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(token)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(token)
   }
 
   /* modulate by T(oken) and order */
   def apply[Modulated](token: T, order: Order) = new OrderBy[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(token, order)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(token, order)
   }
 
   /* modulate by anonymous traversal, e.g. __.inE.value(Name) */
   def apply[Modulated](by: GremlinScala[Modulated]) = new By[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(by.traversal)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(by.traversal)
   }
 
   /* modulate by anonymous traversal and order, e.g. (__.inE.value(Name), Order.decr) */
-  def apply[Modulated](by: GremlinScala[Modulated], order: Order) = new OrderBy[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(by.traversal, order)
-  }
+  def apply[Modulated](by: GremlinScala[Modulated], order: Order) =
+    new OrderBy[Modulated] {
+      override def apply[End](traversal: GraphTraversal[_, End]) =
+        traversal.by(by.traversal, order)
+    }
 
   /* modulate by function
    * n.b. you should better use one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
@@ -70,18 +80,21 @@ object by {
 
   /* modulate by function and order
    * n.b. you should better use one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
-  def apply[From, Modulated](fun: From => Modulated, order: Order) = new OrderBy[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) =
-      traversal.by[From](
-        new JFunction[From, AnyRef] {
-          override def apply(from: From): AnyRef = fun(from).asInstanceOf[AnyRef]
-        },
-        order
-      )
-  }
+  def apply[From, Modulated](fun: From => Modulated, order: Order) =
+    new OrderBy[Modulated] {
+      override def apply[End](traversal: GraphTraversal[_, End]) =
+        traversal.by[From](
+          new JFunction[From, AnyRef] {
+            override def apply(from: From): AnyRef =
+              fun(from).asInstanceOf[AnyRef]
+          },
+          order
+        )
+    }
 
   def apply[Modulated](order: Order) = new OrderBy[Modulated] {
-    override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by(order)
+    override def apply[End](traversal: GraphTraversal[_, End]) =
+      traversal.by(order)
   }
 
   /* identity modulator */

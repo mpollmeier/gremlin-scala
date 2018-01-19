@@ -29,7 +29,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
 
     "has a label and multiple properties as Map " in new Fixture {
-      paris --- (Eurostar,properties) --> london
+      paris --- (Eurostar, properties) --> london
       paris.out(Eurostar).head shouldBe london
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
       paris.outE(Eurostar).value(Length).head shouldBe 100
@@ -56,7 +56,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.inE(Eurostar).value(Length).head shouldBe 100
     }
 
- /*   "has a label and multiple properties as Map" in new Fixture {
+    /*   "has a label and multiple properties as Map" in new Fixture {
       paris <-- (Eurostar, properties) --- london
 
       paris.in(Eurostar).head shouldBe london
@@ -93,7 +93,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
       paris.inE(Eurostar).value(Length).head shouldBe 100
     }
 
-/*    "have labels and multiple properties as Map" in new Fixture {
+    /*    "have labels and multiple properties as Map" in new Fixture {
       paris <-- (Eurostar, properties) --> london
 
       paris.out(Eurostar).head shouldBe london
@@ -178,6 +178,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     val Name = Key[String]("name")
     val Length = Key[Int]("length")
 
-    val properties: Map[String, Any] =List(("name" , "alpha"),( "length" , 100)).toMap
+    val properties: Map[String, Any] =
+      List(("name", "alpha"), ("length", 100)).toMap
   }
 }

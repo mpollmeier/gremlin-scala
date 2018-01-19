@@ -21,13 +21,13 @@ case class CCWithLabel(s: String)
 
 @label("the_label")
 case class CCWithLabelAndId(
-  s: String,
-  @id id: Int,
-  l: Long,
-  o: Option[String],
-  seq: Seq[String],
-  map: Map[String, String],
-  nested: NestedClass
+    s: String,
+    @id id: Int,
+    l: Long,
+    o: Option[String],
+    seq: Seq[String],
+    map: Map[String, String],
+    nested: NestedClass
 ) { def randomDef = ??? }
 
 case class NestedClass(s: String)
@@ -50,7 +50,8 @@ class MarshallableSpec extends WordSpec with Matchers {
 
     "contain options" should {
       "map `Some[A]` to `A`" in new Fixture {
-        val ccWithOptionSome = CCWithOption(Int.MaxValue, Some("optional value"))
+        val ccWithOptionSome =
+          CCWithOption(Int.MaxValue, Some("optional value"))
         val v = graph + ccWithOptionSome
         v.toCC[CCWithOption] shouldBe ccWithOptionSome
 
@@ -64,7 +65,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         v.toCC[CCWithOption] shouldBe ccWithOptionNone
 
         val vl = graph.V(v.id).head
-        vl.keys should not contain "s"  //None should be mapped to `null`
+        vl.keys should not contain "s" //None should be mapped to `null`
       }
 
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
@@ -102,7 +103,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
         vl.valueMap should contain("s" → cc.s)
-        vl.valueMap.keySet should not contain("i")
+        vl.valueMap.keySet should not contain ("i")
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
     }
@@ -112,7 +113,9 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val marshaller = new Marshallable[CCWithOption] {
         def fromCC(cc: CCWithOption) =
-          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+          FromCC(None,
+                 "CCWithOption",
+                 Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
 
         def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
           CCWithOption(i = valueMap("i").asInstanceOf[Int],
@@ -120,7 +123,8 @@ class MarshallableSpec extends WordSpec with Matchers {
       }
 
       val v = graph.+(ccWithOptionNone)(marshaller)
-      v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
+      v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i,
+                                                             Some("undefined"))
     }
 
     "use @label and @id annotations" in new Fixture {
@@ -197,46 +201,69 @@ class MarshallableSpec extends WordSpec with Matchers {
     "have id-annotation None" in new CCEdgeAddFixture {
       val ccEdgeWithOptionIdNoneInitial = CCWithOptionId("edge-property", None)
 
-      val ccEdgeWithOptionIdNone = ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithOptionIdNoneInitial).toCC[CCWithOptionId]
+      val ccEdgeWithOptionIdNone = ccVertexFrom
+        .addEdge(ccVertexTo, ccEdgeWithOptionIdNoneInitial)
+        .toCC[CCWithOptionId]
       ccEdgeWithOptionIdNone.id should not be empty
 
       val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
       ccEdgesWithOptionIdNone should have size 1
-      ccEdgesWithOptionIdNone.head.toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
+      ccEdgesWithOptionIdNone.head
+        .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
     }
 
     "have id-annotation Some(123)" in new CCEdgeAddFixture {
-      val ccEdgeWithOptionIdSomeInitial = CCWithOptionId("edge-property", Some(123))
+      val ccEdgeWithOptionIdSomeInitial =
+        CCWithOptionId("edge-property", Some(123))
 
-      val ccEdgeWithOptionIdSome = ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithOptionIdSomeInitial).toCC[CCWithOptionId]
+      val ccEdgeWithOptionIdSome = ccVertexFrom
+        .addEdge(ccVertexTo, ccEdgeWithOptionIdSomeInitial)
+        .toCC[CCWithOptionId]
       ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
 
       val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
       ccEdgesWithOptionIdSome should have size 1
-      ccEdgesWithOptionIdSome.head.toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
+      ccEdgesWithOptionIdSome.head
+        .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
     }
   }
 
   "edge" should {
     "update using a case-class template" in new CCEdgeUpdateFixture {
-      graph.E(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
+      graph
+        .E(ccWithIdSet.id.get)
+        .head
+        .updateWith(ccUpdate)
+        .toCC[CC] shouldBe ccUpdate
       graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
     }
 
     "update as a case class" in new CCEdgeUpdateFixture {
-      graph.E(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
+      graph
+        .E(ccWithIdSet.id.get)
+        .head
+        .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
+        .toCC[CC] shouldBe ccUpdate
       graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
     }
   }
 
   "vertex" should {
     "update using a case-class template" in new CCVertexUpdateFixture {
-      graph.V(ccWithIdSet.id.get).head.updateWith(ccUpdate).toCC[CC] shouldBe ccUpdate
+      graph
+        .V(ccWithIdSet.id.get)
+        .head
+        .updateWith(ccUpdate)
+        .toCC[CC] shouldBe ccUpdate
       graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
     }
 
     "update as a case class" in new CCVertexUpdateFixture {
-      graph.V(ccWithIdSet.id.get).head.updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i)).toCC[CC] shouldBe ccUpdate
+      graph
+        .V(ccWithIdSet.id.get)
+        .head
+        .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
+        .toCC[CC] shouldBe ccUpdate
       graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
     }
   }

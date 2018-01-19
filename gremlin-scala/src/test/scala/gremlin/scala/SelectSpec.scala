@@ -45,7 +45,8 @@ class SelectSpec extends WordSpec with Matchers {
     val v1 = graph.V(1).head
     val e9 = graph.E(9).head
 
-    def newTraversal: GremlinScala.Aux[Double, Vertex :: Edge :: Double :: HNil] =
+    def newTraversal
+      : GremlinScala.Aux[Double, Vertex :: Edge :: Double :: HNil] =
       graph.V(1).as(a).outE("created").as(b).value(TestGraph.Weight).as(c)
 
     "derive types for a simple as/select" in {
@@ -75,45 +76,62 @@ class SelectSpec extends WordSpec with Matchers {
 
   "resets labels on ReducingBarrier steps" should {
     "work for `mean`" in {
-        graph.V.as("a").outE("created")
-          .value(TestGraph.Weight)
-          .mean.as("b")
-          .select()
-          .head._1 shouldBe 0.49999999999999994
+      graph.V
+        .as("a")
+        .outE("created")
+        .value(TestGraph.Weight)
+        .mean
+        .as("b")
+        .select()
+        .head
+        ._1 shouldBe 0.49999999999999994
     }
 
     "work for `count`" in {
-      graph.V.as("a")
+      graph.V
+        .as("a")
         .out("created")
-        .count().as("b")
-        .select().head._1 shouldBe 4
+        .count()
+        .as("b")
+        .select()
+        .head
+        ._1 shouldBe 4
     }
 
     "work for `max`" in {
-      graph.V.as("a")
+      graph.V
+        .as("a")
         .outE("created")
         .value(TestGraph.Weight)
-        .max().as("b")
+        .max()
+        .as("b")
         .select()
-        .head._1 shouldBe 1.0
+        .head
+        ._1 shouldBe 1.0
     }
 
     "work for `min`" in {
-      graph.V.as("a")
+      graph.V
+        .as("a")
         .outE("created")
         .value(TestGraph.Weight)
-        .min().as("b")
+        .min()
+        .as("b")
         .select()
-        .head._1 shouldBe 0.2
+        .head
+        ._1 shouldBe 0.2
     }
 
     "work for `sum`" in {
-      val sum =graph.V.as("a")
+      val sum = graph.V
+        .as("a")
         .outE("created")
         .value(TestGraph.Weight)
-        .sum().as("b")
+        .sum()
+        .as("b")
         .select()
-        .head._1
+        .head
+        ._1
 
       (sum: Double) shouldBe 2d +- 0.1d
     }

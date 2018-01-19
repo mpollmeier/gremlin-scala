@@ -3,7 +3,10 @@ package gremlin.scala
 import java.io.FileOutputStream
 import org.apache.tinkerpop.gremlin.structure.io.IoCore
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONVersion
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.{
+  TinkerFactory,
+  TinkerGraph
+}
 import org.scalatest.{Matchers, WordSpec}
 
 class GraphSerialisationSpec extends WordSpec with Matchers {
@@ -32,8 +35,18 @@ class GraphSerialisationSpec extends WordSpec with Matchers {
 
     "support graphson v2" in {
       val file = "target/tinkerpop-modern.graphson2.json"
-      val mapper = graph.io(IoCore.graphson).mapper.normalize(true).version(GraphSONVersion.V2_0).create
-      graph.io(IoCore.graphson).writer.mapper(mapper).create.writeGraph(new FileOutputStream(file), graph)
+      val mapper = graph
+        .io(IoCore.graphson)
+        .mapper
+        .normalize(true)
+        .version(GraphSONVersion.V2_0)
+        .create
+      graph
+        .io(IoCore.graphson)
+        .writer
+        .mapper(mapper)
+        .create
+        .writeGraph(new FileOutputStream(file), graph)
 
       val newGraph = TinkerGraph.open
       newGraph.io(IoCore.graphson).readGraph(file)

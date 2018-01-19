@@ -20,7 +20,7 @@ class SchemaSpec extends WordSpec with Matchers {
     "create vertices" in {
       val g = TinkerGraph.open.asScala
 
-      val v0 = g + (Software, Name → "blueprints" , Created → 2010)
+      val v0 = g + (Software, Name → "blueprints", Created → 2010)
       val v1 = g + (Software, Created → 2009, Name → "gremlin")
       val v2 = g + (Software, Name → "gremlinScala")
       val v3 = g + (Person, Name → "mpollmeier")
@@ -59,10 +59,12 @@ class SchemaSpec extends WordSpec with Matchers {
 
         "support traversal" in new Fixture {
           val name = paris.out(EuroStar).value(Name).head
-          val someString: String = name //no implicit conversion, it already is a String
+          val someString
+            : String = name //no implicit conversion, it already is a String
 
           val distance = paris.outE(EuroStar).value(Distance).head
-          val someInt: Int = distance //no implicit conversion, it already is an Int
+          val someInt
+            : Int = distance //no implicit conversion, it already is an Int
         }
       }
 

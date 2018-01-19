@@ -10,7 +10,6 @@ trait TestGraph {
   def v(i: Int) = graph.V(i: Integer).head
   def e(i: Int) = graph.E(i: Integer).head
 
-
   def print(gs: GremlinScala[_]) = println(gs.toList)
 }
 

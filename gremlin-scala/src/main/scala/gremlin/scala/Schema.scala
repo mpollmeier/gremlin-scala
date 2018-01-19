@@ -9,5 +9,4 @@ case class Key[A](name: String) {
   def of(value: A): KeyValue[A] = KeyValue(this, value)
 }
 
-
 case class KeyValue[A](key: Key[A], value: A)

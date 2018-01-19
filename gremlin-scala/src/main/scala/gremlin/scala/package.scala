@@ -1,6 +1,16 @@
 package gremlin
 
-import java.util.function.{BiConsumer, BiPredicate, BiFunction, BinaryOperator, Consumer, Function ⇒ JFunction, Predicate ⇒ JPredicate, Supplier, UnaryOperator}
+import java.util.function.{
+  BiConsumer,
+  BiPredicate,
+  BiFunction,
+  BinaryOperator,
+  Consumer,
+  Function ⇒ JFunction,
+  Predicate ⇒ JPredicate,
+  Supplier,
+  UnaryOperator
+}
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
@@ -53,10 +63,13 @@ package object scala {
 
   // to create a new anonymous traversal, e.g. `__.outE`
   def __[A](): GremlinScala.Aux[A, HNil] =
-    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
+    GremlinScala[A, HNil](
+      org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
 
   def __[A](starts: A*): GremlinScala.Aux[A, HNil] =
-    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.__[A](starts: _*))
+    GremlinScala[A, HNil](
+      org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
+        .__[A](starts: _*))
 
   implicit def asScalaVertex(v: Vertex): ScalaVertex = ScalaVertex(v)
 
@@ -64,7 +77,8 @@ package object scala {
 
   implicit def asScalaGraph(g: Graph): ScalaGraph = ScalaGraph(g)
 
-  implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
+  implicit def asGremlinScala[A](
+      traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](traversal)
 
   implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
@@ -75,31 +89,38 @@ package object scala {
     override def accept(a: A): Unit = f(a)
   }
 
-  implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] = new JFunction[A, B] {
-    override def apply(a: A): B = f(a)
-  }
+  implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] =
+    new JFunction[A, B] {
+      override def apply(a: A): B = f(a)
+    }
 
-  implicit def toJavaUnaryOperator[A](f: A ⇒ A): UnaryOperator[A] = new UnaryOperator[A] {
-    override def apply(a: A): A = f(a)
-  }
+  implicit def toJavaUnaryOperator[A](f: A ⇒ A): UnaryOperator[A] =
+    new UnaryOperator[A] {
+      override def apply(a: A): A = f(a)
+    }
 
-  implicit def toJavaBinaryOperator[A](f: (A, A) ⇒ A): BinaryOperator[A] = new BinaryOperator[A] {
-    override def apply(a1: A, a2: A): A = f(a1, a2)
-  }
+  implicit def toJavaBinaryOperator[A](f: (A, A) ⇒ A): BinaryOperator[A] =
+    new BinaryOperator[A] {
+      override def apply(a1: A, a2: A): A = f(a1, a2)
+    }
 
-  implicit def toJavaBiFunction[A, B, C](f: (A, B) ⇒ C): BiFunction[A, B, C] = new BiFunction[A, B, C] {
-    override def apply(a: A, b: B): C = f(a, b)
-  }
+  implicit def toJavaBiFunction[A, B, C](f: (A, B) ⇒ C): BiFunction[A, B, C] =
+    new BiFunction[A, B, C] {
+      override def apply(a: A, b: B): C = f(a, b)
+    }
 
-  implicit def toJavaBiConsumer[A, B](f: (A, B) => Unit): BiConsumer[A, B] = new BiConsumer[A,B] {
-    override def accept(a: A, b: B): Unit = f(a, b)
-  }
+  implicit def toJavaBiConsumer[A, B](f: (A, B) => Unit): BiConsumer[A, B] =
+    new BiConsumer[A, B] {
+      override def accept(a: A, b: B): Unit = f(a, b)
+    }
 
-  implicit def toJavaPredicate[A](f: A ⇒ Boolean): JPredicate[A] = new JPredicate[A] {
-    override def test(a: A): Boolean = f(a)
-  }
+  implicit def toJavaPredicate[A](f: A ⇒ Boolean): JPredicate[A] =
+    new JPredicate[A] {
+      override def test(a: A): Boolean = f(a)
+    }
 
-  implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
+  implicit def toJavaBiPredicate[A, B](
+      predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
     new BiPredicate[A, B] {
       def test(a: A, b: B) = predicate(a, b)
     }
@@ -109,6 +130,7 @@ package object scala {
 
   // Marshalling implicits
   implicit class GremlinScalaVertexFunctions(val gs: GremlinScala[Vertex]) {
+
     /**
       * Load a vertex values into a case class
       */
@@ -116,6 +138,7 @@ package object scala {
   }
 
   implicit class GremlinScalaEdgeFunctions(val gs: GremlinScala[Edge]) {
+
     /**
       * Load a edge values into a case class
       */
@@ -130,14 +153,14 @@ package object scala {
   }
 
   implicit class SemiEdgeProductFunctions[
-    LabelAndValuesAsTuple <: Product,
-    LabelAndValues <: HList,
-    Lbl <: String,
-    KeyValues <: HList
-  ](labelAndValuesAsTuple: LabelAndValuesAsTuple)
-  (implicit toHList: ToHList.Aux[LabelAndValuesAsTuple,LabelAndValues],
-   startsWithLabel: IsHCons.Aux[LabelAndValues, Lbl, KeyValues], // first element has to be a Label
-   keyValueToList: ToTraversable.Aux[KeyValues, List, KeyValue[_]] // all other elements have to be KeyValue[_]
+      LabelAndValuesAsTuple <: Product,
+      LabelAndValues <: HList,
+      Lbl <: String,
+      KeyValues <: HList
+  ](labelAndValuesAsTuple: LabelAndValuesAsTuple)(
+      implicit toHList: ToHList.Aux[LabelAndValuesAsTuple, LabelAndValues],
+      startsWithLabel: IsHCons.Aux[LabelAndValues, Lbl, KeyValues], // first element has to be a Label
+      keyValueToList: ToTraversable.Aux[KeyValues, List, KeyValue[_]] // all other elements have to be KeyValue[_]
   ) {
     lazy val labelAndValues = labelAndValuesAsTuple.toHList
     lazy val label: String = labelAndValues.head

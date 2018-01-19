@@ -27,7 +27,8 @@ class AlgorithmSpec extends WordSpec with Matchers {
     }
 
     def isCyclic(graph: ScalaGraph): Boolean = {
-      val paths = graph.V.as("a")
+      val paths = graph.V
+        .as("a")
         .repeat(_.out.simplePath)
         .emit
         .where(_.out.as("a"))

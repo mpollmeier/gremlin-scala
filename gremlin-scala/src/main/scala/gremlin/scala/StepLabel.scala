@@ -16,10 +16,11 @@ object StepLabel {
   }
 
   object combineLabelWithValue extends Poly2 {
-    implicit def atLabel[A, L <: HList] = at[StepLabel[A], (L, JMap[String, Any])] {
-      case (label, (acc, values)) ⇒
-        (values.get(label.name).asInstanceOf[A] :: acc, values)
-    }
+    implicit def atLabel[A, L <: HList] =
+      at[StepLabel[A], (L, JMap[String, Any])] {
+        case (label, (acc, values)) ⇒
+          (values.get(label.name).asInstanceOf[A] :: acc, values)
+      }
   }
 
   trait ExtractLabelType[A] {
@@ -27,19 +28,23 @@ object StepLabel {
   }
 
   object ExtractLabelType extends LowPriorityExtractLabelTypeImplicits {
-    @implicitNotFound("Unable to find implicit for extracting LabelType of StepLabel `${A}`. "
-     + "We probably need to add an implicit def to `LowPriorityExtractLabelTypeImplicits`")
+    @implicitNotFound(
+      "Unable to find implicit for extracting LabelType of StepLabel `${A}`. "
+        + "We probably need to add an implicit def to `LowPriorityExtractLabelTypeImplicits`")
     type Aux[A, Out0] = ExtractLabelType[A] { type Out = Out0 }
   }
 
   trait LowPriorityExtractLabelTypeImplicits {
-    implicit def forSingle[A] = new ExtractLabelType[StepLabel[A]] { type Out = A }
+    implicit def forSingle[A] = new ExtractLabelType[StepLabel[A]] {
+      type Out = A
+    }
 
     implicit def forHNil = new ExtractLabelType[HNil] { type Out = HNil }
 
     implicit def forHList[H, T <: HList, HOut, TOut <: HList](
-      implicit hExtractLabelType: ExtractLabelType.Aux[H, HOut],
-      tExtractLabelType: ExtractLabelType.Aux[T, TOut]): ExtractLabelType.Aux[H :: T, HOut :: TOut] =
+        implicit hExtractLabelType: ExtractLabelType.Aux[H, HOut],
+        tExtractLabelType: ExtractLabelType.Aux[T, TOut])
+      : ExtractLabelType.Aux[H :: T, HOut :: TOut] =
       new ExtractLabelType[H :: T] { type Out = HOut :: TOut }
   }
 }

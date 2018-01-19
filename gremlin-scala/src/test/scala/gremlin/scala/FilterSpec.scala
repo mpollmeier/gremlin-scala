@@ -11,18 +11,20 @@ class FilterSpec extends WordSpec with Matchers {
   "filter" in new Fixture {
     graph.V
       .filter(_.value(Age).is(P.gt(30)))
-      .value(Name).toSet should be(Set("josh", "peter"))
+      .value(Name)
+      .toSet should be(Set("josh", "peter"))
   }
 
   "filterNot" in new Fixture {
     graph.V
       .filterNot(_.value(Age).is(P.gt(30)))
-      .value(Name).toSet should be(Set("lop", "marko", "vadas", "ripple"))
+      .value(Name)
+      .toSet should be(Set("lop", "marko", "vadas", "ripple"))
   }
 
   "filter on end type" in new Fixture {
     graph.V
-      .filterOnEnd( _.property(Age).orElse(0) > 30)
+      .filterOnEnd(_.property(Age).orElse(0) > 30)
       .value(Name)
       .toSet should be(Set("josh", "peter"))
   }
@@ -35,9 +37,15 @@ class FilterSpec extends WordSpec with Matchers {
     val g = TinkerGraph.open.asScala
     g + ("software", Name → "blueprints", Created → 2010)
 
-    g.V.has(Name → "blueprints").head <-- "dependsOn" --- (g + ("software", Name → "gremlin", Created → 2009))
-    g.V.has(Name → "gremlin").head <-- "dependsOn" --- (g + ("software", Name → "gremlinScala"))
-    g.V.has(Name → "gremlinScala").head <-- "createdBy" --- (g + ("person", Name → "mpollmeier"))
+    g.V
+      .has(Name → "blueprints")
+      .head <-- "dependsOn" --- (g + ("software", Name → "gremlin", Created → 2009))
+    g.V
+      .has(Name → "gremlin")
+      .head <-- "dependsOn" --- (g + ("software", Name → "gremlinScala"))
+    g.V
+      .has(Name → "gremlinScala")
+      .head <-- "createdBy" --- (g + ("person", Name → "mpollmeier"))
 
     g.V.toList().size shouldBe 4
     g.V.hasLabel("software").toList().size shouldBe 3
@@ -51,7 +59,11 @@ class FilterSpec extends WordSpec with Matchers {
   }
 
   "hasNot" in new Fixture {
-    graph.V.hasNot(Age, 35).value(Name).toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+    graph.V.hasNot(Age, 35).value(Name).toSet shouldBe Set("lop",
+                                                           "marko",
+                                                           "josh",
+                                                           "vadas",
+                                                           "ripple")
   }
 
   trait Fixture {

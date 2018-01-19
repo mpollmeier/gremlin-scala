@@ -9,15 +9,15 @@ import ReleaseTransformations._
 val gremlinVersion = "3.3.1"
 val commonSettings = Seq(
   libraryDependencies ++= Seq(
-      "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "com.chuusai" %% "shapeless" % "2.3.3",
-      "org.scala-lang.modules" %% "scala-xml" % "1.0.6", //just specified to eliminate sbt warnings
-      "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
-      "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
-      "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "org.scalatest" %% "scalatest" % "3.0.3" % Test,
-      "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
+    "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "com.chuusai" %% "shapeless" % "2.3.3",
+    "org.scala-lang.modules" %% "scala-xml" % "1.0.6", //just specified to eliminate sbt warnings
+    "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
+    "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
+    "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
+    "org.scalatest" %% "scalatest" % "3.0.3" % Test,
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
   ),
   resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
   resolvers += Resolver.mavenLocal,
@@ -55,16 +55,21 @@ val commonSettings = Seq(
   releasePublishArtifactsAction := PgpKeys.publishSigned.value
 )
 
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .aggregate(`gremlin-scala`, macros)
-  .settings(skip in publish := true, publishTo := { Some("publishMeNot" at "https://publish/me/not") })
+  .settings(skip in publish := true, publishTo := {
+    Some("publishMeNot" at "https://publish/me/not")
+  })
 
-lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
+lazy val `gremlin-scala` = project
+  .in(file("gremlin-scala"))
   .settings(commonSettings: _*)
   .dependsOn(macros)
 
 // macros can't be in the same compilation unit
-lazy val macros = project.in(file("macros"))
+lazy val macros = project
+  .in(file("macros"))
   .settings(commonSettings: _*)
 
-ThisBuild/scalafmtOnCompile := true
+ThisBuild / scalafmtOnCompile := true
