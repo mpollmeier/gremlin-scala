@@ -11,13 +11,13 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   def setProperties(properties: Map[Key[Any], Any]): Edge = {
-    properties.foreach { case (k, v) ⇒ setProperty(k, v) }
+    properties.foreach { case (k, v) => setProperty(k, v) }
     edge
   }
 
   def setProperties[CC <: Product: Marshallable](cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    fromCC.valueMap.foreach { case (k, v) ⇒ element.property(k, v) }
+    fromCC.valueMap.foreach { case (k, v) => element.property(k, v) }
     edge
   }
 

@@ -6,8 +6,8 @@ import java.util.function.{
   BiFunction,
   BinaryOperator,
   Consumer,
-  Function ⇒ JFunction,
-  Predicate ⇒ JPredicate,
+  Function => JFunction,
+  Predicate => JPredicate,
   Supplier,
   UnaryOperator
 }
@@ -79,30 +79,30 @@ package object scala {
   implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](traversal)
 
-  implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
+  implicit def toSupplier[A](f: () => A): Supplier[A] = new Supplier[A] {
     override def get(): A = f()
   }
 
-  implicit def toConsumer[A](f: A ⇒ Unit): Consumer[A] = new Consumer[A] {
+  implicit def toConsumer[A](f: A => Unit): Consumer[A] = new Consumer[A] {
     override def accept(a: A): Unit = f(a)
   }
 
-  implicit def toJavaFunction[A, B](f: A ⇒ B): JFunction[A, B] =
+  implicit def toJavaFunction[A, B](f: A => B): JFunction[A, B] =
     new JFunction[A, B] {
       override def apply(a: A): B = f(a)
     }
 
-  implicit def toJavaUnaryOperator[A](f: A ⇒ A): UnaryOperator[A] =
+  implicit def toJavaUnaryOperator[A](f: A => A): UnaryOperator[A] =
     new UnaryOperator[A] {
       override def apply(a: A): A = f(a)
     }
 
-  implicit def toJavaBinaryOperator[A](f: (A, A) ⇒ A): BinaryOperator[A] =
+  implicit def toJavaBinaryOperator[A](f: (A, A) => A): BinaryOperator[A] =
     new BinaryOperator[A] {
       override def apply(a1: A, a2: A): A = f(a1, a2)
     }
 
-  implicit def toJavaBiFunction[A, B, C](f: (A, B) ⇒ C): BiFunction[A, B, C] =
+  implicit def toJavaBiFunction[A, B, C](f: (A, B) => C): BiFunction[A, B, C] =
     new BiFunction[A, B, C] {
       override def apply(a: A, b: B): C = f(a, b)
     }
@@ -112,18 +112,18 @@ package object scala {
       override def accept(a: A, b: B): Unit = f(a, b)
     }
 
-  implicit def toJavaPredicate[A](f: A ⇒ Boolean): JPredicate[A] =
+  implicit def toJavaPredicate[A](f: A => Boolean): JPredicate[A] =
     new JPredicate[A] {
       override def test(a: A): Boolean = f(a)
     }
 
-  implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
+  implicit def toJavaBiPredicate[A, B](predicate: (A, B) => Boolean): BiPredicate[A, B] =
     new BiPredicate[A, B] {
       def test(a: A, b: B) = predicate(a, b)
     }
 
-  implicit def liftTraverser[A, B](fun: A ⇒ B): Traverser[A] ⇒ B =
-    (t: Traverser[A]) ⇒ fun(t.get)
+  implicit def liftTraverser[A, B](fun: A => B): Traverser[A] => B =
+    (t: Traverser[A]) => fun(t.get)
 
   // Marshalling implicits
   implicit class GremlinScalaVertexFunctions(val gs: GremlinScala[Vertex]) {

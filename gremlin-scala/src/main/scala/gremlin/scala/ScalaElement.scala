@@ -63,7 +63,7 @@ trait ScalaElement[ElementType <: Element] {
     valueMap[A](keys.toSeq.map(_.name): _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
-    properties[A](keys: _*).map(p ⇒ (p.key, p.value)).toMap
+    properties[A](keys: _*).map(p => (p.key, p.value)).toMap
 
   def toCC[CC <: Product: Marshallable]: CC
 

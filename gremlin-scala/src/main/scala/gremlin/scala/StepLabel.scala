@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import java.util.UUID.randomUUID
-import java.util.{Map ⇒ JMap}
+import java.util.{Map => JMap}
 import scala.annotation.implicitNotFound
 import shapeless._
 import shapeless.poly._
@@ -18,7 +18,7 @@ object StepLabel {
   object combineLabelWithValue extends Poly2 {
     implicit def atLabel[A, L <: HList] =
       at[StepLabel[A], (L, JMap[String, Any])] {
-        case (label, (acc, values)) ⇒
+        case (label, (acc, values)) =>
           (values.get(label.name).asInstanceOf[A] :: acc, values)
       }
   }

@@ -5,7 +5,7 @@ import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
-import java.util.{List => JList, Map ⇒ JMap, Collection ⇒ JCollection}
+import java.util.{List => JList, Map => JMap, Collection => JCollection}
 import java.lang.{Long => JLong}
 
 import scala.language.existentials
@@ -186,7 +186,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "support for comprehension" in new Fixture {
       val labels = for {
-        vertex ← graph.V
+        vertex <- graph.V
       } yield vertex.label
 
       labels.toSet shouldBe graph.V.label.toSet
@@ -208,8 +208,8 @@ class TraversalSpec extends WordSpec with Matchers {
     "support for comprehension" when {
       "using simple case" in new Fixture {
         val edgeLabels = for {
-          vertex ← graph.V
-          edge ← vertex.outE
+          vertex <- graph.V
+          edge <- vertex.outE
         } yield edge.label
 
         edgeLabels.toSet shouldBe graph.E.label.toSet
@@ -218,8 +218,8 @@ class TraversalSpec extends WordSpec with Matchers {
       "using slightly more complex case" in new Fixture {
         // what is the mean age of the developers for a given software?
         val softwareAndDevAges = for {
-          software ← graph.V.hasLabel("software")
-          meanAge ← software.in("created").value(Age).mean
+          software <- graph.V.hasLabel("software")
+          meanAge <- software.in("created").value(Age).mean
         } yield (software.value2(Name), meanAge)
 
         softwareAndDevAges.toSet shouldBe Set(
@@ -273,8 +273,8 @@ class TraversalSpec extends WordSpec with Matchers {
     marko --- (Likes, Weight → 3) --> scala
 
     val traversal = for {
-      person ← graph.V.hasLabel(Person)
-      favorite ← person.outE(Likes).order(by(Weight, Order.decr)).limit(1).inV
+      person <- graph.V.hasLabel(Person)
+      favorite <- person.outE(Likes).order(by(Weight, Order.decr)).limit(1).inV
     } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(
@@ -287,7 +287,7 @@ class TraversalSpec extends WordSpec with Matchers {
     val ages: Set[Int] = graph.V
       .valueOption(Age)
       .collect {
-        case Some(age) ⇒ age
+        case Some(age) => age
       }
       .toSet
 
@@ -723,8 +723,8 @@ class TraversalSpec extends WordSpec with Matchers {
 
       "don't use special steps" in new Fixture {
         val traversal = for {
-          v1 ← graph.V(1)
-          coDeveloper ← v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
+          v1 <- graph.V(1)
+          coDeveloper <- v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
         } yield v1 --- CoDeveloper --> coDeveloper
         traversal.iterate()
 

@@ -2,7 +2,7 @@ package gremlin.scala.dsl
 
 import gremlin.scala._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
-import java.util.{Map ⇒ JMap}
+import java.util.{Map => JMap}
 import scala.collection.mutable
 import shapeless._
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
@@ -44,7 +44,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     constr(fun(raw))
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain ⇒ NewEndDomain)(
+  def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain => NewEndDomain)(
       implicit
       newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
       constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
@@ -55,7 +55,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     }
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def flatMap[NewSteps <: StepsRoot](fun: EndDomain ⇒ NewSteps)(
+  def flatMap[NewSteps <: StepsRoot](fun: EndDomain => NewSteps)(
       implicit
       constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
       newConverter: Converter[NewSteps#EndDomain0]
@@ -153,7 +153,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     val selectTraversal =
       raw.traversal.select[Any](label1, label2, remainder: _*)
     val newRaw: GremlinScala[SelectedGraphTypesTuple] =
-      GremlinScala(selectTraversal).map { selectValues ⇒
+      GremlinScala(selectTraversal).map { selectValues =>
         val resultTuple = stepLabels.foldRight((HNil: HNil, selectValues))(combineLabelWithValue)
         val values: SelectedTypes = resultTuple._1
         tupler(values)

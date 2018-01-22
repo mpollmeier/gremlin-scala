@@ -298,8 +298,8 @@ g.V()
     val decade = (year / 10)
     (decade * 10): Integer
   }
-  .map { moviesByDecade ⇒
-    val highestRatedByDecade = moviesByDecade.mapValues { movies ⇒
+  .map { moviesByDecade =>
+    val highestRatedByDecade = moviesByDecade.mapValues { movies =>
       movies.toList
         .sortBy { _.inE(Rated).value(Stars).mean().head }
         .reverse.head //get the movie with the highest mean rating
@@ -353,6 +353,6 @@ Rewrite rules (old -> new), using `Vertex` as an example:
 `GremlinScala[Vertex, Vertex :: HNil]` -> `GremlinScala.Aux[Vertex, Vertex :: HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = Vertex :: HNil}`)
 Notice: GremlinScala isn't a case class any more - it shouldn't have been in the first place.
 ### 3.2.4.8 
-The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] ⇒ GremlinScala[_, _])`. The old `filter(predicate: End ⇒ Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
+The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] => GremlinScala[_, _])`. The old `filter(predicate: End => Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
 
 The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.

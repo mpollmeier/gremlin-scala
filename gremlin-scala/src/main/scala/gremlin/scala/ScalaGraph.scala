@@ -24,13 +24,13 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def addVertex(label: String, properties: (String, Any)*): Vertex = {
     val labelParam = Seq(T.label, label)
     val params =
-      properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+      properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(labelParam ++ params: _*)
   }
 
   def addVertex(properties: (String, Any)*): Vertex = {
     val params =
-      properties.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+      properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(params: _*)
   }
 
@@ -48,7 +48,7 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq.flatMap(List(T.id, _))
     val labelParam = Seq(T.label, fromCC.label)
-    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = fromCC.valueMap.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
@@ -57,7 +57,7 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def +(label: String): Vertex = addVertex(label)
 
   def +(label: String, properties: KeyValue[_]*): Vertex =
-    addVertex(label, properties.map(v ⇒ (v.key.name, v.value)).toMap)
+    addVertex(label, properties.map(v => (v.key.name, v.value)).toMap)
 
   def addV(): GremlinScala.Aux[Vertex, HNil] =
     GremlinScala[Vertex, HNil](traversalSource.underlying.addV())
@@ -99,5 +99,5 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def close(): Unit = graph.close()
 
   /* TODO: reimplement with createThreadedTx, if the underlying graph supports it */
-  // def transactional[R](work: Graph ⇒ R) = graph.tx.submit(work)
+  // def transactional[R](work: Graph => R) = graph.tx.submit(work)
 }

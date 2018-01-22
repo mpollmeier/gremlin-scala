@@ -17,7 +17,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   }
 
   def setProperties(properties: Map[Key[Any], Any]): Vertex = {
-    properties.foreach { case (k, v) ⇒ setProperty(k, v) }
+    properties.foreach { case (k, v) => setProperty(k, v) }
     vertex
   }
 
@@ -62,14 +62,14 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
       properties: Seq[KeyValue[_]] = Nil
   ): Edge = {
     val params =
-      properties.toSeq.flatMap(pair ⇒ Seq(pair.key.name, pair.value.asInstanceOf[AnyRef]))
+      properties.toSeq.flatMap(pair => Seq(pair.key.name, pair.value.asInstanceOf[AnyRef]))
     vertex.addEdge(label, inVertex.vertex, params: _*)
   }
 
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq.flatMap(List(T.id, _))
-    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = fromCC.valueMap.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(fromCC.label, inVertex.vertex, idParam ++ params: _*)
   }
 
@@ -87,12 +87,12 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def ---(label: String, properties: Map[String, Any]): SemiEdge =
     SemiEdge(vertex, label, properties.map {
-      case (key, value) ⇒ Key[Any](key) → value
+      case (key, value) => Key[Any](key) → value
     }.toSeq)
 
   def ---[CC <: Product: Marshallable](cc: CC): SemiEdge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r ⇒
+    SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r =>
       Key[Any](r._1) → r._2
     }.toSeq)
   }

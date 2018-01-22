@@ -3,7 +3,7 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.T
-import java.util.function.{Function ⇒ JFunction}
+import java.util.function.{Function => JFunction}
 
 /**
   * by step can be used in combination with all sorts of other steps

@@ -26,7 +26,8 @@ object Marshallable {
 
     val (idParam, fromCCParams, toCCParams) = tpe.decls
       .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"None", Seq.empty, Seq.empty)) {
-        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol) if field.isCaseAccessor ⇒
+        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol)
+            if field.isCaseAccessor =>
           val name = field.name
           val decoded = name.decodedName.toString
           val returnType = field.returnType
@@ -44,10 +45,10 @@ object Marshallable {
           def optionProperty = {
             // check if the property is an Option[AnyVal] and try to extract everything we need to unwrap it
             val treesForOptionValue = for {
-              innerValueClassType ← returnType.typeArgs.headOption
+              innerValueClassType <- returnType.typeArgs.headOption
               if innerValueClassType <:< typeOf[AnyVal]
-              valueName ← valueGetter(innerValueClassType).map(_.name)
-              wrappedType ← wrappedTypeMaybe(innerValueClassType)
+              valueName <- valueGetter(innerValueClassType).map(_.name)
+              wrappedType <- wrappedTypeMaybe(innerValueClassType)
             } yield {
               val valueClassCompanion = innerValueClassType.typeSymbol.companion
               (_idParam,
@@ -68,7 +69,7 @@ object Marshallable {
             val treesForValueClass = for {
               valueName <- valueGetter(returnType)
               if returnType <:< typeOf[AnyVal]
-              wrappedType ← wrappedTypeMaybe(returnType)
+              wrappedType <- wrappedTypeMaybe(returnType)
             } yield {
               val valueClassCompanion = returnType.typeSymbol.companion
               (_idParam,
@@ -94,8 +95,8 @@ object Marshallable {
             tpe.companion.decls
               .filter(_.name.toString == "apply")
               .headOption match {
-              case Some(m: MethodSymbol) ⇒ Some(m)
-              case _ ⇒ None
+              case Some(m: MethodSymbol) => Some(m)
+              case _                     => None
             }
 
           def wrappedTypeMaybe(tpe: Type): Option[Type] =
@@ -117,12 +118,12 @@ object Marshallable {
               property
           }
 
-        case (params, _) ⇒ params
+        case (params, _) => params
       }
 
     val label = tpe.typeSymbol.asClass.annotations
       .find(_.tree.tpe =:= weakTypeOf[label])
-      .map { annotation ⇒
+      .map { annotation =>
         val label = annotation.tree.children.tail.head
         q"""$label"""
       }
