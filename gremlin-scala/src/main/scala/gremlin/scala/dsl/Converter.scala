@@ -42,8 +42,7 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
     def toGraph(dt: DomainType): Vertex = AnonymousVertex(dt)
   }
 
-  implicit def forList[A, AGraphType](
-      implicit aConverter: Converter.Aux[A, AGraphType]) =
+  implicit def forList[A, AGraphType](implicit aConverter: Converter.Aux[A, AGraphType]) =
     new Converter[List[A]] {
       type GraphType = List[AGraphType]
       def toDomain(aGraphs: List[AGraphType]): List[A] =
@@ -51,8 +50,7 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
       def toGraph(as: List[A]): List[AGraphType] = as.map(aConverter.toGraph)
     }
 
-  implicit def forSet[A, AGraphType](
-      implicit aConverter: Converter.Aux[A, AGraphType]) =
+  implicit def forSet[A, AGraphType](implicit aConverter: Converter.Aux[A, AGraphType]) =
     new Converter[Set[A]] {
       type GraphType = Set[AGraphType]
       def toDomain(aGraphs: Set[AGraphType]): Set[A] =
@@ -69,8 +67,7 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
   implicit def forHList[H, HGraphType, T <: HList, TGraphType <: HList](
       implicit
       hConverter: Converter.Aux[H, HGraphType],
-      tConverter: Converter.Aux[T, TGraphType])
-    : Converter.Aux[H :: T, HGraphType :: TGraphType] =
+      tConverter: Converter.Aux[T, TGraphType]): Converter.Aux[H :: T, HGraphType :: TGraphType] =
     new Converter[H :: T] {
       type GraphType = HGraphType :: TGraphType
 
@@ -86,16 +83,12 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
 
 trait LowestPriorityConverterImplicits {
   // for all Products, e.g. tuples, case classes etc
-  implicit def forGeneric[T,
-                          Repr <: HList,
-                          GraphType <: HList,
-                          GraphTypeTuple <: Product](
+  implicit def forGeneric[T, Repr <: HList, GraphType <: HList, GraphTypeTuple <: Product](
       implicit
       gen: Generic.Aux[T, Repr],
       converter: Converter.Aux[Repr, GraphType],
       tupler: Tupler.Aux[GraphType, GraphTypeTuple],
-      toHList: ToHList.Aux[GraphTypeTuple, GraphType])
-    : Converter.Aux[T, GraphTypeTuple] =
+      toHList: ToHList.Aux[GraphTypeTuple, GraphType]): Converter.Aux[T, GraphTypeTuple] =
     new Converter[T] {
       type GraphType = GraphTypeTuple
 

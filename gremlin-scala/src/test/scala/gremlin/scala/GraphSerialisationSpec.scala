@@ -3,10 +3,7 @@ package gremlin.scala
 import java.io.FileOutputStream
 import org.apache.tinkerpop.gremlin.structure.io.IoCore
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONVersion
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.{
-  TinkerFactory,
-  TinkerGraph
-}
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
 import org.scalatest.{Matchers, WordSpec}
 
 class GraphSerialisationSpec extends WordSpec with Matchers {

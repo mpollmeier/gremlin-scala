@@ -105,7 +105,7 @@ class ElementSpec extends TestBase {
 
       graph.V(v1.id).head shouldBe v1
       graph.V(v2.id).head.property(TestProperty).value shouldBe "testValue"
-      graph.V.toList() should have size 2
+      (graph.V.toList() should have).size(2)
     }
 
     it("adds a vertex with a given label") {
@@ -155,8 +155,7 @@ class ElementSpec extends TestBase {
         v1.asScala.addEdge("testLabel", v2, Seq(TestProperty → "testValue"))
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
-      e.valueMap(TestProperty.name) shouldBe Map(
-        TestProperty.name → "testValue")
+      e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name → "testValue")
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }

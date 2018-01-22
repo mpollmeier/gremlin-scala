@@ -24,18 +24,16 @@ import scala.util.Random
 
 class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
-  "sack step" can {
+  "sack step".can {
 
     /** http://tinkerpop.apache.org/docs/current/reference/#sack-step */
     "carry simple value" when {
       "using constant for initial sack" in new Fixture {
-        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d,
-          1d, 1d, 1d)
+        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
       }
 
       "using function for initial sack" in new Fixture {
-        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d,
-          1d, 1d, 1d, 1d, 1d)
+        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
 
         val randomValues =
           graph.configure(_.withSack(() => Random.nextDouble)).V.sack.toList
@@ -123,8 +121,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
       "on an edge" in new Fixture {
         val e7: Edge = graph.E(7).head
-        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d,
-                                                                            1d)
+        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d, 1d)
       }
     }
   }
@@ -188,6 +185,6 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     vertexResult.complete(traversal)
 
     // when expected byte code provided, return vertex result.
-    connection.submitAsync[TVertex] _ when expectedBytecode returns vertexResult
+    (connection.submitAsync[TVertex] _ when expectedBytecode).returns(vertexResult)
   }
 }

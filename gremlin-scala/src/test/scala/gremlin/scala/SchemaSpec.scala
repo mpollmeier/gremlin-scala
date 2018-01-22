@@ -1,12 +1,12 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 import shapeless.test.illTyped
 
 class SchemaSpec extends WordSpec with Matchers {
 
-  "a schema with defined Keys" can {
+  "a schema with defined Keys".can {
     val Software = "software"
     val Person = "person"
     val Paris = "Paris"
@@ -59,12 +59,10 @@ class SchemaSpec extends WordSpec with Matchers {
 
         "support traversal" in new Fixture {
           val name = paris.out(EuroStar).value(Name).head
-          val someString
-            : String = name //no implicit conversion, it already is a String
+          val someString: String = name //no implicit conversion, it already is a String
 
           val distance = paris.outE(EuroStar).value(Distance).head
-          val someInt
-            : Int = distance //no implicit conversion, it already is an Int
+          val someInt: Int = distance //no implicit conversion, it already is an Int
         }
       }
 

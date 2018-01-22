@@ -1,11 +1,11 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 
 class ArrowSyntaxSpec extends WordSpec with Matchers {
 
-  "A --> B creates an edge" which {
+  "A --> B creates an edge".which {
 
     "has a label" in new Fixture {
       paris --- Eurostar --> london
@@ -36,7 +36,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
   }
 
-  "A <-- B creates an edge" which {
+  "A <-- B creates an edge".which {
     "has a label" in new Fixture {
       paris <-- Eurostar --- london
       london.out(Eurostar).head shouldBe paris
@@ -65,7 +65,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }*/
   }
 
-  "A <--> B create edges" which {
+  "A <--> B create edges".which {
     "have labels" in new Fixture {
       paris <-- Eurostar --> london
 

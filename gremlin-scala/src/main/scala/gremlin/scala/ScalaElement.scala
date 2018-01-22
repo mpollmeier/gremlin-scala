@@ -12,8 +12,7 @@ trait ScalaElement[ElementType <: Element] {
   def start(): GremlinScala.Aux[ElementType, HNil] = __(element)
 
   /** start a new traversal from this element and configure it */
-  def start(configure: TraversalSource => TraversalSource)
-    : GremlinScala.Aux[ElementType, HNil] =
+  def start(configure: TraversalSource => TraversalSource): GremlinScala.Aux[ElementType, HNil] =
     GremlinScala[ElementType, HNil](
       configure(TraversalSource(element.graph)).underlying.inject(element)
     )
@@ -64,17 +63,17 @@ trait ScalaElement[ElementType <: Element] {
     valueMap[A](keys.toSeq.map(_.name): _*)
 
   def valueMap[A: DefaultsToAny](keys: String*): Map[String, A] =
-    (properties[A](keys: _*) map (p ⇒ (p.key, p.value))).toMap
+    properties[A](keys: _*).map(p ⇒ (p.key, p.value)).toMap
 
   def toCC[CC <: Product: Marshallable]: CC
 
   def updateWith[CC <: Product: Marshallable](update: CC): ElementType = {
     val propMap = implicitly[Marshallable[CC]].fromCC(update).valueMap
-    this.valueMap.keySet.diff(propMap.keySet) foreach { key =>
+    this.valueMap.keySet.diff(propMap.keySet).foreach { key =>
       val prop = element.property(key)
       if (prop.isPresent) prop.remove()
     }
-    propMap foreach { case (key, value) => element.property(key, value) }
+    propMap.foreach { case (key, value) => element.property(key, value) }
 
     element
   }

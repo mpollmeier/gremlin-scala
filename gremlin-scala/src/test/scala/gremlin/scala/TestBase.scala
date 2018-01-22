@@ -30,6 +30,6 @@ object TestGraph {
 
 trait TestBase extends FunSpec with Matchers with TestGraph {
   implicit class Properties[A](set: Traversable[Property[A]]) {
-    def unroll(): Traversable[A] = set map (_.value)
+    def unroll(): Traversable[A] = set.map(_.value)
   }
 }

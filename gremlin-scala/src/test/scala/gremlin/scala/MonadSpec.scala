@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 import shapeless._
 
 class MonadSpec extends WordSpec with Matchers {

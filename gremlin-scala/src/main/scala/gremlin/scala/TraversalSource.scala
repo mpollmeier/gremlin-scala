@@ -24,27 +24,21 @@ case class TraversalSource(underlying: GraphTraversalSource) {
     withSack(() => initialValue, splitOperator)
 
   def withSack[A](initialValue: () => A, splitOperator: A => A) =
-    TraversalSource(
-      underlying.withSack(initialValue: Supplier[A],
-                          splitOperator: UnaryOperator[A]))
+    TraversalSource(underlying.withSack(initialValue: Supplier[A], splitOperator: UnaryOperator[A]))
 
-  def withSack[A](initialValue: A,
-                  mergeOperator: (A, A) => A): TraversalSource =
+  def withSack[A](initialValue: A, mergeOperator: (A, A) => A): TraversalSource =
     withSack(() => initialValue, mergeOperator)
 
   def withSack[A](initialValue: () => A, mergeOperator: (A, A) => A) =
     TraversalSource(
-      underlying.withSack(initialValue: Supplier[A],
-                          mergeOperator: BinaryOperator[A]))
+      underlying.withSack(initialValue: Supplier[A], mergeOperator: BinaryOperator[A]))
 
   def withSack[A](initialValue: A,
                   splitOperator: A => A,
                   mergeOperator: (A, A) => A): TraversalSource =
     withSack(() => initialValue, splitOperator, mergeOperator)
 
-  def withSack[A](initialValue: () => A,
-                  splitOperator: A => A,
-                  mergeOperator: (A, A) => A) =
+  def withSack[A](initialValue: () => A, splitOperator: A => A, mergeOperator: (A, A) => A) =
     TraversalSource(
       underlying.withSack(initialValue: Supplier[A],
                           splitOperator: UnaryOperator[A],
@@ -57,16 +51,11 @@ case class TraversalSource(underlying: GraphTraversalSource) {
     TraversalSource(underlying.withSideEffect(key, initialValue: Supplier[A]))
 
   def withSideEffect[A](key: String, initialValue: A, reducer: (A, A) => A) =
-    TraversalSource(
-      underlying.withSideEffect(key, initialValue, reducer: BinaryOperator[A]))
+    TraversalSource(underlying.withSideEffect(key, initialValue, reducer: BinaryOperator[A]))
 
-  def withSideEffect[A](key: String,
-                        initialValue: () => A,
-                        reducer: (A, A) => A) =
+  def withSideEffect[A](key: String, initialValue: () => A, reducer: (A, A) => A) =
     TraversalSource(
-      underlying.withSideEffect(key,
-                                initialValue: Supplier[A],
-                                reducer: BinaryOperator[A]))
+      underlying.withSideEffect(key, initialValue: Supplier[A], reducer: BinaryOperator[A]))
 
   def withRemote(configFile: String): TraversalSource =
     TraversalSource(underlying.withRemote(configFile))

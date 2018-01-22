@@ -45,8 +45,7 @@ class SelectSpec extends WordSpec with Matchers {
     val v1 = graph.V(1).head
     val e9 = graph.E(9).head
 
-    def newTraversal
-      : GremlinScala.Aux[Double, Vertex :: Edge :: Double :: HNil] =
+    def newTraversal: GremlinScala.Aux[Double, Vertex :: Edge :: Double :: HNil] =
       graph.V(1).as(a).outE("created").as(b).value(TestGraph.Weight).as(c)
 
     "derive types for a simple as/select" in {

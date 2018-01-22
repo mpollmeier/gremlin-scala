@@ -63,8 +63,7 @@ package object scala {
 
   // to create a new anonymous traversal, e.g. `__.outE`
   def __[A](): GremlinScala.Aux[A, HNil] =
-    GremlinScala[A, HNil](
-      org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
+    GremlinScala[A, HNil](org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.start[A]())
 
   def __[A](starts: A*): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](
@@ -77,8 +76,7 @@ package object scala {
 
   implicit def asScalaGraph(g: Graph): ScalaGraph = ScalaGraph(g)
 
-  implicit def asGremlinScala[A](
-      traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
+  implicit def asGremlinScala[A](traversal: GraphTraversal[_, A]): GremlinScala.Aux[A, HNil] =
     GremlinScala[A, HNil](traversal)
 
   implicit def toSupplier[A](f: () ⇒ A): Supplier[A] = new Supplier[A] {
@@ -119,8 +117,7 @@ package object scala {
       override def test(a: A): Boolean = f(a)
     }
 
-  implicit def toJavaBiPredicate[A, B](
-      predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
+  implicit def toJavaBiPredicate[A, B](predicate: (A, B) ⇒ Boolean): BiPredicate[A, B] =
     new BiPredicate[A, B] {
       def test(a: A, b: B) = predicate(a, b)
     }

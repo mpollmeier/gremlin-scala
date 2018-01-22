@@ -2,7 +2,7 @@ package gremlin.scala.dsl
 
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 import scala.collection.mutable
 import shapeless._
 
@@ -31,7 +31,7 @@ class DslSpec extends WordSpec with Matchers {
           .as("software")
           .select
           .toList
-      personAndSoftware should have size 4
+      (personAndSoftware should have).size(4)
 
       val softwareByCreator: Map[String, Software] = personAndSoftware.map {
         case (person, software) => (person.name, software)
@@ -51,8 +51,7 @@ class DslSpec extends WordSpec with Matchers {
           .as(labelSoftware)
           .select(labelSoftware)
           .toSet
-      personAndSoftware shouldBe Set(Software("lop", "java"),
-                                     Software("ripple", "java"))
+      personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
     }
 
     "allow to select multiple labelled steps" in {
@@ -67,7 +66,7 @@ class DslSpec extends WordSpec with Matchers {
           .as(labelSoftware)
           .select((labelSoftware, labelPerson))
           .toList
-      personAndSoftware should have size 4
+      (personAndSoftware should have).size(4)
 
       val softwareByCreator: Map[String, Software] = personAndSoftware.map {
         case (software, person) => (person.name, software)
@@ -187,12 +186,9 @@ class DslSpec extends WordSpec with Matchers {
 }
 
 object TestDomain {
-  @label("person") case class Person(@id id: Option[Integer],
-                                     name: String,
-                                     age: Integer)
+  @label("person") case class Person(@id id: Option[Integer], name: String, age: Integer)
       extends DomainRoot
-  @label("software") case class Software(name: String, lang: String)
-      extends DomainRoot
+  @label("software") case class Software(name: String, lang: String) extends DomainRoot
 
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
@@ -219,15 +215,12 @@ object TestDomain {
 
   implicit def personStepsConstructor[Labels <: HList]
     : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
-    Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](
-      new PersonSteps[Labels](_))
+    Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](new PersonSteps[Labels](_))
 
   implicit def softwareStepsConstructor[Labels <: HList]
     : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
-    Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](
-      new SoftwareSteps[Labels](_))
+    Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
-  implicit def liftPerson(person: Person)(
-      implicit graph: Graph): PersonSteps[HNil] =
+  implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil] =
     new PersonSteps[HNil](graph.asScala.V(person.id.get))
 }

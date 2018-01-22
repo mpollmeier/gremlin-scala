@@ -7,8 +7,7 @@ import scala.collection.JavaConverters._
 object AnonymousVertex {
   import org.apache.tinkerpop.gremlin.structure._
 
-  def apply[CC <: Product](cc: CC)(implicit marshaller: Marshallable[CC],
-                                   grph: Graph): Vertex = {
+  def apply[CC <: Product](cc: CC)(implicit marshaller: Marshallable[CC], grph: Graph): Vertex = {
     val fromCC = marshaller.fromCC(cc)
     new Vertex {
       val graph = grph
@@ -23,8 +22,7 @@ object AnonymousVertex {
                       key: String,
                       value: V,
                       keyValues: Object*): VertexProperty[V] = ???
-      def vertices(direction: Direction,
-                   edgeLabels: String*): JIterator[Vertex] = ???
+      def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = ???
       def properties[V](x$1: String*): JIterator[VertexProperty[V]] = {
         val x: Iterable[VertexProperty[V]] = fromCC.valueMap.map {
           case (ccKey, ccValue) =>

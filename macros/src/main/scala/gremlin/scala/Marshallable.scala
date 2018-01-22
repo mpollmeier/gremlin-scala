@@ -26,8 +26,7 @@ object Marshallable {
 
     val (idParam, fromCCParams, toCCParams) = tpe.decls
       .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"None", Seq.empty, Seq.empty)) {
-        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol)
-            if field.isCaseAccessor ⇒
+        case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol) if field.isCaseAccessor ⇒
           val name = field.name
           val decoded = name.decodedName.toString
           val returnType = field.returnType
@@ -101,19 +100,17 @@ object Marshallable {
 
           def wrappedTypeMaybe(tpe: Type): Option[Type] =
             util
-              .Try(
-                valueClassConstructor(tpe).get.paramLists.head.head.typeSignature)
+              .Try(valueClassConstructor(tpe).get.paramLists.head.head.typeSignature)
               .toOption
 
-          if (field.annotations map (_.tree.tpe) contains weakTypeOf[id]) {
+          if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) {
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
               idAsOption
             else
               idAsAnyRef
           } else { // normal property member
-            assert(
-              !Hidden.isHidden(decoded),
-              s"The parameter name $decoded can't be used in the persistable case class $tpe")
+            assert(!Hidden.isHidden(decoded),
+                   s"The parameter name $decoded can't be used in the persistable case class $tpe")
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
               optionProperty
             else
@@ -123,11 +120,13 @@ object Marshallable {
         case (params, _) ⇒ params
       }
 
-    val label = tpe.typeSymbol.asClass.annotations find (_.tree.tpe =:= weakTypeOf[
-      label]) map { annotation ⇒
-      val label = annotation.tree.children.tail.head
-      q"""$label"""
-    } getOrElse q"cc.getClass.getSimpleName"
+    val label = tpe.typeSymbol.asClass.annotations
+      .find(_.tree.tpe =:= weakTypeOf[label])
+      .map { annotation ⇒
+        val label = annotation.tree.children.tail.head
+        q"""$label"""
+      }
+      .getOrElse(q"cc.getClass.getSimpleName")
 
     c.Expr[Marshallable[CC]] {
       q"""

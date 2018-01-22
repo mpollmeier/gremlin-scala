@@ -1,12 +1,12 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 
 /* demo common algorithms */
 class AlgorithmSpec extends WordSpec with Matchers {
 
-  "directed acyclic graphs" can {
+  "directed acyclic graphs".can {
     "be detected" in {
       // to start with, there's no cycles
       val graph = TinkerGraph.open.asScala

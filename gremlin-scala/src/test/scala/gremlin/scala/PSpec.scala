@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.{P => JavaP}
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 
 /* test cases copied from TP3 PTest.java */
 class PSpec extends WordSpec with Matchers {
@@ -53,7 +53,7 @@ class PSpec extends WordSpec with Matchers {
     TestCase(P.between("m", "n").or(P.eq("daniel")), "marko", true),
     TestCase(P.between("m", "n").or(P.eq("daniel")), "daniel", true),
     TestCase(P.between("m", "n").or(P.eq("daniel")), "stephen", false)
-  ) map { testCase =>
+  ).map { testCase =>
     s"$testCase" in {
       testCase.predicate.test(testCase.value) shouldBe testCase.expected
     }

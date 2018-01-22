@@ -17,13 +17,11 @@ object GraphHelper {
     original
       .vertices()
       .asScala
-      .foreach(v =>
-        DetachedFactory.detach(v, true).attach(Attachable.Method.create(clone)))
+      .foreach(v => DetachedFactory.detach(v, true).attach(Attachable.Method.create(clone)))
     original
       .edges()
       .asScala
-      .foreach(e =>
-        DetachedFactory.detach(e, true).attach(Attachable.Method.create(clone)))
+      .foreach(e => DetachedFactory.detach(e, true).attach(Attachable.Method.create(clone)))
     clone
   }
 }

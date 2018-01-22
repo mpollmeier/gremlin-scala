@@ -11,13 +11,13 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   def setProperties(properties: Map[Key[Any], Any]): Edge = {
-    properties foreach { case (k, v) ⇒ setProperty(k, v) }
+    properties.foreach { case (k, v) ⇒ setProperty(k, v) }
     edge
   }
 
   def setProperties[CC <: Product: Marshallable](cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    fromCC.valueMap foreach { case (k, v) ⇒ element.property(k, v) }
+    fromCC.valueMap.foreach { case (k, v) ⇒ element.property(k, v) }
     edge
   }
 
@@ -28,7 +28,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   }
 
   override def removeProperties(keys: Key[_]*): Edge = {
-    keys foreach removeProperty
+    keys.foreach(removeProperty)
     edge
   }
 
@@ -38,8 +38,7 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def properties[A: DefaultsToAny]: Stream[Property[A]] =
     edge.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
-  override def properties[A: DefaultsToAny](
-      wantedKeys: String*): Stream[Property[A]] =
+  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
     edge.properties[A](wantedKeys: _*).asScala.toStream
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge

@@ -3,7 +3,7 @@ package gremlin.scala
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
-import org.apache.tinkerpop.gremlin.structure.{Transaction, T}
+import org.apache.tinkerpop.gremlin.structure.{T, Transaction}
 import shapeless._
 
 object ScalaGraph {
@@ -46,10 +46,9 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     */
   def addVertex[CC <: Product: Marshallable](cc: CC): Vertex = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    val idParam = fromCC.id.toSeq flatMap (List(T.id, _))
+    val idParam = fromCC.id.toSeq.flatMap(List(T.id, _))
     val labelParam = Seq(T.label, fromCC.label)
-    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒
-      Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = fromCC.valueMap.toSeq.flatMap(pair ⇒ Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     graph.addVertex(idParam ++ labelParam ++ params: _*)
   }
 
@@ -84,8 +83,7 @@ case class ScalaGraph(traversalSource: TraversalSource) {
 
   // start traversal with some edges identified by given ids
   def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](
-      traversalSource.underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
+    GremlinScala[Edge, HNil](traversalSource.underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def tx(): Transaction = graph.tx()
 

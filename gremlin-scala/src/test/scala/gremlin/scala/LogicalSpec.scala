@@ -1,7 +1,7 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{WordSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
 
 class LogicalSpec extends WordSpec with Matchers {
 
@@ -13,10 +13,9 @@ class LogicalSpec extends WordSpec with Matchers {
           onTrue = _.value(Height),
           onFalse = _.value(Shoesize)
         )
-        .toSet shouldBe Set(
-        190,
-        176, // Michael and Steffi are >30 - take their height
-        5) // Karlotta is <=30 - take her shoesize
+        .toSet shouldBe Set(190,
+                            176, // Michael and Steffi are >30 - take their height
+                            5) // Karlotta is <=30 - take her shoesize
     }
 
     "provide if/elseif/else semantic" in new Fixture {
@@ -28,10 +27,9 @@ class LogicalSpec extends WordSpec with Matchers {
           BranchCase(32, _.value(Shoesize)),
           BranchOtherwise(_.value(YearOfBirth))
         )
-        .toSet shouldBe Set(
-        190, // Michael is 34 - take his height
-        41, //Steffi is 32 - take her shoesize
-        2015) // Karlotta is case `Otherwise` - take her year of birth
+        .toSet shouldBe Set(190, // Michael is 34 - take his height
+                            41, //Steffi is 32 - take her shoesize
+                            2015) // Karlotta is case `Otherwise` - take her year of birth
     }
   }
 
@@ -67,11 +65,10 @@ class LogicalSpec extends WordSpec with Matchers {
           BranchCase(34, _.value(Height)),
           BranchMatchAll(_.value(YearOfBirth))
         )
-        .toSet shouldBe Set(
-        190,
-        1983, // Michael's height (since he is 34) and year of birth
-        1984, //Steffi's year of birth
-        2015) // Karlotta's year of birth
+        .toSet shouldBe Set(190,
+                            1983, // Michael's height (since he is 34) and year of birth
+                            1984, //Steffi's year of birth
+                            2015) // Karlotta's year of birth
     }
   }
 

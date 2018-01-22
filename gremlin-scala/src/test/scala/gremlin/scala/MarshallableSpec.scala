@@ -36,7 +36,7 @@ class NoneCaseClass(s: String)
 
 class MarshallableSpec extends WordSpec with Matchers {
 
-  "marshals / unmarshals case classes" which {
+  "marshals / unmarshals case classes".which {
 
     "only have simple members" in new Fixture {
       val cc = CCSimple("text", 12)
@@ -113,9 +113,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val marshaller = new Marshallable[CCWithOption] {
         def fromCC(cc: CCWithOption) =
-          FromCC(None,
-                 "CCWithOption",
-                 Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
 
         def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
           CCWithOption(i = valueMap("i").asInstanceOf[Int],
@@ -123,8 +121,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       }
 
       val v = graph.+(ccWithOptionNone)(marshaller)
-      v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i,
-                                                             Some("undefined"))
+      v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
     "use @label and @id annotations" in new Fixture {
@@ -179,22 +176,22 @@ class MarshallableSpec extends WordSpec with Matchers {
     graph.V.count.head shouldBe 3
 
     val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
-    ccSimpleVertices should have size 1
+    (ccSimpleVertices should have).size(1)
     ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
 
     val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
-    ccWithLabelVertices should have size 1
+    (ccWithLabelVertices should have).size(1)
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
   }
 
-  "add edges using case-class" which {
+  "add edges using case-class".which {
     "have no id-annotation" in new CCEdgeAddFixture {
       val ccEdgeWithLabelInitial = CCWithLabel("edge-property")
 
       ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithLabelInitial).toCC[CCWithLabel]
 
       val ccEdgesWithLabel = graph.E.hasLabel[CCWithLabel].toList
-      ccEdgesWithLabel should have size 1
+      (ccEdgesWithLabel should have).size(1)
       ccEdgesWithLabel.head.toCC[CCWithLabel] shouldBe ccEdgeWithLabelInitial
     }
 
@@ -207,7 +204,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       ccEdgeWithOptionIdNone.id should not be empty
 
       val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
-      ccEdgesWithOptionIdNone should have size 1
+      (ccEdgesWithOptionIdNone should have).size(1)
       ccEdgesWithOptionIdNone.head
         .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
     }
@@ -222,7 +219,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
 
       val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
-      ccEdgesWithOptionIdSome should have size 1
+      (ccEdgesWithOptionIdSome should have).size(1)
       ccEdgesWithOptionIdSome.head
         .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
     }

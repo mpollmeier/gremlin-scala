@@ -19,11 +19,9 @@ object Constructor extends LowPriorityConstructorImplicits {
     }
 }
 
-trait LowPriorityConstructorImplicits
-    extends LowestPriorityConstructorImplicits {
+trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
-  implicit def forSimpleType[A, Labels <: HList](
-      implicit converter: Converter.Aux[A, A]) =
+  implicit def forSimpleType[A, Labels <: HList](implicit converter: Converter.Aux[A, A]) =
     new Constructor[A, Labels] {
       type GraphType = A
       type StepsType = Steps[A, A, Labels]
@@ -71,11 +69,10 @@ trait LowPriorityConstructorImplicits
                         HStepsType,
                         T <: HList,
                         TGraphType <: HList,
-                        TStepsType](
-      implicit
-      hConstr: Constructor.Aux[H, Labels, HGraphType, HStepsType],
-      tConstr: Constructor.Aux[T, Labels, TGraphType, TStepsType],
-      converter: Converter.Aux[H :: T, HGraphType :: TGraphType]) =
+                        TStepsType](implicit
+                                    hConstr: Constructor.Aux[H, Labels, HGraphType, HStepsType],
+                                    tConstr: Constructor.Aux[T, Labels, TGraphType, TStepsType],
+                                    converter: Converter.Aux[H :: T, HGraphType :: TGraphType]) =
     new Constructor[H :: T, Labels] {
       type GraphType = HGraphType :: TGraphType
       type StepsType = Steps[H :: T, HGraphType :: TGraphType, Labels]
