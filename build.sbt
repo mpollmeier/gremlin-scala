@@ -19,7 +19,7 @@ val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.3" % Test,
     "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
   ),
-  resolvers += "Apache public" at "https://repository.apache.org/content/groups/public/",
+  resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/"),
   resolvers += Resolver.mavenLocal,
   scalacOptions ++= Seq(
     // "-Xlint"
@@ -32,8 +32,8 @@ val commonSettings = Seq(
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
   publishTo := { // format: off
-    if (isSnapshot.value) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-    else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
+    if (isSnapshot.value) Some("snapshots".at("https://oss.sonatype.org/content/repositories/snapshots"))
+    else Some("releases".at("https://oss.sonatype.org/service/local/staging/deploy/maven2"))
   },
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
   licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
@@ -59,7 +59,7 @@ lazy val root = project
   .in(file("."))
   .aggregate(`gremlin-scala`, macros)
   .settings(skip in publish := true, publishTo := {
-    Some("publishMeNot" at "https://publish/me/not")
+    Some("publishMeNot".at("https://publish/me/not"))
   })
 
 lazy val `gremlin-scala` = project
