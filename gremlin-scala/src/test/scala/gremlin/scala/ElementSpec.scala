@@ -36,6 +36,13 @@ class ElementSpec extends TestBase {
       e7.property(TestProperty).value shouldBe "updated"
     }
 
+    it("sets a property with multiple values") {
+      val MultiProperty = Key[Set[String]]("testMultiProperty")
+      val testValues = Set("a", "b")
+      v1.setProperty(MultiProperty, testValues)
+      v1.property(MultiProperty).value.shouldBe(testValues)
+    }
+
     it("removes a property") {
       v1.setProperty(TestProperty, "updated")
       v1.removeProperty(TestProperty)
