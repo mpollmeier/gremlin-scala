@@ -2,6 +2,8 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
+import scala.collection.JavaConverters._
 import TestGraph._
 
 // TODO: rewrite using new type safe steps
@@ -36,11 +38,17 @@ class ElementSpec extends TestBase {
       e7.property(TestProperty).value shouldBe "updated"
     }
 
+    /** adapted from http://tinkerpop.apache.org/docs/current/reference/#vertex-properties
+      * TODO: `properties` should take `Key` as well
+      */
     it("sets a property with multiple values") {
-      val MultiProperty = Key[Set[String]]("testMultiProperty")
-      val testValues = Set("a", "b")
-      v1.setProperty(MultiProperty, testValues)
-      v1.property(MultiProperty).value.shouldBe(testValues)
+      val v = graph.addV().property(Name, "marko").property(Name, "marko a. rodriguez").head
+      graph.V(v).properties(Name.name).count.head shouldBe 2
+
+      v.property(Cardinality.list, Name.name, "m. a. rodriguez")
+      graph.V(v).properties(Name.name).count.head shouldBe 3
+
+      graph.V(v).properties(Name.name).hasValue("marko").count.head shouldBe 1
     }
 
     it("removes a property") {
