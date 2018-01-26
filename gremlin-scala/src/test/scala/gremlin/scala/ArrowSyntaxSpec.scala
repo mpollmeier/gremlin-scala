@@ -14,14 +14,14 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
 
     "has a label and one property" in new Fixture {
-      paris --- (Eurostar, Name → "alpha") --> london
+      paris --- (Eurostar, Name -> "alpha") --> london
 
       paris.out(Eurostar).head shouldBe london
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
     }
 
     "has a label and multiple properties" in new Fixture {
-      paris --- (Eurostar, Name → "alpha", Length → 100) --> london
+      paris --- (Eurostar, Name -> "alpha", Length -> 100) --> london
 
       paris.out(Eurostar).head shouldBe london
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
@@ -43,13 +43,13 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
 
     "has a label and one property" in new Fixture {
-      paris <-- (Eurostar, Name → "alpha") --- london
+      paris <-- (Eurostar, Name -> "alpha") --- london
       paris.in(Eurostar).head shouldBe london
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
     }
 
     "has a label and multiple properties" in new Fixture {
-      paris <-- (Eurostar, Name → "alpha", Length -> 100) --- london
+      paris <-- (Eurostar, Name -> "alpha", Length -> 100) --- london
 
       paris.in(Eurostar).head shouldBe london
       paris.inE(Eurostar).value(Name).head shouldBe "alpha"
@@ -74,7 +74,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
 
     "have labels and one property" in new Fixture {
-      paris <-- (Eurostar, Name → "alpha") --> london
+      paris <-- (Eurostar, Name -> "alpha") --> london
 
       paris.out(Eurostar).head shouldBe london
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
@@ -83,7 +83,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
     }
 
     "have labels and multiple properties" in new Fixture {
-      paris <-- (Eurostar, Name → "alpha", Length → 100) --> london
+      paris <-- (Eurostar, Name -> "alpha", Length -> 100) --> london
 
       paris.out(Eurostar).head shouldBe london
       paris.outE(Eurostar).value(Name).head shouldBe "alpha"
@@ -118,7 +118,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
   //     Long.MaxValue,
   //     Some("option type"),
   //     Seq("test1", "test2"),
-  //     Map("key1" → "value1", "key2" → "value2"),
+  //     Map("key1" -> "value1", "key2" -> "value2"),
   //     NestedClass("nested")
   //   ) --> london
 
@@ -137,7 +137,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
   //     Long.MaxValue,
   //     Some("option type"),
   //     Seq("test1", "test2"),
-  //     Map("key1" → "value1", "key2" → "value2"),
+  //     Map("key1" -> "value1", "key2" -> "value2"),
   //     NestedClass("nested")
   //   ) --> london
 
@@ -160,7 +160,7 @@ class ArrowSyntaxSpec extends WordSpec with Matchers {
   //     Long.MaxValue,
   //     Some("option type"),
   //     Seq("test1", "test2"),
-  //     Map("key1" → "value1", "key2" → "value2"),
+  //     Map("key1" -> "value1", "key2" -> "value2"),
   //     NestedClass("nested")
   //   ) --- london
 

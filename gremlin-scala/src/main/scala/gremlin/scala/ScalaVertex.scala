@@ -77,7 +77,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     se.from.asScala.addEdge(se.label, vertex, se.properties)
 
   def <--(de: SemiDoubleEdge): (Edge, Edge) =
-    addEdge(de.label, de.right, de.properties) → de.right.asScala
+    addEdge(de.label, de.right, de.properties) -> de.right.asScala
       .addEdge(de.label, vertex, de.properties)
 
   def ---(label: String): SemiEdge = SemiEdge(vertex, label)
@@ -87,13 +87,13 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def ---(label: String, properties: Map[String, Any]): SemiEdge =
     SemiEdge(vertex, label, properties.map {
-      case (key, value) => Key[Any](key) → value
+      case (key, value) => Key[Any](key) -> value
     }.toSeq)
 
   def ---[CC <: Product: Marshallable](cc: CC): SemiEdge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r =>
-      Key[Any](r._1) → r._2
+      Key[Any](r._1) -> r._2
     }.toSeq)
   }
 

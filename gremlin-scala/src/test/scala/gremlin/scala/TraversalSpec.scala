@@ -223,8 +223,8 @@ class TraversalSpec extends WordSpec with Matchers {
         } yield (software.value2(Name), meanAge)
 
         softwareAndDevAges.toSet shouldBe Set(
-          "lop" → 32d,
-          "ripple" → 32d
+          "lop" -> 32d,
+          "ripple" -> 32d
         )
       }
     }
@@ -264,13 +264,13 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val scala = graph + "scala"
     val groovy = graph + "groovy"
-    val michael = graph + (Person, Name → "michael")
-    val marko = graph + (Person, Name → "marko")
+    val michael = graph + (Person, Name -> "michael")
+    val marko = graph + (Person, Name -> "marko")
 
-    michael --- (Likes, Weight → 3) --> groovy
-    michael --- (Likes, Weight → 5) --> scala
-    marko --- (Likes, Weight → 4) --> groovy
-    marko --- (Likes, Weight → 3) --> scala
+    michael --- (Likes, Weight -> 3) --> groovy
+    michael --- (Likes, Weight -> 5) --> scala
+    marko --- (Likes, Weight -> 4) --> groovy
+    marko --- (Likes, Weight -> 3) --> scala
 
     val traversal = for {
       person <- graph.V.hasLabel(Person)
@@ -278,8 +278,8 @@ class TraversalSpec extends WordSpec with Matchers {
     } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(
-      "michael" → "scala",
-      "marko" → "groovy"
+      "michael" -> "scala",
+      "marko" -> "groovy"
     )
   }
 
@@ -713,7 +713,7 @@ class TraversalSpec extends WordSpec with Matchers {
           .property(NewProperty, "someValue")
           .iterate()
         graph.V.hasLabel("newLabel").count.head shouldBe 2
-        graph.V.has(NewProperty → "someValue").count.head shouldBe 2
+        graph.V.has(NewProperty -> "someValue").count.head shouldBe 2
       }
     }
 

@@ -76,7 +76,7 @@ val Distance = Key[Int]("distance")
 val paris = graph + "Paris"
 
 // create vertex with typed properties
-val london = graph + ("London", Founded → "43 AD")
+val london = graph + ("London", Founded -> "43 AD")
 
 // create labelled edges 
 paris --- "OneWayRoad" --> london
@@ -84,7 +84,7 @@ paris <-- "OtherWayAround" --- london
 paris <-- "Eurostar" --> london
 
 // create edge with typed properties
-paris --- ("Eurostar", Distance → 495) --> london
+paris --- ("Eurostar", Distance -> 495) --> london
 
 // type safe access to properties
 paris.out("Eurostar").value(Founded).head //43 AD
@@ -100,8 +100,8 @@ val v1 = graph + ("person", Name -> "marko", Age -> 29) asScala
 
 v1.keys // Set(Key("name"), Key("age"))
 v1.property(Name) // "marko"
-v1.valueMap // Map("name" → "marko", "age" → 29)
-v1.valueMap("name", "age") // Map("name" → "marko", "age" → 29)
+v1.valueMap // Map("name" -> "marko", "age" -> 29)
+v1.valueMap("name", "age") // Map("name" -> "marko", "age" -> 29)
 ```
 
 More working examples in [SchemaSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SchemaSpec.scala), [ArrowSyntaxSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ArrowSyntaxSpec.scala) and [ElementSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/ElementSpec.scala).

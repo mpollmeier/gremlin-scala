@@ -44,8 +44,8 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
-      vl.valueMap should contain("s" → cc.s)
-      vl.valueMap should contain("i" → cc.i)
+      vl.valueMap should contain("s" -> cc.s)
+      vl.valueMap should contain("i" -> cc.i)
     }
 
     "contain options" should {
@@ -80,8 +80,8 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
-        vl.valueMap should contain("s" → cc.s)
-        vl.valueMap should contain("i" → cc.i.value)
+        vl.valueMap should contain("s" -> cc.s)
+        vl.valueMap should contain("i" -> cc.i.value)
         vl.toCC[CCWithValueClass] shouldBe cc
       }
 
@@ -91,8 +91,8 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
-        vl.valueMap should contain("s" → cc.s)
-        vl.valueMap should contain("i" → cc.i.get.value)
+        vl.valueMap should contain("s" -> cc.s)
+        vl.valueMap should contain("i" -> cc.i.get.value)
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
 
@@ -102,7 +102,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val vl = graph.V(v.id).head
         vl.label shouldBe cc.getClass.getSimpleName
-        vl.valueMap should contain("s" → cc.s)
+        vl.valueMap should contain("s" -> cc.s)
         vl.valueMap.keySet should not contain ("i")
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
@@ -113,7 +113,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val marshaller = new Marshallable[CCWithOption] {
         def fromCC(cc: CCWithOption) =
-          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" → cc.s.getOrElse("undefined")))
+          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
         def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
           CCWithOption(i = valueMap("i").asInstanceOf[Int],
@@ -131,7 +131,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         Long.MaxValue,
         Some("option type"),
         Seq("test1", "test2"),
-        Map("key1" → "value1", "key2" → "value2"),
+        Map("key1" -> "value1", "key2" -> "value2"),
         NestedClass("nested")
       )
 
@@ -142,12 +142,12 @@ class MarshallableSpec extends WordSpec with Matchers {
       val vl = graph.V(v.id).head()
       vl.label shouldBe "the_label"
       vl.id shouldBe ccWithLabelAndId.id
-      vl.valueMap should contain("s" → ccWithLabelAndId.s)
-      vl.valueMap should contain("l" → ccWithLabelAndId.l)
-      vl.valueMap should contain("o" → ccWithLabelAndId.o.get)
-      vl.valueMap should contain("seq" → ccWithLabelAndId.seq)
-      vl.valueMap should contain("map" → ccWithLabelAndId.map)
-      vl.valueMap should contain("nested" → ccWithLabelAndId.nested)
+      vl.valueMap should contain("s" -> ccWithLabelAndId.s)
+      vl.valueMap should contain("l" -> ccWithLabelAndId.l)
+      vl.valueMap should contain("o" -> ccWithLabelAndId.o.get)
+      vl.valueMap should contain("seq" -> ccWithLabelAndId.seq)
+      vl.valueMap should contain("map" -> ccWithLabelAndId.map)
+      vl.valueMap should contain("nested" -> ccWithLabelAndId.nested)
     }
 
     "have an Option @id annotation" in new Fixture {
@@ -159,7 +159,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       val vl = graph.V(v.id).head()
       vl.label shouldBe cc.getClass.getSimpleName
       vl.id shouldBe cc.id.get
-      vl.valueMap should contain("s" → cc.s)
+      vl.valueMap should contain("s" -> cc.s)
     }
 
   }

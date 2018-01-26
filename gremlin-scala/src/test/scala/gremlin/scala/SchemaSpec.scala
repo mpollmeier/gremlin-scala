@@ -20,10 +20,10 @@ class SchemaSpec extends WordSpec with Matchers {
     "create vertices" in {
       val g = TinkerGraph.open.asScala
 
-      val v0 = g + (Software, Name → "blueprints", Created → 2010)
-      val v1 = g + (Software, Created → 2009, Name → "gremlin")
-      val v2 = g + (Software, Name → "gremlinScala")
-      val v3 = g + (Person, Name → "mpollmeier")
+      val v0 = g + (Software, Name -> "blueprints", Created -> 2010)
+      val v1 = g + (Software, Created -> 2009, Name -> "gremlin")
+      val v2 = g + (Software, Name -> "gremlinScala")
+      val v3 = g + (Person, Name -> "mpollmeier")
 
       g.V.toList().size shouldBe 4
       g.V.hasLabel(Software).toList().size shouldBe 3
@@ -95,9 +95,9 @@ class SchemaSpec extends WordSpec with Matchers {
         object Distance extends Key[Int]("distance")
 
         val g = TinkerGraph.open.asScala
-        val paris = g + (City, Name → "paris")
-        val london = g + (City, Name → "london")
-        val rail = paris --- (EuroStar, Distance → 495) --> london
+        val paris = g + (City, Name -> "paris")
+        val london = g + (City, Name -> "london")
+        val rail = paris --- (EuroStar, Distance -> 495) --> london
       }
     }
   }

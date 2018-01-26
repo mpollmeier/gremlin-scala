@@ -14,15 +14,15 @@ class ElementSpec extends TestBase {
       v1.keys shouldBe Set(Key("name"), Key("age"))
       v1.property(Name).value shouldBe "marko"
       v1.property(DoesNotExist).isPresent shouldBe false
-      v1.valueMap shouldBe Map("name" → "marko", "age" → 29)
-      v1.valueMap("name", "age") shouldBe Map("name" → "marko", "age" → 29)
+      v1.valueMap shouldBe Map("name" -> "marko", "age" -> 29)
+      v1.valueMap("name", "age") shouldBe Map("name" -> "marko", "age" -> 29)
       v1.properties("name", "age").length shouldBe 2
       v1.properties.length shouldBe 2
 
       e7.keys shouldBe Set(Key("weight"))
       e7.property(Weight).value shouldBe 0.5
       e7.property(DoesNotExist).isPresent shouldBe false
-      e7.valueMap("weight") shouldBe Map("weight" → 0.5)
+      e7.valueMap("weight") shouldBe Map("weight" -> 0.5)
     }
 
     it("maps properties to scala.Option") {
@@ -128,7 +128,7 @@ class ElementSpec extends TestBase {
       val label1 = "label1"
       val label2 = "label2"
       val v1 = graph.addVertex(label1)
-      val v2 = graph.addVertex(label2, Map(TestProperty.name → "testValue"))
+      val v2 = graph.addVertex(label2, Map(TestProperty.name -> "testValue"))
 
       graph.V.has(T.label, label1).head shouldBe v1.vertex
       graph.V.has(T.label, label2).head shouldBe v2.vertex
@@ -141,7 +141,7 @@ class ElementSpec extends TestBase {
       val label2 = "label2"
 
       val v1 = graph + label1
-      val v2 = graph + (label2, TestProperty → "testValue")
+      val v2 = graph + (label2, TestProperty -> "testValue")
 
       graph.V.hasLabel(label1).head shouldBe v1.vertex
       graph.V.hasLabel(label2).head shouldBe v2.vertex
@@ -167,10 +167,10 @@ class ElementSpec extends TestBase {
       val v2 = graph.addVertex()
 
       val e =
-        v1.asScala.addEdge("testLabel", v2, Seq(TestProperty → "testValue"))
+        v1.asScala.addEdge("testLabel", v2, Seq(TestProperty -> "testValue"))
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
-      e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name → "testValue")
+      e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name -> "testValue")
       v1.outE().head shouldBe e.edge
       v1.out("testLabel").head shouldBe v2.vertex
     }
