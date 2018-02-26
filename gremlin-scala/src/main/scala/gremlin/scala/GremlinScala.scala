@@ -939,6 +939,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   // NUMBER STEPS END
   // -------------------
 
+  /** run pipeline asynchronously
+    * note: only supported by RemoteGraphs (see `withRemote`) */
   def promise[NewEnd](onComplete: GremlinScala.Aux[End, Labels] => NewEnd): Future[NewEnd] = {
     val promise = Promise[NewEnd]
     val wrapperFun = (t: Traversal[_, _]) =>
@@ -950,6 +952,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
         else promise.success(result)))
     promise.future
   }
+
+  /** convenience step for majority use case for `promise` */
+  def promise(): Future[List[End]] =
+    promise(_.toList)
 
   def V(vertexIdsOrElements: Any*)(implicit ev: End <:< Vertex): GremlinScala.Aux[Vertex, Labels] =
     GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))

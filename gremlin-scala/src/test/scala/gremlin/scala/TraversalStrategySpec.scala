@@ -135,7 +135,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
     "support promise" in new RemoteGraphFixture {
       // Execute a traversal using promise with the provided vertices
-      val future = remoteGraph.V().promise(_.toList())
+      val future = remoteGraph.V().promise()
       val result = Await.result(future, FiniteDuration(1000, MILLISECONDS))
       result shouldEqual mockVertices
     }
