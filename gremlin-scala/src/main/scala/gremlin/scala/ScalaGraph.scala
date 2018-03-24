@@ -60,28 +60,35 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def +(label: String, properties: KeyValue[_]*): Vertex =
     addVertex(label, properties.map(v => (v.key.name, v.value)).toMap)
 
+  @deprecated("use `traversal.addV`", "3.3.1.2")
   def addV(): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.addV()
 
+  @deprecated("use `traversal.addV`", "3.3.1.2")
   def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.addV(label)
 
+  @deprecated("use `traversal.inject`", "3.3.1.2")
   def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
     traversalSource.inject(starts: _*)
 
   // start traversal with all vertices
+  @deprecated("use `traversal.V`", "3.3.1.2")
   def V(): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.V()
 
   // start traversal with all edges
+  @deprecated("use `traversal.E`", "3.3.1.2")
   def E(): GremlinScala.Aux[Edge, HNil] =
     traversalSource.E()
 
   // start traversal with some vertices identified by given ids
+  @deprecated("use `traversal.V`", "3.3.1.2")
   def V(vertexIds: Any*): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.V(vertexIds: _*)
 
   // start traversal with some edges identified by given ids
+  @deprecated("use `traversal.E`", "3.3.1.2")
   def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
     traversalSource.E(edgeIds: _*)
 
