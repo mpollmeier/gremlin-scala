@@ -672,6 +672,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def property[A](key: Key[A], value: A)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.property(key.name, value))
 
+  /** set the property to the given value */
+  def property[A](keyValue: KeyValue[A])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.property(keyValue.key.name, keyValue.value))
+
   /** set the property to the value determined by the given traversal */
   def property[A](key: Key[A])(value: GremlinScala[End] => GremlinScala[A])(
       implicit ev: End <:< Element) =

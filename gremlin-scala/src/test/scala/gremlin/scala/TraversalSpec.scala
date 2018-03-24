@@ -783,6 +783,11 @@ class TraversalSpec extends WordSpec with Matchers {
       graph.V.has(Name, "Joseph").count.head shouldBe 1
     }
 
+    "have a given value (alternative step)" in new Fixture {
+      graph.addV(Person).property(Name -> "Joseph2").iterate
+      graph.V.has(Name, "Joseph2").count.head shouldBe 1
+    }
+
     "derive the value from a traversal" in new Fixture {
       val CreatedCount = Key[JLong]("createdCount")
       graph.V
