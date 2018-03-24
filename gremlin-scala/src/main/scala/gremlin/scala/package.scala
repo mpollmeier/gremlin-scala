@@ -164,7 +164,7 @@ package object scala {
     lazy val keyValues: KeyValues = labelAndValues.tail
     lazy val properties: List[KeyValue[_]] = keyValues.toList
 
-    def ---(from: Vertex) = SemiEdge(from, label, properties)
-    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties)
+    def ---(from: Vertex) = SemiEdge(from, label, properties: _*)
+    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties: _*)
   }
 }

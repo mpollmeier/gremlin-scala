@@ -321,6 +321,7 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "group" should {
+
     "modulate by property key" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V
