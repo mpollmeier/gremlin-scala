@@ -12,6 +12,7 @@ object ScalaGraph {
 }
 
 case class ScalaGraph(traversalSource: TraversalSource) {
+  lazy val traversal = traversalSource
   lazy val graph = traversalSource.graph
 
   def configure(conf: TraversalSource => TraversalSource) =

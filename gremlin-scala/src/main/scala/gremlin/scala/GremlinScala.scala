@@ -864,6 +864,11 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def addE(label: StepLabel[Vertex])(implicit ev: End <:< Vertex): GremlinScala.Aux[Edge, Labels] =
     GremlinScala[Edge, Labels](traversal.addE(label.name))
 
+  /** modulator, use in conjunction with addE()
+    * http://tinkerpop.apache.org/docs/current/reference/#from-step */
+  def from(vertex: Vertex): GremlinScala.Aux[End, Labels] =
+    GremlinScala[End, Labels](traversal.from(vertex))
+
   /** modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
     * http://tinkerpop.apache.org/docs/current/reference/#from-step */
   def from(label: StepLabel[Vertex]): GremlinScala.Aux[End, Labels] =
@@ -878,6 +883,11 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
       fromTraversal: GremlinScala[Vertex] => GremlinScala[Vertex]): GremlinScala.Aux[End, Labels] =
     GremlinScala[End, Labels](
       traversal.from(fromTraversal(start).traversal.asInstanceOf[GraphTraversal[End, Vertex]]))
+
+  /** modulator, use in conjunction with addE()
+    * http://tinkerpop.apache.org/docs/current/reference/#from-step */
+  def to(vertex: Vertex): GremlinScala.Aux[End, Labels] =
+    GremlinScala[End, Labels](traversal.to(vertex))
 
   /** modulator, use in conjunction with simplePath(), cyclicPath(), path(), and addE()
     * http://tinkerpop.apache.org/docs/current/reference/#from-step */

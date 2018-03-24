@@ -20,6 +20,9 @@ case class TraversalSource(underlying: GraphTraversalSource) {
   def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
     GremlinScala[Vertex, HNil](underlying.addV(label))
 
+  def addE(label: String): GremlinScala.Aux[Edge, HNil] =
+    GremlinScala[Edge, HNil](underlying.addE(label))
+
   def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
     GremlinScala[S, HNil](underlying.inject(starts: _*))
 
