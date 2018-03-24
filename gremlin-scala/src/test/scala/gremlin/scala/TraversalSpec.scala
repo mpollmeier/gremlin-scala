@@ -717,11 +717,21 @@ class TraversalSpec extends WordSpec with Matchers {
       }
     }
 
-    "add edges".which {
+    "add elements".which {
       val v1Label = StepLabel[Vertex]("v1")
       val CoDeveloper = "co-developer"
 
-      "don't use special steps" in new Fixture {
+      "show simple case" in new Fixture {
+        val g = graph.traversal
+        val michael = g.addV(Person).property(Name -> "michael").head
+        val karlotta = g.addV(Person).property(Name -> "karlotta").head
+
+        g.V(michael).addE("loves").to(karlotta).head
+        g.addE("knows").from(michael).to(karlotta).head
+        michael.start.outE.count.head shouldBe 2
+      }
+
+      "use multiple traversals" in new Fixture {
         val traversal = for {
           v1 <- graph.V(1)
           coDeveloper <- v1.out(Created).in(Created).filter(_.is(P.neq(v1)))
