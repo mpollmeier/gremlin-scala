@@ -60,30 +60,29 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     addVertex(label, properties.map(v => (v.key.name, v.value)).toMap)
 
   def addV(): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](traversalSource.underlying.addV())
+    traversalSource.addV()
 
   def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](traversalSource.underlying.addV(label))
+    traversalSource.addV(label)
 
   def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
-    GremlinScala[S, HNil](traversalSource.underlying.inject(starts: _*))
+    traversalSource.inject(starts: _*)
 
   // start traversal with all vertices
   def V(): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](traversalSource.underlying.V())
+    traversalSource.V()
 
   // start traversal with all edges
   def E(): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](traversalSource.underlying.E())
+    traversalSource.E()
 
   // start traversal with some vertices identified by given ids
   def V(vertexIds: Any*): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](
-      traversalSource.underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
+    traversalSource.V(vertexIds: _*)
 
   // start traversal with some edges identified by given ids
   def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](traversalSource.underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
+    traversalSource.E(edgeIds: _*)
 
   def tx(): Transaction = graph.tx()
 

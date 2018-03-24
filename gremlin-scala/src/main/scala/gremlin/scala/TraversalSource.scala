@@ -1,10 +1,10 @@
 package gremlin.scala
 
 import java.util.function.{BinaryOperator, Supplier, UnaryOperator}
-
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
+import shapeless.HNil
 
 object TraversalSource {
   def apply(graph: Graph): TraversalSource =
@@ -13,6 +13,31 @@ object TraversalSource {
 
 case class TraversalSource(underlying: GraphTraversalSource) {
   def graph: Graph = underlying.getGraph
+
+  def addV(): GremlinScala.Aux[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](underlying.addV())
+
+  def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](underlying.addV(label))
+
+  def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
+    GremlinScala[S, HNil](underlying.inject(starts: _*))
+
+  // start traversal with all vertices
+  def V(): GremlinScala.Aux[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](underlying.V())
+
+  // start traversal with all edges
+  def E(): GremlinScala.Aux[Edge, HNil] =
+    GremlinScala[Edge, HNil](underlying.E())
+
+  // start traversal with some vertices identified by given ids
+  def V(vertexIds: Any*): GremlinScala.Aux[Vertex, HNil] =
+    GremlinScala[Vertex, HNil](underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
+
+  // start traversal with some edges identified by given ids
+  def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
+    GremlinScala[Edge, HNil](underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def withSack[A](initialValue: A): TraversalSource =
     withSack(() => initialValue)
