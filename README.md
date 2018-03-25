@@ -25,8 +25,10 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 ```
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-val graph = TinkerFactory.createModern.asScala
-graph.V.hasLabel("person").value[String]("name").toList
+implicit val graph = TinkerFactory.createModern.asScala
+val name = Key[String]("name")
+
+graph.V.hasLabel("person").value(name).toList
 // List(marko, vadas, josh, peter)
 ```
 
@@ -39,7 +41,7 @@ import gremlin.scala._
 import org.apache.tinkerpop.gremlin.process.traversal.{Order, P}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 
-val graph = TinkerFactory.createModern.asScala
+implicit val graph = TinkerFactory.createModern.asScala
 
 graph.V //all vertices
 graph.E //all edges
@@ -47,9 +49,10 @@ graph.E //all edges
 graph.V(1).outE("knows") //follow outgoing edges
 graph.V(1).out("knows") //follow outgoing edges to incoming vertex
 
+val weight = Key[Double]("weight")
 for {
   person <- graph.V.hasLabel("person")
-  favorite <- person.outE("likes").orderBy("weight", Order.decr).limit(1).inV
+  favorite <- person.outE("likes").order(by(weight, Order.decr)).limit(1).inV
 } yield (person, favorite.label)
 
 // remove all people over 30 from the graph - also removes corresponding edges
@@ -66,7 +69,7 @@ More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-s
 ```scala
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-val graph = TinkerGraph.open.asScala
+implicit val graph = TinkerGraph.open.asScala
 
 // Keys for properties which can later be used for type safe traversals
 val Founded = Key[String]("founded")
@@ -112,7 +115,7 @@ Gremlin-Scala aims to helps you at compile time as much as possible. Take this s
 ```scala
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-val graph = TinkerGraph.open.asScala
+implicit val graph = TinkerGraph.open.asScala
 graph.V.outE.inV  //compiles
 graph.V.outE.outE //does _not_ compile
 ```
@@ -202,13 +205,15 @@ graph.V(1).headOption
 graph.V.toList
 
 // group all vertices by their label
-graph.V.groupBy(_.label)
+graph.V.group(by.label)
 
 // group vertices by a property
-graph.V.has("age").groupBy(_.value[Integer]("age"))
+val age = Key[Int]("age")
+graph.V.has(age).group(by(age))
 
 // order by property decreasing
-graph.V.has("age").orderBy("age", Order.decr)
+val age = Key[Int]("age")
+graph.V.has(age).order(by(age, Order.decr))
 ```
 
 More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
@@ -227,7 +232,7 @@ object Main {
   import gremlin.scala._
   import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
-  val graph = TinkerGraph.open.asScala
+  implicit val graph = TinkerGraph.open.asScala
   val example = Example(None, Long.MaxValue, Some("optional value"))
   val v = graph + example
   v.toCC[Example] // equal to `example`, but with id set
@@ -345,6 +350,9 @@ Random links:
 * bash testAll.sh
 
 ## Breaking changes
+### 3.3.1.2
+To fix problems with remote graphs and the arrow syntax (e.g. `vertex1 --- "label" --> vertex2`) there now needs to be an `implicit ScalaGraph` in scope. Background: the configuration for remote is unfortunately not stored in the Tinkerpop Graph instance, but in the TraversalSource. Since a vertex only holds a reference to the graph instance, this configuration must be passed somehow. `ScalaGraph` does contain the configuration, e.g. for remote connections, so we now pass it implicitly. 
+
 ### 3.3.1.1
 The type signature of GremlinScala changed: the former type parameter `Labels` is now a type member, which shortens the type if you don't care about Labels. The Labels were only used in a small percentage of steps, but had to be written out by users all the time even if they didn't care.
 Rewrite rules (old -> new), using `Vertex` as an example:
@@ -352,6 +360,7 @@ Rewrite rules (old -> new), using `Vertex` as an example:
 `GremlinScala[Vertex, HNil]` -> `GremlinScala.Aux[Vertex, HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = HNil}`)
 `GremlinScala[Vertex, Vertex :: HNil]` -> `GremlinScala.Aux[Vertex, Vertex :: HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = Vertex :: HNil}`)
 Notice: GremlinScala isn't a case class any more - it shouldn't have been in the first place.
+
 ### 3.2.4.8 
 The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] => GremlinScala[_, _])`. The old `filter(predicate: End => Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
 
