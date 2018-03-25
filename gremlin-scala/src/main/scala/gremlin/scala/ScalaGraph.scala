@@ -18,21 +18,22 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def configure(conf: TraversalSource => TraversalSource) =
     ScalaGraph(conf(TraversalSource(graph)))
 
-  def addVertex(label: String): Vertex = graph.addVertex(label)
+  def addVertex(): Vertex =
+    traversalSource.underlying.addV().next
 
-  def addVertex(): Vertex = graph.addVertex()
-
-  def addVertex(label: String, properties: (String, Any)*): Vertex = {
-    val labelParam = Seq(T.label, label)
-    val params =
-      properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
-    graph.addVertex(labelParam ++ params: _*)
-  }
+  def addVertex(label: String): Vertex =
+    traversalSource.underlying.addV(label).next
 
   def addVertex(properties: (String, Any)*): Vertex = {
-    val params =
-      properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
-    graph.addVertex(params: _*)
+    val traversal = traversalSource.underlying.addV()
+    properties.foreach { case (key, value) => traversal.property(key, value) }
+    traversal.next
+  }
+
+  def addVertex(label: String, properties: (String, Any)*): Vertex = {
+    val traversal = traversalSource.underlying.addV(label)
+    properties.foreach { case (key, value) => traversal.property(key, value) }
+    traversal.next
   }
 
   def addVertex(label: String, properties: Map[String, Any]): Vertex =
@@ -42,15 +43,12 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     addVertex(properties.toSeq: _*)
 
   /**
-    * Save an object's values into a new vertex
-    * @param cc The case class to persist as a vertex
+    * Save an object's values as a new vertex
+    * Note: `@id` members cannot be set for all graphs (e.g. remote graphs), so it is ignored here generally
     */
   def addVertex[CC <: Product: Marshallable](cc: CC): Vertex = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    val idParam = fromCC.id.toSeq.flatMap(List(T.id, _))
-    val labelParam = Seq(T.label, fromCC.label)
-    val params = fromCC.valueMap.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
-    graph.addVertex(idParam ++ labelParam ++ params: _*)
+    addVertex(fromCC.label, fromCC.valueMap)
   }
 
   def +[CC <: Product: Marshallable](cc: CC): Vertex = addVertex(cc)
@@ -60,35 +58,35 @@ case class ScalaGraph(traversalSource: TraversalSource) {
   def +(label: String, properties: KeyValue[_]*): Vertex =
     addVertex(label, properties.map(v => (v.key.name, v.value)).toMap)
 
-  @deprecated("use `traversal.addV`", "3.3.1.2")
+  /** start a traversal with `addV` */
   def addV(): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.addV()
 
-  @deprecated("use `traversal.addV`", "3.3.1.2")
+  /** start a traversal with `addV` */
   def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.addV(label)
 
-  @deprecated("use `traversal.inject`", "3.3.1.2")
+  /** start a traversal with `addV` */
+  def addE(label: String): GremlinScala.Aux[Edge, HNil] =
+    traversalSource.addE(label)
+
+  /** start a traversal with given `starts`` */
   def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
     traversalSource.inject(starts: _*)
 
-  // start traversal with all vertices
-  @deprecated("use `traversal.V`", "3.3.1.2")
+  /** start traversal with all vertices */
   def V(): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.V()
 
-  // start traversal with all edges
-  @deprecated("use `traversal.E`", "3.3.1.2")
+  /** start traversal with all edges */
   def E(): GremlinScala.Aux[Edge, HNil] =
     traversalSource.E()
 
-  // start traversal with some vertices identified by given ids
-  @deprecated("use `traversal.V`", "3.3.1.2")
+  /** start traversal with some vertices identified by given ids */
   def V(vertexIds: Any*): GremlinScala.Aux[Vertex, HNil] =
     traversalSource.V(vertexIds: _*)
 
-  // start traversal with some edges identified by given ids
-  @deprecated("use `traversal.E`", "3.3.1.2")
+  /** start traversal with some edges identified by given ids */
   def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
     traversalSource.E(edgeIds: _*)
 

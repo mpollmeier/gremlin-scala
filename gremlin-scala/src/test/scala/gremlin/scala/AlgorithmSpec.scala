@@ -9,7 +9,7 @@ class AlgorithmSpec extends WordSpec with Matchers {
   "directed acyclic graphs".can {
     "be detected" in {
       // to start with, there's no cycles
-      val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala
       val vA = graph + "a"
       val vB = graph + "b"
       val vC = graph + "c"

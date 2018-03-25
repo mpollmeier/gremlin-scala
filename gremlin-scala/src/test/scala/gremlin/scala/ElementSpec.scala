@@ -42,7 +42,7 @@ class ElementSpec extends TestBase {
       * TODO: `properties` should take `Key` as well
       */
     it("sets a property with multiple values") {
-      val v = graph.addV().property(Name, "marko").property(Name, "marko a. rodriguez").head
+      val v = graph.addVertex((Name.name -> "marko"), (Name.name -> "marko a. rodriguez"))
       graph.V(v).properties(Name.name).count.head shouldBe 2
 
       v.property(Cardinality.list, Name.name, "m. a. rodriguez")
@@ -162,12 +162,11 @@ class ElementSpec extends TestBase {
     }
 
     it("adds an edge with additional properties") {
-      val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e =
-        v1.asScala.addEdge("testLabel", v2, Seq(TestProperty -> "testValue"))
+      val e = v1.asScala.addEdge("testLabel", v2, TestProperty -> "testValue")
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
       e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name -> "testValue")

@@ -18,21 +18,21 @@ class SchemaSpec extends WordSpec with Matchers {
     object Weight extends Key[Int]("weight")
 
     "create vertices" in {
-      val g = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala
 
-      val v0 = g + (Software, Name -> "blueprints", Created -> 2010)
-      val v1 = g + (Software, Created -> 2009, Name -> "gremlin")
-      val v2 = g + (Software, Name -> "gremlinScala")
-      val v3 = g + (Person, Name -> "mpollmeier")
+      val v0 = graph + (Software, Name -> "blueprints", Created -> 2010)
+      val v1 = graph + (Software, Created -> 2009, Name -> "gremlin")
+      val v2 = graph + (Software, Name -> "gremlinScala")
+      val v3 = graph + (Person, Name -> "mpollmeier")
 
-      g.V.toList().size shouldBe 4
-      g.V.hasLabel(Software).toList().size shouldBe 3
-      g.V.hasLabel(Person).toList().size shouldBe 1
+      graph.V.toList().size shouldBe 4
+      graph.V.hasLabel(Software).toList().size shouldBe 3
+      graph.V.hasLabel(Person).toList().size shouldBe 1
 
-      g.V.has(Name).toList().size shouldBe 4
-      g.V.has(Created).toList().size shouldBe 2
+      graph.V.has(Name).toList().size shouldBe 4
+      graph.V.has(Created).toList().size shouldBe 2
 
-      g.asJava.close()
+      graph.asJava.close()
     }
 
     "read type safe properties" when {
@@ -94,9 +94,9 @@ class SchemaSpec extends WordSpec with Matchers {
         object Population extends Key[Int]("population")
         object Distance extends Key[Int]("distance")
 
-        val g = TinkerGraph.open.asScala
-        val paris = g + (City, Name -> "paris")
-        val london = g + (City, Name -> "london")
+        implicit val graph = TinkerGraph.open.asScala
+        val paris = graph + (City, Name -> "paris")
+        val london = graph + (City, Name -> "london")
         val rail = paris --- (EuroStar, Distance -> 495) --> london
       }
     }

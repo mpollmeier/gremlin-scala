@@ -56,15 +56,10 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def bothE(labels: String*) = start().bothE(labels: _*)
 
-  def addEdge(
-      label: String,
-      inVertex: Vertex,
-      properties: Seq[KeyValue[_]] = Nil
-  ): Edge = {
-    val params =
-      properties.toSeq.flatMap(pair => Seq(pair.key.name, pair.value.asInstanceOf[AnyRef]))
-    vertex.addEdge(label, inVertex.vertex, params: _*)
-  }
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*)(
+      implicit graph: ScalaGraph): Edge =
+    graph.traversal.V(vertex).addE(label, properties: _*).to(inVertex).head
 
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
@@ -73,28 +68,30 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.addEdge(fromCC.label, inVertex.vertex, idParam ++ params: _*)
   }
 
-  def <--(se: SemiEdge): Edge =
-    se.from.asScala.addEdge(se.label, vertex, se.properties)
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def <--(se: SemiEdge)(implicit graph: ScalaGraph): Edge =
+    se.from.asScala.addEdge(se.label, vertex, se.properties: _*)
 
-  def <--(de: SemiDoubleEdge): (Edge, Edge) =
-    addEdge(de.label, de.right, de.properties) -> de.right.asScala
-      .addEdge(de.label, vertex, de.properties)
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def <--(de: SemiDoubleEdge)(implicit graph: ScalaGraph): (Edge, Edge) =
+    addEdge(de.label, de.right, de.properties: _*) -> de.right.asScala
+      .addEdge(de.label, vertex, de.properties: _*)
 
   def ---(label: String): SemiEdge = SemiEdge(vertex, label)
 
   def ---(label: String, properties: KeyValue[_]*): SemiEdge =
-    SemiEdge(vertex, label, properties)
+    SemiEdge(vertex, label, properties: _*)
 
   def ---(label: String, properties: Map[String, Any]): SemiEdge =
     SemiEdge(vertex, label, properties.map {
       case (key, value) => Key[Any](key) -> value
-    }.toSeq)
+    }.toSeq: _*)
 
   def ---[CC <: Product: Marshallable](cc: CC): SemiEdge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r =>
       Key[Any](r._1) -> r._2
-    }.toSeq)
+    }.toSeq: _*)
   }
 
   def vertices(direction: Direction, edgeLabels: String*): util.Iterator[Vertex] =
