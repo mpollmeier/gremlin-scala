@@ -256,7 +256,7 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "limit in nested traversals" in {
-    val graph = TinkerGraph.open.asScala
+    implicit val graph = TinkerGraph.open.asScala
     val Person = "person"
     val Likes = "likes"
     val Name = Key[String]("name")
@@ -295,7 +295,7 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "find all edges between two vertices" in {
-    val graph = TinkerGraph.open.asScala
+    implicit val graph = TinkerGraph.open.asScala
 
     val v0 = graph + "v0"
     val v1 = graph + "v1"
@@ -919,7 +919,7 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   trait Fixture {
-    val graph = TinkerFactory.createModern.asScala
+    implicit val graph = TinkerFactory.createModern.asScala
     val Name = Key[String]("name")
     val Nickname = Key[String]("nickname")
     val Lang = Key[String]("lang")

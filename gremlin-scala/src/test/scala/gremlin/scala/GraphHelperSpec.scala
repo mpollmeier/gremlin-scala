@@ -10,13 +10,14 @@ class GraphHelperSpec extends WordSpec with Matchers {
     val testProperty = Key[String]("testProperty")
 
     {
+      implicit val graph: ScalaGraph = original
       val marko = original + "marko"
       val stephen = original + "stephen"
       marko --- "knows" --> stephen
     }
 
     {
-      val clone = GraphHelper.cloneElements(original, TinkerGraph.open.asScala)
+      implicit val clone: ScalaGraph = GraphHelper.cloneElements(original, TinkerGraph.open.asScala)
       val stephen = clone.V.hasLabel("stephen").head
       val michael = clone + "michael"
       michael --- "knows" --> stephen

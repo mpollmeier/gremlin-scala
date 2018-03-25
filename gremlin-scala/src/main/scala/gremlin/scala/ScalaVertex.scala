@@ -56,8 +56,10 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def bothE(labels: String*) = start().bothE(labels: _*)
 
-  def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*): Edge =
-    vertex.start.addE(label, properties: _*).to(inVertex).head
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*)(
+      implicit graph: ScalaGraph): Edge =
+    graph.traversal.V(vertex).addE(label, properties: _*).to(inVertex).head
 
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
@@ -66,10 +68,12 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.addEdge(fromCC.label, inVertex.vertex, idParam ++ params: _*)
   }
 
-  def <--(se: SemiEdge): Edge =
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def <--(se: SemiEdge)(implicit graph: ScalaGraph): Edge =
     se.from.asScala.addEdge(se.label, vertex, se.properties: _*)
 
-  def <--(de: SemiDoubleEdge): (Edge, Edge) =
+  /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
+  def <--(de: SemiDoubleEdge)(implicit graph: ScalaGraph): (Edge, Edge) =
     addEdge(de.label, de.right, de.properties: _*) -> de.right.asScala
       .addEdge(de.label, vertex, de.properties: _*)
 

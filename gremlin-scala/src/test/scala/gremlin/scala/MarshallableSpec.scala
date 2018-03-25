@@ -127,7 +127,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     "use @label and @id annotations" in new Fixture {
       val ccWithLabelAndId = CCWithLabelAndId(
         "some string",
-        Int.MaxValue,
+        id = Int.MaxValue,
         Long.MaxValue,
         Some("option type"),
         Seq("test1", "test2"),
@@ -137,11 +137,8 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val v = graph + ccWithLabelAndId
 
-      v.toCC[CCWithLabelAndId] shouldBe ccWithLabelAndId
-
-      val vl = graph.V(v.id).head()
+      val vl = graph.V(v.id).head
       vl.label shouldBe "the_label"
-      vl.id shouldBe ccWithLabelAndId.id
       vl.valueMap should contain("s" -> ccWithLabelAndId.s)
       vl.valueMap should contain("l" -> ccWithLabelAndId.l)
       vl.valueMap should contain("o" -> ccWithLabelAndId.o.get)
@@ -151,14 +148,13 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
 
     "have an Option @id annotation" in new Fixture {
-      val cc = CCWithOptionId("text", Some(12))
+      val cc = CCWithOptionId(s = "text", id = Some(12))
       val v = graph + cc
 
-      v.toCC[CCWithOptionId] shouldBe cc
+      v.toCC[CCWithOptionId].s shouldBe cc.s
 
-      val vl = graph.V(v.id).head()
+      val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
-      vl.id shouldBe cc.id.get
       vl.valueMap should contain("s" -> cc.s)
     }
 

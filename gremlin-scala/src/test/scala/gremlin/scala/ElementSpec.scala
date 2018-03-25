@@ -162,7 +162,7 @@ class ElementSpec extends TestBase {
     }
 
     it("adds an edge with additional properties") {
-      val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
