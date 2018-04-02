@@ -27,7 +27,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.util.TraverserSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
-import org.apache.tinkerpop.gremlin.process.traversal.{Path, Scope, Traversal}
+import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{Direction, T}
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
@@ -985,5 +985,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   protected def start[A] = __[A]()
 
-  override def toString = traversal.toString
+  override def toString =
+    traversal.toString
+
+  def bytecode: Bytecode =
+    traversal.asAdmin.getBytecode
+
 }
