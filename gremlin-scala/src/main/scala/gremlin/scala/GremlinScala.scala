@@ -984,4 +984,6 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))
 
   protected def start[A] = __[A]()
+
+  override def toString = traversal.toString
 }
