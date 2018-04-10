@@ -223,15 +223,13 @@ You can save and load case classes as a vertex - implemented with a [blackbox ma
 
 ```scala
 // this does _not_ work in a REPL
+import gremlin.scala._
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+
 @label("example")
-case class Example(@id id: Option[Int],
-                   longValue: Long,
-                   stringValue: Option[String])
+case class Example(@id id: Option[Int], longValue: Long, stringValue: Option[String])
 
-object Main {
-  import gremlin.scala._
-  import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-
+object Main extends App {
   implicit val graph = TinkerGraph.open.asScala
   val example = Example(None, Long.MaxValue, Some("optional value"))
   val v = graph + example
@@ -239,7 +237,7 @@ object Main {
 
   // find all vertices with the label of the case class `Example`
   graph.V.hasLabel[Example]
-  
+
   // modify the vertex like a case class
   v.updateAs[Example](_.copy(longValue = 0L))
 }
