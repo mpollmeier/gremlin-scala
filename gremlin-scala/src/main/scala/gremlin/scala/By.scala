@@ -6,7 +6,7 @@ import org.apache.tinkerpop.gremlin.structure.T
 import java.util.function.{Function => JFunction}
 
 /**
-  * by step can be used in combination with all sorts of other steps
+  * By step can be used in combination with all sorts of other steps
   * e.g. group, groupCount, order, dedup, sack, ...
   * http://tinkerpop.apache.org/docs/current/reference/#by-step
   * n.b. `By` can be used in place of `OrderBy`, hence extending OrderBy */
@@ -17,7 +17,7 @@ trait OrderBy[Modulated] {
   def apply[End](traversal: GraphTraversal[_, End]): GraphTraversal[_, End]
 }
 
-object by {
+object By {
 
   /* modulate by property */
   def apply[Modulated](key: Key[Modulated]) = new By[Modulated] {

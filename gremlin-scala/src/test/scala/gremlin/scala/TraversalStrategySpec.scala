@@ -63,7 +63,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
           .configure(_.withSack(1d))
           .V(1)
           .outE
-          .sack(multiply, by(Weight))
+          .sack(multiply, By(Weight))
           .inV
           .sack
           .toSet
@@ -76,7 +76,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
           .configure(_.withSack(1d))
           .V(1)
           .outE
-          .sack(multiply, by(__.value(Weight)))
+          .sack(multiply, By(__.value(Weight)))
           .inV
           .sack
           .toSet

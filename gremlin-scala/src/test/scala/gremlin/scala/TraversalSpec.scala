@@ -140,7 +140,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "order naturally decr" in new Fixture {
       val results: List[Int] =
-        graph.V.value(Age).order(by(Order.decr)).toList
+        graph.V.value(Age).order(By(Order.decr)).toList
       results shouldBe List(35, 32, 29, 27)
     }
 
@@ -148,7 +148,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: List[Int] =
         graph.V
           .has(Age)
-          .order(by(Age))
+          .order(By(Age))
           .value(Age)
           .toList
       results shouldBe Seq(27, 29, 32, 35)
@@ -158,7 +158,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: List[Int] =
         graph.V
           .has(Age)
-          .order(by(Age, Order.decr))
+          .order(By(Age, Order.decr))
           .value(Age)
           .toList
       results shouldBe List(35, 32, 29, 27)
@@ -168,7 +168,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: List[String] =
         graph.V
           .hasLabel("person")
-          .order(by(__.outE(Created).count), by(Age, Order.decr))
+          .order(By(__.outE(Created).count), By(Age, Order.decr))
           .value(Name)
           .toList
       results shouldBe Seq("vadas", "peter", "marko", "josh")
@@ -249,7 +249,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
       graph.V
         .value(Age)
-        .order(by(Order.decr))
+        .order(By(Order.decr))
         .foldLeft("F")(_ + _ + "*")
         .head() shouldBe "F35*32*29*27*"
     }
@@ -274,7 +274,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val traversal = for {
       person <- graph.V.hasLabel(Person)
-      favorite <- person.outE(Likes).order(by(Weight, Order.decr)).limit(1).inV
+      favorite <- person.outE(Likes).order(By(Weight, Order.decr)).limit(1).inV
     } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(
@@ -326,7 +326,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V
           .has(Age)
-          .group(by(Age))
+          .group(By(Age))
           .head
 
       results.get(27) should contain(graph.V(2).head)
@@ -339,7 +339,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: JMap[Int, JCollection[Vertex]] =
         graph.V
           .has(Age)
-          .group(by(__.value(Age)))
+          .group(By(__.value(Age)))
           .head
 
       results.get(27) should contain(graph.V(2).head)
@@ -350,7 +350,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "modulate by label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.group(by.label).head
+        graph.V.group(By.label).head
 
       results.get("software") should contain(graph.V(3).head)
       results.get("software") should contain(graph.V(5).head)
@@ -363,7 +363,7 @@ class TraversalSpec extends WordSpec with Matchers {
     "modulate by function" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
         graph.V
-          .group(by { v: Vertex =>
+          .group(By { v: Vertex =>
             v.label
           })
           .head
@@ -380,7 +380,7 @@ class TraversalSpec extends WordSpec with Matchers {
       type Label = String
       type Name = String
       val results: JMap[Label, JCollection[Name]] =
-        graph.V.group(by.label, by(Name)).head
+        graph.V.group(By.label, By(Name)).head
 
       results.get("software") should contain("lop")
       results.get("software") should contain("ripple")
@@ -400,7 +400,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "work with modulator on Elements" in new Fixture {
       val results: JMap[Int, JLong] =
-        graph.V.hasLabel(Person).groupCount(by(Age)).head
+        graph.V.hasLabel(Person).groupCount(By(Age)).head
       results.asScala shouldBe Map(32 -> 1, 35 -> 1, 27 -> 1, 29 -> 1)
     }
   }
@@ -411,7 +411,7 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "use by modulator" in new Fixture {
-      graph.V.dedup(by.label).value(Name).toSet shouldBe Set("marko", "lop")
+      graph.V.dedup(By.label).value(Name).toSet shouldBe Set("marko", "lop")
     }
 
     "deduplicate labeled steps" in new Fixture {
@@ -490,7 +490,7 @@ class TraversalSpec extends WordSpec with Matchers {
     "allow to be modulated" in new Fixture {
       val results: List[Path] =
         graph.V.out.out
-          .path(by(Name), by(Age))
+          .path(By(Name), By(Age))
           .toList
 
       results.size shouldBe 2
@@ -510,7 +510,7 @@ class TraversalSpec extends WordSpec with Matchers {
             _.outE("created")
           )
           .inV
-          .path(by(Name), by.label)
+          .path(By(Name), By.label)
 
         traversal1.toList().map(path2String) shouldBe
           Seq(Seq("marko", "knows", "vadas"), Seq("marko", "knows", "josh"))
@@ -524,7 +524,7 @@ class TraversalSpec extends WordSpec with Matchers {
             _.outE("knows")
           )
           .inV()
-          .path(by(Name), by.label)
+          .path(By(Name), By.label)
 
         traversal2.toList().map(path2String) shouldBe Seq(Seq("marko", "created", "lop"))
       }
@@ -561,7 +561,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .V(1)
         .repeat(_.out)
         .until(_.outE.count.is(JLong.valueOf(0)))
-        .path(by(Name))
+        .path(By(Name))
 
       traversal.toSet.size shouldBe 4
       // Set([marko, lop], [marko, vadas], [marko, josh, ripple], [marko, josh, lop])
@@ -607,7 +607,7 @@ class TraversalSpec extends WordSpec with Matchers {
             .both
             .both
             .hasLabel(Person)
-            .where(P.gt("a"), by(Age))
+            .where(P.gt("a"), By(Age))
             .value(Name)
 
         traversal.toSet shouldBe Set("josh", "peter")
@@ -620,7 +620,7 @@ class TraversalSpec extends WordSpec with Matchers {
             .as("a")
             .out(Knows)
             .as("b")
-            .where("a", P.gt("b"), by(Age))
+            .where("a", P.gt("b"), By(Age))
             .value(Name)
 
         traversal.toSet shouldBe Set("vadas")
@@ -807,7 +807,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .iterate
 
       val results =
-        graph.V.hasLabel(Person).group(by(Name), by(CreatedCount)).head
+        graph.V.hasLabel(Person).group(By(Name), By(CreatedCount)).head
       /* TODO: find a nicer way to embed tuples in the pipeline */
       def get(name: String): JLong = results.get(name).iterator.next
 
@@ -904,7 +904,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .as("a")
         .out("knows")
         .as("b")
-        .math("a + b", by(Age))
+        .math("a + b", By(Age))
         .toSet shouldBe Set(56d, 61d)
     }
 

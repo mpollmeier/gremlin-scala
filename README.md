@@ -348,6 +348,11 @@ Random links:
 * bash testAll.sh
 
 ## Breaking changes
+### 3.3.2.0
+The `by` modulator is now called `By`. E.g. `order(by(Order.decr))` becomes `order(By(Order.decr))`.
+Background: case insensitive platforms like OSX (default) and Windows fail to compile `object by` and `trait By` because they lead to two separate .class files. I decided for this option because it conforms to Scala's naming best practices. 
+See https://github.com/mpollmeier/gremlin-scala/issues/237#issuecomment-375928284. 
+
 ### 3.3.1.2
 To fix problems with remote graphs and the arrow syntax (e.g. `vertex1 --- "label" --> vertex2`) there now needs to be an `implicit ScalaGraph` in scope. Background: the configuration for remote is unfortunately not stored in the Tinkerpop Graph instance, but in the TraversalSource. Since a vertex only holds a reference to the graph instance, this configuration must be passed somehow. `ScalaGraph` does contain the configuration, e.g. for remote connections, so we now pass it implicitly. 
 
