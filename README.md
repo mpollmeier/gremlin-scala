@@ -10,10 +10,9 @@
 
 A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop) - a JVM graph traversal library - from Scala.
 
-* Scala friendly function signatures, aiming to be close to the Scala collection library.
-  * use standard Scala functions - no need to worry about how to implement things like `java.util.function.BiPredicate`
 * Beautiful DSL to create vertices and edges
 * Type safe traversals
+* Scala friendly function signatures
 * Minimal runtime overhead - only allocates additional instances if absolutely necessary
 * Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
@@ -21,14 +20,16 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt` (this readme assumes tinkergraph). The latest version is displayed at the top of this readme in the maven badge. 
 
 ### Using the sbt console
-* `sbt gremlin-scala/test:console`
+* `sbt gremlin-scala/Test/console`
 ```
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 implicit val graph = TinkerFactory.createModern.asScala
+
 val name = Key[String]("name")
 
-graph.V.hasLabel("person").value(name).toList
+val g = graph.traversal
+g.V.hasLabel("person").value(name).toList
 // List(marko, vadas, josh, peter)
 ```
 
@@ -42,22 +43,23 @@ import org.apache.tinkerpop.gremlin.process.traversal.{Order, P}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 
 implicit val graph = TinkerFactory.createModern.asScala
+val g = graph.traversal
 
-graph.V //all vertices
-graph.E //all edges
+g.V //all vertices
+g.E //all edges
 
-graph.V(1).outE("knows") //follow outgoing edges
-graph.V(1).out("knows") //follow outgoing edges to incoming vertex
+g.V(1).outE("knows") //follow outgoing edges
+g.V(1).out("knows") //follow outgoing edges to incoming vertex
 
 val weight = Key[Double]("weight")
 for {
-  person <- graph.V.hasLabel("person")
-  favorite <- person.outE("likes").order(by(weight, Order.decr)).limit(1).inV
+  person <- g.V.hasLabel("person")
+  favorite <- person.outE("likes").order(By(weight, Order.decr)).limit(1).inV
 } yield (person, favorite.label)
 
-// remove all people over 30 from the graph - also removes corresponding edges
+// remove all people over 30 from the g - also removes corresponding edges
 val Age = Key[Int]("age")
-graph.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
+g.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
 ```
 
 Warning: GremlinScala is _not_ a monad, because the underlying Tinkerpop GraphTraversal is not. I.e. while GremlinScala offers `map`, `flatMap` etc. and you can use it in a for comprehension for syntactic sugar, it does not fulfil all monad laws. 
@@ -116,8 +118,9 @@ Gremlin-Scala aims to helps you at compile time as much as possible. Take this s
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 implicit val graph = TinkerGraph.open.asScala
-graph.V.outE.inV  //compiles
-graph.V.outE.outE //does _not_ compile
+val g = graph.traversal
+g.V.outE.inV  //compiles
+g.V.outE.outE //does _not_ compile
 ```
 
 In Gremlin-Groovy there's nothing stopping you to create the second traversal - it will explode at runtime, as outgoing edges do not have outgoing edges. In Gremlin-Scala this simply doesn't compile.
@@ -126,31 +129,24 @@ In Gremlin-Groovy there's nothing stopping you to create the second traversal - 
 You can label any step using `as(StepLabel)` and the compiler will infer the correct types for you in the select step using an HList (a type safe list, i.e. the compiler knows the types of the elements of the list). In Gremlin-Java and Gremlin-Groovy you get a `Map[String, Any]`, so you have to cast to the type you *think* it will be, which is ugly and error prone. For example:
 
 ```scala
-// use :paste in Scala REPL
 import gremlin.scala._
-import shapeless._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-def g = TinkerFactory.createModern.asScala
+def graph = TinkerFactory.createModern.asScala
+val g = graph.traversal
 
 // select all labelled steps
-g.V(1).as("a")
-.outE.as("b")
-.select
-.toList
+g.V(1).as("a").outE.as("b").select.toList
 // returns a `(Vertex, Edge)` for each path
-
 
 // select subset of labelled steps
 val a = StepLabel[Vertex]()
 val b = StepLabel[Edge]()
 val c = StepLabel[Double]()
 
-g.V(1).as(a)
-.outE("created").as(b)
-.value("weight").as(c)
-.select((b, c)) //step labels parsed as tuple of any size
-.head
+val traversal = g.V(1).as(a).outE("created").as(b).value("weight").as(c)
+    
+traversal.select((b, c)).head
 // returns a `(Edge, Double)`
 ```
 
@@ -199,21 +195,21 @@ See the full setup and more tests in [DslSpec](https://github.com/mpollmeier/gre
 
 ```scala
 // get a vertex by id
-graph.V(1).headOption
+g.V(1).headOption
 
 // get all vertices
-graph.V.toList
+g.V.toList
 
 // group all vertices by their label
-graph.V.group(by.label)
+g.V.group(By.label)
 
 // group vertices by a property
 val age = Key[Int]("age")
-graph.V.has(age).group(by(age))
+g.V.has(age).group(By(age))
 
 // order by property decreasing
 val age = Key[Int]("age")
-graph.V.has(age).order(by(age, Order.decr))
+g.V.has(age).order(By(age, Order.decr))
 ```
 
 More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
@@ -250,7 +246,6 @@ Here are some examples of more complex traversals from the [examples repo](https
 
 _What is `Die Hard's` average rating?_
 ```scala
-// use :paste in Scala REPL
 graph.V.has("movie", "name", "Die Hard")
   .inE("rated")
   .values("stars")
@@ -260,7 +255,6 @@ graph.V.has("movie", "name", "Die Hard")
 
 _Get the maximum number of movies a single user rated_
 ```scala
-// use :paste in Scala REPL
 g.V.hasLabel("person")
   .flatMap(_.outE("rated").count)
   .max
@@ -270,7 +264,6 @@ g.V.hasLabel("person")
 _What 80's action movies do 30-something programmers like?_
 _Group count the movies by their name and sort the group count map in decreasing order by value._
 ```scala
-// use :paste in Scala REPL
 g.V
   .`match`(
     __.as("a").hasLabel("movie"),
@@ -292,7 +285,6 @@ g.V
 
 _What is the most liked movie in each decade?_
 ```
-// use :paste in Scala REPL
 g.V()
   .hasLabel(Movie)
   .where(_.inE(Rated).count().is(P.gt(10)))
