@@ -1,7 +1,7 @@
 name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
-scalaVersion in ThisBuild := "2.12.4"
+scalaVersion in ThisBuild := "2.12.6"
 crossScalaVersions := Seq(scalaVersion.value, "2.11.12")
 releaseCrossBuild := true
 
