@@ -1,11 +1,14 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{Assertion, Matchers, WordSpec}
 import shapeless.{::, HNil}
 
 class SelectSpec extends WordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala
+
+  def assertTypedEquals[A](expected: A, actual: A): Assertion = actual shouldBe expected
 
   "selecting all labelled steps" should {
     "support single label" in {
@@ -56,6 +59,22 @@ class SelectSpec extends WordSpec with Matchers {
       result shouldBe v1
     }
 
+    "derive types for a simple as/select/by" in {
+      val traversal = newTraversal
+      val result =
+        traversal.select(a,By(TestGraph.Name)).head
+
+      assertTypedEquals[String](result, "marko")
+    }
+
+    "derive types for a simple as/select/by with an identity by modulator" in {
+      val traversal = newTraversal
+      val result =
+        traversal.select(a,By[Vertex]()).head
+
+      assertTypedEquals[Vertex](result, v1)
+    }
+
     "derive types for as/select with two labels" in {
       val traversal = newTraversal
       val result: (Vertex, Edge) =
@@ -70,6 +89,30 @@ class SelectSpec extends WordSpec with Matchers {
         traversal.select((a, b, c)).head
 
       result shouldBe ((v1, e9, 0.4))
+    }
+
+    "derive types for as/select with two labels and associated by modulators" in {
+      val traversal = newTraversal
+      val result =
+        traversal.select((a, b), (By(TestGraph.Age), By(TestGraph.Weight))).head
+
+      assertTypedEquals[(Int, Double)](result, (29, 0.4d))
+    }
+
+    "derive types for as/select with two labels and associated by modulators (one is identity)" in {
+      val traversal = newTraversal
+      val result =
+        traversal.select((a, b), (By(TestGraph.Age), By())).head
+
+      assertTypedEquals[(Int, Edge)](result, (29, e9))
+    }
+
+    "derive types for as/select with three labels and associated by modulators" in {
+      val traversal = newTraversal
+      val result =
+        traversal.select((a, b, c), (By(TestGraph.Age), By[Int](T.id), By[Double]())).head
+
+      assertTypedEquals[(Int, Int, Double)](result, (29, 9, 0.4))
     }
   }
 
