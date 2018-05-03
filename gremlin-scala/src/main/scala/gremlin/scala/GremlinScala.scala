@@ -68,9 +68,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
   /** unsafe! this will throw a runtime exception if there is no element. better use `headOption` */
-  def head(): End = toList.head
+  def head(): End = limit(1).toList.head
 
-  def headOption(): Option[End] = toList.headOption
+  def headOption(): Option[End] = limit(1).toList.headOption
 
   def explain(): TraversalExplanation = traversal.explain()
 
