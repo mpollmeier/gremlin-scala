@@ -31,6 +31,14 @@ val commonSettings = Seq(
     "-feature",
     "-deprecation" //hard to handle when supporting multiple scala versions...
   ),
+  Test / console / initialCommands :=
+    """|import gremlin.scala._
+       |import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
+       |import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+       |import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
+       |import org.apache.tinkerpop.gremlin.process.traversal.{Order, P, Scope}
+       |implicit val graph = TinkerFactory.createModern.asScala
+       |val g = graph.traversal""".stripMargin,
   publishTo := { // format: off
     if (isSnapshot.value) Some("snapshots".at("https://oss.sonatype.org/content/repositories/snapshots"))
     else Some("releases".at("https://oss.sonatype.org/service/local/staging/deploy/maven2"))
