@@ -35,7 +35,6 @@ val commonSettings = Seq(
     """|import gremlin.scala._
        |import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
        |import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-       |import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__
        |import org.apache.tinkerpop.gremlin.process.traversal.{Order, P, Scope}
        |implicit val graph = TinkerFactory.createModern.asScala
        |val g = graph.traversal""".stripMargin,
