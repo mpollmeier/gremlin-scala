@@ -608,7 +608,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   /** repeats the provided anonymous traversal which starts at the current End
     * combine with `times` or `until` step, e.g. `gs.V(1).repeat(_.out).times(2)`
-    * Note: has to end on the same type (or a supertype of) the current `End`, 
+    * Note: has to end on the same type (or a supertype of) the current `End`,
     * otherwise we couldn't reapply it multiple times. */
   def repeat[NewEnd >: End](repeatTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[NewEnd])
     : GremlinScala.Aux[NewEnd, Labels] =
