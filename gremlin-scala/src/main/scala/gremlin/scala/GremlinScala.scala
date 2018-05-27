@@ -607,10 +607,17 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def constant[A](value: A) = GremlinScala[A, Labels](traversal.constant(value))
 
   /** repeats the provided anonymous traversal which starts at the current End
-    * best combined with `times` or `until` step
-    *  e.g. gs.V(1).repeat(_.out).times(2) */
-  def repeat(repeatTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[End]) =
-    GremlinScala[End, Labels](traversal.repeat(repeatTraversal(start).traversal))
+    * combine with `times` or `until` step, e.g. `gs.V(1).repeat(_.out).times(2)`
+    * Note: has to end on the same type (or a subtype thereof), otherwise we couldn't
+    * apply this traversal multiple times. */
+  def repeat[NewEnd <: End](repeatTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[NewEnd])
+    : GremlinScala.Aux[NewEnd, Labels] =
+    /* gremlin-java is very restrictive here, repeat only allows traversals of the exact same type
+     * this doesn't need to be this way, e.g. when extending vertex.
+     * As a workaround we're casting our way around it which should be safe.
+     * TODO: better solution: PR against gremlin-java */
+    GremlinScala[NewEnd, Labels](
+      traversal.asInstanceOf[GraphTraversal[_, NewEnd]].repeat(repeatTraversal(start).traversal))
 
   def until(untilTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[_]) =
     GremlinScala[End, Labels](traversal.until(untilTraversal(start).traversal))

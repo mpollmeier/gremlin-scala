@@ -578,7 +578,7 @@ class TraversalSpec extends WordSpec with Matchers {
       traversal.toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
     }
 
-    "iterate until no moure outgoing edges" in new Fixture {
+    "use predicate in `until` modulator: iterate until no moure outgoing edges" in new Fixture {
       val traversal = graph
         .V(1)
         .repeat(_.out)
