@@ -4,7 +4,6 @@ after_script:
 scala:
 - 2.11.11
 - 2.12.6
-- 2.13.0-M4
 jdk:
 - oraclejdk8
 env:

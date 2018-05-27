@@ -2,7 +2,7 @@ name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
 scalaVersion in ThisBuild := "2.12.6"
-crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.13.0-M4")
+crossScalaVersions := Seq(scalaVersion.value, "2.11.12" /*, "2.13.0-M4"*/ )
 releaseCrossBuild := true
 
 import ReleaseTransformations._
@@ -16,8 +16,8 @@ val commonSettings = Seq(
     "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-    "org.scalatest" %% "scalatest" % "3.0.3" % Test,
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
+    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % Test
   ),
   resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/"),
   resolvers += Resolver.mavenLocal,
