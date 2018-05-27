@@ -555,7 +555,29 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "repeat/until step".can {
+  "repeat/until step" should {
+
+    "emit only results from final iteration by default" in new Fixture {
+      val traversal = graph
+        .V(1)
+        .repeat(_.out)
+        .times(2)
+        .value(Name)
+
+      traversal.toSet shouldBe Set("ripple", "lop")
+    }
+
+    "emit all intermediate results when using `emit` modulator" in new Fixture {
+      val traversal = graph
+        .V(1)
+        .emit
+        .repeat(_.out)
+        .times(2)
+        .value(Name)
+
+      traversal.toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+    }
+
     "iterate until no moure outgoing edges" in new Fixture {
       val traversal = graph
         .V(1)
