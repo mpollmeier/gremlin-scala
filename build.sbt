@@ -6,7 +6,7 @@ crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.13.0-M4")
 releaseCrossBuild := true
 
 import ReleaseTransformations._
-val gremlinVersion = "3.3.2"
+val gremlinVersion = "3.3.3"
 val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
