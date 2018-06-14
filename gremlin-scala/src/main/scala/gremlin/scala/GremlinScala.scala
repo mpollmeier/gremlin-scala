@@ -538,11 +538,14 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def inject(injections: End*) =
     GremlinScala[End, Labels](traversal.inject(injections: _*))
 
+  /** modulator for repeat step - emit everything on the way */
   def emit() = GremlinScala[End, Labels](traversal.emit())
 
-  def emit(emitTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[End]) =
+  /** modulator for repeat step - emit if emitTraversal has at least one result */
+  def emit(emitTraversal: GremlinScala.Aux[End, HNil] => GremlinScala[_]) =
     GremlinScala[End, Labels](traversal.emit(emitTraversal(start).traversal))
 
+  /** modulator for repeat step - emit depending on predicate */
   def emitWithTraverser(predicate: Traverser[End] => Boolean) =
     GremlinScala[End, Labels](traversal.emit(predicate))
 
