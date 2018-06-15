@@ -21,6 +21,12 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex
   }
 
+  def setProperties[CC <: Product: Marshallable](cc: CC): Vertex = {
+    val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
+    fromCC.valueMap.foreach { case (k, v) => setProperty(Key[Any](k), v) }
+    vertex
+  }
+
   override def removeProperty(key: Key[_]): Vertex = {
     val p = property(key)
     if (p.isPresent) p.remove()
