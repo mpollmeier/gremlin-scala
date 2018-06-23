@@ -549,17 +549,17 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def emitWithTraverser(predicate: Traverser[End] => Boolean) =
     GremlinScala[End, Labels](traversal.emit(predicate))
 
-  private def asTraversals[S, E](trans: (GremlinScala.Aux[S, HNil] => GremlinScala[E])*) =
-    trans.map(_.apply(start).traversal)
+  private def asTraversals[S, E](travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]) =
+    travs.map(_.apply(start).traversal)
 
   def union[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
-    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals: _*): _*))
+    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
 
   /** evaluates the provided traversals in order and returns the first traversal that emits at least one element
     * useful e.g. for if/elseif/else semantics */
   def coalesce[A](coalesceTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*)
     : GremlinScala.Aux[A, Labels] =
-    GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
+    GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals): _*))
 
   /** special case of choose step if there's only two options - basically an if/else condition for traversals
     *
