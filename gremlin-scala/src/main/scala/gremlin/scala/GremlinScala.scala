@@ -549,11 +549,39 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def emitWithTraverser(predicate: Traverser[End] => Boolean) =
     GremlinScala[End, Labels](traversal.emit(predicate))
 
-  private def asTraversals[S, E](travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]) =
-    travs.map(_.apply(start).traversal)
-
   def union[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
     GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
+
+  /*
+   * ## notes
+   * g.V(1).union1(_.outE("knows"), _.out).head
+   * // (java.util.List[gremlin.scala.Edge], java.util.List[gremlin.scala.Vertex]) = 
+   * // ([e[7][1-knows->2], e[8][1-knows->4]],[v[3], v[2], v[4]])
+   * 
+   * ## TODOs:
+   * impl with hlist (in/out)
+   * impl with tuples
+   * test
+   * rename
+   */
+  def union1[A1, A2](unionTraversal1: GremlinScala.Aux[End, HNil] => GremlinScala[A1],
+                     unionTraversal2: GremlinScala.Aux[End, HNil] => GremlinScala[A2])
+    : GremlinScala.Aux[(JList[A1], JList[A2]), Labels] = {
+    val a1: GraphTraversal[_, JList[A1]] = unionTraversal1(start).fold.traversal
+    val a2: GraphTraversal[_, JList[A2]] = unionTraversal2(start).fold.traversal
+    val travs: Seq[GraphTraversal[_, JList[_]]] =
+      Seq(a1.asInstanceOf[GraphTraversal[_, JList[_]]],
+          a2.asInstanceOf[GraphTraversal[_, JList[_]]])
+
+    val unionTrav: GraphTraversal[_, JList[JList[_]]] = traversal.union(travs: _*).fold
+
+    val ret: GremlinScala.Aux[(JList[A1], JList[A2]), Labels] =
+      GremlinScala[JList[JList[_]], Labels](unionTrav).map { res: JList[JList[_]] =>
+        // we know `res` has exactly two entries: List[A1] and List[A2]
+        (res.get(0).asInstanceOf[JList[A1]], res.get(1).asInstanceOf[JList[A2]])
+      }
+    ret
+  }
 
   /** evaluates the provided traversals in order and returns the first traversal that emits at least one element
     * useful e.g. for if/elseif/else semantics */
@@ -1000,5 +1028,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def bytecode: Bytecode =
     traversal.asAdmin.getBytecode
+
+  private def asTraversals[S, E](travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]) =
+    travs.map(_.apply(start).traversal)
 
 }
