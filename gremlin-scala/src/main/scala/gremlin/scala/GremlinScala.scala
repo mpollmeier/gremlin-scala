@@ -559,28 +559,47 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
    * // ([e[7][1-knows->2], e[8][1-knows->4]],[v[3], v[2], v[4]])
    *
    * ## TODOs:
-   * impl with hlist (in/out)
-   *   idea: unionWith: call multiple times, append type like with 'as'
-   *   problem: _ changes with every unionWith -> better use separate structure to record the traversals and types
-   *   flatten the resulting hlist, but how about the case where the union step returns a tuple? e.g. with a select
-   *     see what's available in shapeless, might have to build something custom: first `unionWith`: wrap in list, afterwards append only
+   * impl with hlist (in/out): union3 compiles fine
+   *  impl/test with value level
    * change from hlist to tuples
    * test
    * rename
+   * cleanup
    * document
    */
+  def union3[Ends <: HList](
+      unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, Ends])
+    : GremlinScala.Aux[Ends, Labels] = {
+    val unionTraversalsUntyped: Seq[GremlinScala.Aux[End, HNil] => GremlinScala[_]] =
+      unionTraversals(new UnionTraversals(Nil)).travsUntyped
+    // compiler cannot infer the types by itself at this point anyway, so just using `Any` here
+    /* TODO: make conversion to Traversal already in UnionTraversal.apply to avoid cast? */
+    /* TODO: avoid other cast as well */
+    val asTravs: Seq[Traversal[_, Any]] =
+      asTraversals(
+        unionTraversalsUntyped.asInstanceOf[Seq[GremlinScala.Aux[End, HNil] => GremlinScala[Any]]])
+    val withFold: Seq[GraphTraversal[_, JList[Any]]] = asTravs.map(_.asInstanceOf[GraphTraversal[_, Any]].fold)
+    val unionTrav: GraphTraversal[_, JList[JList[Any]]] = traversal.union(withFold: _*).fold
 
-  def union3[Ends <: HList](unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, Ends])
-      : GremlinScala.Aux[Ends, Labels] =
-      ???
-
-  // def union2[Ends <: HList](unionTraversals: UnionTraversals[End, Ends]): GremlinScala.Aux[Ends, Labels] =
-  //   ???
-
-  // def unionWith[A](trav: GremlinScala.Aux[End, HNil] => GremlinScala[A])
-  //     (implicit p: Prepend[End :: HNil, A :: HNil])
-  //     : GremlinScala.Aux[p.Out, Labels] =
-  //   ???
+    val ret: GremlinScala.Aux[Ends, Labels] =
+      GremlinScala[JList[JList[Any]], Labels](unionTrav).map { res: JList[JList[Any]] =>
+        val resScala: List[JList[Any]] = res.asScala.toList
+        // instantiate the hlist - we know the types, but they're not preserved in the tp3 traversal, therefor we need to cast
+        // idea1: instantiate `::` in a fold and cast at the end -> test with more elements
+        // idea2: implement the same interface and manually instantiate the hlist, falling back onto the untyped list?
+        // resScala.foreach(println)
+        val resHList: HList = resScala.foldRight(HNil: HList){(next, acc) =>
+          // println(s"next: $next")
+          // println(s"acc: $acc")
+          next :: acc
+        }
+        // println(resHList)
+        // import shapeless.syntax.typeable._
+        // resScala.cast[HNil].get.asInstanceOf[Ends]
+        resHList.asInstanceOf[Ends]
+      }
+    ret
+  }
 
   def union1[A1, A2](unionTraversal1: GremlinScala.Aux[End, HNil] => GremlinScala[A1],
                      unionTraversal2: GremlinScala.Aux[End, HNil] => GremlinScala[A2])
@@ -1047,7 +1066,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def bytecode: Bytecode =
     traversal.asAdmin.getBytecode
 
-  private def asTraversals[S, E](travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]) =
+  private def asTraversals[S, E](
+      travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]): Seq[Traversal[_, E]] =
     travs.map(_.apply(start).traversal)
 
 }
@@ -1059,9 +1079,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 // }
 
 /* TODO: move */
-class UnionTraversals[Start, Ends <: HList](travsUntyped: List[GremlinScala.Aux[Start, HNil] => GremlinScala[_]]) {
-  def join[End](trav: GremlinScala.Aux[Start, HNil] => GremlinScala[End])
-    (implicit p: Prepend[Ends, End :: HNil])
-      : UnionTraversals[Start, p.Out] =
+class UnionTraversals[Start, Ends <: HList](
+    val travsUntyped: Seq[GremlinScala.Aux[Start, HNil] => GremlinScala[_]]) {
+  def join[End](trav: GremlinScala.Aux[Start, HNil] => GremlinScala[End])(
+      implicit p: Prepend[Ends, End :: HNil]): UnionTraversals[Start, p.Out] =
     new UnionTraversals[Start, p.Out](travsUntyped :+ trav)
 }
