@@ -555,15 +555,33 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   /*
    * ## notes
    * g.V(1).union1(_.outE("knows"), _.out).head
-   * // (java.util.List[gremlin.scala.Edge], java.util.List[gremlin.scala.Vertex]) = 
+   * // (java.util.List[gremlin.scala.Edge], java.util.List[gremlin.scala.Vertex]) =
    * // ([e[7][1-knows->2], e[8][1-knows->4]],[v[3], v[2], v[4]])
-   * 
+   *
    * ## TODOs:
    * impl with hlist (in/out)
-   * impl with tuples
+   *   idea: unionWith: call multiple times, append type like with 'as'
+   *   problem: _ changes with every unionWith -> better use separate structure to record the traversals and types
+   *   flatten the resulting hlist, but how about the case where the union step returns a tuple? e.g. with a select
+   *     see what's available in shapeless, might have to build something custom: first `unionWith`: wrap in list, afterwards append only
+   * change from hlist to tuples
    * test
    * rename
+   * document
    */
+
+  def union3[Ends <: HList](unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, Ends])
+      : GremlinScala.Aux[Ends, Labels] =
+      ???
+
+  // def union2[Ends <: HList](unionTraversals: UnionTraversals[End, Ends]): GremlinScala.Aux[Ends, Labels] =
+  //   ???
+
+  // def unionWith[A](trav: GremlinScala.Aux[End, HNil] => GremlinScala[A])
+  //     (implicit p: Prepend[End :: HNil, A :: HNil])
+  //     : GremlinScala.Aux[p.Out, Labels] =
+  //   ???
+
   def union1[A1, A2](unionTraversal1: GremlinScala.Aux[End, HNil] => GremlinScala[A1],
                      unionTraversal2: GremlinScala.Aux[End, HNil] => GremlinScala[A2])
     : GremlinScala.Aux[(JList[A1], JList[A2]), Labels] = {
@@ -1032,4 +1050,18 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   private def asTraversals[S, E](travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]) =
     travs.map(_.apply(start).traversal)
 
+}
+
+// object UnionTraversals {
+//   def apply[Start, End](trav: GremlinScala.Aux[Start, HNil] => GremlinScala[End])
+//       : UnionTraversals[Start, End :: HNil] =
+//     new UnionTraversals[Start, End :: HNil](List(trav))
+// }
+
+/* TODO: move */
+class UnionTraversals[Start, Ends <: HList](travsUntyped: List[GremlinScala.Aux[Start, HNil] => GremlinScala[_]]) {
+  def join[End](trav: GremlinScala.Aux[Start, HNil] => GremlinScala[End])
+    (implicit p: Prepend[Ends, End :: HNil])
+      : UnionTraversals[Start, p.Out] =
+    new UnionTraversals[Start, p.Out](travsUntyped :+ trav)
 }
