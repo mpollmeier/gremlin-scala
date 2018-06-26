@@ -454,9 +454,9 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "union provides extra type safety" in new Fixture {
+  "union supports heterogeneous queries" in new Fixture {
     val traversal: GremlinScala[(JList[Edge], JList[Vertex])] =
-      g.V(1).union4(
+      g.V(1).union(
         _.join(_.outE)
          .join(_.out)
       )
@@ -469,23 +469,20 @@ class TraversalSpec extends WordSpec with Matchers {
     outVertices.asScala.map(_.id).toSet shouldBe Set(2,3,4)
   }
 
-  "old (untyped) union" should {
+  "unionFlat (only homogeneous queries)" should {
     "work for traversals with the same end type" in new Fixture {
       val traversal: GremlinScala[Int] =
-        graph
-          .V(4)
-          .union(
-            _.in.value(Age),
-            _.in.out.value(Age)
-          )
+        g.V(4).unionFlat(
+          _.in.value(Age),
+          _.in.out.value(Age)
+        )
 
       traversal.toSet shouldBe Set(27, 29, 32)
     }
 
-    "work for traversals with the different end types" in new Fixture {
-      val traversal: GremlinScala[Any] = graph
-        .V(4)
-        .union(
+    "falls back to `Any` for heterogeneous queries" in new Fixture {
+      val traversal: GremlinScala[Any] =
+        g.V(4).unionFlat(
           _.in.value("age"),
           _.in.value("name")
         )

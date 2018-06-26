@@ -549,19 +549,17 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def emitWithTraverser(predicate: Traverser[End] => Boolean) =
     GremlinScala[End, Labels](traversal.emit(predicate))
 
-  def union[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
-    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
-
-  /*
-   * ## TODOs:
-   * rename: union -> @deprecated unionUntyped?
-   * document
-   */
-  def union4[EndsHList <: HList, EndsTuple](unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, EndsHList])(implicit tupler: Tupler.Aux[EndsHList, EndsTuple]): GremlinScala.Aux[EndsTuple, Labels] = {
+  /** merges of the results of an arbitrary number of traversals.
+    * supports heterogeneous queries, e.g. for the following query:
+    * `g.V(1).union(_.join(_.outE).join(_.out))` the result type is derived as
+    * `GremlinScala[(JList[Edge], JList[Vertex])]`
+    */
+  def union[EndsHList <: HList, EndsTuple](
+      unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, EndsHList])(
+      implicit tupler: Tupler.Aux[EndsHList, EndsTuple]): GremlinScala.Aux[EndsTuple, Labels] = {
     // compiler cannot infer the types by itself at this point anyway, so just using `Any` here
     val unionTraversalsUntyped =
-      unionTraversals(new UnionTraversals(Nil))
-        .travsUntyped
+      unionTraversals(new UnionTraversals(Nil)).travsUntyped
         .asInstanceOf[Seq[GremlinScala.Aux[End, HNil] => GremlinScala[Any]]]
     val asTravs: Seq[GraphTraversal[_, Any]] = asTraversals(unionTraversalsUntyped)
     val folded: Seq[GraphTraversal[_, JList[Any]]] = asTravs.map(_.fold)
@@ -573,6 +571,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
       tupler(hlist.asInstanceOf[EndsHList])
     }
   }
+
+  /** merges of the results of an arbitrary number of traversals into a flat structure (i.e. no folds).   */
+  def unionFlat[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
+    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
 
   /** evaluates the provided traversals in order and returns the first traversal that emits at least one element
     * useful e.g. for if/elseif/else semantics */
