@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import java.util.{List => JList}
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.Prepend
 
@@ -7,7 +8,7 @@ import shapeless.ops.hlist.Prepend
 class UnionTraversals[Start, Ends <: HList](val travsUntyped: Seq[GremlinScala.Aux[Start, HNil] => GremlinScala[_]]) {
 
   def join[End](trav: GremlinScala.Aux[Start, HNil] => GremlinScala[End])(
-      implicit p: Prepend[Ends, End :: HNil]): UnionTraversals[Start, p.Out] =
+      implicit p: Prepend[Ends, JList[End] :: HNil]): UnionTraversals[Start, p.Out] =
     new UnionTraversals[Start, p.Out](travsUntyped :+ trav)
 
 }

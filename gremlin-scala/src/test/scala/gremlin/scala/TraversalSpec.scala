@@ -454,7 +454,22 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
-  "union" should {
+  "union provides extra type safety" in new Fixture {
+    val traversal: GremlinScala[(JList[Edge], JList[Vertex])] =
+      g.V(1).union4(
+        _.join(_.outE)
+         .join(_.out)
+      )
+
+    val (outEdges, outVertices) = traversal.head
+    outEdges.size shouldBe 3
+    outEdges.asScala.map(_.id).toSet shouldBe Set(7,8,9)
+
+    outVertices.size shouldBe 3
+    outVertices.asScala.map(_.id).toSet shouldBe Set(2,3,4)
+  }
+
+  "old (untyped) union" should {
     "work for traversals with the same end type" in new Fixture {
       val traversal: GremlinScala[Int] =
         graph
@@ -745,7 +760,6 @@ class TraversalSpec extends WordSpec with Matchers {
       val CoDeveloper = "co-developer"
 
       "show simple case" in new Fixture {
-        val g = graph.traversal
         val michael = g.addV(Person).property(Name -> "michael").head
         val karlotta = g.addV(Person).property(Name -> "karlotta").head
 
@@ -942,6 +956,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
   trait Fixture {
     implicit val graph = TinkerFactory.createModern.asScala
+    val g = graph.traversal
     val Name = Key[String]("name")
     val Nickname = Key[String]("nickname")
     val Lang = Key[String]("lang")

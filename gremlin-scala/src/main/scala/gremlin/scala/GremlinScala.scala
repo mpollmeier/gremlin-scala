@@ -554,7 +554,6 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   /*
    * ## TODOs:
-   * add proper test
    * rename: union -> @deprecated unionUntyped?
    * document
    */
