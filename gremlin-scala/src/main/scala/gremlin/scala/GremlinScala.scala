@@ -553,23 +553,12 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
 
   /*
-   * ## notes
-   * g.V(1).union1(_.outE("knows"), _.out).head
-   * // (java.util.List[gremlin.scala.Edge], java.util.List[gremlin.scala.Vertex]) =
-   * // ([e[7][1-knows->2], e[8][1-knows->4]],[v[3], v[2], v[4]])
-   *
    * ## TODOs:
-   * impl with hlist (in/out): union3 compiles fine
-   *  impl/test with value level
-   * change from hlist to tuples
-   * test
-   * rename
-   * cleanup
+   * add proper test
+   * rename: union -> @deprecated unionUntyped?
    * document
    */
-  def union3[Ends <: HList](
-      unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, Ends])
-    : GremlinScala.Aux[Ends, Labels] = {
+  def union4[EndsHList <: HList, EndsTuple](unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, EndsHList])(implicit tupler: Tupler.Aux[EndsHList, EndsTuple]): GremlinScala.Aux[EndsTuple, Labels] = {
     // compiler cannot infer the types by itself at this point anyway, so just using `Any` here
     val unionTraversalsUntyped =
       unionTraversals(new UnionTraversals(Nil))
@@ -581,7 +570,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
     GremlinScala[JList[JList[Any]], Labels](unionTrav).map { results: JList[JList[Any]] =>
       // create the hlist - we know the types we will end up with: `Ends`, but they're not preserved in the tp3 (java) traversal, therefor we need to cast
-      results.asScala.toList.foldRight(HNil: HList)(_ :: _).asInstanceOf[Ends]
+      val hlist = results.asScala.toList.foldRight(HNil: HList)(_ :: _)
+      tupler(hlist.asInstanceOf[EndsHList])
     }
   }
 
