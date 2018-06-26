@@ -549,17 +549,38 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def emitWithTraverser(predicate: Traverser[End] => Boolean) =
     GremlinScala[End, Labels](traversal.emit(predicate))
 
-  private def asTraversals[S, E](trans: (GremlinScala.Aux[S, HNil] => GremlinScala[E])*) =
-    trans.map(_.apply(start).traversal)
+  /** merges of the results of an arbitrary number of traversals.
+    * supports heterogeneous queries, e.g. for the following query:
+    * `g.V(1).union(_.join(_.outE).join(_.out))` the result type is derived as
+    * `GremlinScala[(JList[Edge], JList[Vertex])]`
+    */
+  def union[EndsHList <: HList, EndsTuple](
+      unionTraversals: UnionTraversals[End, HNil] => UnionTraversals[End, EndsHList])(
+      implicit tupler: Tupler.Aux[EndsHList, EndsTuple]): GremlinScala.Aux[EndsTuple, Labels] = {
+    // compiler cannot infer the types by itself at this point anyway, so just using `Any` here
+    val unionTraversalsUntyped =
+      unionTraversals(new UnionTraversals(Nil)).travsUntyped
+        .asInstanceOf[Seq[GremlinScala.Aux[End, HNil] => GremlinScala[Any]]]
+    val asTravs: Seq[GraphTraversal[_, Any]] = asTraversals(unionTraversalsUntyped)
+    val folded: Seq[GraphTraversal[_, JList[Any]]] = asTravs.map(_.fold)
+    val unionTrav: GraphTraversal[_, JList[JList[Any]]] = traversal.union(folded: _*).fold
 
-  def union[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
-    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals: _*): _*))
+    GremlinScala[JList[JList[Any]], Labels](unionTrav).map { results: JList[JList[Any]] =>
+      // create the hlist - we know the types we will end up with: `Ends`, but they're not preserved in the tp3 (java) traversal, therefor we need to cast
+      val hlist = results.asScala.toList.foldRight(HNil: HList)(_ :: _)
+      tupler(hlist.asInstanceOf[EndsHList])
+    }
+  }
+
+  /** merges of the results of an arbitrary number of traversals into a flat structure (i.e. no folds).   */
+  def unionFlat[A](unionTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*) =
+    GremlinScala[A, Labels](traversal.union(asTraversals(unionTraversals): _*))
 
   /** evaluates the provided traversals in order and returns the first traversal that emits at least one element
     * useful e.g. for if/elseif/else semantics */
   def coalesce[A](coalesceTraversals: (GremlinScala.Aux[End, HNil] => GremlinScala[A])*)
     : GremlinScala.Aux[A, Labels] =
-    GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals: _*): _*))
+    GremlinScala[A, Labels](traversal.coalesce(asTraversals(coalesceTraversals): _*))
 
   /** special case of choose step if there's only two options - basically an if/else condition for traversals
     *
@@ -1000,5 +1021,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def bytecode: Bytecode =
     traversal.asAdmin.getBytecode
+
+  private def asTraversals[S, E](
+      travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]): Seq[GraphTraversal[_, E]] =
+    travs.map(_.apply(start).traversal)
 
 }

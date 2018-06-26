@@ -152,6 +152,17 @@ traversal.select((b, c)).head
 
 More working examples in [SelectSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/SelectSpec.scala). Kudos to [shapeless](https://github.com/milessabin/shapeless/) and Scala's sophisticated type system that made this possible. 
 
+As of 3.3.3.2 there is a typesafe `union` step that supports heterogeneous queries:
+```scala
+val traversal =
+  g.V(1).union(
+    _.join(_.outE)
+     .join(_.out)
+  )
+// derived type: GremlinScala[(List[Edge], List[Vertex])] 
+val (outEdges, outVertices) = traversal.head
+```
+
 ### A note on predicates
 tl;dr: use gremlin.scala.P to create predicates of type P. 
 
@@ -340,6 +351,9 @@ Random links:
 * bash testAll.sh
 
 ## Breaking changes
+### 3.3.3.2
+We now have a fully typed `union` step which supports heterogeneous queries. The old version is still available as `unionFlat`, since it may still be relevant in some situations where the union traversals are homogeneous.
+
 ### 3.3.2.0
 The `by` modulator is now called `By`. E.g. `order(by(Order.decr))` becomes `order(By(Order.decr))`.
 Background: case insensitive platforms like OSX (default) and Windows fail to compile `object by` and `trait By` because they lead to two separate .class files. I decided for this option because it conforms to Scala's naming best practices. 
