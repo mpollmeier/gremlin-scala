@@ -341,13 +341,13 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def range(scope: Scope, low: Long, high: Long) =
     GremlinScala[End, Labels](traversal.range(scope, low, high))
 
-  def limit(limit: Long) = GremlinScala[End, Labels](traversal.limit(limit))
+  def limit(max: Long) = GremlinScala[End, Labels](traversal.limit(max))
 
-  def limit(scope: Scope, limit: Long) =
-    GremlinScala[End, Labels](traversal.limit(scope, limit))
+  def limit(scope: Scope, max: Long) =
+    GremlinScala[End, Labels](traversal.limit(scope, max))
 
-  def timeLimit(limit: FiniteDuration) =
-    GremlinScala[End, Labels](traversal.timeLimit(limit.toMillis))
+  def timeLimit(maxTime: FiniteDuration) =
+    GremlinScala[End, Labels](traversal.timeLimit(maxTime.toMillis))
 
   def tail() = GremlinScala[End, Labels](traversal.tail())
 

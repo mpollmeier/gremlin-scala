@@ -70,7 +70,7 @@ object By {
     }
 
   /* modulate by function
-   * n.b. you should better use one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
+   * n.b. prefer one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
   def apply[From, Modulated](fun: From => Modulated) = new By[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by[From](new JFunction[From, AnyRef] {
@@ -79,7 +79,7 @@ object By {
   }
 
   /* modulate by function and order
-   * n.b. you should better use one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
+   * n.b. prefer one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
   def apply[From, Modulated](fun: From => Modulated, order: Order) =
     new OrderBy[Modulated] {
       override def apply[End](traversal: GraphTraversal[_, End]) =
