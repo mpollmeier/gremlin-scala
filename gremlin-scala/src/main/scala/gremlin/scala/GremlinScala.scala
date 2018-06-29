@@ -816,7 +816,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def hasKey(key: Key[_], keys: Key[_]*) =
     GremlinScala[End, Labels](traversal.hasKey(key.name, keys.map(_.name): _*))
 
-  def hasValue(value: String, values: String*) =
+  def hasValue[A](value: A, values: AnyRef*) =
     GremlinScala[End, Labels](traversal.hasValue(value, values: _*))
 
   def hasNot(key: Key[_]) =
