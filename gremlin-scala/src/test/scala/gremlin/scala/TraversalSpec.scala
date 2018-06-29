@@ -456,36 +456,39 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "union supports heterogeneous queries" in new Fixture {
     val traversal: GremlinScala[(JList[Edge], JList[Vertex])] =
-      g.V(1).union(
-        _.join(_.outE)
-         .join(_.out)
-      )
+      g.V(1)
+        .union(
+          _.join(_.outE)
+            .join(_.out)
+        )
 
     val (outEdges, outVertices) = traversal.head
     outEdges.size shouldBe 3
-    outEdges.asScala.map(_.id).toSet shouldBe Set(7,8,9)
+    outEdges.asScala.map(_.id).toSet shouldBe Set(7, 8, 9)
 
     outVertices.size shouldBe 3
-    outVertices.asScala.map(_.id).toSet shouldBe Set(2,3,4)
+    outVertices.asScala.map(_.id).toSet shouldBe Set(2, 3, 4)
   }
 
   "unionFlat (only homogeneous queries)" should {
     "work for traversals with the same end type" in new Fixture {
       val traversal: GremlinScala[Int] =
-        g.V(4).unionFlat(
-          _.in.value(Age),
-          _.in.out.value(Age)
-        )
+        g.V(4)
+          .unionFlat(
+            _.in.value(Age),
+            _.in.out.value(Age)
+          )
 
       traversal.toSet shouldBe Set(27, 29, 32)
     }
 
     "falls back to `Any` for heterogeneous queries" in new Fixture {
       val traversal: GremlinScala[Any] =
-        g.V(4).unionFlat(
-          _.in.value("age"),
-          _.in.value("name")
-        )
+        g.V(4)
+          .unionFlat(
+            _.in.value("age"),
+            _.in.value("name")
+          )
 
       traversal.toSet shouldBe Set(29, "marko")
     }
