@@ -27,7 +27,12 @@ class ElementSpec extends TestBase {
       graph.V(1).properties(Age.name, Name.name).hasValue("marko").count.head shouldBe 1
       graph.V(1).properties(Age.name, Name.name).hasValue(29).count.head shouldBe 1
       graph.V(1).properties(Age.name, Name.name).hasValue(29, "marko").count.head shouldBe 2
-      graph.V(1).properties(Age.name, Name.name).hasValue("marko", 29:Integer).count.head shouldBe 2
+      graph
+        .V(1)
+        .properties(Age.name, Name.name)
+        .hasValue("marko", 29: Integer)
+        .count
+        .head shouldBe 2
     }
 
     it("maps properties to scala.Option") {

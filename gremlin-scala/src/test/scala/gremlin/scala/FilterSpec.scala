@@ -83,8 +83,13 @@ class FilterSpec extends WordSpec with Matchers {
     val a = StepLabel[Edge]()
     val b = StepLabel[Vertex]()
 
-    graph.V.outE.as(a).inV.as(b)
-      .select(a).select(b).order(By(Name))
+    graph.V.outE
+      .as(a)
+      .inV
+      .as(b)
+      .select(a)
+      .select(b)
+      .order(By(Name))
       .value(Name)
       .dedup()
       .toList shouldBe List("josh", "lop", "ripple", "vadas")
@@ -94,19 +99,26 @@ class FilterSpec extends WordSpec with Matchers {
     graph.V.outE.drop().toSet shouldBe Set()
   }
 
-
   "is usage" in new Fixture {
     graph.V.value(Age).is(P.lte(30)).toSet shouldBe Set(27, 29)
   }
 
   "range success" in new Fixture {
     val markoVertexId = 1
-    graph.V(markoVertexId).out("knows").out("created").range(0, 1).value(Name).toSet should contain oneOf("lop", "ripple")
+    (graph
+      .V(markoVertexId)
+      .out("knows")
+      .out("created")
+      .range(0, 1)
+      .value(Name)
+      .toSet should contain).oneOf("lop", "ripple")
   }
 
   "simple path" in new Fixture {
     val markoVertexId = 1
-    graph.V(markoVertexId).out("created").in("created").simplePath.value(Name).toSet shouldBe Set("josh", "peter")
+    graph.V(markoVertexId).out("created").in("created").simplePath.value(Name).toSet shouldBe Set(
+      "josh",
+      "peter")
   }
 
   "tail" in new Fixture {
@@ -115,7 +127,13 @@ class FilterSpec extends WordSpec with Matchers {
 
   "where" in new Fixture {
     val a = StepLabel[Vertex]()
-    graph.V.as(a).out("created").where(_.as(a).value(Name).is("josh")).in("created").value(Name).toSet shouldBe Set("marko", "josh", "peter")
+    graph.V
+      .as(a)
+      .out("created")
+      .where(_.as(a).value(Name).is("josh"))
+      .in("created")
+      .value(Name)
+      .toSet shouldBe Set("marko", "josh", "peter")
   }
 
   trait Fixture {
