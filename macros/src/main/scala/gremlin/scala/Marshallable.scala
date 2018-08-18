@@ -131,7 +131,7 @@ object Marshallable {
 
     c.Expr[Marshallable[CC]] {
       q"""
-      new Marshallable[$tpe] {
+      new gremlin.scala.Marshallable[$tpe] {
         def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))
         def toCC(id: AnyRef, valueMap: Map[String, Any]): $tpe = $companion(..$toCCParams)
       }
