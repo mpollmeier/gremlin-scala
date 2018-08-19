@@ -213,6 +213,10 @@ object TestDomain {
     def isRipple = new SoftwareSteps[Labels](raw.has(Key("name") -> "ripple"))
   }
 
+  implicit def toPersonSteps[Labels <: HList](
+      steps: Steps[Person, Vertex, Labels]): PersonSteps[Labels] =
+    new PersonSteps[Labels](steps.raw)
+
   implicit def personStepsConstructor[Labels <: HList]
     : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
     Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](new PersonSteps[Labels](_))
