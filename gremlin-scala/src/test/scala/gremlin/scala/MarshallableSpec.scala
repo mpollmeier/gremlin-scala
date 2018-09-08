@@ -20,9 +20,8 @@ case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
 case class CCWithLabel(s: String)
 
 @label("the_label")
-case class CCWithLabelAndId(
+case class ComplexCC(
     s: String,
-    @id id: Int,
     l: Long,
     o: Option[String],
     seq: Seq[String],
@@ -125,9 +124,8 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
 
     "use @label and @id annotations" in new Fixture {
-      val ccWithLabelAndId = CCWithLabelAndId(
+      val cc = ComplexCC(
         "some string",
-        id = Int.MaxValue,
         Long.MaxValue,
         Some("option type"),
         Seq("test1", "test2"),
@@ -135,16 +133,16 @@ class MarshallableSpec extends WordSpec with Matchers {
         NestedClass("nested")
       )
 
-      val v = graph + ccWithLabelAndId
+      val v = graph + cc
 
       val vl = graph.V(v.id).head
       vl.label shouldBe "the_label"
-      vl.valueMap should contain("s" -> ccWithLabelAndId.s)
-      vl.valueMap should contain("l" -> ccWithLabelAndId.l)
-      vl.valueMap should contain("o" -> ccWithLabelAndId.o.get)
-      vl.valueMap should contain("seq" -> ccWithLabelAndId.seq)
-      vl.valueMap should contain("map" -> ccWithLabelAndId.map)
-      vl.valueMap should contain("nested" -> ccWithLabelAndId.nested)
+      vl.valueMap should contain("s" -> cc.s)
+      vl.valueMap should contain("l" -> cc.l)
+      vl.valueMap should contain("o" -> cc.o.get)
+      vl.valueMap should contain("seq" -> cc.seq)
+      vl.valueMap should contain("map" -> cc.map)
+      vl.valueMap should contain("nested" -> cc.nested)
     }
 
     "have an Option @id annotation" in new Fixture {
