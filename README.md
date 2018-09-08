@@ -332,7 +332,7 @@ If you would like to help, here's a list of things that needs to be addressed:
 * fill this readme and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
 ## Why such a long version number?
-The first three digits is the TP3 version number, only the last digit is incremented on every release of gremlin-scala.
+The first three digits is the TP3 version number, only the last digit is automatically incremented on every release of gremlin-scala.
 
 ## Further reading
 For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
@@ -347,12 +347,7 @@ Random links:
 * `org.apache.tinkerpop.gremlin.structure.Transaction` is not thread-safe. It's implemented with Apache's ThreadLocal class, see https://github.com/mpollmeier/gremlin-scala/issues/196#issuecomment-301625679
 
 ## Release a new version of gremlin-scala
-* release  #will do a release for each crossScalaVersions
-* sonatypeReleaseAll
-### after release: upgrade gremlin-examples
-* find . -name build.sbt | xargs grep gremlin-scala
-* git grep -l 3.2.3.1 | xargs sed -i 's/3.2.3.1/3.2.4.0/g'
-* bash testAll.sh
+Releases happen automatically for every commit on `master` from [travis.ci](https://travis-ci.org/mpollmeier/gremlin-scala)
 
 ## Breaking changes
 ### 3.3.3.2
