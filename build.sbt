@@ -3,9 +3,7 @@ organization in ThisBuild := "com.michaelpollmeier"
 
 scalaVersion in ThisBuild := "2.12.6"
 crossScalaVersions := Seq(scalaVersion.value, "2.11.12" /*, "2.13.0-M4"*/ )
-releaseCrossBuild := true
 
-import ReleaseTransformations._
 val gremlinVersion = "3.3.3"
 val commonSettings = Seq(
   libraryDependencies ++= Seq(
@@ -38,28 +36,18 @@ val commonSettings = Seq(
        |import org.apache.tinkerpop.gremlin.process.traversal.{Order, P, Scope}
        |implicit val graph = TinkerFactory.createModern.asScala
        |val g = graph.traversal""".stripMargin,
-  publishTo := { // format: off
-    if (isSnapshot.value) Some("snapshots".at("https://oss.sonatype.org/content/repositories/snapshots"))
-    else Some("releases".at("https://oss.sonatype.org/service/local/staging/deploy/maven2"))
-  },
+  scmInfo := Some(
+    ScmInfo(url("https://github.com/mpollmeier/gremlin-scala"),
+            "scm:git@github.com:mpollmeier/gremlin-scala.git")),
+  developers := List(
+    Developer("mpollmeier",
+              "Michael Pollmeier",
+              "michael@michaelpollmeier.com",
+              url("https://michaelpollmeier.com"))),
   homepage := Some(url("https://github.com/mpollmeier/gremlin-scala")),
-  licenses +=("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
-  pomIncludeRepository := { _ => false },
-  pomExtra :=
-    <scm>
-      <url>git@github.com:mpollmeier/gremlin-scala.git</url>
-      <connection>scm:git:git@github.com:mpollmeier/gremlin-scala.git</connection>
-    </scm>
-      <developers>
-        <developer>
-          <id>mpollmeier</id>
-          <name>Michael Pollmeier</name>
-          <url>http://www.michaelpollmeier.com</url>
-        </developer>
-    </developers>, // format: on
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+  publishTo := sonatypePublishTo.value,
+  publishArtifact in Test := false
 )
 
 lazy val root = project

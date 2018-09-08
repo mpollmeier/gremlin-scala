@@ -1,5 +1,2 @@
-/target/
-gremlin-scala/target/
-macros/target/
-project/project/
-project/target/
+target
+private-key.pem
