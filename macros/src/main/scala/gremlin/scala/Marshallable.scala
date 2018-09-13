@@ -109,7 +109,8 @@ object Marshallable {
             assert(
               returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
               "@underlying parameter *must* be of type `Option[A]`, since" +
-                " it can only be defined after it has been added to the graph")
+                " it can only be defined after it has been added to the graph"
+            )
             (q"cc.$name.asInstanceOf[Option[AnyRef]]",
              _fromCCParams,
              _toCCParams :+ q"Option(element).asInstanceOf[$returnType]")

@@ -193,109 +193,108 @@ class MarshallableSpec extends WordSpec with Matchers {
         """
       }
     }
-
   }
 
-  // "find vertices by label" in new Fixture {
-  //   val ccSimple = CCSimple("a string", 42)
-  //   val ccWithOption = CCWithOption(52, Some("other string"))
-  //   val ccWithLabel = CCWithLabel("s")
+  "find vertices by label" in new Fixture {
+    val ccSimple = CCSimple("a string", 42)
+    val ccWithOption = CCWithOption(52, Some("other string"))
+    val ccWithLabel = CCWithLabel("s")
 
-  //   graph + ccSimple
-  //   graph + ccWithOption
-  //   graph + ccWithLabel
+    graph + ccSimple
+    graph + ccWithOption
+    graph + ccWithLabel
 
-  //   graph.V.count.head shouldBe 3
+    graph.V.count.head shouldBe 3
 
-  //   val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
-  //   (ccSimpleVertices should have).size(1)
-  //   ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
+    val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
+    (ccSimpleVertices should have).size(1)
+    ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
 
-  //   val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
-  //   (ccWithLabelVertices should have).size(1)
-  //   ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
-  // }
+    val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
+    (ccWithLabelVertices should have).size(1)
+    ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
+  }
 
-  // "add edges using case-class".which {
-  //   "have no id-annotation" in new CCEdgeAddFixture {
-  //     val ccEdgeWithLabelInitial = CCWithLabel("edge-property")
+  "add edges using case-class".which {
+    "have no id-annotation" in new CCEdgeAddFixture {
+      val ccEdgeWithLabelInitial = CCWithLabel("edge-property")
 
-  //     ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithLabelInitial).toCC[CCWithLabel]
+      ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithLabelInitial).toCC[CCWithLabel]
 
-  //     val ccEdgesWithLabel = graph.E.hasLabel[CCWithLabel].toList
-  //     (ccEdgesWithLabel should have).size(1)
-  //     ccEdgesWithLabel.head.toCC[CCWithLabel] shouldBe ccEdgeWithLabelInitial
-  //   }
+      val ccEdgesWithLabel = graph.E.hasLabel[CCWithLabel].toList
+      (ccEdgesWithLabel should have).size(1)
+      ccEdgesWithLabel.head.toCC[CCWithLabel] shouldBe ccEdgeWithLabelInitial
+    }
 
-  //   "have id-annotation None" in new CCEdgeAddFixture {
-  //     val ccEdgeWithOptionIdNoneInitial = CCWithOptionId("edge-property", None)
+    "have id-annotation None" in new CCEdgeAddFixture {
+      val ccEdgeWithOptionIdNoneInitial = CCWithOptionId("edge-property", None)
 
-  //     val ccEdgeWithOptionIdNone = ccVertexFrom
-  //       .addEdge(ccVertexTo, ccEdgeWithOptionIdNoneInitial)
-  //       .toCC[CCWithOptionId]
-  //     ccEdgeWithOptionIdNone.id should not be empty
+      val ccEdgeWithOptionIdNone = ccVertexFrom
+        .addEdge(ccVertexTo, ccEdgeWithOptionIdNoneInitial)
+        .toCC[CCWithOptionId]
+      ccEdgeWithOptionIdNone.id should not be empty
 
-  //     val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
-  //     (ccEdgesWithOptionIdNone should have).size(1)
-  //     ccEdgesWithOptionIdNone.head
-  //       .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
-  //   }
+      val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
+      (ccEdgesWithOptionIdNone should have).size(1)
+      ccEdgesWithOptionIdNone.head
+        .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
+    }
 
-  //   "have id-annotation Some(123)" in new CCEdgeAddFixture {
-  //     val ccEdgeWithOptionIdSomeInitial =
-  //       CCWithOptionId("edge-property", Some(123))
+    "have id-annotation Some(123)" in new CCEdgeAddFixture {
+      val ccEdgeWithOptionIdSomeInitial =
+        CCWithOptionId("edge-property", Some(123))
 
-  //     val ccEdgeWithOptionIdSome = ccVertexFrom
-  //       .addEdge(ccVertexTo, ccEdgeWithOptionIdSomeInitial)
-  //       .toCC[CCWithOptionId]
-  //     ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
+      val ccEdgeWithOptionIdSome = ccVertexFrom
+        .addEdge(ccVertexTo, ccEdgeWithOptionIdSomeInitial)
+        .toCC[CCWithOptionId]
+      ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
 
-  //     val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
-  //     (ccEdgesWithOptionIdSome should have).size(1)
-  //     ccEdgesWithOptionIdSome.head
-  //       .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
-  //   }
-  // }
+      val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
+      (ccEdgesWithOptionIdSome should have).size(1)
+      ccEdgesWithOptionIdSome.head
+        .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
+    }
+  }
 
-  // "edge" should {
-  //   "update using a case-class template" in new CCEdgeUpdateFixture {
-  //     graph
-  //       .E(ccWithIdSet.id.get)
-  //       .head
-  //       .updateWith(ccUpdate)
-  //       .toCC[CC] shouldBe ccUpdate
-  //     graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
+  "edge" should {
+    "update using a case-class template" in new CCEdgeUpdateFixture {
+      graph
+        .E(ccWithIdSet.id.get)
+        .head
+        .updateWith(ccUpdate)
+        .toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
 
-  //   "update as a case class" in new CCEdgeUpdateFixture {
-  //     graph
-  //       .E(ccWithIdSet.id.get)
-  //       .head
-  //       .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
-  //       .toCC[CC] shouldBe ccUpdate
-  //     graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
-  // }
+    "update as a case class" in new CCEdgeUpdateFixture {
+      graph
+        .E(ccWithIdSet.id.get)
+        .head
+        .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
+        .toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
+  }
 
-  // "vertex" should {
-  //   "update using a case-class template" in new CCVertexUpdateFixture {
-  //     graph
-  //       .V(ccWithIdSet.id.get)
-  //       .head
-  //       .updateWith(ccUpdate)
-  //       .toCC[CC] shouldBe ccUpdate
-  //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
+  "vertex" should {
+    "update using a case-class template" in new CCVertexUpdateFixture {
+      graph
+        .V(ccWithIdSet.id.get)
+        .head
+        .updateWith(ccUpdate)
+        .toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
 
-  //   "update as a case class" in new CCVertexUpdateFixture {
-  //     graph
-  //       .V(ccWithIdSet.id.get)
-  //       .head
-  //       .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
-  //       .toCC[CC] shouldBe ccUpdate
-  //     graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
-  //   }
-  // }
+    "update as a case class" in new CCVertexUpdateFixture {
+      graph
+        .V(ccWithIdSet.id.get)
+        .head
+        .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
+        .toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+    }
+  }
 
   "marshals a the end step of a traversal" in new Fixture {
     val cc1 = CCSimple("text one", 1)
@@ -311,34 +310,34 @@ class MarshallableSpec extends WordSpec with Matchers {
     val graph = TinkerGraph.open.asScala
   }
 
-  // trait CCUpdateFixture[E <: Element] extends Fixture {
-  //   type CC = CCWithOptionIdNested
-  //   val ccInitial = CCWithOptionIdNested("string", None, MyValueClass(42))
+  trait CCUpdateFixture[E <: Element] extends Fixture {
+    type CC = CCWithOptionIdNested
+    val ccInitial = CCWithOptionIdNested("string", None, MyValueClass(42))
 
-  //   def ccWithIdSet: CC
-  //   lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
-  // }
+    def ccWithIdSet: CC
+    lazy val ccUpdate = ccWithIdSet.copy(s = "otherString", i = MyValueClass(7))
+  }
 
-  // trait CCVertexUpdateFixture extends CCUpdateFixture[Vertex] {
-  //   val ccWithIdSet = (graph + ccInitial).toCC[CC]
-  // }
+  trait CCVertexUpdateFixture extends CCUpdateFixture[Vertex] {
+    val ccWithIdSet = (graph + ccInitial).toCC[CC]
+  }
 
-  // trait CCEdgeAddFixture extends Fixture {
-  //   val ccVertexFrom = graph + "fromLabel"
-  //   val ccVertexTo = graph + "toLabel"
-  // }
+  trait CCEdgeAddFixture extends Fixture {
+    val ccVertexFrom = graph + "fromLabel"
+    val ccVertexTo = graph + "toLabel"
+  }
 
-  // trait CCEdgeUpdateFixture extends CCUpdateFixture[Edge] {
-  //   private val testVertex = graph + "Huh"
-  //   val ccWithIdSet = testVertex.addEdge(testVertex, ccInitial).toCC[CC]
-  // }
+  trait CCEdgeUpdateFixture extends CCUpdateFixture[Edge] {
+    private val testVertex = graph + "Huh"
+    val ccWithIdSet = testVertex.addEdge(testVertex, ccInitial).toCC[CC]
+  }
 
-  // "can't persist a none product type (none case class or tuple)" in {
-  //   illTyped {
-  //     """
-  //       val graph = TinkerGraph.open.asScala
-  //       graph + new NoneCaseClass("test")
-  //     """
-  //   }
-  // }
+  "can't persist a none product type (none case class or tuple)" in {
+    illTyped {
+      """
+        val graph = TinkerGraph.open.asScala
+        graph + new NoneCaseClass("test")
+      """
+    }
+  }
 }
