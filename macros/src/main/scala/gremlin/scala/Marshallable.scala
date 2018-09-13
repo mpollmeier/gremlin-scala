@@ -40,12 +40,12 @@ object Marshallable {
               if innerValueClassType <:< typeOf[AnyVal]
               valueName <- valueGetter(innerValueClassType).map(_.name)
               wrappedType <- wrappedTypeMaybe(innerValueClassType)
-            } yield {
+            } yield { // Option[ValueClass]
               val valueClassCompanion = innerValueClassType.typeSymbol.companion
               (_idParam,
                //TODO: setting the `__gs` property isn't necessary
                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
-               _toCCParams :+ q"Option(element.value[$wrappedType]($decoded)).map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+               _toCCParams :+ q"element.property($decoded).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
             }
             treesForOptionValue.getOrElse { //normal option property
               (_idParam,
@@ -142,7 +142,7 @@ object Marshallable {
       }
       """
     }
-    // if (tpe.toString == "gremlin.scala.CCWithUnderlyingVertex") {
+    // if (tpe.toString == "gremlin.scala.CCWithOptionValueClass") {
     //   println(ret)
     // }
     ret
