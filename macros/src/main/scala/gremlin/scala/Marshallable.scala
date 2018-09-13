@@ -36,7 +36,7 @@ object Marshallable {
           def idAsOption =
             (q"cc.$name.asInstanceOf[Option[AnyRef]]",
              _fromCCParams,
-             _toCCParams :+ q"Option(id).asInstanceOf[$returnType]")
+             _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
 
           def idAsAnyRef =
             (q"Option(cc.$name.asInstanceOf[AnyRef])",
@@ -55,13 +55,13 @@ object Marshallable {
               (_idParam,
                //TODO: setting the `__gs` property isn't necessary
                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
-               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[Option[$wrappedType]].map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+               _toCCParams :+ q"Option(element.value[$wrappedType]($decoded)).map($valueClassCompanion.apply).asInstanceOf[$returnType]")
             }
             treesForOptionValue.getOrElse { //normal option property
               (_idParam,
                //TODO: setting the `__gs` property isn't necessary
                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
-               _toCCParams :+ q"valueMap.get($decoded).asInstanceOf[$returnType]")
+               _toCCParams :+ q"element.property($decoded).toOption.asInstanceOf[$returnType]")
             }
           }
 
@@ -75,12 +75,12 @@ object Marshallable {
               val valueClassCompanion = returnType.typeSymbol.companion
               (_idParam,
                _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-               _toCCParams :+ q"$valueClassCompanion(valueMap($decoded).asInstanceOf[$wrappedType]).asInstanceOf[$returnType]")
+               _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
             }
             treesForValueClass.getOrElse { //normal property
               (_idParam,
                _fromCCParams :+ q"$decoded -> cc.$name",
-               _toCCParams :+ q"valueMap($decoded).asInstanceOf[$returnType]")
+               _toCCParams :+ q"element.value[$returnType]($decoded)")
             }
           }
 
@@ -130,13 +130,18 @@ object Marshallable {
       }
       .getOrElse(q"cc.getClass.getSimpleName")
 
-    c.Expr[Marshallable[CC]] {
+    val ret = c.Expr[Marshallable[CC]] {
       q"""
-      new gremlin.scala.Marshallable[$tpe] {
+      import gremlin.scala._
+      new Marshallable[$tpe] {
         def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
-    """
+      """
     }
+    // if (tpe.toString == "gremlin.scala.CCWithOptionId") {
+    //   println(ret)
+    // }
+    ret
   }
 }
