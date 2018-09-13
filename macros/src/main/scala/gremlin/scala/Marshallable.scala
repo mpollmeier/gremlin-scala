@@ -95,7 +95,7 @@ object Marshallable {
               .Try(valueClassConstructor(tpe).get.paramLists.head.head.typeSignature)
               .toOption
 
-          if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) {
+          if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) { // @id
             assert(
               returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
               "@id parameter *must* be of type `Option[A]`. In the context of " +
@@ -105,6 +105,14 @@ object Marshallable {
              _fromCCParams,
              _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
 
+          } else if (field.annotations.map(_.tree.tpe) contains weakTypeOf[underlying]) { // @underlying
+            assert(
+              returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
+              "@underlying parameter *must* be of type `Option[A]`, since" +
+                " it can only be defined after it has been added to the graph")
+            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+             _fromCCParams,
+             _toCCParams :+ q"Option(element).asInstanceOf[$returnType]")
           } else { // normal property member
             assert(!Hidden.isHidden(decoded),
                    s"The parameter name $decoded can't be used in the persistable case class $tpe")

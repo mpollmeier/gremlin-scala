@@ -13,11 +13,12 @@ case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 
 case class CCWithOption(i: Int, s: Option[String])
 
-// this should fail, id must be assigned by graph (in the context of Marshallable)
-case class CCWithId(@id id: Int)
-
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
+case class CCWithNonOptionalIdShouldFail(@id id: Int)
+
+case class CCWithUnderlyingVertex(@underlying underlying: Option[Vertex], s: String)
+case class CCWithNonOptionalUnderlyingShouldFail(@underlying underlying: Vertex)
 
 @label("label_a")
 case class CCWithLabel(s: String)
@@ -31,8 +32,6 @@ case class ComplexCC(
     map: Map[String, String],
     nested: NestedClass
 ) { def randomDef = ??? }
-
-case class CCWithUnderlyingVertex(@underlying underlying: Option[Vertex], s: String)
 
 case class NestedClass(s: String)
 
@@ -162,16 +161,17 @@ class MarshallableSpec extends WordSpec with Matchers {
       vl.valueMap should contain("s" -> cc.s)
     }
 
-    "fails for non-option @id annotation" in new Fixture {
+    "fails compilation for non-option @id annotation" in new Fixture {
+      // id must be assigned by graph (in the context of Marshallable)
       illTyped {
         """
-        val cc = CCWithId(12)
+        val cc = CCWithNonOptionalIdShouldFail(12)
         graph + cc
         """
       }
     }
 
-    "have @underlying vertex" ignore new Fixture {
+    "have @underlying vertex" in new Fixture {
       val cc = CCWithUnderlyingVertex(
         underlying = None, //not known yet, not part of graph yet
         "some string"
@@ -183,6 +183,15 @@ class MarshallableSpec extends WordSpec with Matchers {
       ccFromVertex.underlying shouldBe 'defined
 
       graph.V(ccFromVertex.underlying.get.id).value[String]("s").head shouldBe cc.s
+    }
+
+    "fails compilation for non-option @underlying annotation" in new Fixture {
+      illTyped {
+        """
+        val cc = CCWithNonOptionalUnderlyingShouldFail(null)
+        graph + cc
+        """
+      }
     }
 
   }
