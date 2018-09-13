@@ -33,16 +33,6 @@ object Marshallable {
           val decoded = name.decodedName.toString
           val returnType = field.returnType
 
-          def idAsOption =
-            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
-             _fromCCParams,
-             _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
-
-          def idAsAnyRef =
-            (q"Option(cc.$name.asInstanceOf[AnyRef])",
-             _fromCCParams,
-             _toCCParams :+ q"id.asInstanceOf[$returnType]")
-
           def optionProperty = {
             // check if the property is an Option[AnyVal] and try to extract everything we need to unwrap it
             val treesForOptionValue = for {
@@ -106,10 +96,15 @@ object Marshallable {
               .toOption
 
           if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) {
-            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
-              idAsOption
-            else
-              idAsAnyRef
+            assert(
+              returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
+              "@id parameter *must* be of type `Option[A]`. In the context of " +
+                "Marshallable, we have to let the graph assign an id"
+            )
+            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+             _fromCCParams,
+             _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
+
           } else { // normal property member
             assert(!Hidden.isHidden(decoded),
                    s"The parameter name $decoded can't be used in the persistable case class $tpe")
@@ -139,7 +134,7 @@ object Marshallable {
       }
       """
     }
-    // if (tpe.toString == "gremlin.scala.CCWithOptionId") {
+    // if (tpe.toString == "gremlin.scala.CCWithUnderlyingVertex") {
     //   println(ret)
     // }
     ret

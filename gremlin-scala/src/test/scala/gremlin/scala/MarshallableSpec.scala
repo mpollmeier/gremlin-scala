@@ -13,6 +13,9 @@ case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 
 case class CCWithOption(i: Int, s: Option[String])
 
+// this should fail, id must be assigned by graph (in the context of Marshallable)
+case class CCWithId(@id id: Int)
+
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
 
@@ -29,7 +32,6 @@ case class ComplexCC(
     nested: NestedClass
 ) { def randomDef = ??? }
 
-@label("with_underlying")
 case class CCWithUnderlyingVertex(@underlying underlying: Option[Vertex], s: String)
 
 case class NestedClass(s: String)
@@ -158,6 +160,15 @@ class MarshallableSpec extends WordSpec with Matchers {
       val vl = graph.V(v.id).head
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" -> cc.s)
+    }
+
+    "fails for non-option @id annotation" in new Fixture {
+      illTyped {
+        """
+        val cc = CCWithId(12)
+        graph + cc
+        """
+      }
     }
 
     "have @underlying vertex" ignore new Fixture {
