@@ -16,6 +16,27 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 * Minimal runtime overhead - only allocates additional instances if absolutely necessary
 * Nothing is hidden away, you can always easily access the underlying Gremlin-Java objects if needed, e.g. to access graph db specifics things like indexes
 
+### TOC
+<!-- markdown-toc --maxdepth 2 --no-firsth1 README.md -->
+- [Getting started](#getting-started)
+- [Using the sbt console](#using-the-sbt-console)
+- [Simple traversals](#simple-traversals)
+- [Vertices and edges with type safe properties](#vertices-and-edges-with-type-safe-properties)
+- [Compiler helps to eliminate invalid traversals](#compiler-helps-to-eliminate-invalid-traversals)
+- [Type safe traversals](#type-safe-traversals)
+- [A note on predicates](#a-note-on-predicates)
+- [Build a custom DSL on top of Gremlin-Scala](#build-a-custom-dsl-on-top-of-gremlin-scala)
+- [Common and useful steps](#common-and-useful-steps)
+- [Mapping vertices from/to case classes](#mapping-vertices-fromto-case-classes)
+- [More advanced traversals](#more-advanced-traversals)
+- [Serialise to and from files](#serialise-to-and-from-files)
+- [Help - it's open source!](#help---its-open-source)
+- [Why such a long version number?](#why-such-a-long-version-number)
+- [Further reading](#further-reading)
+- [Random things worth knowing](#random-things-worth-knowing)
+- [Releases](#releases)
+- [Breaking changes](#breaking-changes)
+
 ### Getting started
 The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) comes with working examples for different graph databases. Typically you just need to add a dependency on `"com.michaelpollmeier" %% "gremlin-scala" % "SOME_VERSION"` and one for the graph db of your choice to your `build.sbt` (this readme assumes tinkergraph). The latest version is displayed at the top of this readme in the maven badge. 
 
@@ -256,7 +277,7 @@ object Main extends App {
 
 You can also define your own marshaller, if the macro generated one doesn't quite cut it. For that and more examples check out the [MarshallableSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/MarshallableSpec.scala).
 
-### Some more advanced traversals
+### More advanced traversals
 Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/). If you want to run them yourself, check out the tinkergraph examples in there. 
 
 _What is `Die Hard's` average rating?_
@@ -320,21 +341,21 @@ g.V()
   .head
 ```
 
-## Serialise to and from files
+### Serialise to and from files
 Currently graphML, graphson and gryo/kryo are supported file formats, it is very easy to serialise and deserialise into those: see [GraphSerialisationSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/GraphSerialisationSpec.scala). 
 An easy way to visualise your graph is to export it into graphML and import it into [gephi](https://gephi.org/). 
 
-## Help - it's open source!
+### Help - it's open source!
 If you would like to help, here's a list of things that needs to be addressed:
 * add more graph databases and examples into the [examples project](https://github.com/mpollmeier/gremlin-scala-examples)
 * port over more TP3 steps - see [TP3 testsuite](https://github.com/apache/incubator-tinkerpop/tree/master/gremlin-test/src/main/java/org/apache/tinkerpop/gremlin/process/traversal/step) and [Gremlin-Scala StandardTests](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/GremlinStandardTestSuite.scala)
 * ideas for more type safety in traversals
 * fill this readme and provide other documentation, or how-tos, e.g. a blog post or tutorial
 
-## Why such a long version number?
+### Why such a long version number?
 The first three digits is the TP3 version number, only the last digit is automatically incremented on every release of gremlin-scala.
 
-## Further reading
+### Further reading
 For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
 Please note that while Gremlin-Scala is very close to the original Gremlin, there are differences to Gremlin-Groovy - don't be afraid, they hopefully all make sense to a Scala developer ;)
 
@@ -343,25 +364,25 @@ Random links:
 * [Shortest path algorithm with Gremlin-Scala 3.0.0 (Michael Pollmeier)](http://www.michaelpollmeier.com/2014/12/27/gremlin-scala-shortest-path)
 * [Shortest path algorithm with Gremlin-Scala 2.4.1 (Stefan Bleibinhaus)](http://bleibinha.us/blog/2013/10/scala-and-graph-databases-with-gremlin-scala)
 
-## Random things worth knowing
+### Random things worth knowing
 * `org.apache.tinkerpop.gremlin.structure.Transaction` is not thread-safe. It's implemented with Apache's ThreadLocal class, see https://github.com/mpollmeier/gremlin-scala/issues/196#issuecomment-301625679
 
-## Release a new version of gremlin-scala
-Releases happen automatically for every commit on `master` from [travis.ci](https://travis-ci.org/mpollmeier/gremlin-scala)
+### Releases
+... happen automatically for every commit on `master` from [travis.ci](https://travis-ci.org/mpollmeier/gremlin-scala) thanks to [sbt-ci-release-early](https://github.com/ShiftLeftSecurity/sbt-ci-release-early)
 
-## Breaking changes
-### 3.3.3.2
+### Breaking changes
+#### 3.3.3.2
 We now have a fully typed `union` step which supports heterogeneous queries. The old version is still available as `unionFlat`, since it may still be relevant in some situations where the union traversals are homogeneous.
 
-### 3.3.2.0
+#### 3.3.2.0
 The `by` modulator is now called `By`. E.g. `order(by(Order.decr))` becomes `order(By(Order.decr))`.
 Background: case insensitive platforms like OSX (default) and Windows fail to compile `object by` and `trait By` because they lead to two separate .class files. I decided for this option because it conforms to Scala's naming best practices. 
 See https://github.com/mpollmeier/gremlin-scala/issues/237#issuecomment-375928284. 
 
-### 3.3.1.2
+#### 3.3.1.2
 To fix problems with remote graphs and the arrow syntax (e.g. `vertex1 --- "label" --> vertex2`) there now needs to be an `implicit ScalaGraph` in scope. Background: the configuration for remote is unfortunately not stored in the Tinkerpop Graph instance, but in the TraversalSource. Since a vertex only holds a reference to the graph instance, this configuration must be passed somehow. `ScalaGraph` does contain the configuration, e.g. for remote connections, so we now pass it implicitly. 
 
-### 3.3.1.1
+#### 3.3.1.1
 The type signature of GremlinScala changed: the former type parameter `Labels` is now a type member, which shortens the type if you don't care about Labels. The Labels were only used in a small percentage of steps, but had to be written out by users all the time even if they didn't care.
 Rewrite rules (old -> new), using `Vertex` as an example:
 `GremlinScala[Vertex, _]` -> `GremlinScala[Vertex]` (existential type: most common, i.e the user doesn't use or care about the Labels)
@@ -369,7 +390,7 @@ Rewrite rules (old -> new), using `Vertex` as an example:
 `GremlinScala[Vertex, Vertex :: HNil]` -> `GremlinScala.Aux[Vertex, Vertex :: HNil]` (equivalent: `GremlinScala[Vertex] {type Labels = Vertex :: HNil}`)
 Notice: GremlinScala isn't a case class any more - it shouldn't have been in the first place.
 
-### 3.2.4.8 
+#### 3.2.4.8 
 The `filter` step changed it's signature and now takes a traversal: `filter(predicate: GremlinScala[End, _] => GremlinScala[_, _])`. The old `filter(predicate: End => Boolean)` is now called `filterOnEnd`, in case you still need it. This change might affect your for comprehensions. 
 
 The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
