@@ -38,7 +38,7 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
       implicit marshaller: Marshallable[DomainType],
       graph: Graph) = new Converter[DomainType] {
     type GraphType = Vertex
-    def toDomain(v: Vertex): DomainType = marshaller.toCC(v.id, v.valueMap)
+    def toDomain(v: Vertex): DomainType = marshaller.toCC(v)
     def toGraph(dt: DomainType): Vertex = AnonymousVertex(dt)
   }
 

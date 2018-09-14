@@ -186,13 +186,13 @@ class DslSpec extends WordSpec with Matchers {
 }
 
 object TestDomain {
-  @label("person") case class Person(@id id: Option[Integer], name: String, age: Integer)
-      extends DomainRoot
+  @label("person") case class Person(@id id: Option[Integer], name: String, age: Integer) extends DomainRoot
   @label("software") case class Software(name: String, lang: String) extends DomainRoot
 
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
   }
+  
   class PersonSteps[Labels <: HList](override val raw: GremlinScala[Vertex])
       extends NodeSteps[Person, Labels](raw) {
 

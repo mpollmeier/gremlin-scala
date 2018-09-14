@@ -15,6 +15,10 @@ case class CCWithOption(i: Int, s: Option[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
+case class CCWithNonOptionalIdShouldFail(@id id: Int)
+
+case class CCWithUnderlyingVertex(@underlying underlying: Option[Vertex], s: String)
+case class CCWithNonOptionalUnderlyingShouldFail(@underlying underlying: Vertex)
 
 @label("label_a")
 case class CCWithLabel(s: String)
@@ -114,16 +118,17 @@ class MarshallableSpec extends WordSpec with Matchers {
         def fromCC(cc: CCWithOption) =
           FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
-        def toCC(id: AnyRef, valueMap: Map[String, Any]): CCWithOption =
-          CCWithOption(i = valueMap("i").asInstanceOf[Int],
-                       s = valueMap.get("s").asInstanceOf[Option[String]])
+        def toCC(element: Element): CCWithOption =
+          CCWithOption(
+            i = element.value[Int]("i"),
+            s = element.property[String]("s").toOption)
       }
 
       val v = graph.+(ccWithOptionNone)(marshaller)
       v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
-    "use @label and @id annotations" in new Fixture {
+    "combination of many things" in new Fixture {
       val cc = ComplexCC(
         "some string",
         Long.MaxValue,
@@ -156,6 +161,38 @@ class MarshallableSpec extends WordSpec with Matchers {
       vl.valueMap should contain("s" -> cc.s)
     }
 
+    "fails compilation for non-option @id annotation" in new Fixture {
+      // id must be assigned by graph (in the context of Marshallable)
+      illTyped {
+        """
+        val cc = CCWithNonOptionalIdShouldFail(12)
+        graph + cc
+        """
+      }
+    }
+
+    "have @underlying vertex" in new Fixture {
+      val cc = CCWithUnderlyingVertex(
+        underlying = None, //not known yet, not part of graph yet
+        "some string"
+      )
+
+      val vertex = graph + cc
+      val ccFromVertex = vertex.toCC[CCWithUnderlyingVertex]
+      ccFromVertex.s shouldBe cc.s
+      ccFromVertex.underlying shouldBe 'defined
+
+      graph.V(ccFromVertex.underlying.get.id).value[String]("s").head shouldBe cc.s
+    }
+
+    "fails compilation for non-option @underlying annotation" in new Fixture {
+      illTyped {
+        """
+        val cc = CCWithNonOptionalUnderlyingShouldFail(null)
+        graph + cc
+        """
+      }
+    }
   }
 
   "find vertices by label" in new Fixture {
