@@ -230,21 +230,21 @@ You can save and load case classes as a vertex - implemented with a [blackbox ma
 
 Note: your classes must be defined outside the scope where they are being used (e.g. in the code below the class `Example` cannot be inside `object Main`). 
 
-Note: you cannot specify the id when adding a vertex like this. Using `@id` only works when retrieving the vertex back from the graph.
+Note: you cannot specify the id when adding a vertex like this. Using `@id` only works when retrieving the vertex back from the graph and it therefor must be an `Option`.
 
 ```scala
 // this does _not_ work in a REPL
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 
-@label("example")
-case class Example(@id id: Option[Int], longValue: Long, stringValue: Option[String])
+@label("my_custom_label")
+case class Example(longValue: Long, stringValue: Option[String], @underlying vertex: Option[Vertex] = None)
 
 object Main extends App {
   implicit val graph = TinkerGraph.open.asScala
-  val example = Example(None, Long.MaxValue, Some("optional value"))
+  val example = Example(Long.MaxValue, Some("optional value"))
   val v = graph + example
-  v.toCC[Example] // equal to `example`, but with id set
+  v.toCC[Example] // equal to `example`, but with `vertex` set
 
   // find all vertices with the label of the case class `Example`
   graph.V.hasLabel[Example]

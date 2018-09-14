@@ -143,7 +143,7 @@ object Marshallable {
       }
       """
     }
-    // if (tpe.toString == "gremlin.scala.CCWithOptionValueClass") {
+    // if (tpe.toString.contains("Person")) {
     //   println(ret)
     // }
     ret

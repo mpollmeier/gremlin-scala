@@ -119,9 +119,7 @@ class MarshallableSpec extends WordSpec with Matchers {
           FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
         def toCC(element: Element): CCWithOption =
-          CCWithOption(
-            i = element.value[Int]("i"),
-            s = element.property[String]("s").toOption)
+          CCWithOption(i = element.value[Int]("i"), s = element.property[String]("s").toOption)
       }
 
       val v = graph.+(ccWithOptionNone)(marshaller)
