@@ -42,7 +42,7 @@ The [examples project](https://github.com/mpollmeier/gremlin-scala-examples) com
 
 ### Using the sbt console
 * `sbt gremlin-scala/Test/console`
-```
+```scala
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 implicit val graph = TinkerFactory.createModern.asScala
