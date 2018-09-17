@@ -1,8 +1,9 @@
 name := "root"
-organization in ThisBuild := "com.michaelpollmeier"
-
-scalaVersion in ThisBuild := "2.12.6"
+ThisBuild / organization := "com.michaelpollmeier"
+ThisBuild / scalaVersion := "2.12.6"
 crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.13.0-M5")
+publish / skip := true
+enablePlugins(GitVersioning)
 
 val gremlinVersion = "3.3.3"
 val commonSettings = Seq(
@@ -48,13 +49,6 @@ val commonSettings = Seq(
   publishTo := sonatypePublishTo.value,
   publishArtifact in Test := false
 )
-
-lazy val root = project
-  .in(file("."))
-  .aggregate(`gremlin-scala`, macros)
-  .settings(skip in publish := true, publishTo := {
-    Some("publishMeNot".at("https://publish/me/not"))
-  })
 
 lazy val `gremlin-scala` = project
   .in(file("gremlin-scala"))
