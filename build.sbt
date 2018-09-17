@@ -2,7 +2,7 @@ name := "root"
 organization in ThisBuild := "com.michaelpollmeier"
 
 scalaVersion in ThisBuild := "2.12.6"
-crossScalaVersions := Seq(scalaVersion.value, "2.11.12" /*, "2.13.0-M4"*/ )
+crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.13.0-M5")
 
 val gremlinVersion = "3.3.3"
 val commonSettings = Seq(
@@ -10,7 +10,6 @@ val commonSettings = Seq(
     "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "com.chuusai" %% "shapeless" % "2.3.3",
-    "org.scala-lang.modules" %% "scala-xml" % "1.0.6", //just specified to eliminate sbt warnings
     "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
     "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
