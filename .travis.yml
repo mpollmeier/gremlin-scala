@@ -1,5 +1,8 @@
 language: scala
 jdk: oraclejdk8
+scala:
+  - 2.11.12
+  - 2.12.6
 before_install:
 - openssl aes-256-cbc -K $encrypted_188b0d6c1746_key -iv $encrypted_188b0d6c1746_iv
   -in private-key.pem.enc -out private-key.pem -d
