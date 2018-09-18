@@ -4,10 +4,9 @@ inThisBuild(
   Seq(
     organization := "com.michaelpollmeier",
     scalaVersion := "2.12.6",
-    crossScalaVersions := Seq(/*"2.11.12"*/, "2.12.6" /*, "2.13.0-M5"*/ ),
+    crossScalaVersions := Seq("2.11.12", "2.12.6" /*, "2.13.0-M5"*/ ),
     libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "com.chuusai" %% "shapeless" % "2.3.3",
       "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
@@ -48,8 +47,10 @@ inThisBuild(
   )
 )
 
+lazy val macros = project // macros must be in a separate compilation unit
+  .in(file("macros"))
+  .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
 lazy val `gremlin-scala` = project.in(file("gremlin-scala")).dependsOn(macros)
-lazy val macros = project.in(file("macros")) // macros must be in a separate compilation unit
 
 ThisBuild / publishTo := sonatypePublishTo.value
 enablePlugins(GitVersioning)
