@@ -4,7 +4,7 @@ inThisBuild(
   Seq(
     organization := "com.michaelpollmeier",
     scalaVersion := "2.12.6",
-    crossScalaVersions := Seq("2.11.12", "2.12.6" /*, "2.13.0-M5"*/ ),
+    crossScalaVersions := Seq( /*"2.11.12",*/ "2.12.6" /*, "2.13.0-M5"*/ ),
     libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "com.chuusai" %% "shapeless" % "2.3.3",

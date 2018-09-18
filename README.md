@@ -320,7 +320,7 @@ g.V
 ```
 
 _What is the most liked movie in each decade?_
-```
+```scala
 g.V()
   .hasLabel(Movie)
   .where(_.inE(Rated).count().is(P.gt(10)))
