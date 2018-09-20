@@ -45,13 +45,13 @@ object Marshallable {
               (_idParam,
                //TODO: setting the `__gs` property isn't necessary
                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
-               _toCCParams :+ q"element.property($decoded).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+               _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
             }
             treesForOptionValue.getOrElse { //normal option property
               (_idParam,
                //TODO: setting the `__gs` property isn't necessary
                _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
-               _toCCParams :+ q"element.property($decoded).toOption.asInstanceOf[$returnType]")
+               _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
             }
           }
 

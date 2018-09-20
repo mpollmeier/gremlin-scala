@@ -1,5 +1,18 @@
-package gremlin.scala
+package gremlin.scala.marshallable
+// specifically moved this to a separate package to verify `gremlin.scala.` imports
 
+import gremlin.scala.{
+  asScalaEdge,
+  asScalaVertex,
+  id,
+  label,
+  underlying,
+  Edge,
+  Element,
+  GraphAsScala,
+  Marshallable,
+  Vertex
+}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
@@ -115,6 +128,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
       val marshaller = new Marshallable[CCWithOption] {
+        import gremlin.scala.PropertyOps
         def fromCC(cc: CCWithOption) =
           FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
