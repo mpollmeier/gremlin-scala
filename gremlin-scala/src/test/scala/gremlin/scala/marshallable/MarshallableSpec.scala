@@ -16,6 +16,7 @@ import gremlin.scala.{
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.WordSpec
 import org.scalatest.Matchers
+import scala.collection.JavaConverters._
 import shapeless.test.illTyped
 
 case class CCSimple(s: String, i: Int)
@@ -25,6 +26,7 @@ case class CCWithValueClass(s: String, i: MyValueClass)
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 
 case class CCWithOption(i: Int, s: Option[String])
+case class CCWithList(i: Int, strings: List[String])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
@@ -87,6 +89,15 @@ class MarshallableSpec extends WordSpec with Matchers {
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
       // which wouldn't make any sense. So we rather translate it to `null` if it's `None`.
       // https://github.com/mpollmeier/gremlin-scala/issues/98
+    }
+
+    "contain List[A]" in new Fixture {
+      val cc = CCWithList(Int.MinValue, List("one", "two"))
+      val v = graph + cc
+      v.toCC[CCWithList] shouldBe cc
+
+      val vl = graph.V(v.id).head
+      vl.properties[String]("strings").asScala.toList.map(_.value) shouldBe cc.strings
     }
 
     "contain value classes" should {
