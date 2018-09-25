@@ -36,6 +36,10 @@ case class CCWithNonOptionalUnderlyingShouldFail(@underlying underlying: Vertex)
 @label("label_a")
 case class CCWithLabel(s: String)
 
+object Labels { val refLabel = "label_b" }
+@label(Labels.refLabel)
+case class CCWithRefLabel(s: String)
+
 @label("the_label")
 case class ComplexCC(
     s: String,
@@ -211,12 +215,14 @@ class MarshallableSpec extends WordSpec with Matchers {
     val ccSimple = CCSimple("a string", 42)
     val ccWithOption = CCWithOption(52, Some("other string"))
     val ccWithLabel = CCWithLabel("s")
+    val ccWithRefLabel = CCWithRefLabel("z")
 
     graph + ccSimple
     graph + ccWithOption
     graph + ccWithLabel
+    graph + ccWithRefLabel
 
-    graph.V.count.head shouldBe 3
+    graph.V.count.head shouldBe 4
 
     val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
     (ccSimpleVertices should have).size(1)
@@ -225,6 +231,10 @@ class MarshallableSpec extends WordSpec with Matchers {
     val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
     (ccWithLabelVertices should have).size(1)
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
+
+    val ccWithRefLabelVertices = graph.V.hasLabel[CCWithRefLabel].toList
+    (ccWithRefLabelVertices should have).size(1)
+    ccWithRefLabelVertices.head.toCC[CCWithRefLabel] shouldBe ccWithRefLabel
   }
 
   "add edges using case-class".which {
