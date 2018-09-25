@@ -793,23 +793,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def hasLabel[CC <: Product: ru.WeakTypeTag]()(
       implicit ev: End <:< Element): GremlinScala.Aux[End, Labels] = {
-    val tpe = implicitly[ru.WeakTypeTag[CC]].tpe
-
-    // TODO: there must be a way to avoid this...
-    def unquote(s: String) = {
-      val quote = "\""
-      if (s.startsWith(quote) && s.endsWith(quote))
-        s.substring(1, s.length - 1)
-      else s
-    }
-
-    val label: String =
-      tpe.typeSymbol.asClass.annotations
-        .find { _.toString.startsWith("gremlin.scala.label(\"") }
-        .map(_.tree.children.tail.head.toString)
-        .map(unquote)
-        .getOrElse(tpe.typeSymbol.name.toString)
-
+    val label: String = Annotations.labelOf[CC].map(_.label)
+      .getOrElse(implicitly[ru.WeakTypeTag[CC]].tpe.typeSymbol.name.toString)
     hasLabel(label)
   }
 
