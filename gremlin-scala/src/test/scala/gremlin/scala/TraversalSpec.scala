@@ -255,6 +255,18 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "store step stores results in a Set" in new Fixture {
+    val x = StepLabel[java.util.Set[Vertex]]("x")
+    val set = g.V().store(x).cap(x).head
+    set.size shouldBe 6
+  }
+
+  "aggregate step stores results in a Set" in new Fixture {
+    val x = StepLabel[java.util.Set[Vertex]]("x")
+    val set = g.V().aggregate(x).cap(x).head
+    set.size shouldBe 6
+  }
+
   "limit in nested traversals" in {
     implicit val graph = TinkerGraph.open.asScala
     val Person = "person"
