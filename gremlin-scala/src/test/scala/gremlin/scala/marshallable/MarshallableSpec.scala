@@ -22,9 +22,8 @@ case class CCSimple(s: String, i: Int)
 
 case class MyValueClass(value: Int) extends AnyVal
 case class CCWithValueClass(s: String, i: MyValueClass)
-case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
-
 case class CCWithOption(i: Int, s: Option[String])
+case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
