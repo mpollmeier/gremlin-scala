@@ -12,7 +12,8 @@ import java.util.{
   List => JList,
   Map => JMap,
   Collection => JCollection,
-  Iterator => JIterator
+  Iterator => JIterator,
+  Set => JSet
 }
 import java.util.stream.{Stream => JStream}
 
@@ -386,9 +387,6 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
         }
       ))
 
-  def aggregate(sideEffectKey: String) =
-    GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
-
   /** Organize objects in the stream into a Map. */
   def group[A: DefaultsToAny]() =
     GremlinScala[JMap[String, A], Labels](traversal.group())
@@ -537,6 +535,20 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def inject(injections: End*) =
     GremlinScala[End, Labels](traversal.inject(injections: _*))
+
+  def store(stepLabel: StepLabel[JSet[End]]) =
+    GremlinScala[End, Labels](traversal.store(stepLabel.name))
+
+  @deprecated("use store(StepLabel) for more type safety", "3.3.3.16")
+  def store(sideEffectKey: String) =
+    GremlinScala[End, Labels](traversal.store(sideEffectKey))
+
+  def aggregate(stepLabel: StepLabel[JSet[End]]) =
+    GremlinScala[End, Labels](traversal.aggregate(stepLabel.name))
+
+  @deprecated("use aggregate(StepLabel) for more type safety", "3.3.3.16")
+  def aggregate(sideEffectKey: String) =
+    GremlinScala[End, Labels](traversal.aggregate(sideEffectKey))
 
   /** modulator for repeat step - emit everything on the way */
   def emit() = GremlinScala[End, Labels](traversal.emit())
@@ -833,8 +845,6 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def timeLimit(millis: Long)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.timeLimit(millis))
 
-  def store(sideEffectKey: String)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.store(sideEffectKey))
   // ELEMENT STEPS END
   // -------------------
 
