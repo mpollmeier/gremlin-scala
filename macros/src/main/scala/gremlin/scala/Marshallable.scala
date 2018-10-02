@@ -43,14 +43,12 @@ object Marshallable {
             } yield { // Option[ValueClass]
               val valueClassCompanion = innerValueClassType.typeSymbol.companion
               (_idParam,
-               //TODO: setting the `__gs` property isn't necessary
-               _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name.$valueName }.getOrElse("__gs" -> "")""",
+               _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x.$valueName }.getOrElse($decoded -> null)""",
                _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
             }
             treesForOptionValue.getOrElse { //normal option property
               (_idParam,
-               //TODO: setting the `__gs` property isn't necessary
-               _fromCCParams :+ q"""cc.$name.map{ name => $decoded -> name }.getOrElse("__gs" -> "")""",
+               _fromCCParams :+ q"$decoded -> cc.$name.orNull",
                _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
             }
           }
@@ -138,12 +136,12 @@ object Marshallable {
       q"""
       import gremlin.scala._
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams))
+        def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams).filter(_._2 != null))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
       """
     }
-    // if (tpe.toString.contains("Person")) {
+    // if (tpe.toString.contains("CCWithOptionValueClass")) {
     //   println(ret)
     // }
     ret
