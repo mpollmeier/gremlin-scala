@@ -35,21 +35,24 @@ object Marshallable {
 
           def optionProperty = {
             // check if the property is an Option[AnyVal] and try to extract everything we need to unwrap it
-            val treesForOptionValue = for {
-              innerValueClassType <- returnType.typeArgs.headOption
-              if innerValueClassType <:< typeOf[AnyVal]
-              valueName <- valueGetter(innerValueClassType).map(_.name)
-              wrappedType <- wrappedTypeMaybe(innerValueClassType)
-            } yield { // Option[ValueClass]
-              val valueClassCompanion = innerValueClassType.typeSymbol.companion
-              (_idParam,
-               _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x.$valueName }.getOrElse($decoded -> null)""",
-               _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
-            }
-            treesForOptionValue.getOrElse { //normal option property
-              (_idParam,
-               _fromCCParams :+ q"$decoded -> cc.$name.orNull",
-               _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
+            returnType.typeArgs.headOption match {
+              case Some(innerAnyValClassType) if innerAnyValClassType <:< typeOf[AnyVal] =>
+                valueGetter(innerAnyValClassType) match {
+                  case Some(wrappedValueGetter) =>
+                    val valueClassCompanion = innerAnyValClassType.typeSymbol.companion
+                    (_idParam,
+                     _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null)""",
+                     _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+                  case None =>
+                    (_idParam,
+                     _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null)""",
+                     _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
+                }
+
+              case _ =>
+                (_idParam,
+                 _fromCCParams :+ q"$decoded -> cc.$name.orNull",
+                 _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
             }
           }
 

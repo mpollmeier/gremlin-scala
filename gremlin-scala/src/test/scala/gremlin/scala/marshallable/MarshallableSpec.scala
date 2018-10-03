@@ -24,6 +24,7 @@ case class MyValueClass(value: Int) extends AnyVal
 case class CCWithValueClass(s: String, i: MyValueClass)
 case class CCWithOption(i: Int, s: Option[String])
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
+case class CCWithOptionAnyVal(x: Option[Int], y: Option[Long])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
@@ -85,6 +86,16 @@ class MarshallableSpec extends WordSpec with Matchers {
 
         val vl = graph.V(v.id).head
         vl.keys should not contain "s" //None should be mapped to `null`
+      }
+
+      "handle an optional AnyVal" in new Fixture {
+        val ccWithOptionAnyVal = CCWithOptionAnyVal(Some(1), None)
+        val v = graph + ccWithOptionAnyVal
+        v.toCC[CCWithOptionAnyVal]
+
+        val vl = graph.V(v.id).head
+        vl.value[Int]("x") shouldBe ccWithOptionAnyVal.x.get
+        vl.keys should not contain "y"
       }
 
       // Background: if we marshal Option types, the graph db needs to understand scala.Option,
