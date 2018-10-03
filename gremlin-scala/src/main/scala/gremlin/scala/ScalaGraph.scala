@@ -48,7 +48,7 @@ case class ScalaGraph(traversalSource: TraversalSource) {
     */
   def addVertex[CC <: Product: Marshallable](cc: CC): Vertex = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    addVertex(fromCC.label, fromCC.valueMap)
+    addVertex(fromCC.label, fromCC.properties: _*)
   }
 
   def +[CC <: Product: Marshallable](cc: CC): Vertex = addVertex(cc)

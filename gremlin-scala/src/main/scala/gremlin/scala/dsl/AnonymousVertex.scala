@@ -25,7 +25,7 @@ object AnonymousVertex {
       def vertices(direction: Direction, edgeLabels: String*): JIterator[Vertex] = ???
       def properties[V](keys: String*): JIterator[VertexProperty[V]] = {
         val requestedKeys: Set[String] = keys.toSet
-        val x: Iterable[VertexProperty[V]] = fromCC.valueMap.collect {
+        val x: Iterable[VertexProperty[V]] = fromCC.properties.collect {
           case (ccKey, ccValue) if requestedKeys.contains(ccKey) =>
             new VertexProperty[V] {
               // Members declared in org.apache.tinkerpop.gremlin.structure.Element

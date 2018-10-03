@@ -14,8 +14,8 @@ import gremlin.scala.{
   Vertex
 }
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.WordSpec
-import org.scalatest.Matchers
+import org.scalatest.{Matchers, WordSpec}
+import scala.collection.JavaConverters._
 import shapeless.test.illTyped
 
 case class CCSimple(s: String, i: Int)
@@ -25,6 +25,7 @@ case class CCWithValueClass(s: String, i: MyValueClass)
 case class CCWithOption(i: Int, s: Option[String])
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 case class CCWithOptionAnyVal(x: Option[Int], y: Option[Long])
+case class CCWithList(ss: List[String], is: List[Int], ds: List[Double])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
@@ -141,16 +142,16 @@ class MarshallableSpec extends WordSpec with Matchers {
     "define their custom marshaller" in new Fixture {
       val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
-      val marshaller = new Marshallable[CCWithOption] {
+      implicit val marshaller = new Marshallable[CCWithOption] {
         import gremlin.scala.PropertyOps
         def fromCC(cc: CCWithOption) =
-          FromCC(None, "CCWithOption", Map("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
+          FromCC(None, "CCWithOption", List("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))
 
         def toCC(element: Element): CCWithOption =
           CCWithOption(i = element.value[Int]("i"), s = element.property[String]("s").toOption)
       }
 
-      val v = graph.+(ccWithOptionNone)(marshaller)
+      val v = graph + ccWithOptionNone
       v.toCC[CCWithOption](marshaller) shouldBe CCWithOption(ccWithOptionNone.i, Some("undefined"))
     }
 
