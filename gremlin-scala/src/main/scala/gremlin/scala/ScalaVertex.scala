@@ -23,7 +23,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def setProperties[CC <: Product: Marshallable](cc: CC): Vertex = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    fromCC.valueMap.foreach { case (k, v) => setProperty(Key[Any](k), v) }
+    fromCC.properties.foreach { case (k, v) => setProperty(Key[Any](k), v) }
     vertex
   }
 
@@ -70,7 +70,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
     val idParam = fromCC.id.toSeq.flatMap(List(T.id, _))
-    val params = fromCC.valueMap.toSeq.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
+    val params = fromCC.properties.flatMap(pair => Seq(pair._1, pair._2.asInstanceOf[AnyRef]))
     vertex.addEdge(fromCC.label, inVertex.vertex, idParam ++ params: _*)
   }
 
@@ -95,7 +95,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   def ---[CC <: Product: Marshallable](cc: CC): SemiEdge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
-    SemiEdge(vertex, fromCC.label, fromCC.valueMap.map { r =>
+    SemiEdge(vertex, fromCC.label, fromCC.properties.map { r =>
       Key[Any](r._1) -> r._2
     }.toSeq: _*)
   }

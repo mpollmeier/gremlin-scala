@@ -8,8 +8,7 @@ import scala.reflect.macros.blackbox
 trait Marshallable[CC <: Product] {
   type Id = AnyRef
   type Label = String
-  type ValueMap = Map[String, Any]
-  case class FromCC(id: Option[Id], label: Label, valueMap: ValueMap)
+  case class FromCC(id: Option[Id], label: Label, properties: List[(String, Any)])
 
   def fromCC(cc: CC): FromCC
   def toCC(element: Element): CC
@@ -57,24 +56,31 @@ object Marshallable {
             returnType.typeArgs.headOption match {
               case Some(innerAnyValClassType) if innerAnyValClassType <:< typeOf[AnyVal] =>
                 valueGetter(innerAnyValClassType) match {
-                  case Some(wrappedValueGetter) =>
+                  case Some(wrappedValueGetter) => //Option[ValueClass]
                     val valueClassCompanion = innerAnyValClassType.typeSymbol.companion
                     (_idParam,
                      _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null)""",
                      _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
-                  case None =>
+                  case None => // Option[AnyVal]
                     (_idParam,
                      _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null)""",
                      _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
                 }
 
-              case _ =>
+              case _ => // normal option property
                 (_idParam,
                  _fromCCParams :+ q"$decoded -> cc.$name.orNull",
                  _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
             }
           }
 
+          // def handleListProperty = {
+          //     case _ => // normal option property
+          //       (_idParam,
+          //        _fromCCParams :+ q"$decoded -> cc.$name.orNull",
+          //        _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
+          //   }
+          // }
 
           def valueGetter(tpe: Type): Option[MethodSymbol] =
             tpe.declarations.sorted
@@ -129,6 +135,9 @@ object Marshallable {
                    s"The parameter name $decoded can't be used in the persistable case class $tpe")
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
               handleOptionProperty
+            } else if (returnType.typeSymbol == weakTypeOf[List[_]].typeSymbol) {
+              // handleListProperty
+              ???
             } else {
               handleStandardProperty
             }
@@ -149,16 +158,15 @@ object Marshallable {
       q"""
       import gremlin.scala._
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe) = FromCC($idParam, $label, Map(..$fromCCParams).filter(_._2 != null))
+        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).filter(_._2 != null))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
       """
     }
-    if (tpe.toString.contains("CCWithList")) {
-      println(ret)
-    }
+    // if (tpe.toString.contains("CCWithList")) {
+    //   println(ret)
+    // }
     ret
   }
-
 
 }

@@ -68,7 +68,8 @@ trait ScalaElement[ElementType <: Element] {
   def toCC[CC <: Product: Marshallable]: CC
 
   def updateWith[CC <: Product: Marshallable](update: CC): ElementType = {
-    val propMap = implicitly[Marshallable[CC]].fromCC(update).valueMap
+    val properties: List[(String, Any)] = implicitly[Marshallable[CC]].fromCC(update).properties
+    val propMap = properties.toMap
     this.valueMap.keySet.diff(propMap.keySet).foreach { key =>
       val prop = element.property(key)
       if (prop.isPresent) prop.remove()
