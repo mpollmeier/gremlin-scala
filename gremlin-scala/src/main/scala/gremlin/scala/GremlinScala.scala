@@ -805,7 +805,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def hasLabel[CC <: Product: ru.WeakTypeTag]()(
       implicit ev: End <:< Element): GremlinScala.Aux[End, Labels] = {
-    val label: String = Annotations.labelOf[CC].map(_.label)
+    val label: String = Annotations
+      .labelOf[CC]
+      .map(_.label)
       .getOrElse(implicitly[ru.WeakTypeTag[CC]].tpe.typeSymbol.name.toString)
     hasLabel(label)
   }

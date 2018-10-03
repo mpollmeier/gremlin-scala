@@ -33,7 +33,26 @@ object Marshallable {
           val decoded = name.decodedName.toString
           val returnType = field.returnType
 
-          def optionProperty = {
+          def handleStandardProperty = {
+            // check if the property is a value class and try to extract everything we need to unwrap it
+            val treesForValueClass = for {
+              valueName <- valueGetter(returnType)
+              if returnType <:< typeOf[AnyVal]
+              wrappedType <- wrappedTypeMaybe(returnType)
+            } yield {
+              val valueClassCompanion = returnType.typeSymbol.companion
+              (_idParam,
+               _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
+               _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
+            }
+            treesForValueClass.getOrElse { //normal property
+              (_idParam,
+               _fromCCParams :+ q"$decoded -> cc.$name",
+               _toCCParams :+ q"element.value[$returnType]($decoded)")
+            }
+          }
+
+          def handleOptionProperty = {
             // check if the property is an Option[AnyVal] and try to extract everything we need to unwrap it
             returnType.typeArgs.headOption match {
               case Some(innerAnyValClassType) if innerAnyValClassType <:< typeOf[AnyVal] =>
@@ -56,24 +75,6 @@ object Marshallable {
             }
           }
 
-          def property = {
-            // check if the property is a value class and try to extract everything we need to unwrap it
-            val treesForValueClass = for {
-              valueName <- valueGetter(returnType)
-              if returnType <:< typeOf[AnyVal]
-              wrappedType <- wrappedTypeMaybe(returnType)
-            } yield {
-              val valueClassCompanion = returnType.typeSymbol.companion
-              (_idParam,
-               _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
-               _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
-            }
-            treesForValueClass.getOrElse { //normal property
-              (_idParam,
-               _fromCCParams :+ q"$decoded -> cc.$name",
-               _toCCParams :+ q"element.value[$returnType]($decoded)")
-            }
-          }
 
           def valueGetter(tpe: Type): Option[MethodSymbol] =
             tpe.declarations.sorted
@@ -96,7 +97,7 @@ object Marshallable {
               .Try(valueClassConstructor(tpe).get.paramLists.head.head.typeSignature)
               .toOption
 
-          if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) { // @id
+          def handleId = {
             assert(
               returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
               "@id parameter *must* be of type `Option[A]`. In the context of " +
@@ -105,8 +106,9 @@ object Marshallable {
             (q"cc.$name.asInstanceOf[Option[AnyRef]]",
              _fromCCParams,
              _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
+          }
 
-          } else if (field.annotations.map(_.tree.tpe) contains weakTypeOf[underlying]) { // @underlying
+          def handleUnderlying = {
             assert(
               returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol,
               "@underlying parameter *must* be of type `Option[A]`, since" +
@@ -115,13 +117,21 @@ object Marshallable {
             (q"cc.$name.asInstanceOf[Option[AnyRef]]",
              _fromCCParams,
              _toCCParams :+ q"Option(element).asInstanceOf[$returnType]")
+          }
+
+          // main control flow
+          if (field.annotations.map(_.tree.tpe) contains weakTypeOf[id]) {
+            handleId // @id
+          } else if (field.annotations.map(_.tree.tpe) contains weakTypeOf[underlying]) {
+            handleUnderlying // @underlying
           } else { // normal property member
             assert(!Hidden.isHidden(decoded),
                    s"The parameter name $decoded can't be used in the persistable case class $tpe")
-            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol)
-              optionProperty
-            else
-              property
+            if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
+              handleOptionProperty
+            } else {
+              handleStandardProperty
+            }
           }
 
         case (params, _) => params
@@ -144,9 +154,11 @@ object Marshallable {
       }
       """
     }
-    // if (tpe.toString.contains("CCWithOptionValueClass")) {
-    //   println(ret)
-    // }
+    if (tpe.toString.contains("CCWithList")) {
+      println(ret)
+    }
     ret
   }
+
+
 }
