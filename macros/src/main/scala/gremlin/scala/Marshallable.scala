@@ -38,15 +38,15 @@ object Marshallable {
               valueName <- valueGetter(returnType)
               if returnType <:< typeOf[AnyVal]
               wrappedType <- wrappedTypeMaybe(returnType)
-            } yield {
+            } yield { // ValueClass property
               val valueClassCompanion = returnType.typeSymbol.companion
               (_idParam,
-               _fromCCParams :+ q"$decoded -> cc.$name.$valueName",
+               _fromCCParams :+ q"List($decoded -> cc.$name.$valueName)",
                _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
             }
             treesForValueClass.getOrElse { //normal property
               (_idParam,
-               _fromCCParams :+ q"$decoded -> cc.$name",
+               _fromCCParams :+ q"List($decoded -> cc.$name)",
                _toCCParams :+ q"element.value[$returnType]($decoded)")
             }
           }
@@ -59,28 +59,28 @@ object Marshallable {
                   case Some(wrappedValueGetter) => //Option[ValueClass]
                     val valueClassCompanion = innerAnyValClassType.typeSymbol.companion
                     (_idParam,
-                     _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null)""",
+                     _fromCCParams :+ q"List(cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null))",
                      _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
                   case None => // Option[AnyVal]
                     (_idParam,
-                     _fromCCParams :+ q"""cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null)""",
+                     _fromCCParams :+ q"List(cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null))",
                      _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
                 }
 
               case _ => // normal option property
                 (_idParam,
-                 _fromCCParams :+ q"$decoded -> cc.$name.orNull",
+                 _fromCCParams :+ q"List($decoded -> cc.$name.orNull)",
                  _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
             }
           }
 
-          // def handleListProperty = {
-          //     case _ => // normal option property
-          //       (_idParam,
-          //        _fromCCParams :+ q"$decoded -> cc.$name.orNull",
-          //        _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
-          //   }
-          // }
+          def handleListProperty = {
+            (_idParam,
+             _fromCCParams :+ q"cc.$name.map { x => $decoded -> x }",
+             _toCCParams :+ q"element.properties($decoded).asScala.toList.map(_.value).asInstanceOf[$returnType]")
+            //       element.properties[String]("ss").asScala.toList.map(_.value),
+            // _toCCParams :+ q"element.value[$returnType]($decoded)")
+          }
 
           def valueGetter(tpe: Type): Option[MethodSymbol] =
             tpe.declarations.sorted
@@ -136,8 +136,7 @@ object Marshallable {
             if (returnType.typeSymbol == weakTypeOf[Option[_]].typeSymbol) {
               handleOptionProperty
             } else if (returnType.typeSymbol == weakTypeOf[List[_]].typeSymbol) {
-              // handleListProperty
-              ???
+              handleListProperty
             } else {
               handleStandardProperty
             }
@@ -157,8 +156,10 @@ object Marshallable {
     val ret = c.Expr[Marshallable[CC]] {
       q"""
       import gremlin.scala._
+      import scala.collection.JavaConverters._
+
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).filter(_._2 != null))
+        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).flatten.filter(_._2 != null))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
       """
