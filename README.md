@@ -247,11 +247,15 @@ g.V.has(age).order(By(age, Order.decr))
 More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-scala/blob/master/gremlin-scala/src/test/scala/gremlin/scala/TraversalSpec.scala).
 
 ### Mapping vertices from/to case classes
-You can save and load case classes as a vertex - implemented with a [blackbox macro](http://docs.scala-lang.org/overviews/macros/blackbox-whitebox.html). You can optionally annotate the id and label of your case class. Scala's `Option` types will be automatically unwrapped, i.e. a `Some[A]` will be stored as the value of type `A` in the database, or `null` if it's `None`. If we wouldn't unwrap it, the database would have to understand Scala's Option type itself. The same goes for value classes, i.e. a `case class ShoeSize(value: Int) extends AnyVal` will be stored as an Integer. 
+You can save and load case classes as a vertex - implemented with a [blackbox macro](http://docs.scala-lang.org/overviews/macros/blackbox-whitebox.html).
 
-Note: your classes must be defined outside the scope where they are being used (e.g. in the code below the class `Example` cannot be inside `object Main`). 
+* You can optionally specify the label of your class using `@label`
+* `Option` members will be automatically unwrapped, i.e. a `Some[A]` will be stored as the value of type `A` in the database, or `null` if it's `None`. If we wouldn't unwrap it, the database would have to understand Scala's Option type itself. 
+* The same goes for value classes, i.e. a `case class ShoeSize(value: Int) extends AnyVal` will be stored as an Integer. 
+* `List` members will be stored as multi-properties, i.e. Cardinality.list
+* Annotating members with `@id` and `@underlying` will instruct the marshaller to set the element id and/or the underlying element in the class. Note: you cannot specify the id when adding a vertex like this. Using `@id` only works when retrieving the vertex back from the graph and it therefor must be an `Option`.
+* Your classes must be defined outside the scope where they are being used (e.g. in the code below the class `Example` cannot be inside `object Main`). 
 
-Note: you cannot specify the id when adding a vertex like this. Using `@id` only works when retrieving the vertex back from the graph and it therefor must be an `Option`.
 
 ```scala
 // this does _not_ work in a REPL

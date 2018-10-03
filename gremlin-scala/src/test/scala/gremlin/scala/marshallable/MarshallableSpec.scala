@@ -25,7 +25,7 @@ case class CCWithValueClass(s: String, i: MyValueClass)
 case class CCWithOption(i: Int, s: Option[String])
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 case class CCWithOptionAnyVal(x: Option[Int], y: Option[Long])
-case class CCWithList(ss: List[String], is: List[Int], ds: List[Double])
+case class CCWithList(s: String, ss: List[String], is: List[Int], ds: List[Double])
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
@@ -137,6 +137,18 @@ class MarshallableSpec extends WordSpec with Matchers {
         vl.valueMap.keySet should not contain ("i")
         vl.toCC[CCWithOptionValueClass] shouldBe cc
       }
+    }
+
+    "handle List members" in new Fixture {
+      val cc = CCWithList(s = "foo", ss = List("one", "two"), is = List(1,2), ds = Nil)
+
+      val v = graph + cc
+      v.toCC[CCWithList] shouldBe cc
+
+      val vl = graph.V(v.id).head
+      val properties = vl.properties[String]("ss").asScala.toList
+      properties.size shouldBe 2
+      properties.map(_.value) shouldBe List("one", "two")
     }
 
     "define their custom marshaller" in new Fixture {
