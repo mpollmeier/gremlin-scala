@@ -159,7 +159,7 @@ object Marshallable {
       import scala.collection.JavaConverters._
 
       new Marshallable[$tpe] {
-        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).flatten.filter(_._2 != null))
+        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).flatten.filter(kv => Option(kv._2).isDefined))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
       """
