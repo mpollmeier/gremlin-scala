@@ -32,6 +32,7 @@ A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerp
 - [Serialise to and from files](#serialise-to-and-from-files)
 - [Help - it's open source!](#help---its-open-source)
 - [Why such a long version number?](#why-such-a-long-version-number)
+- [Talks](#talks)
 - [Further reading](#further-reading)
 - [Random things worth knowing](#random-things-worth-knowing)
 - [Releases](#releases)
@@ -358,6 +359,11 @@ If you would like to help, here's a list of things that needs to be addressed:
 
 ### Why such a long version number?
 The first three digits is the TP3 version number, only the last digit is automatically incremented on every release of gremlin-scala.
+
+### Talks
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=XIYBbJhhd9k" target="_blank">
+  <img src="doc/images/scaladays-talk-shot.png" alt="ScalaDays Berlin 2018" height="360" border="10" />
+</a>
 
 ### Further reading
 For more information about Gremlin see the [Gremlin docs](http://tinkerpop.incubator.apache.org/) and the [Gremlin users mailinglist](https://groups.google.com/forum/#!forum/gremlin-users).
