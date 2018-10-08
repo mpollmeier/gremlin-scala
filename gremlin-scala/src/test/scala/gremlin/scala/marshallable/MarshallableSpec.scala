@@ -140,7 +140,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     }
 
     "handle List members" in new Fixture {
-      val cc = CCWithList(s = "foo", ss = List("one", "two"), is = List(1,2), ds = Nil)
+      val cc = CCWithList(s = "foo", ss = List("one", "two"), is = List(1, 2), ds = Nil)
 
       val v = graph + cc
       v.toCC[CCWithList] shouldBe cc
