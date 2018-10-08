@@ -155,17 +155,16 @@ object Marshallable {
 
     val ret = c.Expr[Marshallable[CC]] {
       q"""
-      import gremlin.scala._
-      import scala.collection.JavaConverters._
-
-      new Marshallable[$tpe] {
+      new gremlin.scala.Marshallable[$tpe] {
+        import gremlin.scala._
+        import scala.collection.JavaConverters._
         def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).flatten.filter(kv => Option(kv._2).isDefined))
         def toCC(element: Element): $tpe = $companion(..$toCCParams)
       }
       """
     }
     // if (tpe.toString.contains("CCWithList")) {
-    //   println(ret)
+    // println(ret)
     // }
     ret
   }
