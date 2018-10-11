@@ -3,6 +3,7 @@ package gremlin.scala.dsl
 import gremlin.scala._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
+import scala.collection.mutable
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
@@ -28,6 +29,13 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   /* executes traversal and converts results into cpg domain type */
   def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
+  def iterate(): Unit = raw.iterate()
+
+  /**
+    Execute the traversal and convert it to a mutable buffer
+    */
+  def toBuffer(): mutable.Buffer[EndDomain] = toList.toBuffer
+
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
   override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())

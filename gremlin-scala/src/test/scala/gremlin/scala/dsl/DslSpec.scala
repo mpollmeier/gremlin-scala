@@ -140,6 +140,12 @@ class DslSpec extends WordSpec with Matchers {
     maps.foreach(_.keySet.asScala shouldBe Set("name", "age"))
   }
 
+  "allow side effects" in {
+    var i = 0
+    PersonSteps(TinkerFactory.createModern).sideEffect(_ => i = i + 1).iterate
+    i shouldBe 4
+  }
+
   "deduplicates" in {
     val results: List[Person] =
       PersonSteps(TinkerFactory.createModern).created.createdBy.dedup.toList
