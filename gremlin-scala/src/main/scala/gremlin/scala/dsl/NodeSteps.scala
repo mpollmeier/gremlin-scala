@@ -1,6 +1,7 @@
 package gremlin.scala.dsl
 
 import gremlin.scala._
+import java.util.{Map => JMap}
 import scala.collection.mutable
 import shapeless.HList
 
@@ -11,6 +12,11 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
     implicit marshaller: Marshallable[EndDomain])
     extends Steps[EndDomain, Vertex, Labels](raw)(
       Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)) {
+
+  def toMaps(): Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels] = {
+    implicit val c = Converter.identityConverter[JMap[String, AnyRef]]
+    new Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels](raw.valueMap())
+  }
 
   /** Aggregate all objects at this point into the given collection, e.g. `mutable.ArrayBuffer.empty[EndDomain]`
     * Uses eager evaluation (as opposed to `store`() which lazily fills a collection)
@@ -28,4 +34,5 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
         predicate(v.toCC[EndDomain])
       }
     )
+
 }

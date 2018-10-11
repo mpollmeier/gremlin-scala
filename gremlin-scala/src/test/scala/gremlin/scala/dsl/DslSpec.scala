@@ -1,9 +1,11 @@
 package gremlin.scala.dsl
 
 import gremlin.scala._
+import java.util.{Map => JMap}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 import shapeless._
 
 class DslSpec extends WordSpec with Matchers {
@@ -128,6 +130,14 @@ class DslSpec extends WordSpec with Matchers {
 
     markos.size shouldBe 1
     allPersons.size should be > 1
+  }
+
+  "converts to maps" in {
+    val maps: List[JMap[String, AnyRef]] =
+      PersonSteps(TinkerFactory.createModern).toMaps.toList
+
+    maps.size shouldBe 4
+    maps.foreach(_.keySet.asScala shouldBe Set("name", "age"))
   }
 
   "deduplicates" in {
