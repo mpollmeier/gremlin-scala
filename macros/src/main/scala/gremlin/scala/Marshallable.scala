@@ -25,7 +25,7 @@ object Marshallable {
     val companion = tpe.typeSymbol.companion
 
     val (idParam, fromCCParams, toCCParams) = tpe.decls
-      .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"None", Seq.empty, Seq.empty)) {
+      .foldLeft[(Tree, Seq[Tree], Seq[Tree])]((q"_root_.scala.None", Seq.empty, Seq.empty)) {
         case ((_idParam, _fromCCParams, _toCCParams), field: MethodSymbol)
             if field.isCaseAccessor =>
           val name = field.name
@@ -41,12 +41,12 @@ object Marshallable {
             } yield { // ValueClass property
               val valueClassCompanion = returnType.typeSymbol.companion
               (_idParam,
-               _fromCCParams :+ q"List($decoded -> cc.$name.$valueName)",
+               _fromCCParams :+ q"_root_.scala.collection.immutable.List($decoded -> cc.$name.$valueName)",
                _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
             }
             treesForValueClass.getOrElse { //normal property
               (_idParam,
-               _fromCCParams :+ q"List($decoded -> cc.$name)",
+               _fromCCParams :+ q"_root_.scala.collection.immutable.List($decoded -> cc.$name)",
                _toCCParams :+ q"element.value[$returnType]($decoded)")
             }
           }
@@ -59,25 +59,58 @@ object Marshallable {
                   case Some(wrappedValueGetter) => //Option[ValueClass]
                     val valueClassCompanion = innerAnyValClassType.typeSymbol.companion
                     (_idParam,
-                     _fromCCParams :+ q"List(cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null))",
-                     _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.map($valueClassCompanion.apply).asInstanceOf[$returnType]")
+                     _fromCCParams :+
+                       q"""
+                           _root_.scala.collection.immutable.List(
+                             cc.$name.map{ x => $decoded -> x.${wrappedValueGetter.name} }.getOrElse($decoded -> null)
+                           )
+                       """,
+                     _toCCParams :+
+                       q"""
+                           new _root_.gremlin.scala.PropertyOps(element.property($decoded))
+                             .toOption
+                             .map($valueClassCompanion.apply)
+                             .asInstanceOf[$returnType]
+                       """)
                   case None => // Option[AnyVal]
                     (_idParam,
-                     _fromCCParams :+ q"List(cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null))",
-                     _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
+                     _fromCCParams :+
+                       q"""
+                           _root_.scala.collection.immutable.List(
+                             cc.$name.map{ x => $decoded -> x }.getOrElse($decoded -> null)
+                           )
+                       """,
+                     _toCCParams :+
+                       q"""
+                           new _root_.gremlin.scala.PropertyOps(element.property($decoded))
+                             .toOption
+                             .asInstanceOf[$returnType]
+                       """)
                 }
 
               case _ => // normal option property
                 (_idParam,
-                 _fromCCParams :+ q"List($decoded -> cc.$name.orNull)",
-                 _toCCParams :+ q"new PropertyOps(element.property($decoded)).toOption.asInstanceOf[$returnType]")
+                 _fromCCParams :+ q"_root_.scala.collection.immutable.List($decoded -> cc.$name.orNull)",
+                 _toCCParams :+
+                   q"""
+                       new _root_.gremlin.scala.PropertyOps(element.property($decoded))
+                         .toOption
+                         .asInstanceOf[$returnType]
+                   """)
             }
           }
 
           def handleListProperty = {
             (_idParam,
              _fromCCParams :+ q"cc.$name.map { x => $decoded -> x }",
-             _toCCParams :+ q"element.properties($decoded).asScala.toList.map(_.value).asInstanceOf[$returnType]")
+             _toCCParams :+
+               q"""
+                   element.properties($decoded)
+                     .asScala
+                     .toList
+                     .map(_.value)
+                     .asInstanceOf[$returnType]
+               """)
             //       element.properties[String]("ss").asScala.toList.map(_.value),
             // _toCCParams :+ q"element.value[$returnType]($decoded)")
           }
@@ -109,9 +142,9 @@ object Marshallable {
               "@id parameter *must* be of type `Option[A]`. In the context of " +
                 "Marshallable, we have to let the graph assign an id"
             )
-            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+            (q"cc.$name.asInstanceOf[_root_.scala.Option[AnyRef]]",
              _fromCCParams,
-             _toCCParams :+ q"Option(element.id).asInstanceOf[$returnType]")
+             _toCCParams :+ q"_root_.scala.Option(element.id).asInstanceOf[$returnType]")
           }
 
           def handleUnderlying = {
@@ -120,9 +153,9 @@ object Marshallable {
               "@underlying parameter *must* be of type `Option[A]`, since" +
                 " it can only be defined after it has been added to the graph"
             )
-            (q"cc.$name.asInstanceOf[Option[AnyRef]]",
+            (q"cc.$name.asInstanceOf[_root_.scala.Option[AnyRef]]",
              _fromCCParams,
-             _toCCParams :+ q"Option(element).asInstanceOf[$returnType]")
+             _toCCParams :+ q"_root_.scala.Option(element).asInstanceOf[$returnType]")
           }
 
           // main control flow
@@ -155,12 +188,18 @@ object Marshallable {
 
     val ret = c.Expr[Marshallable[CC]] {
       q"""
-      new gremlin.scala.Marshallable[$tpe] {
-        import gremlin.scala._
-        import scala.collection.JavaConverters._
-        def fromCC(cc: $tpe) = FromCC($idParam, $label, List(..$fromCCParams).flatten.filter(kv => Option(kv._2).isDefined))
-        def toCC(element: Element): $tpe = $companion(..$toCCParams)
-      }
+          new _root_.gremlin.scala.Marshallable[$tpe] {
+            import _root_.scala.collection.JavaConverters._
+            def fromCC(cc: $tpe) =
+              this.FromCC(
+                $idParam,
+                $label,
+                _root_.scala.collection.immutable.List(..$fromCCParams)
+                  .flatten
+                  .filter(kv => _root_.scala.Option(kv._2).isDefined)
+              )
+            def toCC(element: _root_.gremlin.scala.Element): $tpe = $companion(..$toCCParams)
+          }
       """
     }
     // if (tpe.toString.contains("CCWithList")) {
