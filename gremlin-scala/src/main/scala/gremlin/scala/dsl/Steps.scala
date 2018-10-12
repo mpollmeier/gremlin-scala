@@ -167,5 +167,65 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     new Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels](newRaw)
   }
 
+  /**
+    Repeat the given traversal. This step can be combined with the until and emit steps to
+    provide a termination and emit criteria.
+    */
+  def repeat[NewEndDomain >: EndDomain](
+      repeatTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[NewEndDomain, EndGraph, _])(
+      implicit newConverter: Converter.Aux[NewEndDomain, EndGraph])
+    : Steps[NewEndDomain, EndGraph, Labels] =
+    new Steps[NewEndDomain, EndGraph, Labels](
+      raw.repeat { rawTraversal =>
+        repeatTraversal(
+          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+        ).raw
+      }
+    )
+
+  /**
+    Termination criteria for a repeat step.
+    If used before the repeat step it as "while" characteristics.
+    If used after the repeat step it as "do-while" characteristics
+    */
+  def until(untilTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])
+    : Steps[EndDomain, EndGraph, Labels] =
+    new Steps[EndDomain, EndGraph, Labels](
+      raw.until { rawTraversal =>
+        untilTraversal(
+          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+        ).raw
+      }
+    )
+
+  /**
+    * Modifier for repeat steps. Configure the amount of times the repeat traversal is
+    * executed.
+    */
+  def times(maxLoops: Int): Steps[EndDomain, EndGraph, Labels] =
+    new Steps[EndDomain, EndGraph, Labels](raw.times(maxLoops))
+
+  /**
+    Emit is used with the repeat step to emit the elements of the repeatTraversal after each
+    iteration of the repeat loop.
+    */
+  def emit(): Steps[EndDomain, EndGraph, Labels] =
+    new Steps[EndDomain, EndGraph, Labels](raw.emit())
+
+  /**
+    Emit is used with the repeat step to emit the elements of the repeatTraversal after each
+    iteration of the repeat loop.
+    The emitTraversal defines under which condition the elements are emitted.
+    */
+  def emit(emitTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])
+    : Steps[EndDomain, EndGraph, Labels] =
+    new Steps[EndDomain, EndGraph, Labels](
+      raw.emit { rawTraversal =>
+        emitTraversal(
+          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+        ).raw
+      }
+    )
+
   override def toString = s"${getClass.getSimpleName}($raw)"
 }
