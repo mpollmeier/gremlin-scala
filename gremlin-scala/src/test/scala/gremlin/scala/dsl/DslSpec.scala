@@ -132,14 +132,6 @@ class DslSpec extends WordSpec with Matchers {
     allPersons.size should be > 1
   }
 
-  "converts to maps" in {
-    val maps: List[JMap[String, AnyRef]] =
-      PersonSteps(TinkerFactory.createModern).toMaps.toList
-
-    maps.size shouldBe 4
-    maps.foreach(_.keySet.asScala shouldBe Set("name", "age"))
-  }
-
   "allow side effects" in {
     var i = 0
     PersonSteps(TinkerFactory.createModern).sideEffect(_ => i = i + 1).iterate
