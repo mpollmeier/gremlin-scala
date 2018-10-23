@@ -13,11 +13,6 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
     extends Steps[EndDomain, Vertex, Labels](raw)(
       Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)) {
 
-  def toMaps(): Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels] = {
-    implicit val c = Converter.identityConverter[JMap[String, AnyRef]]
-    new Steps[JMap[String, AnyRef], JMap[String, AnyRef], Labels](raw.valueMap())
-  }
-
   /* follow the incoming edges of the given type as long as possible */
   def walkIn(edgeType: String): GremlinScala[Vertex] =
     raw
@@ -42,8 +37,8 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
     )
 
   /** filter by id */
-  def id(id: AnyRef): NodeSteps[EndDomain, Labels] =
-    new NodeSteps[EndDomain, Labels](raw.hasId(id))
+  def id(ids: AnyRef*): NodeSteps[EndDomain, Labels] =
+    new NodeSteps[EndDomain, Labels](raw.hasId(ids: _*))
 
   /**
      Extend the traversal with a side-effect step, where `fun` is a

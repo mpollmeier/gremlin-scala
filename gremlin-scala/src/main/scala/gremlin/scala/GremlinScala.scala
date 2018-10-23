@@ -794,8 +794,11 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def has[A](label: String, key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.has(label, key.name, predicate))
 
-  def hasId(id: AnyRef, ids: AnyRef*)(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.hasId(id, ids: _*))
+  def hasId(ids: AnyRef*)(implicit ev: End <:< Element) = {
+    val list = ids.toList
+    assert(list.nonEmpty, "must provide at least one id to filter on")
+    GremlinScala[End, Labels](traversal.hasId(list.head, list.tail: _*))
+  }
 
   def hasId(predicate: P[AnyRef])(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.hasId(predicate))
