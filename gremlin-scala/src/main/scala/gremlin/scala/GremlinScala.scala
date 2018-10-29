@@ -272,7 +272,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy(elementPropertyKey: String)(
       implicit ev: End <:< Element): GremlinScala.Aux[End, Labels] =
-    GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, Order.incr))
+    GremlinScala[End, Labels](traversal.order().by(elementPropertyKey, Order.asc))
 
   @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy(elementPropertyKey: String, comparator: Order)(
@@ -286,10 +286,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[End, Labels](traversal.order().by(comparator))
 
   def order(scope: Scope) =
-    GremlinScala[End, Labels](traversal.order(scope).by(Order.incr))
+    GremlinScala[End, Labels](traversal.order(scope).by(Order.asc))
 
   @deprecated("use order(by(...))", "3.0.0.1")
-  def order(scope: Scope, comparator: Order = Order.incr) =
+  def order(scope: Scope, comparator: Order = Order.asc) =
     GremlinScala[End, Labels](traversal.order(scope).by(comparator))
 
   /** n.b. `By` can be used in place of `OrderBy` */
@@ -476,7 +476,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   @deprecated("don't use step by itself, most steps now accept a `By` instance as an argument",
               "3.0.0.1")
   def by[A <: AnyRef](funProjection: End => A,
-                      comparator: Comparator[A] = Order.incr): GremlinScala.Aux[End, Labels] =
+                      comparator: Comparator[A] = Order.asc): GremlinScala.Aux[End, Labels] =
     GremlinScala[End, Labels](
       traversal.by(toJavaFunction(funProjection)
                      .asInstanceOf[java.util.function.Function[_, AnyRef]],

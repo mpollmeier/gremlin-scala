@@ -138,9 +138,9 @@ class TraversalSpec extends WordSpec with Matchers {
       results shouldBe Seq(27, 29, 32, 35)
     }
 
-    "order naturally decr" in new Fixture {
+    "order naturally desc" in new Fixture {
       val results: List[Int] =
-        graph.V.value(Age).order(By(Order.decr)).toList
+        graph.V.value(Age).order(By(Order.desc)).toList
       results shouldBe List(35, 32, 29, 27)
     }
 
@@ -154,11 +154,11 @@ class TraversalSpec extends WordSpec with Matchers {
       results shouldBe Seq(27, 29, 32, 35)
     }
 
-    "order by property decr" in new Fixture {
+    "order by property desc" in new Fixture {
       val results: List[Int] =
         graph.V
           .has(Age)
-          .order(By(Age, Order.decr))
+          .order(By(Age, Order.desc))
           .value(Age)
           .toList
       results shouldBe List(35, 32, 29, 27)
@@ -168,7 +168,7 @@ class TraversalSpec extends WordSpec with Matchers {
       val results: List[String] =
         graph.V
           .hasLabel("person")
-          .order(By(__.outE(Created).count), By(Age, Order.decr))
+          .order(By(__.outE(Created).count), By(Age, Order.desc))
           .value(Name)
           .toList
       results shouldBe Seq("vadas", "peter", "marko", "josh")
@@ -249,7 +249,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
       graph.V
         .value(Age)
-        .order(By(Order.decr))
+        .order(By(Order.desc))
         .foldLeft("F")(_ + _ + "*")
         .head() shouldBe "F35*32*29*27*"
     }
@@ -286,7 +286,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
     val traversal = for {
       person <- graph.V.hasLabel(Person)
-      favorite <- person.outE(Likes).order(By(Weight, Order.decr)).limit(1).inV
+      favorite <- person.outE(Likes).order(By(Weight, Order.desc)).limit(1).inV
     } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(

@@ -30,6 +30,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
   def iterate(): Unit = raw.iterate()
+  def exec(): Unit = iterate
 
   /**
     Execute the traversal and convert it to a mutable buffer
