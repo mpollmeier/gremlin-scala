@@ -8,7 +8,7 @@ import shapeless.HNil
 
 object TraversalSource {
   def apply(graph: Graph): TraversalSource =
-    TraversalSource(new GraphTraversalSource(graph))
+    TraversalSource(graph.traversal())
 }
 
 case class TraversalSource(underlying: GraphTraversalSource) {
