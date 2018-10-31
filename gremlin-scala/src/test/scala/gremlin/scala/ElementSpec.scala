@@ -52,13 +52,20 @@ class ElementSpec extends TestBase {
       * TODO: `properties` should take `Key` as well
       */
     it("sets a property with multiple values") {
+      // tp3 standard way
       val v = graph.addVertex((Name.name -> "marko"), (Name.name -> "marko a. rodriguez"))
       graph.V(v).properties(Name.name).count.head shouldBe 2
 
+      // add one more
       v.property(Cardinality.list, Name.name, "m. a. rodriguez")
       graph.V(v).properties(Name.name).count.head shouldBe 3
 
+      // can filter on property values as well
       graph.V(v).properties(Name.name).hasValue("marko").count.head shouldBe 1
+
+      // gremlin-scala style
+      v.setPropertyList(TestProperty, List("one", "two", "three"))
+      graph.V(v).properties(TestProperty.name).count.head shouldBe 3
     }
 
     it("removes a property") {

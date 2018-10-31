@@ -112,6 +112,27 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
                   keyValues: AnyRef*): VertexProperty[A] =
     vertex.property(cardinality, key.name, value, keyValues: _*)
 
+  /** convenience function for `property` which normally requires to pass in key/value pairs as varargs */
+  def setPropertyList[A <: AnyRef](key: Key[A], values: List[A]): VertexProperty[A] = {
+    removeProperty(key)
+    values
+      .map { value =>
+        vertex.property(Cardinality.list, key.name, value)
+      }
+      .lastOption
+      .getOrElse(VertexProperty.empty[A])
+  }
+  /* TODO: looks like there's a bug in tinkerpop - passing multiple values with the same key doesn't result in all those values being set:
+    values match {
+      case Nil =>
+        removeProperty(key)
+        VertexProperty.empty[A]
+      case headValue :: tailValues =>
+        val varargs = tailValues.flatMap(value => List(key.name, value))
+        vertex.property(Cardinality.list, key.name, headValue, varargs: _*)
+    }
+   */
+
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
     vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
