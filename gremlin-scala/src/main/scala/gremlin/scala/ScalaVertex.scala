@@ -113,11 +113,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex.property(cardinality, key.name, value, keyValues: _*)
 
   /** convenience function for `property` which normally requires to pass in key/value pairs as varargs */
-  def setPropertyList[A <: AnyRef](key: Key[A], values: List[A]): VertexProperty[A] = {
-    removeProperty(key)
+  def setPropertyList[A <: AnyRef](key: String, values: List[A]): VertexProperty[A] = {
+    removeProperty(Key[A](key))
     values
       .map { value =>
-        vertex.property(Cardinality.list, key.name, value)
+        vertex.property(Cardinality.list, key, value)
       }
       .lastOption
       .getOrElse(VertexProperty.empty[A])
@@ -132,6 +132,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
         vertex.property(Cardinality.list, key.name, headValue, varargs: _*)
     }
    */
+
+  def setPropertyList[A <: AnyRef](key: Key[A], values: List[A]): VertexProperty[A] =
+    setPropertyList(key.name, values)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
     vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
