@@ -27,9 +27,19 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     vertex
   }
 
-  override def removeProperty(key: Key[_]): Vertex = {
-    val p = property(key)
-    if (p.isPresent) p.remove()
+  override def removeProperty(key: Key[_]): Vertex =
+    removeProperty(key, Cardinality.single)
+
+  def removeProperty(key: Key[_], cardinality: Cardinality): Vertex = {
+    cardinality match {
+      case Cardinality.single =>
+        val p = property(key)
+        if (p.isPresent) p.remove
+      case Cardinality.list | Cardinality.set =>
+        vertex.properties(key.name).asScala.foreach { p: VertexProperty[_] =>
+          p.remove
+        }
+    }
     vertex
   }
 
@@ -114,7 +124,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   /** convenience function for `property` which normally requires to pass in key/value pairs as varargs */
   def setPropertyList[A <: AnyRef](key: String, values: List[A]): VertexProperty[A] = {
-    removeProperty(Key[A](key))
+    removeProperty(Key[A](key), Cardinality.list)
     values
       .map { value =>
         vertex.property(Cardinality.list, key, value)

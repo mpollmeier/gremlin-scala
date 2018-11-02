@@ -66,6 +66,10 @@ class ElementSpec extends TestBase {
       // gremlin-scala style
       v.setPropertyList(TestProperty, List("one", "two", "three"))
       graph.V(v).properties(TestProperty.name).count.head shouldBe 3
+
+      // can override
+      v.setPropertyList(TestProperty, List("three", "four"))
+      graph.V(v).properties(TestProperty.name).count.head shouldBe 2
     }
 
     it("removes a property") {
