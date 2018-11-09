@@ -351,6 +351,11 @@ class MarshallableSpec extends WordSpec with Matchers {
     results shouldBe Set(cc1, cc2)
   }
 
+  case class EmptyCC()
+  "handle case class without elements" in new Fixture {
+    val m = implicitly[Marshallable[EmptyCC]]
+  }
+
   trait Fixture {
     val graph = TinkerGraph.open.asScala
   }
