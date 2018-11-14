@@ -194,11 +194,10 @@ object Marshallable {
               this.FromCC(
                 $idParam,
                 $label,
-                _root_.scala.collection.immutable.List(..$fromCCParams)
+                _root_.scala.collection.immutable.List[_root_.scala.collection.immutable.List[(_root_.scala.Predef.String,_root_.scala.Any)]](..$fromCCParams)
                   .flatten
                   .filter { kv =>
-                    kv.isInstanceOf[Product2[_, _]] &&
-                    kv.asInstanceOf[Product2[_, _]]._2 != null
+                    _root_.scala.Option(kv._2).isDefined
                   }
               )
             def toCC(element: _root_.gremlin.scala.Element): $tpe = $companion(..$toCCParams)
