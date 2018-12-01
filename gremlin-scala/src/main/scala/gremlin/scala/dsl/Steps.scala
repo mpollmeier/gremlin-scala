@@ -3,6 +3,7 @@ package gremlin.scala.dsl
 import gremlin.scala._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
+import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
@@ -21,13 +22,14 @@ trait StepsRoot {
 }
 
 class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph])(
-    implicit converter: Converter.Aux[EndDomain, EndGraph])
+    implicit val converter: Converter.Aux[EndDomain, EndGraph])
     extends StepsRoot {
   type EndDomain0 = EndDomain
   type EndGraph0 = EndGraph
 
   /* executes traversal and converts results into cpg domain type */
   def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
+  def toStream(): JStream[EndDomain] = raw.toStream.map(converter.toDomain)
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
   def iterate(): Unit = raw.iterate()
   def exec(): Unit = iterate
