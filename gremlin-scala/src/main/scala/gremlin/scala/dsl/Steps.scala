@@ -41,6 +41,8 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
   def head(): EndDomain = converter.toDomain(raw.head)
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
+  def isDefined: Boolean = headOption().isDefined
+
   override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
 
   def dedup(): Steps[EndDomain, EndGraph, Labels] =
@@ -229,6 +231,32 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
         ).raw
       }
     )
+
+  /**
+    * The or step is a filter with multiple or related filter traversals.
+    */
+  def or(orTraversals: (Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])*)
+    : Steps[EndDomain, EndGraph, Labels] = {
+    val rawOrTraversals = orTraversals.map {
+      orTraversal => (rawTraversal: GremlinScala[EndGraph]) =>
+        orTraversal(
+          new Steps[EndDomain, EndGraph, HNil](
+            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]])
+        ).raw
+    }
+
+    new Steps[EndDomain, EndGraph, Labels](
+      raw.or(rawOrTraversals: _*)
+    )
+  }
+
+  /**
+    * Step that orders nodes according to f.
+    * */
+  def orderBy[A](fun: EndDomain => A): Steps[EndDomain, EndGraph, Labels] =
+    new Steps[EndDomain, EndGraph, Labels](raw.order(By { v: EndGraph =>
+      fun(converter.toDomain(v))
+    }))
 
   override def toString = s"${getClass.getSimpleName}($raw)"
 }
