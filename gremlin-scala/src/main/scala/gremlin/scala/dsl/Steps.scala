@@ -233,7 +233,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     )
 
   /**
-    * The or step is a filter with multiple or related filter traversals.
+    * The or step is a filter with multiple `or` related filter traversals.
     */
   def or(orTraversals: (Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])*)
     : Steps[EndDomain, EndGraph, Labels] = {
@@ -247,6 +247,24 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
     new Steps[EndDomain, EndGraph, Labels](
       raw.or(rawOrTraversals: _*)
+    )
+  }
+
+  /**
+    * The and step is a filter with multiple `and` related filter traversals.
+    */
+  def and(andTraversals: (Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])*)
+    : Steps[EndDomain, EndGraph, Labels] = {
+    val rawAndTraversals = andTraversals.map {
+      andTraversal => (rawTraversal: GremlinScala[EndGraph]) =>
+        andTraversal(
+          new Steps[EndDomain, EndGraph, HNil](
+            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]])
+        ).raw
+    }
+
+    new Steps[EndDomain, EndGraph, Labels](
+      raw.and(rawAndTraversals: _*)
     )
   }
 
