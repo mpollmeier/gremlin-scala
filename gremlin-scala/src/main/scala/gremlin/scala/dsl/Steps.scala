@@ -43,6 +43,38 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
   def isDefined: Boolean = headOption().isDefined
 
+  /**
+    * shortcut for `toList`
+    */
+  def l: List[EndDomain] = toList
+
+  /**
+    Alias for `toStream`
+    */
+  def s(): JStream[EndDomain] = toStream()
+
+  /**
+    * print the results to stdout
+    */
+  def p(): Unit = {
+    l.foreach {
+      case vertex: Vertex => {
+        val label = vertex.label
+        val id = vertex.id().toString
+        val keyValPairs = vertex.valueMap.toList
+          .filter(x => x._2.toString != "")
+          .sortBy(_._1)
+          .map(x => x._1 + ": " + x._2)
+        println(s"($label,$id): " + keyValPairs.mkString(", "))
+
+      }
+      case elem => println(elem)
+    }
+  }
+
+  def count(): Long =
+    raw.count.head
+
   override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
 
   def dedup(): Steps[EndDomain, EndGraph, Labels] =
