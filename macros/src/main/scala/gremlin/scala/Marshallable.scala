@@ -32,7 +32,7 @@ object Marshallable {
           val decoded = name.decodedName.toString
           val returnType = field.returnType
 
-          def handleStandardProperty = {
+          def handleStandardProperty(nullable: Boolean) = {
             // check if the property is a value class and try to extract everything we need to unwrap it
             val treesForValueClass = for {
               valueName <- valueGetter(returnType)
@@ -45,9 +45,16 @@ object Marshallable {
                _toCCParams :+ q"$valueClassCompanion(element.value[$wrappedType]($decoded)).asInstanceOf[$returnType]")
             }
             treesForValueClass.getOrElse { //normal property
+              val toCCParams =
+                if (!nullable) {
+                  q"element.value[$returnType]($decoded)"
+                } else {
+                  // for people who like to shoot themselves in the foot
+                  q"new _root_.gremlin.scala.PropertyOps(element.property[$returnType]($decoded)).toOption.orNull"
+                }
               (_idParam,
                _fromCCParams :+ q"_root_.scala.collection.immutable.List($decoded -> cc.$name)",
-               _toCCParams :+ q"element.value[$returnType]($decoded)")
+               _toCCParams :+ toCCParams)
             }
           }
 
@@ -171,7 +178,8 @@ object Marshallable {
             } else if (returnType.typeSymbol == weakTypeOf[List[_]].typeSymbol) {
               handleListProperty
             } else {
-              handleStandardProperty
+              handleStandardProperty(
+                nullable = field.annotations.map(_.tree.tpe).contains(weakTypeOf[nullable]))
             }
           }
 
@@ -204,9 +212,7 @@ object Marshallable {
           }
       """
     }
-    // if (tpe.toString.contains("CCWithList")) {
-    // println(ret)
-    // }
+    // if (tpe.toString.contains("CCWithNullable")) println(ret)
     ret
   }
 

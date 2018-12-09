@@ -14,6 +14,12 @@ class underlying extends StaticAnnotation
 @getter @beanGetter
 class id extends StaticAnnotation
 
+/** annotate a non-option member with `@nullable` to allow `null` values.
+  * by default this would throw an error on deserialization
+  * a.k.a. license to shoot yourself in the foot */
+@getter @beanGetter
+class nullable extends StaticAnnotation
+
 class label(val label: String = "") extends StaticAnnotation
 
 object Annotations {

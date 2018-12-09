@@ -6,6 +6,7 @@ import gremlin.scala.{
   asScalaVertex,
   id,
   label,
+  nullable,
   underlying,
   Edge,
   Element,
@@ -26,6 +27,7 @@ case class CCWithOption(i: Int, s: Option[String])
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 case class CCWithOptionAnyVal(x: Option[Int], y: Option[Long])
 case class CCWithList(s: String, ss: List[String], is: List[Int], ds: List[Double])
+case class CCWithNullable(i: Int, @nullable maybeNull: String)
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
@@ -149,6 +151,13 @@ class MarshallableSpec extends WordSpec with Matchers {
       val properties = vl.properties[String]("ss").asScala.toList
       properties.size shouldBe 2
       properties.map(_.value) shouldBe List("one", "two")
+    }
+
+    "allows members to be `null` if annotated with `@nullable`" in new Fixture {
+      val cc = CCWithNullable(i = 42, maybeNull = null)
+
+      val v = graph + cc
+      v.toCC[CCWithNullable] shouldBe cc
     }
 
     "define their custom marshaller" in new Fixture {
