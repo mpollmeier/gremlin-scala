@@ -56,8 +56,8 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   /**
     * print the results to stdout
     */
-  def p(): Unit = {
-    l.foreach {
+  def p(): List[String] = {
+    l.map {
       case vertex: Vertex => {
         val label = vertex.label
         val id = vertex.id().toString
@@ -65,10 +65,10 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
           .filter(x => x._2.toString != "")
           .sortBy(_._1)
           .map(x => x._1 + ": " + x._2)
-        println(s"($label,$id): " + keyValPairs.mkString(", "))
-
+        s"($label,$id): " + keyValPairs.mkString(", ")
       }
-      case elem => println(elem)
+      case elem => elem.toString
+      case _    => ""
     }
   }
 
