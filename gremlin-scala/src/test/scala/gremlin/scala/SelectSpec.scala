@@ -3,6 +3,8 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.{::, HNil}
+import java.util.{Collection ⇒ JCollection, Map ⇒ JMap, Set ⇒ JSet}
+import scala.collection.JavaConverters._
 
 class SelectSpec extends WordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala
@@ -133,6 +135,73 @@ class SelectSpec extends WordSpec with Matchers {
         ._1
 
       (sum: Double) shouldBe 2d +- 0.1d
+    }
+  }
+
+  "select column" should {
+    "extract keys from map" in {
+      val result = graph
+        .V()
+        .hasLabel("software")
+        .group(By(__.value(Key[String]("name"))), By(__.in("created")))
+        .selectKeys
+        .head
+        .asScala
+      result shouldBe Set("ripple", "lop")
+    }
+
+    "extract keys from map entry" in {
+      val result = graph
+        .V()
+        .hasLabel("software")
+        .group(By(__.value(Key[String]("name"))), By(__.in("created")))
+        .unfold[JMap.Entry[String, JCollection[Vertex]]]()
+        .selectKeys
+        .toList
+      result shouldBe List("ripple", "lop")
+    }
+
+    "extract keys from path" in {
+      val result = graph
+        .V(1).as("a")
+        .outE.as("b")
+        .path()
+        .selectKeys.head.asScala.map(_.asScala)
+      result shouldBe List(Set("a"), Set("b"))
+    }
+
+    "extract values from map" in {
+      val result = graph
+        .V()
+        .hasLabel("software")
+        .group(By(Key[String]("lang")), By(Key[String]("name")))
+        .selectValues
+        .head
+        .asScala
+        .flatMap(_.asScala)
+      result shouldBe List("lop", "ripple")
+    }
+
+    "extract values from map entry" in {
+      val result = graph
+        .V()
+        .hasLabel("software")
+        .group(By(__.value(Key[String]("name"))), By(__.in("created").value(Key[String]("name"))))
+        .unfold[JMap.Entry[String, JCollection[Vertex]]]()
+        .selectValues
+        .toList
+      result shouldBe List("josh", "marko")
+    }
+
+    "extract values from path" in {
+      val result = graph
+        .V(1).as("a")
+        .outE.as("b")
+        .path()
+        .selectValues
+        .head
+      result.get(0).toString shouldBe "v[1]"
+      result.get(1).toString shouldBe "e[9][1-created->3]"
     }
   }
 }

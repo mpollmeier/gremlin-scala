@@ -29,7 +29,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.util.{BulkSet, Tree}
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.util.TraverserSet
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Path, Scope, Traversal}
-import org.apache.tinkerpop.gremlin.structure.{Direction, T}
+import org.apache.tinkerpop.gremlin.structure.{Column, Direction, T}
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
@@ -251,6 +251,20 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def select(pop: Pop, selectKey1: String, selectKey2: String, otherSelectKeys: String*) =
     GremlinScala[JMap[String, Any], Labels](
       traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
+
+  def selectKeys[K](implicit columnType: ColumnType.Aux[End, K, _]): GremlinScala[K] = {
+    new GremlinScala[K](
+      traversal
+        .select(Column.keys) // The result of select(keys) may not be a collection (when applied on Map.Entry)
+        .asInstanceOf[GraphTraversal[_, K]])
+  }
+
+  def selectValues[V](implicit columnType: ColumnType.Aux[End, _, V]): GremlinScala[V] = {
+    new GremlinScala[V](
+      traversal
+        .select(Column.values)
+        .asInstanceOf[GraphTraversal[_, V]])
+  }
 
   @deprecated("use order(by(...))", "3.0.0.1")
   def orderBy[A <: AnyRef: Ordering](by: End => A): GremlinScala.Aux[End, Labels] =
@@ -1026,4 +1040,30 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
       travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]): Seq[GraphTraversal[_, E]] =
     travs.map(_.apply(start).traversal)
 
+}
+
+trait ColumnType[FROM] {
+  type KEY
+  type VALUE
+}
+
+object ColumnType {
+  type Aux[FROM, K, V] = ColumnType[FROM] {
+    type KEY = K
+    type VALUE = V
+  }
+  implicit def MapKeyColumn[K, V]: Aux[JMap[K, V], JSet[K], JCollection[V]] =
+    new ColumnType[JMap[K, V]] {
+      type KEY = JSet[K]
+      type VALUE = JCollection[V]
+    }
+  implicit def MapEntryKeyColumn[K, V]: Aux[JMap.Entry[K, V], K, V] =
+    new ColumnType[JMap.Entry[K, V]] {
+      type KEY = K
+      type VALUE = V
+    }
+  implicit val PathKeyColumn: Aux[Path, JList[JSet[String]], JList[Any]] = new ColumnType[Path] {
+    type KEY = JList[JSet[String]]
+    type VALUE = JList[Any]
+  }
 }
