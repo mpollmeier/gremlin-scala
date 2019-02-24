@@ -118,29 +118,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
 
   def project[H <: HList](
-      builder: ProjectionBuilder[End, HNil] ⇒ ProjectionBuilder[End, H]): GremlinScala[H] =
-    builder(new ProjectionBuilder(Nil, scala.Predef.identity, _ ⇒ HNil)).build(this)
-
-  class ProjectionBuilder[T, H <: HList] private[gremlin] (
-      labels: Seq[String],
-      addBy: GraphTraversal[_, JMap[String, Any]] ⇒ GraphTraversal[_, JMap[String, Any]],
-      buildResult: JMap[String, Any] ⇒ H) {
-
-    def apply[U, HR <: HList](by: By[U])(
-        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = {
-      val label = UUID.randomUUID().toString
-      new ProjectionBuilder[T, HR](labels :+ label,
-                                   addBy.andThen(by.apply),
-                                   map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
-    }
-
-    def and[U, HR <: HList](by: By[U])(
-        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = apply(by)
-
-    private[gremlin] def build(g: GremlinScala[T]): GremlinScala[H] = {
-      GremlinScala(addBy(g.traversal.project(labels.head, labels.tail: _*))).map(buildResult)
-    }
-  }
+      builder: ProjectionBuilder[HNil] ⇒ ProjectionBuilder[H]): GremlinScala[H] =
+    builder(ProjectionBuilder()).build(this)
 
   /** You might think that predicate should be `GremlinScala[End] => GremlinScala[Boolean]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
@@ -1052,4 +1031,29 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
       travs: Seq[GremlinScala.Aux[S, HNil] => GremlinScala[E]]): Seq[GraphTraversal[_, E]] =
     travs.map(_.apply(start).traversal)
 
+}
+
+class ProjectionBuilder[H <: HList] private[gremlin] (
+    labels: Seq[String],
+    addBy: GraphTraversal[_, JMap[String, Any]] ⇒ GraphTraversal[_, JMap[String, Any]],
+    buildResult: JMap[String, Any] ⇒ H) {
+
+  def apply[U, HR <: HList](by: By[U])(
+      implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[HR] = {
+    val label = UUID.randomUUID().toString
+    new ProjectionBuilder[HR](labels :+ label,
+                              addBy.andThen(by.apply),
+                              map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
+  }
+
+  def and[U, HR <: HList](by: By[U])(
+      implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[HR] = apply(by)
+
+  private[gremlin] def build(g: GremlinScala[_]): GremlinScala[H] = {
+    GremlinScala(addBy(g.traversal.project(labels.head, labels.tail: _*))).map(buildResult)
+  }
+}
+
+object ProjectionBuilder {
+  def apply() = new ProjectionBuilder[HNil](Nil, scala.Predef.identity, _ ⇒ HNil)
 }
