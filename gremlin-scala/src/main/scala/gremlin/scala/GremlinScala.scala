@@ -13,7 +13,8 @@ import java.util.{
   Map => JMap,
   Collection => JCollection,
   Iterator => JIterator,
-  Set => JSet
+  Set => JSet,
+  UUID
 }
 import java.util.stream.{Stream => JStream}
 
@@ -115,6 +116,31 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def project[A](projectKey: String,
                  otherProjectKeys: String*): GremlinScala.Aux[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
+
+  def project[H <: HList](
+      builder: ProjectionBuilder[End, HNil] ⇒ ProjectionBuilder[End, H]): GremlinScala[H] =
+    builder(new ProjectionBuilder(Nil, scala.Predef.identity, _ ⇒ HNil)).build(this)
+
+  class ProjectionBuilder[T, H <: HList] private[gremlin] (
+      labels: Seq[String],
+      addBy: GraphTraversal[_, JMap[String, Any]] ⇒ GraphTraversal[_, JMap[String, Any]],
+      buildResult: JMap[String, Any] ⇒ H) {
+
+    def apply[U, HR <: HList](f: GremlinScala[T] ⇒ GremlinScala[U])(
+        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = {
+      val label = UUID.randomUUID().toString
+      new ProjectionBuilder[T, HR](labels :+ label,
+                                addBy.andThen(_.by(f(__[T]()).traversal)),
+                                map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
+    }
+
+    def and[U, HR <: HList](f: GremlinScala[T] ⇒ GremlinScala[U])(
+        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = apply(f)
+
+    private[gremlin] def build(g: GremlinScala[T]): GremlinScala[H] = {
+      GremlinScala(addBy(g.traversal.project(labels.head, labels.tail: _*))).map(buildResult)
+    }
+  }
 
   /** You might think that predicate should be `GremlinScala[End] => GremlinScala[Boolean]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
