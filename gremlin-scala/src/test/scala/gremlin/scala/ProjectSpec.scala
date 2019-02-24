@@ -12,8 +12,8 @@ class ProjectSpec extends WordSpec with Matchers {
       val result = graph
         .V()
         .out("created")
-        .project(_(_.value(Key[String]("name")))
-          .and(_.in("created").count()))
+        .project(_(By(Key[String]("name")))
+          .and(By(__.in("created").count())))
         .toList()
 
       result shouldBe List(
@@ -28,8 +28,8 @@ class ProjectSpec extends WordSpec with Matchers {
       val result = graph
         .V()
         .has(Key("name").of("marko"))
-        .project(_(_.outE().count())
-          .and(_.inE().count()))
+        .project(_(By(__.outE().count()))
+          .and(By(__.inE().count())))
         .head()
 
       result shouldBe (3 :: 0 :: HNil)

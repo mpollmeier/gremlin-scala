@@ -126,16 +126,16 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
       addBy: GraphTraversal[_, JMap[String, Any]] ⇒ GraphTraversal[_, JMap[String, Any]],
       buildResult: JMap[String, Any] ⇒ H) {
 
-    def apply[U, HR <: HList](f: GremlinScala[T] ⇒ GremlinScala[U])(
+    def apply[U, HR <: HList](by: By[U])(
         implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = {
       val label = UUID.randomUUID().toString
       new ProjectionBuilder[T, HR](labels :+ label,
-                                addBy.andThen(_.by(f(__[T]()).traversal)),
-                                map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
+                                   addBy.andThen(by.apply),
+                                   map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
     }
 
-    def and[U, HR <: HList](f: GremlinScala[T] ⇒ GremlinScala[U])(
-        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = apply(f)
+    def and[U, HR <: HList](by: By[U])(
+        implicit prepend: Prepend.Aux[H, U :: HNil, HR]): ProjectionBuilder[T, HR] = apply(by)
 
     private[gremlin] def build(g: GremlinScala[T]): GremlinScala[H] = {
       GremlinScala(addBy(g.traversal.project(labels.head, labels.tail: _*))).map(buildResult)
