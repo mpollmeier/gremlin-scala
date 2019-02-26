@@ -2,7 +2,6 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
-import shapeless.HNil
 
 class ProjectSpec extends WordSpec with Matchers {
   def graph: ScalaGraph = TinkerFactory.createModern.asScala()
@@ -17,10 +16,10 @@ class ProjectSpec extends WordSpec with Matchers {
         .toList()
 
       result shouldBe List(
-        "lop" :: 3 :: HNil,
-        "lop" :: 3 :: HNil,
-        "lop" :: 3 :: HNil,
-        "ripple" :: 1 :: HNil
+        ("lop", 3),
+        ("lop",3),
+        ("lop",3),
+        ("ripple", 1)
       )
     }
 
@@ -32,7 +31,7 @@ class ProjectSpec extends WordSpec with Matchers {
           .and(By(__.inE().count())))
         .head()
 
-      result shouldBe (3 :: 0 :: HNil)
+      result shouldBe (3, 0)
     }
   }
 }
