@@ -33,6 +33,7 @@ import org.apache.tinkerpop.gremlin.structure.{Direction, T}
 import shapeless.{::, HList, HNil}
 import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
 import shapeless.ops.product.ToHList
+import shapeless.syntax.std.tuple._
 import scala.concurrent.duration.FiniteDuration
 import scala.reflect.runtime.{universe => ru}
 import scala.collection.{immutable, mutable}
@@ -115,6 +116,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def project[A](projectKey: String,
                  otherProjectKeys: String*): GremlinScala.Aux[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
+
+  def project[H <: Product](
+      builder: ProjectionBuilder[Nil.type] => ProjectionBuilder[H]): GremlinScala[H] =
+    builder(ProjectionBuilder()).build(this)
 
   /** You might think that predicate should be `GremlinScala[End] => GremlinScala[Boolean]`,
     * but that's not how tp3 works: e.g. `.value(Age).is(30)` returns `30`, not `true`
