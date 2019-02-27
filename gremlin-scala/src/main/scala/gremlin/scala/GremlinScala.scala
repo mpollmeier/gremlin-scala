@@ -1048,8 +1048,8 @@ class ProjectionBuilder[T <: Product] private[gremlin] (
                               map ⇒ buildResult(map) :+ map.get(label).asInstanceOf[U])
   }
 
-  def and[U, TR <: Product](by: By[U])
-                         (implicit prepend: TuplePrepend.Aux[T, Tuple1[U], TR]): ProjectionBuilder[TR] = apply(by)
+  def and[U, TR <: Product](by: By[U])(
+      implicit prepend: TuplePrepend.Aux[T, Tuple1[U], TR]): ProjectionBuilder[TR] = apply(by)
 
   private[gremlin] def build(g: GremlinScala[_]): GremlinScala[T] = {
     GremlinScala(addBy(g.traversal.project(labels.head, labels.tail: _*))).map(buildResult)
