@@ -252,6 +252,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[JMap[String, Any], Labels](
       traversal.select(pop, selectKey1, selectKey2, otherSelectKeys: _*))
 
+  /* select only the keys from a map (e.g. groupBy) - see usage examples in SelectSpec.scala */
   def selectKeys[K](implicit columnType: ColumnType.Aux[End, K, _]): GremlinScala[K] = {
     new GremlinScala[K](
       traversal
@@ -259,6 +260,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
         .asInstanceOf[GraphTraversal[_, K]])
   }
 
+  /* select only the values from a map (e.g. groupBy) - see usage examples in SelectSpec.scala */
   def selectValues[V](implicit columnType: ColumnType.Aux[End, _, V]): GremlinScala[V] = {
     new GremlinScala[V](
       traversal
