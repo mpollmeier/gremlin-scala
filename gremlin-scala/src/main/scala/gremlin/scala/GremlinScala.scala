@@ -778,10 +778,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[A, Labels](traversal.values[A](key: _*))
 
   def valueMap(implicit ev: End <:< Element) =
-    GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap())
+    GremlinScala[JMap[AnyRef, AnyRef], Labels](traversal.valueMap())
 
   def valueMap(keys: String*)(implicit ev: End <:< Element) =
-    GremlinScala[JMap[String, AnyRef], Labels](traversal.valueMap(keys: _*))
+    GremlinScala[JMap[AnyRef, AnyRef], Labels](traversal.valueMap(keys: _*))
 
   def has(key: Key[_])(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.has(key.name))
@@ -989,15 +989,15 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   // NUMBER STEPS START
   // -------------------
-  def max[N <: Number]()(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.max())
-  def max[N <: Number](scope: Scope)(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.max(scope))
+  def max[C <: Comparable[_]]()(implicit toComparable: End => C) =
+    GremlinScala[C, HNil](traversalToComparable.max[C])
+  def max[C <: Comparable[_]](scope: Scope)(implicit toComparable: End => C) =
+    GremlinScala[C, HNil](traversalToComparable.max[C](scope))
 
-  def min[N <: Number]()(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.min())
-  def min[N <: Number](scope: Scope)(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.min(scope))
+  def min[C <: Comparable[_]]()(implicit toComparable: End => C) =
+    GremlinScala[C, HNil](traversalToComparable.min[C]())
+  def min[C <: Comparable[_]](scope: Scope)(implicit toComparable: End => C) =
+    GremlinScala[C, HNil](traversalToComparable.min[C](scope))
 
   def sum[N <: Number]()(implicit toNumber: End => N) =
     GremlinScala[N, HNil](traversalToNumber.sum())
@@ -1011,6 +1011,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   private def traversalToNumber[N <: Number]()(implicit toNumber: End => N): GraphTraversal[_, N] =
     this.map(toNumber).traversal
+
+  private def traversalToComparable[C <: Comparable[_]]()(implicit toComparable: End => C) =
+    this.map(toComparable).traversal
+
   // NUMBER STEPS END
   // -------------------
 
