@@ -68,7 +68,6 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
         s"($label,$id): " + keyValPairs.mkString(", ")
       }
       case elem => elem.toString
-      case _    => ""
     }
   }
 
