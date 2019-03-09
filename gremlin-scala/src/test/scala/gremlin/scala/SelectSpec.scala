@@ -188,16 +188,13 @@ class SelectSpec extends WordSpec with Matchers {
     }
 
     "extract values from map entry" in {
-      // TODO: this resolves to `List[java.util.Collection[Vertex]]`, but should rather be `List[String]` -> therefor it crashes when getting one value (`val crash`)
-      // val result: List[String] = graph
-      val result = graph
+      val result: List[String] = graph
         .V()
         .hasLabel("software")
         .group(By(__.value(Key[String]("name"))), By(__.in("created").value(Key[String]("name"))))
-        .unfold[JMap.Entry[String, JCollection[Vertex]]]()
+        .unfold[JMap.Entry[String, String]]
         .selectValues
         .toList
-      val crash = result.head //ClassCastException
 
       result shouldBe List("josh", "marko")
     }
