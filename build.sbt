@@ -16,7 +16,6 @@ inThisBuild(
     ),
     resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/"),
     resolvers += Resolver.mavenLocal,
-    scalafmtOnCompile := true,
     scalacOptions ++= Seq(
       // "-Xlint"
       // "-Xfatal-warnings",
