@@ -29,7 +29,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
   /* executes traversal and converts results into cpg domain type */
   def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
-  def toStream(): JStream[EndDomain] = raw.toStream.map(converter.toDomain)
+  def toStream(): JStream[EndDomain] = raw.toStream.map { end: EndGraph => converter.toDomain(end) }
   def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
   def iterate(): Unit = raw.iterate()
   def exec(): Unit = iterate
