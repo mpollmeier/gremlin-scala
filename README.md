@@ -285,6 +285,11 @@ You can also define your own marshaller, if the macro generated one doesn't quit
 ### More advanced traversals
 Here are some examples of more complex traversals from the [examples repo](https://github.com/mpollmeier/gremlin-scala-examples/). If you want to run them yourself, check out the tinkergraph examples in there. 
 
+_What's the property distribution of all vertices?_
+```scala
+graph.V.groupCount(By(__.properties().count)).head
+```
+
 _What is `Die Hard's` average rating?_
 ```scala
 graph.V.has("movie", "name", "Die Hard")
