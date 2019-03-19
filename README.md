@@ -410,4 +410,3 @@ The `filter` step changed it's signature and now takes a traversal: `filter(pred
 
 The reasoning for the change is that it's discouraged to use lambdas (see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas). Instead we are now creating anonymous traversals, which can be optimised by the driver, sent over the wire as gremlin binary for remote execution etc.
 
-
