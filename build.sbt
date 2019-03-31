@@ -1,4 +1,4 @@
-val gremlinVersion = "3.4.0"
+val gremlinVersion = "3.4.1"
 
 inThisBuild(
   Seq(
