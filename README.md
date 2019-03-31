@@ -257,6 +257,8 @@ You can save and load case classes as a vertex - implemented with a [blackbox ma
 * Annotating members with `@id` and `@underlying` will instruct the marshaller to set the element id and/or the underlying element in the class. Note: you cannot specify the id when adding a vertex like this. Using `@id` only works when retrieving the vertex back from the graph and it therefor must be an `Option`.
 * Your classes must be defined outside the scope where they are being used (e.g. in the code below the class `Example` cannot be inside `object Main`). 
 
+_Warning_: this may not work with your particular remote graph, depending on the implementation/configuration. That's because the graph [may choose to only return *referenced elements* which doesn't contain it's properties](http://tinkerpop.apache.org/docs/3.4.1/reference/#_properties_of_elements).
+
 
 ```scala
 // this does _not_ work in a REPL
