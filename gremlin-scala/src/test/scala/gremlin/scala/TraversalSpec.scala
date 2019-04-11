@@ -617,6 +617,56 @@ class TraversalSpec extends WordSpec with Matchers {
     }
   }
 
+  "match step".can {
+    "filter using pattern matching" in new Fixture {
+      val traversal =
+        graph
+          .V()
+          .`match`(_.as("a").out("created").as("b"),
+                   _.as("b").has(Name -> "lop"),
+                   _.as("b").in("created").as("c"),
+                   _.as("c").has(Age -> 29))
+          .select("a", "c")
+          .by("name")
+      traversal.toSet shouldBe Set(
+        Map("a" -> "marko", "c" -> "marko").asJava,
+        Map("a" -> "josh", "c" -> "marko").asJava,
+        Map("a" -> "peter", "c" -> "marko").asJava
+      )
+    }
+
+    "filter using condensed pattern matching" in new Fixture {
+      val traversal = graph
+        .V()
+        .`match`(_.as("creators").out("created").has(Name -> "lop").as("projects"),
+                 _.as("projects").in("created").has(Age -> 29).as("cocreators"))
+        .select("creators", "cocreators")
+        .by("name")
+
+      traversal.toSet shouldBe Set(
+        Map("creators" -> "marko", "cocreators" -> "marko").asJava,
+        Map("creators" -> "josh", "cocreators" -> "marko").asJava,
+        Map("creators" -> "peter", "cocreators" -> "marko").asJava
+      )
+    }
+
+    "filter using recursive pattern matching" in new Fixture {
+      val traversal = graph
+        .V()
+        .`match`(
+          _.as("a").out("knows").as("b"),
+          _.as("b").out("created").has(Name -> "lop"),
+          _.as("b")
+            .`match`(_.as("b").out("created").as("c"), _.as("c").has(Name -> "ripple"))
+            .select("c")
+            .as("c")
+        )
+        .select("a", "c")
+        .by("name")
+      traversal.toSet shouldBe Set(Map("a" -> "marko", "c" -> "ripple").asJava)
+    }
+  }
+
   "where step".can {
     "filter based on label" in new Fixture {
       // Who are marko’s collaborators, where marko can not be his own collaborator?

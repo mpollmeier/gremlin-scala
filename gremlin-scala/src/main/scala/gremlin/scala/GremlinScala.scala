@@ -540,9 +540,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def by[A](byTraversal: Traversal[_, A], comparator: Comparator[A]) =
     GremlinScala[End, Labels](traversal.by(byTraversal, comparator))
 
-  def `match`[A](traversals: Traversal[End, _]*) =
+  def `match`[A](traversals: (GremlinScala.Aux[End, HNil] => GremlinScala[_])*) =
     GremlinScala[JMap[String, A], Labels](
-      traversal.`match`(traversals: _*)
+      traversal.`match`(traversals.map(_.apply(__[End]()).traversal): _*)
     )
 
   def unfold[A]() = GremlinScala[A, Labels](traversal.unfold())
