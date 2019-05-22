@@ -154,6 +154,8 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def loops() = GremlinScala[Integer, HNil](traversal.loops())
 
+  def getSideEffect[A](sideEffectKey: String): A = traversal.asAdmin().getSideEffects.get(sideEffectKey)
+
   def map[A](fun: End => A) =
     GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] =>
       fun(t.get)
