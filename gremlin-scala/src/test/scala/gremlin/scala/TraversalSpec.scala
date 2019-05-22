@@ -5,8 +5,10 @@ import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.{Matchers, WordSpec}
-import java.util.{List => JList, Map => JMap, Collection => JCollection}
+import java.util.{Collection => JCollection, List => JList, Map => JMap}
 import java.lang.{Long => JLong}
+
+import org.apache.tinkerpop.gremlin.process.traversal.util.DefaultTraversalMetrics
 
 import scala.language.existentials
 import shapeless.test.illTyped
@@ -1013,6 +1015,21 @@ class TraversalSpec extends WordSpec with Matchers {
         .value(Age)
         .math("_ / x")
         .toSet shouldBe Set(2.9, 2.7, 3.2, 3.5)
+    }
+  }
+
+  "traversal getSideEffects".must {
+    val key = "Side Effect Key"
+
+    "return side effects if they exist" in new Fixture {
+      assertThrows[IllegalArgumentException] {
+        graph.V().getSideEffect(key)
+      }
+    }
+
+    "throw if side effects if no side effects in traversal" in new Fixture {
+      val profile: DefaultTraversalMetrics = graph.V().profile(key).getSideEffect(key)
+      assert(profile != null)
     }
   }
 
