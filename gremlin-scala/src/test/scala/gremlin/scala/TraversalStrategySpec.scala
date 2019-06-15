@@ -11,7 +11,7 @@ import org.apache.tinkerpop.gremlin.process.remote.traversal.{
   RemoteTraversalSideEffects
 }
 import org.apache.tinkerpop.gremlin.structure.{Vertex => TVertex}
-import org.apache.tinkerpop.gremlin.process.traversal.Bytecode
+import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Step}
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
@@ -167,9 +167,8 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     )
 
     // Create a future that completes immediately and provides a remote traversal providing vertices
-    val vertexResult =
-      new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]()
-    val traversal = new AbstractRemoteTraversal[Int, TVertex]() {
+    val vertexResult = new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]
+    val traversal = new AbstractRemoteTraversal[Int, TVertex] {
       val it = mockVertices.iterator
 
       override def nextTraverser: Admin[TVertex] =
@@ -181,6 +180,8 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
       override def next(): TVertex = nextTraverser().get()
 
       override def hasNext: Boolean = it.hasNext
+
+      override def getSteps: util.List[Step[_, _]] = super.getSteps
     }
     vertexResult.complete(traversal)
 

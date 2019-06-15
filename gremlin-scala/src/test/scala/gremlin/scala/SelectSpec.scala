@@ -3,7 +3,7 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.{Matchers, WordSpec}
 import shapeless.{::, HNil}
-import java.util.{Collection ⇒ JCollection, Map ⇒ JMap, Set ⇒ JSet}
+import java.util.{Collection => JCollection, Map => JMap, Set => JSet}
 import scala.collection.JavaConverters._
 
 class SelectSpec extends WordSpec with Matchers {
@@ -171,6 +171,7 @@ class SelectSpec extends WordSpec with Matchers {
         .selectKeys
         .head
         .asScala
+        .toList
         .map(_.asScala)
       result shouldBe List(Set("a"), Set("b"))
     }
