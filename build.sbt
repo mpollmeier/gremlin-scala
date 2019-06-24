@@ -3,16 +3,17 @@ val gremlinVersion = "3.4.1"
 inThisBuild(
   Seq(
     organization := "com.michaelpollmeier",
-    scalaVersion := "2.12.8",
-    crossScalaVersions := Seq("2.11.12", "2.12.8" /*, "2.13.0-M5"*/ ),
+    // scalaVersion := "2.12.8",
+    scalaVersion := "2.13.0",
+    crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0"),
     libraryDependencies ++= Seq(
       "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
       "com.chuusai" %% "shapeless" % "2.3.3",
       "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
       "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
       "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
-      "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % Test
+      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      "org.scalamock" %% "scalamock" % "4.3.0" % Test
     ),
     resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/"),
     resolvers += Resolver.mavenLocal,
