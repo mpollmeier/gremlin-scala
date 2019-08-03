@@ -387,6 +387,11 @@ Random links:
 ### Releases
 ... happen automatically for every commit on `master` from [travis.ci](https://travis-ci.org/mpollmeier/gremlin-scala) thanks to [sbt-ci-release-early](https://github.com/ShiftLeftSecurity/sbt-ci-release-early)
 
+### YourKit endorsement
+YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications.
+YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
+<a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a>, and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
+
 ### Breaking changes
 #### 3.3.3.2
 We now have a fully typed `union` step which supports heterogeneous queries. The old version is still available as `unionFlat`, since it may still be relevant in some situations where the union traversals are homogeneous.
