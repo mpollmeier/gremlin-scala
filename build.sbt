@@ -3,7 +3,6 @@ val gremlinVersion = "3.4.1"
 inThisBuild(
   Seq(
     organization := "com.michaelpollmeier",
-    // scalaVersion := "2.12.8",
     scalaVersion := "2.13.0",
     crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0"),
     libraryDependencies ++= Seq(
