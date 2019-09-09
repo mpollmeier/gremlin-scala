@@ -56,7 +56,8 @@ lazy val macros = project // macros must be in a separate compilation unit
     ))
 lazy val `gremlin-scala` = project.in(file("gremlin-scala")).dependsOn(macros)
 
-ThisBuild / publishTo := sonatypePublishTo.value
+ThisBuild / useGpg := false
+ThisBuild / publishTo := sonatypePublishToBundle.value
 enablePlugins(GitVersioning)
 
 // virtual root project settings
