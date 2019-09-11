@@ -2,36 +2,31 @@ language: scala
 jdk: openjdk8
 dist: xenial
 if: tag IS blank
-
 branches:
   only:
   - master
-
 before_install:
+- openssl aes-256-cbc -K $encrypted_188b0d6c1746_key -iv $encrypted_188b0d6c1746_iv
+  -in private-key.pem.enc -out private-key.pem -d
 - git fetch --tags
-- if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_EVENT_TYPE" == "push" ]]; then
-    openssl aes-256-cbc -K $encrypted_188b0d6c1746_key -iv $encrypted_188b0d6c1746_iv -in private-key.pem.enc -out private-key.pem -d;
-    gpg --import private-key.pem;
-    gpg --import public-key.pem;
-  fi
-
+install:
+- gpg --import public-key.pem
+- gpg --import private-key.pem
+- gpg --list-keys
 stages:
 - name: test
 - name: release
   if: branch = master AND type = push
-
 jobs:
   include:
   - stage: test
     script: sbt +test
   - stage: release
     script: sbt ci-release-sonatype
-
 before_cache:
 - find $HOME/.sbt -name "*.lock" -type f -delete
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
 - rm -rf $HOME/.ivy2/local
-
 cache:
   directories:
   - "$HOME/.sbt/1.0/dependency"
