@@ -15,6 +15,7 @@ import shapeless.test.illTyped
 
 import collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
+import gremlin.scala.TestGraph.Software
 
 class TraversalSpec extends WordSpec with Matchers {
 
@@ -525,6 +526,24 @@ class TraversalSpec extends WordSpec with Matchers {
       results.size shouldBe 2
       path2String(results(0)) shouldBe List("marko", "32", "ripple")
       path2String(results(1)) shouldBe List("marko", "32", "lop")
+    }
+
+    "only include steps between from and to" in new Fixture {
+      val knownPersonStep = StepLabel[Vertex]()
+      val createdSoftwareStep = StepLabel[Vertex]()
+
+      val results: List[Path] = 
+        graph.V
+        .has(Name, "marko")
+        .out(Knows).as(knownPersonStep)
+        .out(Created).as(createdSoftwareStep)
+        .path(By(Name))
+        .from(knownPersonStep)
+        .to(createdSoftwareStep)
+        .toList
+
+      path2String(results(0)) shouldBe List("josh", "ripple")
+      path2String(results(1)) shouldBe List("josh", "lop")
     }
   }
 
