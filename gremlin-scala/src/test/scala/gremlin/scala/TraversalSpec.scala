@@ -15,7 +15,6 @@ import shapeless.test.illTyped
 
 import collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
-import gremlin.scala.TestGraph.Software
 
 class TraversalSpec extends WordSpec with Matchers {
 
