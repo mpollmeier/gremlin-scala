@@ -1,6 +1,6 @@
 language: scala
 dist: bionic
-jdk: openjdk10
+jdk: openjdk11
 if: tag IS blank
 
 branches:
