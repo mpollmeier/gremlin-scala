@@ -76,6 +76,32 @@ class TraversalSpec extends WordSpec with Matchers {
       illTyped { """graph.V(1).inV""" }
       illTyped { """graph.V(1).out.inV""" }
     }
+
+    "valueMap specific key" in new Fixture {
+      val map = graph.V(1).valueMap("name").head
+      map.get("name") shouldBe List("marko").asJava
+    }
+
+    "valueMap all keys" in new Fixture {
+      val map = graph.V(1).valueMap.head
+      map.get("name") shouldBe List("marko").asJava
+      map.get("age") shouldBe List(29).asJava
+    }
+
+    "elementMap specific key" in new Fixture {
+      val res = graph.V(1).elementMap("name").head
+      res.get(T.id) shouldBe 1
+      res.get(T.label) shouldBe "person"
+      res.get("name") shouldBe "marko"
+    }
+
+    "elementMap all keys" in new Fixture {
+      val res = graph.V(1).elementMap.head
+      res.get(T.id) shouldBe 1
+      res.get(T.label) shouldBe "person"
+      res.get("name") shouldBe "marko"
+      res.get("age") shouldBe 29
+    }
   }
 
   "edge steps".can {

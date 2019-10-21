@@ -790,6 +790,27 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def valueMap(keys: String*)(implicit ev: End <:< Element) =
     GremlinScala[JMap[AnyRef, AnyRef], Labels](traversal.valueMap(keys: _*))
 
+  /**
+    * Map the {@link Element} to a {@code Map} of the property values key'd according to their {@link Property#key}.
+    * For vertices, the {@code Map} will be returned with the assumption of single property values along with {@link T#id} and {@link T#label}. Prefer
+    * {@link #valueMap(String...)} if multi-property processing is required. For edges, keys will include additional
+    * related edge structure of {@link Direction#IN} and {@link Direction#OUT} which themselves are {@code Map}
+    * instances of the particular {@link Vertex} represented by {@link T#id} and {@link T#label}.
+    */
+  def elementMap(keys: String*)(implicit ev: End <:< Element) =
+    GremlinScala[JMap[AnyRef, AnyRef], Labels](traversal.elementMap(keys: _*))
+
+  /**
+    * Map the {@link Element} to a {@code Map} of the property values key'd according to their {@link Property#key}.
+    * This step will retrieve all property values. For vertices, the {@code Map} will
+    * be returned with the assumption of single property values along with {@link T#id} and {@link T#label}. Prefer
+    * {@link #valueMap(String...)} if multi-property processing is required. For edges, keys will include additional
+    * related edge structure of {@link Direction#IN} and {@link Direction#OUT} which themselves are {@code Map}
+    * instances of the particular {@link Vertex} represented by {@link T#id} and {@link T#label}.
+    */
+  def elementMap(implicit ev: End <:< Element) =
+    GremlinScala[JMap[AnyRef, AnyRef], Labels](traversal.elementMap())
+
   def has(key: Key[_])(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.has(key.name))
 
