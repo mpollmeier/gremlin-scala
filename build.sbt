@@ -54,12 +54,7 @@ publish / skip := true
 
 lazy val macros = project // macros must be in a separate compilation unit
   .in(file("macros"))
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.scala-lang" % "scala-compiler" % scalaVersion.value
-    ))
-
+  .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
 lazy val `gremlin-scala` = project.in(file("gremlin-scala")).dependsOn(macros)
 
 enablePlugins(GitVersioning)
