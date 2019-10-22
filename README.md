@@ -394,6 +394,9 @@ YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourK
 <img src="doc/images/yourkit.png" height="44" />
 
 ### Breaking changes
+#### 3.4.1.13
+The implementation for `@label` with non literal values (e.g. `@label(SomeClass.LABEL)`) was dropped due to it's [bad performance](https://github.com/mpollmeier/gremlin-scala/issues/288). Please use String literals instead, e.g. `@label("MyLabel")`.
+
 #### 3.3.3.2
 We now have a fully typed `union` step which supports heterogeneous queries. The old version is still available as `unionFlat`, since it may still be relevant in some situations where the union traversals are homogeneous.
 
