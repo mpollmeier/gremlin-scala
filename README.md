@@ -93,6 +93,7 @@ More working examples in [TraversalSpec](https://github.com/mpollmeier/gremlin-s
 ```scala
 import gremlin.scala._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
+import scala.language.postfixOps
 implicit val graph = TinkerGraph.open.asScala
 
 // Keys for properties which can later be used for type safe traversals
