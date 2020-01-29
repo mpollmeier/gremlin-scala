@@ -2,7 +2,7 @@ val gremlinVersion = "3.4.4"
 
 ThisBuild/organization := "com.michaelpollmeier"
 ThisBuild/scalaVersion := "2.13.1"
-ThisBuild/crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0", "2.13.1")
+ThisBuild/crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
 
 ThisBuild/libraryDependencies ++= Seq(
   "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
