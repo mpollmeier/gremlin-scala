@@ -52,9 +52,16 @@ Global/useGpgPinentry := true
 name := "root"
 publish / skip := true
 
+lazy val commonSettings = Seq(
+  crossVersion := CrossVersion.full,
+  crossTarget := target.value / s"scala-${scalaVersion.value}") // workaround for https://github.com/sbt/sbt/issues/5097
+
 lazy val macros = project // macros must be in a separate compilation unit
   .in(file("macros"))
+  .settings(commonSettings: _*)
   .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
-lazy val `gremlin-scala` = project.in(file("gremlin-scala")).dependsOn(macros)
+lazy val `gremlin-scala` = project.in(file("gremlin-scala"))
+  .dependsOn(macros)
+  .settings(commonSettings: _*)
 
 enablePlugins(GitVersioning)
