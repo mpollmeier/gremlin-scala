@@ -1,4 +1,4 @@
-val gremlinVersion = "3.4.4"
+val gremlinVersion = "3.4.7"
 
 ThisBuild/organization := "com.michaelpollmeier"
 ThisBuild/scalaVersion := "2.13.3"
