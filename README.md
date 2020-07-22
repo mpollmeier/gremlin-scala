@@ -395,6 +395,12 @@ YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourK
 <img src="doc/images/yourkit.png" height="44" />
 
 ### Breaking changes
+#### 3.4.7.2
+Marshallable now treats Sets as multi-properties, i.e. one property for each element in the set. This is similar to how
+List properties are handled and allows for a natural representation of vertex properties whose cardinality is `set`
+in case classes. This change breaks compatibility with Marshallable's previous behaviour in which Sets were effectively
+treated as `single` cardinality properties, i.e. a single property whose value is the entire set.
+
 #### 3.4.1.13
 The implementation for `@label` with non literal values (e.g. `@label(SomeClass.LABEL)`) was dropped due to it's [bad performance](https://github.com/mpollmeier/gremlin-scala/issues/288). Please use String literals instead, e.g. `@label("MyLabel")`.
 
