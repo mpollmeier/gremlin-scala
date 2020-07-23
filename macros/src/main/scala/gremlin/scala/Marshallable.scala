@@ -122,6 +122,19 @@ object Marshallable {
             // _toCCParams :+ q"element.value[$returnType]($decoded)")
           }
 
+          def handleSetProperty = {
+            (_idParam,
+              _fromCCParams :+ q"cc.$name.toList.map { x => $decoded -> x }",
+              _toCCParams :+
+                q"""
+                    element.properties($decoded)
+                      .asScala
+                      .map(_.value)
+                      .toSet
+                      .asInstanceOf[$returnType]
+                  """)
+          }
+
           def valueGetter(tpe: Type): Option[MethodSymbol] =
             tpe.declarations.sorted
               .filter(_.isMethod)
@@ -177,6 +190,8 @@ object Marshallable {
               handleOptionProperty
             } else if (returnType.typeSymbol == weakTypeOf[List[_]].typeSymbol) {
               handleListProperty
+            } else if (returnType.typeSymbol == weakTypeOf[Set[_]].typeSymbol) {
+              handleSetProperty
             } else {
               handleStandardProperty(
                 nullable = field.annotations.map(_.tree.tpe).contains(weakTypeOf[nullable]))

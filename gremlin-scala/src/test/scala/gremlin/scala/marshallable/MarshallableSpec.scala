@@ -27,6 +27,7 @@ case class CCWithOption(i: Int, s: Option[String])
 case class CCWithOptionValueClass(s: String, i: Option[MyValueClass])
 case class CCWithOptionAnyVal(x: Option[Int], y: Option[Long])
 case class CCWithList(s: String, ss: List[String], is: List[Int], ds: List[Double])
+case class CCWithSet(s: String, ss: Set[String])
 case class CCWithNullable(i: Int, @nullable maybeNull: String)
 
 case class CCWithOptionId(s: String, @id id: Option[Int])
@@ -147,6 +148,18 @@ class MarshallableSpec extends WordSpec with Matchers {
       val properties = vl.properties[String]("ss").asScala.toList
       properties.size shouldBe 2
       properties.map(_.value) shouldBe List("one", "two")
+    }
+
+    "handle Set members" in new Fixture {
+      val cc = CCWithSet(s = "foo", ss = Set("bar", "baz"))
+
+      val v = graph + cc
+      v.toCC[CCWithSet] shouldBe cc
+
+      val vl = graph.V(v.id).head
+      val properties = vl.properties[String]("ss").asScala.toList
+      properties.size shouldBe 2
+      properties.map(_.value) shouldBe List("bar", "baz")
     }
 
     "allows members to be `null` if annotated with `@nullable`" in new Fixture {
