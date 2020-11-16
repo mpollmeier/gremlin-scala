@@ -1,6 +1,6 @@
 ![logo](https://github.com/mpollmeier/gremlin-scala/raw/master/doc/images/gremlin-scala-logo.png)
 
-[![Build Status](https://secure.travis-ci.org/mpollmeier/gremlin-scala.png?branch=master)](http://travis-ci.org/mpollmeier/gremlin-scala)
+[![Build Status](https://github.com/mpollmeier/gremlin-scala/workflows/release/badge.svg)](https://github.com/mpollmeier/gremlin-scala/actions?query=workflow%3Arelease)
 [![Join the chat at https://gitter.im/mpollmeier/gremlin-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mpollmeier/gremlin-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Scaladex](https://index.scala-lang.org/mpollmeier/gremlin-scala/gremlin-scala/latest.svg)](https://index.scala-lang.org/mpollmeier/gremlin-scala/gremlin-scala/)
 [![scaladoc](http://www.javadoc.io/badge/com.michaelpollmeier/gremlin-scala_2.12.svg?color=blue&label=scaladoc)](http://www.javadoc.io/doc/com.michaelpollmeier/gremlin-scala_2.12)

@@ -46,7 +46,6 @@ ThisBuild/developers := List(
 ThisBuild/homepage := Some(url("https://github.com/mpollmeier/gremlin-scala"))
 ThisBuild/licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 ThisBuild/publishTo := sonatypePublishToBundle.value
-Global/useGpgPinentry := true
 
 // virtual root project
 name := "root"

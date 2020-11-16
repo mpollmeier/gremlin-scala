@@ -1,3 +1,5 @@
 target
 private-key.pem
 .idea/
+/.bsp
+/gnupg-*
