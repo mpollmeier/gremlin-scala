@@ -73,8 +73,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def bothE(labels: String*) = start().bothE(labels: _*)
 
   /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
-  def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*)(
-      implicit graph: ScalaGraph): Edge =
+  def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*): Edge =
     graph.traversal.V(vertex).addE(label, properties: _*).to(inVertex).head
 
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {

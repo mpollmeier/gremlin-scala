@@ -954,16 +954,14 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[Edge, Labels](traversal.bothE(labels: _*))
 
   /** may be used together with `from` / `to`, see TraversalSpec for examples */
-  def addE(label: String, properties: KeyValue[_]*)(
-      implicit ev: End <:< Vertex): GremlinScala.Aux[Edge, Labels] = {
+  def addE(label: String, properties: KeyValue[_]*): GremlinScala.Aux[Edge, Labels] = {
     val newTrav = properties.foldLeft(traversal.addE(label)) { (trav, prop) =>
       trav.property(prop.key.name, prop.value)
     }
     GremlinScala[Edge, Labels](newTrav)
   }
 
-  def addE(label: StepLabel[Vertex], properties: KeyValue[_]*)(
-      implicit ev: End <:< Vertex): GremlinScala.Aux[Edge, Labels] =
+  def addE(label: StepLabel[Vertex], properties: KeyValue[_]*): GremlinScala.Aux[Edge, Labels] =
     addE(label.name, properties: _*)
 
   /** modulator, use in conjunction with addE
