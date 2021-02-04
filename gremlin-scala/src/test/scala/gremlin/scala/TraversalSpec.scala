@@ -877,12 +877,16 @@ class TraversalSpec extends WordSpec with Matchers {
       }
 
       "add multiple edges in one iteration" in new Fixture {
+        val knows = StepLabel[Edge]("knows")
+        val likes = StepLabel[Edge]("likes")
         val michael = g.addV(Person).property(Name -> "michael").head
         val karlotta = g.addV(Person).property(Name -> "karlotta").head
 
         g.addE("knows").from(michael).to(karlotta)
+         .addE(knows).from(michael).to(karlotta)
+         .addE(likes).from(karlotta).to(michael)
          .addE("likes").from(karlotta).to(michael).iterate()
-        michael.start.bothE().count.head shouldBe 2
+        michael.start.bothE().count.head shouldBe 4
       }
 
       "use multiple traversals" in new Fixture {

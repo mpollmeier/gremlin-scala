@@ -961,7 +961,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[Edge, Labels](newTrav)
   }
 
-  def addE(label: StepLabel[Vertex], properties: KeyValue[_]*): GremlinScala.Aux[Edge, Labels] =
+  def addE(label: StepLabel[Edge], properties: KeyValue[_]*): GremlinScala.Aux[Edge, Labels] =
     addE(label.name, properties: _*)
 
   /** modulator, use in conjunction with addE
