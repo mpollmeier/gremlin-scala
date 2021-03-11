@@ -1,5 +1,6 @@
 package gremlin.scala
 
+import org.apache.tinkerpop.gremlin.process.traversal.TextP
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import TestGraph._
@@ -27,6 +28,13 @@ class FilterSpec extends WordSpec with Matchers {
       .filterOnEnd(_.property(Age).orElse(0) > 30)
       .value(Name)
       .toSet should be(Set("josh", "peter"))
+  }
+
+  "filter with TextP - e.g. contains, endsWith etc" in new Fixture {
+    graph.V
+      .has(Name, TextP.containing("os"))
+      .value(Name)
+      .toSet should be(Set("josh"))
   }
 
   "has" in new Fixture {
