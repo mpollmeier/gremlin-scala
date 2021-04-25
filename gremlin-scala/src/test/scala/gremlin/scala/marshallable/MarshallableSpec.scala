@@ -34,6 +34,9 @@ case class CCWithOptionId(s: String, @id id: Option[Int])
 case class CCWithOptionIdNested(s: String, @id id: Option[Int], i: MyValueClass)
 case class CCWithNonOptionalIdShouldFail(@id id: Int)
 
+case class MyIdValueClass(value: Long) extends AnyVal
+case class CCWithValueClassId(s: String, @id id: Option[MyIdValueClass])
+
 case class CCWithUnderlyingVertex(@underlying underlying: Option[Vertex], s: String)
 case class CCWithNonOptionalUnderlyingShouldFail(@underlying underlying: Vertex)
 
@@ -135,6 +138,13 @@ class MarshallableSpec extends WordSpec with Matchers {
         vl.valueMap should contain("s" -> cc.s)
         vl.valueMap.keySet should not contain ("i")
         vl.toCC[CCWithOptionValueClass] shouldBe cc
+      }
+
+      "handle value class ID" in new Fixture {
+        val cc = CCWithValueClassId(s = "some text", id = None)
+        val v = graph + cc
+        val underlyingId = v.id().asInstanceOf[Long]
+        v.toCC[CCWithValueClassId].id shouldBe Some(MyIdValueClass(underlyingId))
       }
     }
 

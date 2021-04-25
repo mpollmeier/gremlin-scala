@@ -162,9 +162,21 @@ object Marshallable {
               "@id parameter *must* be of type `Option[A]`. In the context of " +
                 "Marshallable, we have to let the graph assign an id"
             )
-            (q"cc.$name.asInstanceOf[_root_.scala.Option[AnyRef]]",
-             _fromCCParams,
-             _toCCParams :+ q"_root_.scala.Option(element.id).asInstanceOf[$returnType]")
+
+            val valueClassParams = for {
+              valueClass <- returnType.typeArgs.headOption if valueClass <:< typeOf[AnyVal]
+              wrappedValueGetter <- valueGetter(valueClass)
+            } yield {
+              val valueClassCompanion = valueClass.typeSymbol.companion
+              (q"cc.$name.map(_.${wrappedValueGetter.name}).asInstanceOf[_root_.scala.Option[AnyRef]]",
+                _fromCCParams,
+                _toCCParams :+ q"_root_.scala.Option(element.id.asInstanceOf[${wrappedValueGetter.returnType}]).map($valueClassCompanion.apply)")
+            }
+
+            valueClassParams.getOrElse(
+              (q"cc.$name.asInstanceOf[_root_.scala.Option[AnyRef]]",
+                _fromCCParams,
+                _toCCParams :+ q"_root_.scala.Option(element.id).asInstanceOf[$returnType]"))
           }
 
           def handleUnderlying = {
