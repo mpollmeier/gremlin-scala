@@ -18,6 +18,7 @@ import java.util.{
 import java.util.stream.{Stream => JStream}
 
 import collection.JavaConverters._
+import gremlin.scala.By.combineModulatorWithValue
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
@@ -31,7 +32,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{Column, Direction, T}
 import shapeless.{::, HList, HNil}
-import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
+import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler, Zip}
 import shapeless.ops.product.ToHList
 import shapeless.syntax.std.tuple._
 import scala.concurrent.duration.FiniteDuration
@@ -203,6 +204,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def select[A](stepLabel: StepLabel[A]) =
     GremlinScala[A, Labels](traversal.select(stepLabel.name))
 
+  def select[A,B](stepLabel: StepLabel[A], by: By[B]) =
+    GremlinScala[B, Labels](by(traversal.select(stepLabel.name)))
+
   /** Select values from the traversal based on some given StepLabels (must be a tuple of `StepLabel`)
     *
     *  Lot's of type level magic here to make this work...
@@ -241,6 +245,69 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala(selectTraversal).map { selectValues =>
       val resultTuple =
         stepLabels.foldRight((HNil: HNil, selectValues))(combineLabelWithValue)
+      val values: Values = resultTuple._1
+      tupler(values)
+    }
+  }
+
+  /** Select values from the traversal based on some given StepLabels and then apply
+    * associated By modulators.  The argument list is a tuple of StepLabel[_] elements
+    * followed by a tuple of By[_] elements.  See SelectSpec for example usage.
+    *
+    *  Lot's of type level magic here to make this work...
+    *   * takes the tuple whose elements are all StepLabel[_], and converts it to an HList
+    *   * get's the actual values from the Tinkerpop3 java select as a Map[String, Any]
+    *   * takes the tuple whose elements are all By[Modulated], and converts it to an HList
+    *   * applies the By modulators to the select traversal
+    *   * zips the StepLabel HList together with the By HList, and then uses a type-level
+    *     fold to fetch the StepLabels to get the values from the map, and associate them
+    *     with the By's Modulated type labels.
+    */
+  def select[StepLabelsAsTuple <: Product,
+             BysAsTuple <: Product,
+             StepLabels <: HList,
+             Bys <: HList,
+             StepLabelsZipBy <: HList,
+             H0,
+             T0 <: HList,
+             LabelNames <: HList,
+             TupleWithValue,
+             Values <: HList,
+             Z,
+             ValueTuples](stepLabelsTuple: StepLabelsAsTuple,
+                          bysTuple: BysAsTuple)(
+      implicit stepLabelsToHList: ToHList.Aux[StepLabelsAsTuple, StepLabels],
+      bysToHList: ToHList.Aux[BysAsTuple, Bys],
+      stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
+      labelTrav: ToTraversable.Aux[LabelNames, List, String],
+      byTrav: ToTraversable.Aux[Bys, List, By[_]],
+      zipper: Zip.Aux[StepLabels :: Bys :: HNil, StepLabelsZipBy],
+      resultMapToHListFolder: RightFolder.Aux[StepLabelsZipBy,
+                                              (HNil, JMap[String, Any]),
+                                              combineModulatorWithValue.type,
+                                              (Values, Z)],
+      tupler: Tupler.Aux[Values, ValueTuples]
+  ): GremlinScala.Aux[ValueTuples, Labels] = {
+    // Select each StepLabel
+    val stepLabels: StepLabels = stepLabelsToHList(stepLabelsTuple)
+    val labels: List[String] = stepLabels.map(GetLabelName).toList
+    val label1 = labels.head
+    val label2 = labels.tail.head
+    val remainder = labels.tail.tail
+    val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
+
+    // Apply By modulators to selected steps
+    val bysHList: Bys = bysToHList(bysTuple)
+    val bys: List[By[_]] = bysHList.toList
+    var byTraversal = selectTraversal
+    bys.foreach { by => byTraversal = by.apply(byTraversal) }
+
+    // Extract selected values from the map of labeled values, and construct a
+    // result tuple typed by Modulated from By[Modulated]
+    val stepLabelZipBy = stepLabels.zip(bysHList)
+    GremlinScala(byTraversal).map { selectValues =>
+      val resultTuple =
+        stepLabelZipBy.foldRight((HNil: HNil, selectValues))(combineModulatorWithValue)
       val values: Values = resultTuple._1
       tupler(values)
     }

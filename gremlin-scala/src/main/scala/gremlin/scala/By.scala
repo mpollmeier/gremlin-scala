@@ -3,7 +3,9 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.T
+import shapeless.{HList, Poly2}
 import java.util.function.{Function => JFunction}
+import java.util.{Map => JMap}
 
 /**
   * By step can be used in combination with all sorts of other steps
@@ -100,5 +102,14 @@ object By {
   /* identity modulator */
   def apply[Modulated]() = new By[Modulated] {
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by()
+  }
+
+  object combineModulatorWithValue extends Poly2 {
+    implicit def atLabel[Value, Modulated, Label <: HList] = {
+      at[(StepLabel[Value], By[Modulated]), (Label, JMap[String, Any])] {
+        case (stepLabelByTuple, (acc, values)) =>
+          (values.get(stepLabelByTuple._1.name).asInstanceOf[Modulated] :: acc, values)
+      }
+    }
   }
 }
