@@ -146,8 +146,8 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
     setPropertyList(key.name, values)
 
   override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.to(Stream)
+    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
 
   override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
-    vertex.properties[A](wantedKeys: _*).asScala.to(Stream)
+    vertex.properties[A](wantedKeys: _*).asScala.toStream
 }
