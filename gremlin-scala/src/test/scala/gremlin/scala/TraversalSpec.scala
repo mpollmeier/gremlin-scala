@@ -4,7 +4,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.{Order, Path}
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import java.util.{Collection => JCollection, List => JList, Map => JMap}
 import java.lang.{Long => JLong}
 
@@ -13,90 +14,91 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.DefaultTraversalMetri
 import scala.language.existentials
 import shapeless.test.illTyped
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
-class TraversalSpec extends WordSpec with Matchers {
+class TraversalSpec extends AnyWordSpec with Matchers {
 
   "vertex steps".can {
     "get all vertices" in new Fixture {
-      (graph.V.toList should have).size(6)
+      (graph.V().toList() should have).size(6)
     }
 
     "follow the out vertices" in new Fixture {
-      graph.V(1).out.values[String]("name").toSet should be(Set("vadas", "josh", "lop"))
-      graph.V(1).out("knows").values[String]("name").toSet should be(Set("vadas", "josh"))
+      graph.V(1).out().values[String]("name").toSet() should be(Set("vadas", "josh", "lop"))
+      graph.V(1).out("knows").values[String]("name").toSet() should be(Set("vadas", "josh"))
 
-      graph.V(1).out.out.values[String]("name").toSet should be(Set("ripple", "lop"))
-      graph.V(1).out.out("created").values[String]("name").toSet should be(Set("ripple", "lop"))
+      graph.V(1).out().out().values[String]("name").toSet() should be(Set("ripple", "lop"))
+      graph.V(1).out().out("created").values[String]("name").toSet() should be(Set("ripple", "lop"))
     }
 
     "follow the in vertices" in new Fixture {
-      graph.V(3).in.values[String]("name").toSet should be(Set("marko", "josh", "peter"))
-      graph.V(3).in("created").values[String]("name").toSet should be(Set("marko", "josh", "peter"))
+      graph.V(3).in().values[String]("name").toSet() should be(Set("marko", "josh", "peter"))
+      graph.V(3).in("created").values[String]("name").toSet() should be(
+        Set("marko", "josh", "peter"))
 
-      graph.V(3).in.in.values[String]("name").toSet should be(Set("marko"))
-      graph.V(3).in.in("knows").values[String]("name").toSet should be(Set("marko"))
+      graph.V(3).in().in().values[String]("name").toSet() should be(Set("marko"))
+      graph.V(3).in().in("knows").values[String]("name").toSet() should be(Set("marko"))
     }
 
     "follow both in and out vertices" in new Fixture {
-      graph.V(4).both.values[String]("name").toSet should be(Set("marko", "ripple", "lop"))
-      graph.V(4).both("knows").values[String]("name").toSet should be(Set("marko"))
+      graph.V(4).both().values[String]("name").toSet() should be(Set("marko", "ripple", "lop"))
+      graph.V(4).both("knows").values[String]("name").toSet() should be(Set("marko"))
 
-      graph.V(4).both.both.values[String]("name").toSet should be(
+      graph.V(4).both().both().values[String]("name").toSet() should be(
         Set("marko", "lop", "peter", "josh", "vadas"))
-      graph.V(4).both.both("knows").values[String]("name").toSet should be(Set("josh", "vadas"))
+      graph.V(4).both().both("knows").values[String]("name").toSet() should be(Set("josh", "vadas"))
     }
 
     "follow out edges" in new Fixture {
-      graph.V(1).outE.toSet.map(_.label) should be(Set("knows", "created"))
-      graph.V(1).outE("knows").toSet.map(_.label) should be(Set("knows"))
+      graph.V(1).outE().toSet().map(_.label) should be(Set("knows", "created"))
+      graph.V(1).outE("knows").toSet().map(_.label) should be(Set("knows"))
 
-      graph.V(1).out.outE.toSet.map(_.label) should be(Set("created"))
-      graph.V(1).out.outE("created").toSet.map(_.label) should be(Set("created"))
+      graph.V(1).out().outE().toSet().map(_.label) should be(Set("created"))
+      graph.V(1).out().outE("created").toSet().map(_.label) should be(Set("created"))
     }
 
     "follow in edges" in new Fixture {
-      graph.V(3).inE.toSet.map(_.label) should be(Set("created"))
-      graph.V(3).inE("created").toSet.map(_.label) should be(Set("created"))
+      graph.V(3).inE().toSet().map(_.label) should be(Set("created"))
+      graph.V(3).inE("created").toSet().map(_.label) should be(Set("created"))
 
-      graph.V(3).in.inE.toSet.map(_.label) should be(Set("knows"))
-      graph.V(3).in.inE("knows").toSet.map(_.label) should be(Set("knows"))
+      graph.V(3).in().inE().toSet().map(_.label) should be(Set("knows"))
+      graph.V(3).in().inE("knows").toSet().map(_.label) should be(Set("knows"))
     }
 
     "follow both edges" in new Fixture {
-      graph.V(4).bothE.toSet.map(_.label) should be(Set("created", "knows"))
-      graph.V(4).bothE("knows").toSet.map(_.label) should be(Set("knows"))
+      graph.V(4).bothE().toSet().map(_.label) should be(Set("created", "knows"))
+      graph.V(4).bothE("knows").toSet().map(_.label) should be(Set("knows"))
 
-      graph.V(4).in.bothE.toSet.map(_.label) should be(Set("knows", "created"))
-      graph.V(4).in.bothE("knows").toSet.map(_.label) should be(Set("knows"))
+      graph.V(4).in().bothE().toSet().map(_.label) should be(Set("knows", "created"))
+      graph.V(4).in().bothE("knows").toSet().map(_.label) should be(Set("knows"))
     }
 
     "does not allow edge steps" in new Fixture {
-      illTyped { """graph.V(1).inV""" }
-      illTyped { """graph.V(1).out.inV""" }
+      illTyped { """graph.V(1).inV()""" }
+      illTyped { """graph.V(1).out().inV()""" }
     }
 
     "valueMap specific key" in new Fixture {
-      val map = graph.V(1).valueMap("name").head
+      val map = graph.V(1).valueMap("name").head()
       map.get("name") shouldBe List("marko").asJava
     }
 
     "valueMap all keys" in new Fixture {
-      val map = graph.V(1).valueMap.head
+      val map = graph.V(1).valueMap.head()
       map.get("name") shouldBe List("marko").asJava
       map.get("age") shouldBe List(29).asJava
     }
 
     "elementMap specific key" in new Fixture {
-      val res = graph.V(1).elementMap("name").head
+      val res = graph.V(1).elementMap("name").head()
       res.get(T.id) shouldBe 1
       res.get(T.label) shouldBe "person"
       res.get("name") shouldBe "marko"
     }
 
     "elementMap all keys" in new Fixture {
-      val res = graph.V(1).elementMap.head
+      val res = graph.V(1).elementMap.head()
       res.get(T.id) shouldBe 1
       res.get(T.label) shouldBe "person"
       res.get("name") shouldBe "marko"
@@ -106,7 +108,7 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "edge steps".can {
     "get all edges" in new Fixture {
-      (graph.E.toList should have).size(6)
+      (graph.E().toList() should have).size(6)
     }
 
     //   "follow in vertex" in new Fixture {
@@ -129,128 +131,133 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "head".can {
     "get the first element" in new Fixture {
-      graph.V.values[String]("name").head shouldBe "marko"
+      graph.V().values[String]("name").head() shouldBe "marko"
     }
 
     "throw an exception if there is no result" in new Fixture {
       intercept[NoSuchElementException] {
-        graph.V
+        graph
+          .V()
           .filter(_.has(Key("nonExistingProperty")))
           .values[String]("name")
-          .head
+          .head()
       }
     }
   }
 
   "headOption".can {
     "get the first element" in new Fixture {
-      graph.V.values[String]("name").headOption shouldBe Some("marko")
+      graph.V().values[String]("name").headOption() shouldBe Some("marko")
     }
 
     "return None if there is no result" in new Fixture {
-      graph.V
+      graph
+        .V()
         .filter(_.has(Key("nonExistingProperty")))
         .values[String]("name")
-        .headOption shouldBe None
+        .headOption() shouldBe None
     }
   }
 
   "value gets values" in new Fixture {
-    graph.V.value(Age).toSet shouldBe Set(27, 29, 32, 35)
+    graph.V().value(Age).toSet() shouldBe Set(27, 29, 32, 35)
   }
 
   "order".can {
     "order naturally" in new Fixture {
       val results: List[Int] =
-        graph.V.value(Age).order.toList
+        graph.V().value(Age).order().toList()
       results shouldBe Seq(27, 29, 32, 35)
     }
 
     "order naturally desc" in new Fixture {
       val results: List[Int] =
-        graph.V.value(Age).order(By(Order.desc)).toList
+        graph.V().value(Age).order(By(Order.desc)).toList()
       results shouldBe List(35, 32, 29, 27)
     }
 
     "order by property" in new Fixture {
       val results: List[Int] =
-        graph.V
+        graph
+          .V()
           .has(Age)
           .order(By(Age))
           .value(Age)
-          .toList
+          .toList()
       results shouldBe Seq(27, 29, 32, 35)
     }
 
     "order by property desc" in new Fixture {
       val results: List[Int] =
-        graph.V
+        graph
+          .V()
           .has(Age)
           .order(By(Age, Order.desc))
           .value(Age)
-          .toList
+          .toList()
       results shouldBe List(35, 32, 29, 27)
     }
 
     "order by multiple modulators" in new Fixture {
       val results: List[String] =
-        graph.V
+        graph
+          .V()
           .hasLabel("person")
-          .order(By(__.outE(Created).count), By(Age, Order.desc))
+          .order(By(__().outE(Created).count()), By(Age, Order.desc))
           .value(Name)
-          .toList
+          .toList()
       results shouldBe Seq("vadas", "peter", "marko", "josh")
     }
   }
 
   "map".can {
     "transform the latest step" in new Fixture {
-      graph.V.map(_.label).toList shouldBe graph.V.label.toList
+      graph.V().map(_.label).toList() shouldBe graph.V().label().toList()
     }
 
     "infer the right types" in new Fixture {
-      val labels: List[String] = graph.V.map(_.label).toList
+      val labels: List[String] = graph.V().map(_.label).toList()
     }
 
     "support for comprehension" in new Fixture {
       val labels = for {
-        vertex <- graph.V
+        vertex <- graph.V()
       } yield vertex.label
 
-      labels.toSet shouldBe graph.V.label.toSet
+      labels.toSet() shouldBe graph.V().label().toSet()
     }
   }
 
   "flatMap".can {
     "transform the latest step" in new Fixture {
-      val v1outEdges = graph.V(1).outE.toList
+      val v1outEdges = graph.V(1).outE().toList()
       (v1outEdges should have).length(3)
 
-      graph.V(1).flatMap(_.outE).toList shouldBe v1outEdges
+      graph.V(1).flatMap(_.outE()).toList() shouldBe v1outEdges
     }
 
     "infers the right types" in new Fixture {
-      val edges: List[Edge] = graph.V(1).flatMap(_.outE).toList
+      val edges: List[Edge] = graph.V(1).flatMap(_.outE()).toList()
     }
 
     "support for comprehension" when {
       "using simple case" in new Fixture {
         val edgeLabels = for {
-          vertex <- graph.V
-          edge <- vertex.outE
+          vertex <- graph.V()
+          edge <- vertex.outE()
         } yield edge.label
 
-        edgeLabels.toSet shouldBe graph.E.label.toSet
+        edgeLabels.toSet() shouldBe graph.E().label().toSet()
       }
 
       "using slightly more complex case" in new Fixture {
         // what is the mean age of the developers for a given software?
         val softwareAndDevAges = for {
-          software <- graph.V.hasLabel("software")
-          meanAge <- software.in("created").value(Age).mean
+          software <- graph.V().hasLabel("software")
+          meanAge <- software.in("created").value(Age).mean()
         } yield (software.value2(Name), meanAge)
 
-        softwareAndDevAges.toSet shouldBe Set(
+        softwareAndDevAges.toSet() shouldBe Set(
           "lop" -> 32d,
           "ripple" -> 32d
         )
@@ -258,24 +265,26 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "doesn't compile for bad traversals" in new Fixture {
-      graph.V(1).flatMap(_.outE) //compiles fine
+      graph.V(1).flatMap(_.outE()) //compiles fine
       illTyped { """graph.V(1).flatMap(_.inV)""" } //verify doesn't compile
     }
   }
 
   "fold".can {
     "gather elements in a list" in new Fixture {
-      val result: JList[String] = graph.V(1).out(Knows).value(Name).fold.head
+      val result: JList[String] = graph.V(1).out(Knows).value(Name).fold().head()
       result shouldBe List("vadas", "josh").asJava
     }
 
     "aggregate with arbitrary initial value and function" in new Fixture {
-      graph.V
+      graph
+        .V()
         .value(Age)
         .foldLeft(0)(_ + _)
         .head() shouldBe 123
 
-      graph.V
+      graph
+        .V()
         .value(Age)
         .order(By(Order.desc))
         .foldLeft("F")(_ + _ + "*")
@@ -285,18 +294,18 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "store step stores results in a Set" in new Fixture {
     val x = StepLabel[java.util.Set[Vertex]]("x")
-    val set = g.V().store(x).cap(x).head
+    val set = g.V().store(x).cap(x).head()
     set.size shouldBe 6
   }
 
   "aggregate step stores results in a Set" in new Fixture {
     val x = StepLabel[java.util.Set[Vertex]]("x")
-    val set = g.V().aggregate(x).cap(x).head
+    val set = g.V().aggregate(x).cap(x).head()
     set.size shouldBe 6
   }
 
   "limit in nested traversals" in {
-    implicit val graph = TinkerGraph.open.asScala
+    implicit val graph = TinkerGraph.open.asScala()
     val Person = "person"
     val Likes = "likes"
     val Name = Key[String]("name")
@@ -313,8 +322,8 @@ class TraversalSpec extends WordSpec with Matchers {
     marko --- (Likes, Weight -> 3) --> scala
 
     val traversal = for {
-      person <- graph.V.hasLabel(Person)
-      favorite <- person.outE(Likes).order(By(Weight, Order.desc)).limit(1).inV
+      person <- graph.V().hasLabel(Person)
+      favorite <- person.outE(Likes).order(By(Weight, Order.desc)).limit(1).inV()
     } yield (person.value2(Name), favorite.label)
 
     traversal.toMap shouldBe Map(
@@ -324,18 +333,19 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   "collect" in new Fixture {
-    val ages: Set[Int] = graph.V
+    val ages: Set[Int] = graph
+      .V()
       .valueOption(Age)
       .collect {
         case Some(age) => age
       }
-      .toSet
+      .toSet()
 
     ages shouldBe Set(27, 29, 32, 35)
   }
 
   "find all edges between two vertices" in {
-    implicit val graph = TinkerGraph.open.asScala
+    implicit val graph = TinkerGraph.open.asScala()
 
     val v0 = graph + "v0"
     val v1 = graph + "v1"
@@ -345,18 +355,18 @@ class TraversalSpec extends WordSpec with Matchers {
     v0 <-- "e1" --- v1
     v0 <-- "e2" --> v2
 
-    graph.E.count.head shouldBe 4
-    val v0v1Edges = v0.bothE.filter(_.bothV.is(v1)).label.toSet
+    graph.E().count().head() shouldBe 4
+    val v0v1Edges = v0.bothE().filter(_.bothV().is(v1)).label().toSet()
     v0v1Edges shouldBe Set("e0", "e1")
   }
 
   "`drop` removes elements from the graph" in new Fixture {
     // remove all people over 30 from the graph
-    graph.V.hasLabel("person").has(Age, P.gte(30)).drop.iterate
+    graph.V().hasLabel("person").has(Age, P.gte(30)).drop().iterate()
 
-    graph.V.hasLabel("person").count.head shouldBe 2
+    graph.V().hasLabel("person").count().head() shouldBe 2
     withClue("should remove corresponding edges as well") {
-      graph.E.count.head shouldBe 2
+      graph.E().count().head() shouldBe 2
     }
   }
 
@@ -364,63 +374,66 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "modulate by property key" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
-        graph.V
+        graph
+          .V()
           .has(Age)
           .group(By(Age))
-          .head
+          .head()
 
-      results.get(27) should contain(graph.V(2).head)
-      results.get(29) should contain(graph.V(1).head)
-      results.get(32) should contain(graph.V(4).head)
-      results.get(35) should contain(graph.V(6).head)
+      results.get(27) should contain(graph.V(2).head())
+      results.get(29) should contain(graph.V(1).head())
+      results.get(32) should contain(graph.V(4).head())
+      results.get(35) should contain(graph.V(6).head())
     }
 
     "modulate by traversal" in new Fixture {
       val results: JMap[Int, JCollection[Vertex]] =
-        graph.V
+        graph
+          .V()
           .has(Age)
-          .group(By(__.value(Age)))
-          .head
+          .group(By(__().value(Age)))
+          .head()
 
-      results.get(27) should contain(graph.V(2).head)
-      results.get(29) should contain(graph.V(1).head)
-      results.get(32) should contain(graph.V(4).head)
-      results.get(35) should contain(graph.V(6).head)
+      results.get(27) should contain(graph.V(2).head())
+      results.get(29) should contain(graph.V(1).head())
+      results.get(32) should contain(graph.V(4).head())
+      results.get(35) should contain(graph.V(6).head())
     }
 
     "modulate by label" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V.group(By.label).head
+        graph.V().group(By.label).head()
 
-      results.get("software") should contain(graph.V(3).head)
-      results.get("software") should contain(graph.V(5).head)
-      results.get("person") should contain(graph.V(1).head)
-      results.get("person") should contain(graph.V(2).head)
-      results.get("person") should contain(graph.V(4).head)
-      results.get("person") should contain(graph.V(6).head)
+      results.get("software") should contain(graph.V(3).head())
+      results.get("software") should contain(graph.V(5).head())
+      results.get("person") should contain(graph.V(1).head())
+      results.get("person") should contain(graph.V(2).head())
+      results.get("person") should contain(graph.V(4).head())
+      results.get("person") should contain(graph.V(6).head())
     }
 
     "modulate by function" in new Fixture {
       val results: JMap[String, JCollection[Vertex]] =
-        graph.V
+        graph
+          .V()
           .group(By { v: Vertex =>
             v.label
           })
-          .head
+          .head()
 
-      results.get("software") should contain(graph.V(3).head)
-      results.get("software") should contain(graph.V(5).head)
-      results.get("person") should contain(graph.V(1).head)
-      results.get("person") should contain(graph.V(2).head)
-      results.get("person") should contain(graph.V(4).head)
-      results.get("person") should contain(graph.V(6).head)
+      results.get("software") should contain(graph.V(3).head())
+      results.get("software") should contain(graph.V(5).head())
+      results.get("person") should contain(graph.V(1).head())
+      results.get("person") should contain(graph.V(2).head())
+      results.get("person") should contain(graph.V(4).head())
+      results.get("person") should contain(graph.V(6).head())
     }
 
     "modulate key and value" in new Fixture {
       type Label = String
       type Name = String
       val results: JMap[Label, JCollection[Name]] =
-        graph.V.group(By.label, By(Name)).head
+        graph.V().group(By.label, By(Name)).head()
 
       results.get("software") should contain("lop")
       results.get("software") should contain("ripple")
@@ -434,63 +447,65 @@ class TraversalSpec extends WordSpec with Matchers {
   "groupCount" should {
     "work on values" in new Fixture {
       val results: JMap[Int, JLong] =
-        graph.V.hasLabel(Person).value(Age).groupCount().head
+        graph.V().hasLabel(Person).value(Age).groupCount().head()
       results.asScala shouldBe Map(32 -> 1, 35 -> 1, 27 -> 1, 29 -> 1)
     }
 
     "work with modulator on Elements" in new Fixture {
       val results: JMap[Int, JLong] =
-        graph.V.hasLabel(Person).groupCount(By(Age)).head
+        graph.V().hasLabel(Person).groupCount(By(Age)).head()
       results.asScala shouldBe Map(32 -> 1, 35 -> 1, 27 -> 1, 29 -> 1)
     }
   }
 
   "dedup".can {
     "simply deduplicate" in new Fixture {
-      graph.V.value(Lang).dedup.count.head shouldBe 1
+      graph.V().value(Lang).dedup().count().head() shouldBe 1
     }
 
     "use by modulator" in new Fixture {
-      graph.V.dedup(By.label).value(Name).toSet shouldBe Set("marko", "lop")
+      graph.V().dedup(By.label).value(Name).toSet() shouldBe Set("marko", "lop")
     }
 
     "deduplicate labeled steps" in new Fixture {
-      graph.V
+      graph
+        .V()
         .as("a")
         .out(Created)
         .as("b")
         .in(Created)
         .as("c")
         .dedup("a", "b")
-        .count
-        .head shouldBe 4
+        .count()
+        .head() shouldBe 4
     }
   }
 
   "subgraph" should {
     "work in simple scenario" in new Fixture {
       val stepLabel = StepLabel[Graph]("subGraph")
-      val subGraph: Graph = graph.E
+      val subGraph: Graph = graph
+        .E()
         .hasLabel("knows")
         .subgraph(stepLabel)
         .cap(stepLabel)
-        .head
+        .head()
 
-      subGraph.V.count.head shouldBe 3
-      subGraph.E.count.head shouldBe 2
+      subGraph.V().count().head() shouldBe 3
+      subGraph.E().count().head() shouldBe 2
     }
 
     "get all of the graph structure surrounding a single vertex" in new Fixture {
       val stepLabel = StepLabel[Graph]("subGraph")
       val subGraph: Graph = graph
         .V(3)
-        .repeat(_.inE.subgraph(stepLabel).outV)
+        .repeat(_.inE().subgraph(stepLabel).outV())
         .times(3)
         .cap(stepLabel)
-        .head
+        .head()
 
-      subGraph.V.count.head shouldBe 4
-      subGraph.E.count.head shouldBe 4
+      subGraph.V().count().head() shouldBe 4
+      subGraph.E().count().head() shouldBe 4
     }
   }
 
@@ -498,11 +513,11 @@ class TraversalSpec extends WordSpec with Matchers {
     val traversal: GremlinScala[(JList[Edge], JList[Vertex])] =
       g.V(1)
         .union(
-          _.join(_.outE)
-            .join(_.out)
+          _.join(_.outE())
+            .join(_.out())
         )
 
-    val (outEdges, outVertices) = traversal.head
+    val (outEdges, outVertices) = traversal.head()
     outEdges.size shouldBe 3
     outEdges.asScala.map(_.id).toSet shouldBe Set(7, 8, 9)
 
@@ -515,28 +530,28 @@ class TraversalSpec extends WordSpec with Matchers {
       val traversal: GremlinScala[Int] =
         g.V(4)
           .unionFlat(
-            _.in.value(Age),
-            _.in.out.value(Age)
+            _.in().value(Age),
+            _.in().out().value(Age)
           )
 
-      traversal.toSet shouldBe Set(27, 29, 32)
+      traversal.toSet() shouldBe Set(27, 29, 32)
     }
 
     "falls back to `Any` for heterogeneous queries" in new Fixture {
       val traversal: GremlinScala[Any] =
         g.V(4)
           .unionFlat(
-            _.in.value("age"),
-            _.in.value("name")
+            _.in().value("age"),
+            _.in().value("name")
           )
 
-      traversal.toSet shouldBe Set(29, "marko")
+      traversal.toSet() shouldBe Set(29, "marko")
     }
   }
 
   "path" should {
     "include every step in the traversal" in new Fixture {
-      val results: List[Path] = graph.V.out.out.value(Name).path.toList
+      val results: List[Path] = graph.V().out().out().value(Name).path().toList()
       results.size shouldBe 2
       path2String(results(0)) shouldBe List("v[1]", "v[4]", "v[5]", "ripple")
       path2String(results(1)) shouldBe List("v[1]", "v[4]", "v[3]", "lop")
@@ -544,9 +559,12 @@ class TraversalSpec extends WordSpec with Matchers {
 
     "allow to be modulated" in new Fixture {
       val results: List[Path] =
-        graph.V.out.out
+        graph
+          .V()
+          .out()
+          .out()
           .path(By(Name), By(Age))
-          .toList
+          .toList()
 
       results.size shouldBe 2
       path2String(results(0)) shouldBe List("marko", "32", "ripple")
@@ -557,15 +575,18 @@ class TraversalSpec extends WordSpec with Matchers {
       val knownPersonStep = StepLabel[Vertex]()
       val createdSoftwareStep = StepLabel[Vertex]()
 
-      val results: List[Path] = 
-        graph.V
-        .has(Name, "marko")
-        .out(Knows).as(knownPersonStep)
-        .out(Created).as(createdSoftwareStep)
-        .path(By(Name))
-        .from(knownPersonStep)
-        .to(createdSoftwareStep)
-        .toList
+      val results: List[Path] =
+        graph
+          .V()
+          .has(Name, "marko")
+          .out(Knows)
+          .as(knownPersonStep)
+          .out(Created)
+          .as(createdSoftwareStep)
+          .path(By(Name))
+          .from(knownPersonStep)
+          .to(createdSoftwareStep)
+          .toList()
 
       path2String(results(0)) shouldBe List("josh", "ripple")
       path2String(results(1)) shouldBe List("josh", "lop")
@@ -582,7 +603,7 @@ class TraversalSpec extends WordSpec with Matchers {
             _.outE("knows"),
             _.outE("created")
           )
-          .inV
+          .inV()
           .path(By(Name), By.label)
 
         traversal1.toList().map(path2String) shouldBe
@@ -607,7 +628,8 @@ class TraversalSpec extends WordSpec with Matchers {
       // Add a new property on a specific vertex and test that it is picked up first.
       graph.V(1).property(Nickname, "okram").iterate()
 
-      val traversal3 = graph.V
+      val traversal3 = graph
+        .V()
         .hasLabel("person")
         .coalesce(
           _.value(Nickname),
@@ -618,7 +640,8 @@ class TraversalSpec extends WordSpec with Matchers {
     }
 
     "allow constant as default" in new Fixture {
-      val traversal3 = graph.V
+      val traversal3 = graph
+        .V()
         .coalesce(
           _.value(Age).map(_.toString),
           _.constant("ageless")
@@ -633,32 +656,32 @@ class TraversalSpec extends WordSpec with Matchers {
     "emit only results from final iteration by default" in new Fixture {
       val traversal = graph
         .V(1)
-        .repeat(_.out)
+        .repeat(_.out())
         .times(2)
         .value(Name)
 
-      traversal.toSet shouldBe Set("ripple", "lop")
+      traversal.toSet() shouldBe Set("ripple", "lop")
     }
 
     "emit all intermediate results when using `emit` modulator" in new Fixture {
       val traversal = graph
         .V(1)
-        .emit
-        .repeat(_.out)
+        .emit()
+        .repeat(_.out())
         .times(2)
         .value(Name)
 
-      traversal.toSet shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
+      traversal.toSet() shouldBe Set("lop", "marko", "josh", "vadas", "ripple")
     }
 
     "use predicate in `until` modulator: iterate until no moure outgoing edges" in new Fixture {
       val traversal = graph
         .V(1)
-        .repeat(_.out)
-        .until(_.outE.count.is(JLong.valueOf(0)))
+        .repeat(_.out())
+        .until(_.outE().count().is(JLong.valueOf(0)))
         .path(By(Name))
 
-      traversal.toSet.size shouldBe 4
+      traversal.toSet().size shouldBe 4
       // Set([marko, lop], [marko, vadas], [marko, josh, ripple], [marko, josh, lop])
     }
   }
@@ -674,7 +697,7 @@ class TraversalSpec extends WordSpec with Matchers {
                    _.as("c").has(Age -> 29))
           .select("a", "c")
           .by("name")
-      traversal.toSet shouldBe Set(
+      traversal.toSet() shouldBe Set(
         Map("a" -> "marko", "c" -> "marko").asJava,
         Map("a" -> "josh", "c" -> "marko").asJava,
         Map("a" -> "peter", "c" -> "marko").asJava
@@ -689,7 +712,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .select("creators", "cocreators")
         .by("name")
 
-      traversal.toSet shouldBe Set(
+      traversal.toSet() shouldBe Set(
         Map("creators" -> "marko", "cocreators" -> "marko").asJava,
         Map("creators" -> "josh", "cocreators" -> "marko").asJava,
         Map("creators" -> "peter", "cocreators" -> "marko").asJava
@@ -709,7 +732,7 @@ class TraversalSpec extends WordSpec with Matchers {
         )
         .select("a", "c")
         .by("name")
-      traversal.toSet shouldBe Set(Map("a" -> "marko", "c" -> "ripple").asJava)
+      traversal.toSet() shouldBe Set(Map("a" -> "marko", "c" -> "ripple").asJava)
     }
   }
 
@@ -725,7 +748,7 @@ class TraversalSpec extends WordSpec with Matchers {
           .where(P.neq("a"))
           .value(Name)
 
-      traversal.toSet shouldBe Set("josh", "peter")
+      traversal.toSet() shouldBe Set("josh", "peter")
     }
 
     "filter with traversal" in new Fixture {
@@ -736,10 +759,10 @@ class TraversalSpec extends WordSpec with Matchers {
           .as("a")
           .out(Created)
           .in(Created)
-          .where(_.out(Created).count.is(P.gt(1)))
+          .where(_.out(Created).count().is(P.gt(1)))
           .value(Name)
 
-      traversal.toSet shouldBe Set("josh")
+      traversal.toSet() shouldBe Set("josh")
     }
 
     "be modulated with `by`" when {
@@ -749,26 +772,27 @@ class TraversalSpec extends WordSpec with Matchers {
           graph
             .V(1)
             .as("a")
-            .both
-            .both
+            .both()
+            .both()
             .hasLabel(Person)
             .where(P.gt("a"), By(Age))
             .value(Name)
 
-        traversal.toSet shouldBe Set("josh", "peter")
+        traversal.toSet() shouldBe Set("josh", "peter")
       }
 
       "comparing two labels" in new Fixture {
         // Marko knows josh and vadas but is only older than vadas
         val traversal =
-          graph.V
+          graph
+            .V()
             .as("a")
             .out(Knows)
             .as("b")
             .where("a", P.gt("b"), By(Age))
             .value(Name)
 
-        traversal.toSet shouldBe Set("vadas")
+        traversal.toSet() shouldBe Set("vadas")
       }
     }
   }
@@ -785,12 +809,12 @@ class TraversalSpec extends WordSpec with Matchers {
 
       val tree = graph
         .V(1)
-        .head
+        .head()
         .start()
-        .repeat(_.outE.inV)
+        .repeat(_.outE().inV())
         .emit()
         .tree()
-        .head
+        .head()
 
       tree.keySet().asScala shouldBe Set(vertices(1))
 
@@ -816,13 +840,13 @@ class TraversalSpec extends WordSpec with Matchers {
   "optional step".which {
     "doesn't take a default value" should {
       "return result of optional traversal if it has one" in new Fixture {
-        val results = graph.V(1).optional(_.out("knows")).value(Name).toList
+        val results = graph.V(1).optional(_.out("knows")).value(Name).toList()
         results shouldBe List("vadas", "josh")
       }
 
       "return identity if optional traversal doesn't find anything" in new Fixture {
         val results =
-          graph.V(1).optional(_.out("doesnt exist")).value(Name).toList
+          graph.V(1).optional(_.out("doesnt exist")).value(Name).toList()
         results shouldBe List("marko")
       }
     }
@@ -833,7 +857,7 @@ class TraversalSpec extends WordSpec with Matchers {
           .V(1)
           .optional(_.out("knows"), DetachedVertex())
           .value(Name)
-          .toList
+          .toList()
         results shouldBe List("vadas", "josh")
       }
 
@@ -842,7 +866,7 @@ class TraversalSpec extends WordSpec with Matchers {
           .V(1)
           .optional(_.out("doesnt exist"), DetachedVertex())
           .value(Name)
-          .toList
+          .toList()
         results shouldBe List()
       }
     }
@@ -853,13 +877,14 @@ class TraversalSpec extends WordSpec with Matchers {
       "has a label and properties" in new Fixture {
         val NewProperty = Key[String]("newProperty")
 
-        graph.V
+        graph
+          .V()
           .outE("knows")
           .addV("newLabel")
           .property(NewProperty, "someValue")
           .iterate()
-        graph.V.hasLabel("newLabel").count.head shouldBe 2
-        graph.V.has(NewProperty -> "someValue").count.head shouldBe 2
+        graph.V().hasLabel("newLabel").count().head() shouldBe 2
+        graph.V().has(NewProperty -> "someValue").count().head() shouldBe 2
       }
     }
 
@@ -868,25 +893,34 @@ class TraversalSpec extends WordSpec with Matchers {
       val CoDeveloper = "co-developer"
 
       "show simple case" in new Fixture {
-        val michael = g.addV(Person).property(Name -> "michael").head
-        val karlotta = g.addV(Person).property(Name -> "karlotta").head
+        val michael = g.addV(Person).property(Name -> "michael").head()
+        val karlotta = g.addV(Person).property(Name -> "karlotta").head()
 
         g.V(michael).addE("loves").to(karlotta).iterate()
         g.addE("knows").from(michael).to(karlotta).iterate()
-        michael.start.outE.count.head shouldBe 2
+        michael.start().outE().count().head() shouldBe 2
       }
 
       "add multiple edges in one iteration" in new Fixture {
         val knows = StepLabel[Edge]("knows")
         val likes = StepLabel[Edge]("likes")
-        val michael = g.addV(Person).property(Name -> "michael").head
-        val karlotta = g.addV(Person).property(Name -> "karlotta").head
+        val michael = g.addV(Person).property(Name -> "michael").head()
+        val karlotta = g.addV(Person).property(Name -> "karlotta").head()
 
-        g.addE("knows").from(michael).to(karlotta)
-         .addE(knows).from(michael).to(karlotta)
-         .addE(likes).from(karlotta).to(michael)
-         .addE("likes").from(karlotta).to(michael).iterate()
-        michael.start.bothE().count.head shouldBe 4
+        g.addE("knows")
+          .from(michael)
+          .to(karlotta)
+          .addE(knows)
+          .from(michael)
+          .to(karlotta)
+          .addE(likes)
+          .from(karlotta)
+          .to(michael)
+          .addE("likes")
+          .from(karlotta)
+          .to(michael)
+          .iterate()
+        michael.start().bothE().count().head() shouldBe 4
       }
 
       "use multiple traversals" in new Fixture {
@@ -896,7 +930,7 @@ class TraversalSpec extends WordSpec with Matchers {
         } yield v1 --- CoDeveloper --> coDeveloper
         traversal.iterate()
 
-        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+        graph.V(1).out(CoDeveloper).value(Name).toSet() shouldBe Set("josh", "peter")
       }
 
       "reference the `to` vertex via StepLabel" in new Fixture {
@@ -908,8 +942,8 @@ class TraversalSpec extends WordSpec with Matchers {
           .where(P.neq(v1Label.name))
           .addE(CoDeveloper)
           .to(v1Label)
-          .iterate
-        graph.V(1).in(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+          .iterate()
+        graph.V(1).in(CoDeveloper).value(Name).toSet() shouldBe Set("josh", "peter")
       }
 
       "reference the `from` vertex via StepLabel" in new Fixture {
@@ -921,50 +955,51 @@ class TraversalSpec extends WordSpec with Matchers {
           .where(P.neq(v1Label.name))
           .addE(CoDeveloper)
           .from(v1Label)
-          .iterate
-        graph.V(1).out(CoDeveloper).value(Name).toSet shouldBe Set("josh", "peter")
+          .iterate()
+        graph.V(1).out(CoDeveloper).value(Name).toSet() shouldBe Set("josh", "peter")
       }
 
       "reference the `to` vertex via traversal" in new Fixture {
         val KnowsCreator = "knowsCreator"
-        graph.V(1).addE(KnowsCreator).to(_.out(Knows).out(Created)).iterate
+        graph.V(1).addE(KnowsCreator).to(_.out(Knows).out(Created)).iterate()
 
         // note: when using with addE, it only selects the first vertex!
         // https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs
-        graph.V(1).outE(KnowsCreator).count.head shouldBe 1
+        graph.V(1).outE(KnowsCreator).count().head() shouldBe 1
       }
 
       "reference the `from` vertex via traversal" in new Fixture {
         val CreatorKnows = "creatorKnows"
-        graph.V(1).addE(CreatorKnows).from(_.out(Knows).out(Created)).iterate
+        graph.V(1).addE(CreatorKnows).from(_.out(Knows).out(Created)).iterate()
 
         // note: when using with addE, it only selects the first vertex!
         // https://groups.google.com/forum/#!topic/gremlin-users/3YgKMKB4iNs
-        graph.V(1).inE(CreatorKnows).count.head shouldBe 1
+        graph.V(1).inE(CreatorKnows).count().head() shouldBe 1
       }
     }
   }
 
   "set properties".which {
     "have a given value" in new Fixture {
-      graph.addV(Person).property(Name, "Joseph").iterate
-      graph.V.has(Name, "Joseph").count.head shouldBe 1
+      graph.addV(Person).property(Name, "Joseph").iterate()
+      graph.V().has(Name, "Joseph").count().head() shouldBe 1
     }
 
     "have a given value (alternative step)" in new Fixture {
-      graph.addV(Person).property(Name -> "Joseph2").iterate
-      graph.V.has(Name, "Joseph2").count.head shouldBe 1
+      graph.addV(Person).property(Name -> "Joseph2").iterate()
+      graph.V().has(Name, "Joseph2").count().head() shouldBe 1
     }
 
     "derive the value from a traversal" in new Fixture {
       val CreatedCount = Key[JLong]("createdCount")
-      graph.V
+      graph
+        .V()
         .hasLabel(Person)
-        .property(CreatedCount)(_.outE("created").count)
-        .iterate
+        .property(CreatedCount)(_.outE("created").count())
+        .iterate()
 
       val results =
-        graph.V.hasLabel(Person).group(By(Name), By(CreatedCount)).head
+        graph.V().hasLabel(Person).group(By(Name), By(CreatedCount)).head()
       /* TODO: find a nicer way to embed tuples in the pipeline */
       def get(name: String): JLong = results.get(name).iterator.next
 
@@ -976,8 +1011,8 @@ class TraversalSpec extends WordSpec with Matchers {
 
   "local step".can {
     "limit a local subquery" in new Fixture {
-      graph.V.outE.inV.count.head shouldBe 6
-      graph.V.local(_.outE.limit(1)).inV.limit(3).count.head shouldBe 3
+      graph.V().outE().inV().count().head() shouldBe 6
+      graph.V().local(_.outE().limit(1)).inV().limit(3).count().head() shouldBe 3
     }
   }
 
@@ -986,14 +1021,16 @@ class TraversalSpec extends WordSpec with Matchers {
       graph
         .inject(1, 2)
         .map(_ + 1)
-        .map(graph.V(_).value(Name).head)
-        .toList shouldEqual List("vadas", "lop")
+        .map(graph.V(_).value(Name).head())
+        .toList() shouldEqual List("vadas", "lop")
     }
 
     "used to add values to traversal" in new Fixture {
-      graph.V(4).out().value(Name).inject("daniel").toList shouldEqual List("daniel",
-                                                                            "ripple",
-                                                                            "lop")
+      graph.V(4).out().value(Name).inject("daniel").toList() shouldEqual List(
+        "daniel",
+        "ripple",
+        "lop"
+      )
     }
   }
 
@@ -1013,7 +1050,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .from(a)
         .to(b)
         .property(StartTime, 2010)
-        .iterate
+        .iterate()
 
       val names = graph
         .E()
@@ -1021,7 +1058,7 @@ class TraversalSpec extends WordSpec with Matchers {
         .has(StartTime, 2010)
         .bothV()
         .value(Name)
-        .toList
+        .toList()
         .sorted
 
       names shouldEqual List("marko", "vadas")
@@ -1041,17 +1078,17 @@ class TraversalSpec extends WordSpec with Matchers {
         }
       }
       .times(10)
-      .toList
+      .toList()
 
     val duration = System.currentTimeMillis - start
     duration should be <= maxTime.toMillis
   })
 
   "allows to be cloned" in new Fixture {
-    val gs = graph.V(1).count
+    val gs = graph.V(1).count()
     val gsCloned = gs.clone()
-    gs.head shouldBe 1
-    gsCloned.head shouldBe 1
+    gs.head() shouldBe 1
+    gsCloned.head() shouldBe 1
   }
 
   "math step".can {
@@ -1062,16 +1099,16 @@ class TraversalSpec extends WordSpec with Matchers {
         .out("knows")
         .as("b")
         .math("a + b", By(Age))
-        .toSet shouldBe Set(56d, 61d)
+        .toSet() shouldBe Set(56d, 61d)
     }
 
     "work with sideeffect key and placeholder" in new Fixture {
       graph
         .configure(_.withSideEffect("x", 10))
-        .V
+        .V()
         .value(Age)
         .math("_ / x")
-        .toSet shouldBe Set(2.9, 2.7, 3.2, 3.5)
+        .toSet() shouldBe Set(2.9, 2.7, 3.2, 3.5)
     }
   }
 
@@ -1091,7 +1128,7 @@ class TraversalSpec extends WordSpec with Matchers {
   }
 
   trait Fixture {
-    implicit val graph = TinkerFactory.createModern.asScala
+    implicit val graph = TinkerFactory.createModern.asScala()
     val g = graph.traversal
     val Name = Key[String]("name")
     val Nickname = Key[String]("nickname")

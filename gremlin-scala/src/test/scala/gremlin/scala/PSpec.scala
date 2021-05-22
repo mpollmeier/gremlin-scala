@@ -1,10 +1,11 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.{P => JavaP}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /* test cases copied from TP3 PTest.java */
-class PSpec extends WordSpec with Matchers {
+class PSpec extends AnyWordSpec with Matchers {
 
   List(
     TestCase(P.eq(0), 0, true),

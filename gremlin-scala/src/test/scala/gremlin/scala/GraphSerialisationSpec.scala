@@ -4,9 +4,10 @@ import java.io.FileOutputStream
 import org.apache.tinkerpop.gremlin.structure.io.IoCore
 import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONVersion
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.{TinkerFactory, TinkerGraph}
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
-class GraphSerialisationSpec extends WordSpec with Matchers {
+class GraphSerialisationSpec extends AnyWordSpec with Matchers {
 
   "serialising from/to" should {
 
@@ -16,8 +17,8 @@ class GraphSerialisationSpec extends WordSpec with Matchers {
 
       val newGraph = TinkerGraph.open
       newGraph.io(IoCore.graphml).readGraph(file)
-      newGraph.V.count.head shouldBe 6
-      newGraph.E.count.head shouldBe 6
+      newGraph.V().count().head() shouldBe 6
+      newGraph.E().count().head() shouldBe 6
     }
 
     "support graphson" in {
@@ -26,8 +27,8 @@ class GraphSerialisationSpec extends WordSpec with Matchers {
 
       val newGraph = TinkerGraph.open
       newGraph.io(IoCore.graphson).readGraph(file)
-      newGraph.V.count.head shouldBe 6
-      newGraph.E.count.head shouldBe 6
+      newGraph.V().count().head() shouldBe 6
+      newGraph.E().count().head() shouldBe 6
     }
 
     "support graphson v2" in {
@@ -47,8 +48,8 @@ class GraphSerialisationSpec extends WordSpec with Matchers {
 
       val newGraph = TinkerGraph.open
       newGraph.io(IoCore.graphson).readGraph(file)
-      newGraph.V.count.head shouldBe 6
-      newGraph.E.count.head shouldBe 6
+      newGraph.V().count().head() shouldBe 6
+      newGraph.E().count().head() shouldBe 6
     }
 
     "support gryo/kryo" in {
@@ -57,8 +58,8 @@ class GraphSerialisationSpec extends WordSpec with Matchers {
 
       val newGraph = TinkerGraph.open
       newGraph.io(IoCore.gryo).readGraph(file)
-      newGraph.V.count.head shouldBe 6
-      newGraph.E.count.head shouldBe 6
+      newGraph.V().count().head() shouldBe 6
+      newGraph.E().count().head() shouldBe 6
     }
   }
 

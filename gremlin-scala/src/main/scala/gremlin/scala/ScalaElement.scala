@@ -31,9 +31,9 @@ trait ScalaElement[ElementType <: Element] {
 
   def property[A](key: Key[A]): Property[A] = element.property[A](key.name)
 
-  def properties[A: DefaultsToAny]: Stream[Property[A]]
+  def properties[A: DefaultsToAny]: LazyList[Property[A]]
 
-  def properties[A: DefaultsToAny](keys: String*): Stream[Property[A]]
+  def properties[A: DefaultsToAny](keys: String*): LazyList[Property[A]]
 
   // note: this may throw an IllegalStateException - better use `valueOption` or `Property`
   def value[A: DefaultsToAny](key: String): A =

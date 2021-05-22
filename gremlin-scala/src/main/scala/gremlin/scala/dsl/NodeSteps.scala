@@ -17,7 +17,7 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
   def walkIn(edgeType: String): GremlinScala[Vertex] =
     raw
       .repeat(_.in(edgeType))
-      .until(_.in(edgeType).count.is(P.eq(0)))
+      .until(_.in(edgeType).count().is(P.eq(0)))
 
   /** Aggregate all objects at this point into the given collection, e.g. `mutable.ArrayBuffer.empty[EndDomain]`
     * Uses eager evaluation (as opposed to `store`() which lazily fills a collection)

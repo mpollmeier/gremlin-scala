@@ -1,16 +1,15 @@
 package gremlin.scala
 
-import org.apache.tinkerpop.gremlin.structure._
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.scalatest.Matchers
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 trait TestGraph {
-  implicit val graph = TinkerFactory.createClassic.asScala
-  def v(i: Int) = graph.V(i: Integer).head
-  def e(i: Int) = graph.E(i: Integer).head
+  implicit val graph = TinkerFactory.createClassic.asScala()
+  def v(i: Int) = graph.V(i: Integer).head()
+  def e(i: Int) = graph.E(i: Integer).head()
 
-  def print(gs: GremlinScala[_]) = println(gs.toList)
+  def print(gs: GremlinScala[_]) = println(gs.toList())
 }
 
 object TestGraph {
@@ -28,8 +27,8 @@ object TestGraph {
   case class Software(name: String, lang: String)
 }
 
-trait TestBase extends FunSpec with Matchers with TestGraph {
-  implicit class Properties[A](set: Traversable[Property[A]]) {
-    def unroll(): Traversable[A] = set.map(_.value)
+trait TestBase extends AnyFunSpec with Matchers with TestGraph {
+  implicit class Properties[A](set: Iterable[Property[A]]) {
+    def unroll(): Iterable[A] = set.map(_.value)
   }
 }

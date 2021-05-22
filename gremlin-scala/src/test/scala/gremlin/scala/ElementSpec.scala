@@ -24,15 +24,15 @@ class ElementSpec extends TestBase {
       e7.property(DoesNotExist).isPresent shouldBe false
       e7.valueMap("weight") shouldBe Map("weight" -> 0.5)
 
-      graph.V(1).properties(Age.name, Name.name).hasValue("marko").count.head shouldBe 1
-      graph.V(1).properties(Age.name, Name.name).hasValue(29).count.head shouldBe 1
-      graph.V(1).properties(Age.name, Name.name).hasValue(29, "marko").count.head shouldBe 2
+      graph.V(1).properties(Age.name, Name.name).hasValue("marko").count().head() shouldBe 1
+      graph.V(1).properties(Age.name, Name.name).hasValue(29).count().head() shouldBe 1
+      graph.V(1).properties(Age.name, Name.name).hasValue(29, "marko").count().head() shouldBe 2
       graph
         .V(1)
         .properties(Age.name, Name.name)
         .hasValue("marko", 29: Integer)
-        .count
-        .head shouldBe 2
+        .count()
+        .head() shouldBe 2
     }
 
     it("maps properties to scala.Option") {
@@ -54,22 +54,22 @@ class ElementSpec extends TestBase {
     it("sets a property with multiple values") {
       // tp3 standard way
       val v = graph.addVertex((Name.name -> "marko"), (Name.name -> "marko a. rodriguez"))
-      graph.V(v).properties(Name.name).count.head shouldBe 2
+      graph.V(v).properties(Name.name).count().head() shouldBe 2
 
       // add one more
       v.property(Cardinality.list, Name.name, "m. a. rodriguez")
-      graph.V(v).properties(Name.name).count.head shouldBe 3
+      graph.V(v).properties(Name.name).count().head() shouldBe 3
 
       // can filter on property values as well
-      graph.V(v).properties(Name.name).hasValue("marko").count.head shouldBe 1
+      graph.V(v).properties(Name.name).hasValue("marko").count().head() shouldBe 1
 
       // gremlin-scala style
       v.setPropertyList(TestProperty, List("one", "two", "three"))
-      graph.V(v).properties(TestProperty.name).count.head shouldBe 3
+      graph.V(v).properties(TestProperty.name).count().head() shouldBe 3
 
       // can override
       v.setPropertyList(TestProperty, List("three", "four"))
-      graph.V(v).properties(TestProperty.name).count.head shouldBe 2
+      graph.V(v).properties(TestProperty.name).count().head() shouldBe 2
     }
 
     it("removes a property") {
@@ -118,13 +118,13 @@ class ElementSpec extends TestBase {
     }
 
     it("equals") {
-      v1 == v(1).asScala shouldBe true
-      v1 == v(2).asScala shouldBe false
+      v1 == v(1).asScala() shouldBe true
+      v1 == v(2).asScala() shouldBe false
     }
 
     it("uses the right hashCodes") {
-      v1.hashCode shouldBe v(1).asScala.hashCode
-      v1.hashCode should not be v(2).asScala.hashCode
+      v1.hashCode shouldBe v(1).asScala().hashCode
+      v1.hashCode should not be v(2).asScala().hashCode
 
       Set(v1) contains v(1) shouldBe true
       Set(v1) contains v(2) shouldBe false
@@ -134,76 +134,76 @@ class ElementSpec extends TestBase {
   describe("adding and removing elements") {
 
     it("adds a vertex") {
-      val graph = TinkerGraph.open.asScala
+      val graph = TinkerGraph.open.asScala()
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
       v2.setProperty(TestProperty, "testValue")
 
-      graph.V(v1.id).head shouldBe v1
-      graph.V(v2.id).head.property(TestProperty).value shouldBe "testValue"
-      (graph.V.toList() should have).size(2)
+      graph.V(v1.id).head() shouldBe v1
+      graph.V(v2.id).head().property(TestProperty).value shouldBe "testValue"
+      (graph.V().toList() should have).size(2)
     }
 
     it("adds a vertex with a given label") {
-      val graph = TinkerGraph.open.asScala
+      val graph = TinkerGraph.open.asScala()
       val label1 = "label1"
       val label2 = "label2"
       val v1 = graph.addVertex(label1)
       val v2 = graph.addVertex(label2, Map(TestProperty.name -> "testValue"))
 
-      graph.V.has(T.label, label1).head shouldBe v1.vertex
-      graph.V.has(T.label, label2).head shouldBe v2.vertex
-      graph.V.has(T.label, label2).value(TestProperty).head shouldBe "testValue"
+      graph.V().has(T.label, label1).head() shouldBe v1.vertex
+      graph.V().has(T.label, label2).head() shouldBe v2.vertex
+      graph.V().has(T.label, label2).value(TestProperty).head() shouldBe "testValue"
     }
 
     it("adds a vertex with a given label with syntactic sugar") {
-      val graph = TinkerGraph.open.asScala
+      val graph = TinkerGraph.open.asScala()
       val label1 = "label1"
       val label2 = "label2"
 
       val v1 = graph + label1
       val v2 = graph + (label2, TestProperty -> "testValue")
 
-      graph.V.hasLabel(label1).head shouldBe v1.vertex
-      graph.V.hasLabel(label2).head shouldBe v2.vertex
-      graph.V.hasLabel(label2).value(TestProperty).head shouldBe "testValue"
+      graph.V().hasLabel(label1).head() shouldBe v1.vertex
+      graph.V().hasLabel(label2).head() shouldBe v2.vertex
+      graph.V().hasLabel(label2).value(TestProperty).head() shouldBe "testValue"
 
-      graph.asJava.close()
+      graph.asJava().close()
     }
 
     it("adds an edge") {
-      val graph = TinkerGraph.open.asScala
+      val graph = TinkerGraph.open.asScala()
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
       val e = v1.addEdge("testLabel", v2)
       e.label shouldBe "testLabel"
-      v1.outE().head shouldBe e.edge
-      v1.out("testLabel").head shouldBe v2.vertex
+      v1.outE().head() shouldBe e.edge
+      v1.out("testLabel").head() shouldBe v2.vertex
     }
 
     it("adds an edge with additional properties") {
-      implicit val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala()
       val v1 = graph.addVertex()
       val v2 = graph.addVertex()
 
-      val e = v1.asScala.addEdge("testLabel", v2, TestProperty -> "testValue")
+      val e = v1.asScala().addEdge("testLabel", v2, TestProperty -> "testValue")
       e.label shouldBe "testLabel"
       e.value2(TestProperty) shouldBe "testValue"
       e.valueMap(TestProperty.name) shouldBe Map(TestProperty.name -> "testValue")
-      v1.outE().head shouldBe e.edge
-      v1.out("testLabel").head shouldBe v2.vertex
+      v1.outE().head() shouldBe e.edge
+      v1.out("testLabel").head() shouldBe v2.vertex
     }
 
     it("removes elements") {
-      val graph = TinkerGraph.open.asScala
+      val graph = TinkerGraph.open.asScala()
       val v = graph.addVertex()
       v.remove()
-      graph.V.toList() shouldBe empty
+      graph.V().toList() shouldBe empty
     }
   }
 
-  def v1 = v(1).asScala
-  def e7 = e(7).asScala
+  def v1 = v(1).asScala()
+  def e7 = e(7).asScala()
   val TestProperty = Key[String]("testProperty")
 }

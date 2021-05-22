@@ -1,17 +1,20 @@
-val gremlinVersion = "3.4.7"
+val gremlinVersion = "3.4.11"
+val scalaTestVersion = "3.2.9"
 
 ThisBuild/organization := "com.michaelpollmeier"
-ThisBuild/scalaVersion := "2.13.5"
-ThisBuild/crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.5")
+ThisBuild/scalaVersion := "2.13.6"
+ThisBuild/crossScalaVersions := Seq("2.11.12", "2.12.13", "2.13.6")
 
 ThisBuild/libraryDependencies ++= Seq(
   "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-  "com.chuusai" %% "shapeless" % "2.3.3",
-  "org.slf4j" % "slf4j-nop" % "1.7.25" % Test,
+  "com.chuusai" %% "shapeless" % "2.3.7",
+  "org.slf4j" % "slf4j-nop" % "1.7.30" % Test,
   "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
   "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-  "org.scalatest" %% "scalatest" % "3.0.8" % Test,
-  "org.scalamock" %% "scalamock" % "4.3.0" % Test
+  "org.scalatest" %% "scalatest-shouldmatchers" % scalaTestVersion % Test,
+  "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
+  "org.scalatest" %% "scalatest-funspec" % scalaTestVersion % Test,
+  "org.scalamock" %% "scalamock" % "5.1.0" % Test
 )
 ThisBuild/resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/")
 ThisBuild/resolvers += Resolver.mavenLocal

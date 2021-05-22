@@ -17,7 +17,7 @@ import java.util.{
 }
 import java.util.stream.{Stream => JStream}
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
@@ -57,9 +57,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   type Labels <: HList
 
   /** alias for `toList`, because typing kills */
-  def l(): List[End] = toList
+  def l(): List[End] = toList()
 
-  def toList(): List[End] = traversal.toList.asScala.toList
+  def toList(): List[End] = traversal.toList().asScala.toList
 
   def toIterator(): Iterator[End] = traversal.asScala
 
@@ -67,21 +67,21 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def toStream(): JStream[End] = traversal.toStream
 
-  def toSet(): Set[End] = toList.toSet
+  def toSet(): Set[End] = toList().toSet
 
   def toMap[A, B](implicit ev: End <:< (A, B)): immutable.Map[A, B] =
-    toList.toMap
+    toList().toMap
 
   def toBuffer(): mutable.Buffer[End] = traversal.toList.asScala
 
   /** unsafe! this will throw a runtime exception if there is no element. better use `headOption` */
-  def head(): End = limit(1).toList.head
+  def head(): End = limit(1).toList().head
 
-  def headOption(): Option[End] = limit(1).toList.headOption
+  def headOption(): Option[End] = limit(1).toList().headOption
 
   def explain(): TraversalExplanation = traversal.explain()
 
-  def exists(): Boolean = headOption.isDefined
+  def exists(): Boolean = headOption().isDefined
   def notExists(): Boolean = !exists()
 
   /** execute pipeline - applies all side effects */
@@ -172,14 +172,14 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def flatMap[A](fun: End => GremlinScala[A]): GremlinScala.Aux[A, Labels] =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { t: Traverser[End] =>
-        fun(t.get).toList().toIterator.asJava: JIterator[A]
+        fun(t.get).toList().iterator.asJava: JIterator[A]
       }
     )
 
   def flatMapWithTraverser[A](fun: Traverser[End] => GremlinScala[A]) =
     GremlinScala[A, Labels](
       traversal.flatMap[A] { e: Traverser[End] =>
-        fun(e).toList().toIterator.asJava: JIterator[A]
+        fun(e).toList().iterator.asJava: JIterator[A]
       }
     )
 
@@ -565,11 +565,11 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[End, Labels](traversal.inject(injections: _*))
 
   def store(stepLabel: StepLabel[JSet[End]]) =
-    GremlinScala[End, Labels](traversal.store(stepLabel.name))
+    GremlinScala[End, Labels](traversal.aggregate(Scope.local, stepLabel.name))
 
   @deprecated("use store(StepLabel) for more type safety", "3.3.3.16")
   def store(sideEffectKey: String) =
-    GremlinScala[End, Labels](traversal.store(sideEffectKey))
+    GremlinScala[End, Labels](traversal.aggregate(Scope.local, sideEffectKey))
 
   def aggregate(stepLabel: StepLabel[JSet[End]]) =
     GremlinScala[End, Labels](traversal.aggregate(stepLabel.name))
@@ -887,13 +887,13 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     GremlinScala[End, Labels](traversal.hasNot(key.name))
 
   def hasNot[A](keyValue: KeyValue[A]) =
-    GremlinScala[End, Labels](traversal.not(__.traversal.has(keyValue.key.name, keyValue.value)))
+    GremlinScala[End, Labels](traversal.not(__().traversal.has(keyValue.key.name, keyValue.value)))
 
   def hasNot[A](key: Key[A], value: A) =
-    GremlinScala[End, Labels](traversal.not(__.traversal.has(key.name, value)))
+    GremlinScala[End, Labels](traversal.not(__().traversal.has(key.name, value)))
 
   def hasNot[A](key: Key[A], predicate: P[A])(implicit ev: End <:< Element) =
-    GremlinScala[End, Labels](traversal.not(__.traversal.has(key.name, predicate)))
+    GremlinScala[End, Labels](traversal.not(__().traversal.has(key.name, predicate)))
 
   def and(traversals: (GremlinScala.Aux[End, HNil] => GremlinScala[_])*) =
     GremlinScala[End, Labels](traversal.and(traversals.map {
@@ -1029,24 +1029,24 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   // NUMBER STEPS START
   // -------------------
   def max[C <: Comparable[_]]()(implicit toComparable: End => C) =
-    GremlinScala[C, HNil](traversalToComparable.max[C])
+    GremlinScala[C, HNil](traversalToComparable().max[C])
   def max[C <: Comparable[_]](scope: Scope)(implicit toComparable: End => C) =
-    GremlinScala[C, HNil](traversalToComparable.max[C](scope))
+    GremlinScala[C, HNil](traversalToComparable().max[C](scope))
 
   def min[C <: Comparable[_]]()(implicit toComparable: End => C) =
-    GremlinScala[C, HNil](traversalToComparable.min[C]())
+    GremlinScala[C, HNil](traversalToComparable().min[C]())
   def min[C <: Comparable[_]](scope: Scope)(implicit toComparable: End => C) =
-    GremlinScala[C, HNil](traversalToComparable.min[C](scope))
+    GremlinScala[C, HNil](traversalToComparable().min[C](scope))
 
   def sum[N <: Number]()(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.sum())
+    GremlinScala[N, HNil](traversalToNumber().sum())
   def sum[N <: Number](scope: Scope)(implicit toNumber: End => N) =
-    GremlinScala[N, HNil](traversalToNumber.sum(scope))
+    GremlinScala[N, HNil](traversalToNumber().sum(scope))
 
   def mean[N <: Number]()(implicit toNumber: End => N) =
-    GremlinScala[JDouble, HNil](traversalToNumber.mean())
+    GremlinScala[JDouble, HNil](traversalToNumber().mean())
   def mean[N <: Number](scope: Scope)(implicit toNumber: End => N) =
-    GremlinScala[JDouble, HNil](traversalToNumber.mean(scope))
+    GremlinScala[JDouble, HNil](traversalToNumber().mean(scope))
 
   private def traversalToNumber[N <: Number]()(implicit toNumber: End => N): GraphTraversal[_, N] =
     this.map(toNumber).traversal
@@ -1060,7 +1060,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   /** run pipeline asynchronously
     * note: only supported by RemoteGraphs (see `withRemote`) */
   def promise[NewEnd](onComplete: GremlinScala.Aux[End, Labels] => NewEnd): Future[NewEnd] = {
-    val promise = Promise[NewEnd]
+    val promise = Promise[NewEnd]()
     val wrapperFun = (t: Traversal[_, _]) =>
       onComplete(GremlinScala(t.asInstanceOf[GraphTraversal[_, End]]))
     this.traversal
@@ -1073,7 +1073,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   /** convenience step for majority use case for `promise` */
   def promise(): Future[List[End]] =
-    promise(_.toList)
+    promise(_.toList())
 
   def V(vertexIdsOrElements: Any*)(implicit ev: End <:< Vertex): GremlinScala.Aux[Vertex, Labels] =
     GremlinScala[Vertex, Labels](traversal.V(vertexIdsOrElements.asInstanceOf[Seq[AnyRef]]: _*))

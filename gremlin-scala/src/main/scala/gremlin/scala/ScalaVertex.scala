@@ -74,7 +74,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
   def addEdge(label: String, inVertex: Vertex, properties: KeyValue[_]*)(implicit graph: ScalaGraph): Edge =
-    graph.traversal.V(vertex).addE(label, properties: _*).to(inVertex).head
+    graph.traversal.V(vertex).addE(label, properties: _*).to(inVertex).head()
 
   def addEdge[CC <: Product: Marshallable](inVertex: Vertex, cc: CC): Edge = {
     val fromCC = implicitly[Marshallable[CC]].fromCC(cc)
@@ -85,11 +85,11 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
 
   /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
   def <--(se: SemiEdge)(implicit graph: ScalaGraph): Edge =
-    se.from.asScala.addEdge(se.label, vertex, se.properties: _*)
+    se.from.asScala().addEdge(se.label, vertex, se.properties: _*)
 
   /** `implicit ScalaGraph` required for configuration, e.g. when using remote graph */
   def <--(de: SemiDoubleEdge)(implicit graph: ScalaGraph): (Edge, Edge) =
-    addEdge(de.label, de.right, de.properties: _*) -> de.right.asScala
+    addEdge(de.label, de.right, de.properties: _*) -> de.right.asScala()
       .addEdge(de.label, vertex, de.properties: _*)
 
   def ---(label: String): SemiEdge = SemiEdge(vertex, label)
@@ -145,9 +145,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def setPropertyList[A <: AnyRef](key: Key[A], values: List[A]): VertexProperty[A] =
     setPropertyList(key.name, values)
 
-  override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
+  override def properties[A: DefaultsToAny]: LazyList[VertexProperty[A]] =
+    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.to(LazyList)
 
-  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
-    vertex.properties[A](wantedKeys: _*).asScala.toStream
+  override def properties[A: DefaultsToAny](wantedKeys: String*): LazyList[VertexProperty[A]] =
+    vertex.properties[A](wantedKeys: _*).asScala.to(LazyList)
 }

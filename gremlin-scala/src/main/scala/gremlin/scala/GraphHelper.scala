@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 object GraphHelper {
 
   def cloneElements(original: ScalaGraph, clone: ScalaGraph): ScalaGraph = {
-    cloneElements(original.graph, clone.graph).asScala
+    cloneElements(original.graph, clone.graph).asScala()
   }
 
   /**

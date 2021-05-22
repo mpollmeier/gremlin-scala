@@ -124,9 +124,9 @@ object Marshallable {
 
           def handleSetProperty = {
             (_idParam,
-              _fromCCParams :+ q"cc.$name.toList.map { x => $decoded -> x }",
-              _toCCParams :+
-                q"""
+             _fromCCParams :+ q"cc.$name.toList.map { x => $decoded -> x }",
+             _toCCParams :+
+               q"""
                     element.properties($decoded)
                       .asScala
                       .map(_.value)
@@ -136,17 +136,14 @@ object Marshallable {
           }
 
           def valueGetter(tpe: Type): Option[MethodSymbol] =
-            tpe.declarations.sorted
+            tpe.decls.sorted
               .filter(_.isMethod)
               .map(_.asMethod)
               .takeWhile(!_.isConstructor)
-              .filter(_.paramLists == Nil /* nullary */ )
-              .headOption
+              .find(_.paramLists == Nil /* nullary */ )
 
           def valueClassConstructor(tpe: Type): Option[MethodSymbol] =
-            tpe.companion.decls
-              .filter(_.name.toString == "apply")
-              .headOption match {
+            tpe.companion.decls.find(_.name.toString == "apply") match {
               case Some(m: MethodSymbol) => Some(m)
               case _                     => None
             }
@@ -169,14 +166,14 @@ object Marshallable {
             } yield {
               val valueClassCompanion = valueClass.typeSymbol.companion
               (q"cc.$name.map(_.${wrappedValueGetter.name}).asInstanceOf[_root_.scala.Option[AnyRef]]",
-                _fromCCParams,
-                _toCCParams :+ q"_root_.scala.Option(element.id.asInstanceOf[${wrappedValueGetter.returnType}]).map($valueClassCompanion.apply)")
+               _fromCCParams,
+               _toCCParams :+ q"_root_.scala.Option(element.id.asInstanceOf[${wrappedValueGetter.returnType}]).map($valueClassCompanion.apply)")
             }
 
             valueClassParams.getOrElse(
               (q"cc.$name.asInstanceOf[_root_.scala.Option[AnyRef]]",
-                _fromCCParams,
-                _toCCParams :+ q"_root_.scala.Option(element.id).asInstanceOf[$returnType]"))
+               _fromCCParams,
+               _toCCParams :+ q"_root_.scala.Option(element.id).asInstanceOf[$returnType]"))
           }
 
           def handleUnderlying = {
