@@ -1,15 +1,16 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /* demo common algorithms */
-class AlgorithmSpec extends WordSpec with Matchers {
+class AlgorithmSpec extends AnyWordSpec with Matchers {
 
   "directed acyclic graphs".can {
     "be detected" in {
       // to start with, there's no cycles
-      implicit val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala()
       val vA = graph + "a"
       val vB = graph + "b"
       val vC = graph + "c"
@@ -27,14 +28,14 @@ class AlgorithmSpec extends WordSpec with Matchers {
     }
 
     def isCyclic(graph: ScalaGraph): Boolean = {
-      val paths = graph.V
+      val paths = graph.V()
         .as("a")
-        .repeat(_.out.simplePath)
-        .emit
-        .where(_.out.as("a"))
-        .toList
+        .repeat(_.out().simplePath())
+        .emit()
+        .where(_.out().as("a"))
+        .toList()
 
-      paths.size > 0
+      paths.nonEmpty
     }
   }
 

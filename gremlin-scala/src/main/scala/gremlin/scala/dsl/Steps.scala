@@ -28,25 +28,25 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   type EndGraph0 = EndGraph
 
   /* executes traversal and converts results into cpg domain type */
-  def toList(): List[EndDomain] = raw.toList.map(converter.toDomain)
-  def toStream(): JStream[EndDomain] = raw.toStream.map { end: EndGraph => converter.toDomain(end) }
-  def toSet(): Set[EndDomain] = raw.toSet.map(converter.toDomain)
+  def toList(): List[EndDomain] = raw.toList().map(converter.toDomain)
+  def toStream(): JStream[EndDomain] = raw.toStream().map { end: EndGraph => converter.toDomain(end) }
+  def toSet(): Set[EndDomain] = raw.toSet().map(converter.toDomain)
   def iterate(): Unit = raw.iterate()
-  def exec(): Unit = iterate
+  def exec(): Unit = iterate()
 
   /**
     Execute the traversal and convert it to a mutable buffer
     */
-  def toBuffer(): mutable.Buffer[EndDomain] = toList.toBuffer
+  def toBuffer(): mutable.Buffer[EndDomain] = toList().toBuffer
 
-  def head(): EndDomain = converter.toDomain(raw.head)
-  def headOption(): Option[EndDomain] = raw.headOption.map(converter.toDomain)
+  def head(): EndDomain = converter.toDomain(raw.head())
+  def headOption(): Option[EndDomain] = raw.headOption().map(converter.toDomain)
   def isDefined: Boolean = headOption().isDefined
 
   /**
     * shortcut for `toList`
     */
-  def l: List[EndDomain] = toList
+  def l: List[EndDomain] = toList()
 
   /**
     Alias for `toStream`
@@ -72,7 +72,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   }
 
   def count(): Long =
-    raw.count.head
+    raw.count().head()
 
   override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
 

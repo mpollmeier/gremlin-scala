@@ -3,17 +3,18 @@ package gremlin.scala.dsl
 import gremlin.scala._
 import java.util.{Map => JMap}
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 import shapeless._
 
-class DslSpec extends WordSpec with Matchers {
+class DslSpec extends AnyWordSpec with Matchers {
   import TestDomain._
 
   "finds all persons" in {
     val personSteps = PersonSteps(TinkerFactory.createModern)
-    personSteps.toSet shouldBe Set(
+    personSteps.toSet() shouldBe Set(
       Person(Some(1), "marko", 29),
       Person(Some(2), "vadas", 27),
       Person(Some(4), "josh", 32),
@@ -31,8 +32,8 @@ class DslSpec extends WordSpec with Matchers {
           .as("person")
           .created
           .as("software")
-          .select
-          .toList
+          .select()
+          .toList()
       (personAndSoftware should have).size(4)
 
       val softwareByCreator: Map[String, Software] = personAndSoftware.map {
@@ -52,7 +53,7 @@ class DslSpec extends WordSpec with Matchers {
           .created
           .as(labelSoftware)
           .select(labelSoftware)
-          .toSet
+          .toSet()
       personAndSoftware shouldBe Set(Software("lop", "java"), Software("ripple", "java"))
     }
 
@@ -67,7 +68,7 @@ class DslSpec extends WordSpec with Matchers {
           .created
           .as(labelSoftware)
           .select((labelSoftware, labelPerson))
-          .toList
+          .toList()
       (personAndSoftware should have).size(4)
 
       val softwareByCreator: Map[String, Software] = personAndSoftware.map {
@@ -85,7 +86,7 @@ class DslSpec extends WordSpec with Matchers {
       software <- person.created
     } yield (person.name, software)
 
-    val tuples = traversal.toSet shouldBe Set(
+    val tuples = traversal.toSet() shouldBe Set(
       ("marko", Software("lop", "java")),
       ("josh", Software("lop", "java")),
       ("peter", Software("lop", "java")),
@@ -98,7 +99,7 @@ class DslSpec extends WordSpec with Matchers {
       val ripples = PersonSteps(TinkerFactory.createModern)
         .filter(_.created.isRipple)
 
-      ripples.toList shouldBe List(
+      ripples.toList() shouldBe List(
         Person(Some(4), "josh", 32)
       )
     }
@@ -108,14 +109,14 @@ class DslSpec extends WordSpec with Matchers {
     val notRipple = PersonSteps(TinkerFactory.createModern)
       .filterNot(_.created.isRipple)
 
-    notRipple.toList.size shouldBe 3
+    notRipple.toList().size shouldBe 3
   }
 
   "filter on domain type" in {
     val markos: List[Person] =
       PersonSteps(TinkerFactory.createModern)
         .filterOnEnd(_.name == "marko")
-        .toList
+        .toList()
 
     markos.size shouldBe 1
   }
@@ -126,7 +127,7 @@ class DslSpec extends WordSpec with Matchers {
       PersonSteps(TinkerFactory.createModern)
         .aggregate(allPersons)
         .filterOnEnd(_.name == "marko")
-        .toList
+        .toList()
 
     markos.size shouldBe 1
     allPersons.size should be > 1
@@ -134,13 +135,13 @@ class DslSpec extends WordSpec with Matchers {
 
   "allow side effects" in {
     var i = 0
-    PersonSteps(TinkerFactory.createModern).sideEffect(_ => i = i + 1).iterate
+    PersonSteps(TinkerFactory.createModern).sideEffect(_ => i = i + 1).iterate()
     i shouldBe 4
   }
 
   "deduplicates" in {
     val results: List[Person] =
-      PersonSteps(TinkerFactory.createModern).created.createdBy.dedup.toList
+      PersonSteps(TinkerFactory.createModern).created.createdBy.dedup().toList()
     results.size shouldBe 3
   }
 
@@ -148,7 +149,7 @@ class DslSpec extends WordSpec with Matchers {
     val steps: PersonSteps[_] =
       PersonSteps(TinkerFactory.createModern)
         .onRaw(_.hasId(1: Integer))
-    steps.toList.size shouldBe 1
+    steps.toList().size shouldBe 1
   }
 
   "traverses from person to software" in {
@@ -156,7 +157,7 @@ class DslSpec extends WordSpec with Matchers {
       PersonSteps(TinkerFactory.createModern)
         .onRaw(_.hasId(1: Integer))
 
-    personSteps.created.toSet shouldBe Set(Software("lop", "java"))
+    personSteps.created.toSet() shouldBe Set(Software("lop", "java"))
   }
 
   "supports collections in map/flatMap" when {
@@ -165,19 +166,19 @@ class DslSpec extends WordSpec with Matchers {
 
     "using List" in {
       val query = personSteps.map { person =>
-        (person.name, person.created.toList)
+        (person.name, person.created.toList())
       }
 
-      val results: List[(String, List[Software])] = query.toList
+      val results: List[(String, List[Software])] = query.toList()
       results.size shouldBe 4
     }
 
     "using Set" in {
       val query = personSteps.map { person =>
-        (person.name, person.created.toSet)
+        (person.name, person.created.toSet())
       }
 
-      val results: List[(String, Set[Software])] = query.toList
+      val results: List[(String, Set[Software])] = query.toList()
       results.size shouldBe 4
     }
   }
@@ -188,8 +189,8 @@ class DslSpec extends WordSpec with Matchers {
 
     val query = personSteps.hasName("marko")
     val queryCloned = query.clone()
-    query.toList.size shouldBe 1
-    queryCloned.toList.size shouldBe 1
+    query.toList().size shouldBe 1
+    queryCloned.toList().size shouldBe 1
   }
 }
 
@@ -199,7 +200,7 @@ object TestDomain {
   @label("software") case class Software(name: String, lang: String) extends DomainRoot
 
   object PersonSteps {
-    def apply(graph: Graph) = new PersonSteps[HNil](graph.V.hasLabel[Person])
+    def apply(graph: Graph) = new PersonSteps[HNil](graph.V().hasLabel[Person]())
   }
   class PersonSteps[Labels <: HList](override val raw: GremlinScala[Vertex])
       extends NodeSteps[Person, Labels](raw) {
@@ -234,5 +235,5 @@ object TestDomain {
     Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
   implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[HNil] =
-    new PersonSteps[HNil](graph.asScala.V(person.id.get))
+    new PersonSteps[HNil](graph.asScala().V(person.id.get))
 }

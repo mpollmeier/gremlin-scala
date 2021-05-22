@@ -15,7 +15,8 @@ import gremlin.scala.{
   Vertex
 }
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import scala.collection.JavaConverters._
 import shapeless.test.illTyped
 
@@ -57,7 +58,7 @@ case class NestedClass(s: String)
 
 class NoneCaseClass(s: String)
 
-class MarshallableSpec extends WordSpec with Matchers {
+class MarshallableSpec extends AnyWordSpec with Matchers {
 
   "marshals / unmarshals case classes".which {
 
@@ -65,7 +66,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       val cc = CCSimple("text", 12)
       val v = graph + cc
 
-      val vl = graph.V(v.id).head
+      val vl = graph.V(v.id).head()
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" -> cc.s)
       vl.valueMap should contain("i" -> cc.i)
@@ -78,7 +79,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val v = graph + ccWithOptionSome
         v.toCC[CCWithOption] shouldBe ccWithOptionSome
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.value[String]("s") shouldBe ccWithOptionSome.s.get
       }
 
@@ -87,7 +88,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val v = graph + ccWithOptionNone
         v.toCC[CCWithOption] shouldBe ccWithOptionNone
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.keys should not contain "s" //None should be mapped to `null`
       }
 
@@ -96,7 +97,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val v = graph + ccWithOptionAnyVal
         v.toCC[CCWithOptionAnyVal]
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.value[Int]("x") shouldBe ccWithOptionAnyVal.x.get
         vl.keys should not contain "y"
       }
@@ -111,7 +112,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val cc = CCWithValueClass("some text", MyValueClass(42))
         val v = graph + cc
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.label shouldBe cc.getClass.getSimpleName
         vl.valueMap should contain("s" -> cc.s)
         vl.valueMap should contain("i" -> cc.i.value)
@@ -122,7 +123,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val cc = CCWithOptionValueClass("some text", Some(MyValueClass(42)))
         val v = graph + cc
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.label shouldBe cc.getClass.getSimpleName
         vl.valueMap should contain("s" -> cc.s)
         vl.valueMap should contain("i" -> cc.i.get.value)
@@ -133,7 +134,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         val cc = CCWithOptionValueClass("some text", None)
         val v = graph + cc
 
-        val vl = graph.V(v.id).head
+        val vl = graph.V(v.id).head()
         vl.label shouldBe cc.getClass.getSimpleName
         vl.valueMap should contain("s" -> cc.s)
         vl.valueMap.keySet should not contain ("i")
@@ -154,7 +155,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       val v = graph + cc
       v.toCC[CCWithList] shouldBe cc
 
-      val vl = graph.V(v.id).head
+      val vl = graph.V(v.id).head()
       val properties = vl.properties[String]("ss").asScala.toList
       properties.size shouldBe 2
       properties.map(_.value) shouldBe List("one", "two")
@@ -166,7 +167,7 @@ class MarshallableSpec extends WordSpec with Matchers {
       val v = graph + cc
       v.toCC[CCWithSet] shouldBe cc
 
-      val vl = graph.V(v.id).head
+      val vl = graph.V(v.id).head()
       val properties = vl.properties[String]("ss").asScala.toList
       properties.size shouldBe 2
       properties.map(_.value) shouldBe List("bar", "baz")
@@ -207,7 +208,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       val v = graph + cc
 
-      val vl = graph.V(v.id).head
+      val vl = graph.V(v.id).head()
       vl.label shouldBe "the_label"
       vl.valueMap should contain("s" -> cc.s)
       vl.valueMap should contain("l" -> cc.l)
@@ -223,7 +224,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       v.toCC[CCWithOptionId].s shouldBe cc.s
 
-      val vl = graph.V(v.id).head
+      val vl = graph.V(v.id).head()
       vl.label shouldBe cc.getClass.getSimpleName
       vl.valueMap should contain("s" -> cc.s)
     }
@@ -247,9 +248,9 @@ class MarshallableSpec extends WordSpec with Matchers {
       val vertex = graph + cc
       val ccFromVertex = vertex.toCC[CCWithUnderlyingVertex]
       ccFromVertex.s shouldBe cc.s
-      ccFromVertex.underlying shouldBe 'defined
+      ccFromVertex.underlying shouldBe Symbol("defined")
 
-      graph.V(ccFromVertex.underlying.get.id).value[String]("s").head shouldBe cc.s
+      graph.V(ccFromVertex.underlying.get.id).value[String]("s").head() shouldBe cc.s
     }
 
     "fails compilation for non-option @underlying annotation" in new Fixture {
@@ -271,13 +272,13 @@ class MarshallableSpec extends WordSpec with Matchers {
     graph + ccWithOption
     graph + ccWithLabel
 
-    graph.V.count.head shouldBe 3
+    graph.V().count().head() shouldBe 3
 
-    val ccSimpleVertices = graph.V.hasLabel[CCSimple].toList
+    val ccSimpleVertices = graph.V().hasLabel[CCSimple]().toList()
     (ccSimpleVertices should have).size(1)
     ccSimpleVertices.head.toCC[CCSimple] shouldBe ccSimple
 
-    val ccWithLabelVertices = graph.V.hasLabel[CCWithLabel].toList
+    val ccWithLabelVertices = graph.V().hasLabel[CCWithLabel]().toList()
     (ccWithLabelVertices should have).size(1)
     ccWithLabelVertices.head.toCC[CCWithLabel] shouldBe ccWithLabel
   }
@@ -288,7 +289,7 @@ class MarshallableSpec extends WordSpec with Matchers {
 
       ccVertexFrom.addEdge(ccVertexTo, ccEdgeWithLabelInitial).toCC[CCWithLabel]
 
-      val ccEdgesWithLabel = graph.E.hasLabel[CCWithLabel].toList
+      val ccEdgesWithLabel = graph.E().hasLabel[CCWithLabel]().toList()
       (ccEdgesWithLabel should have).size(1)
       ccEdgesWithLabel.head.toCC[CCWithLabel] shouldBe ccEdgeWithLabelInitial
     }
@@ -301,7 +302,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         .toCC[CCWithOptionId]
       ccEdgeWithOptionIdNone.id should not be empty
 
-      val ccEdgesWithOptionIdNone = graph.E.hasLabel[CCWithOptionId].toList
+      val ccEdgesWithOptionIdNone = graph.E().hasLabel[CCWithOptionId]().toList()
       (ccEdgesWithOptionIdNone should have).size(1)
       ccEdgesWithOptionIdNone.head
         .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdNone
@@ -316,7 +317,7 @@ class MarshallableSpec extends WordSpec with Matchers {
         .toCC[CCWithOptionId]
       ccEdgeWithOptionIdSome.id shouldBe ccEdgeWithOptionIdSomeInitial.id
 
-      val ccEdgesWithOptionIdSome = graph.E.hasLabel[CCWithOptionId].toList
+      val ccEdgesWithOptionIdSome = graph.E().hasLabel[CCWithOptionId]().toList()
       (ccEdgesWithOptionIdSome should have).size(1)
       ccEdgesWithOptionIdSome.head
         .toCC[CCWithOptionId] shouldBe ccEdgeWithOptionIdSome
@@ -327,19 +328,19 @@ class MarshallableSpec extends WordSpec with Matchers {
     "update using a case-class template" in new CCEdgeUpdateFixture {
       graph
         .E(ccWithIdSet.id.get)
-        .head
+        .head()
         .updateWith(ccUpdate)
         .toCC[CC] shouldBe ccUpdate
-      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head().toCC[CC] shouldBe ccUpdate
     }
 
     "update as a case class" in new CCEdgeUpdateFixture {
       graph
         .E(ccWithIdSet.id.get)
-        .head
+        .head()
         .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
         .toCC[CC] shouldBe ccUpdate
-      graph.E(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+      graph.E(ccWithIdSet.id.get).head().toCC[CC] shouldBe ccUpdate
     }
   }
 
@@ -347,19 +348,19 @@ class MarshallableSpec extends WordSpec with Matchers {
     "update using a case-class template" in new CCVertexUpdateFixture {
       graph
         .V(ccWithIdSet.id.get)
-        .head
+        .head()
         .updateWith(ccUpdate)
         .toCC[CC] shouldBe ccUpdate
-      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head().toCC[CC] shouldBe ccUpdate
     }
 
     "update as a case class" in new CCVertexUpdateFixture {
       graph
         .V(ccWithIdSet.id.get)
-        .head
+        .head()
         .updateAs[CC](_.copy(s = ccUpdate.s, i = ccUpdate.i))
         .toCC[CC] shouldBe ccUpdate
-      graph.V(ccWithIdSet.id.get).head.toCC[CC] shouldBe ccUpdate
+      graph.V(ccWithIdSet.id.get).head().toCC[CC] shouldBe ccUpdate
     }
   }
 
@@ -369,7 +370,7 @@ class MarshallableSpec extends WordSpec with Matchers {
     graph + cc1
     graph + cc2
 
-    val results: Set[CCSimple] = graph.V.toCC[CCSimple].toSet
+    val results: Set[CCSimple] = graph.V().toCC[CCSimple].toSet()
     results shouldBe Set(cc1, cc2)
   }
 
@@ -379,7 +380,7 @@ class MarshallableSpec extends WordSpec with Matchers {
   }
 
   trait Fixture {
-    val graph = TinkerGraph.open.asScala
+    val graph = TinkerGraph.open.asScala()
   }
 
   trait CCUpdateFixture[E <: Element] extends Fixture {
@@ -407,7 +408,7 @@ class MarshallableSpec extends WordSpec with Matchers {
   "can't persist a none product type (none case class or tuple)" in {
     illTyped {
       """
-        val graph = TinkerGraph.open.asScala
+        val graph = TinkerGraph.open.asScala()
         graph + new NoneCaseClass("test")
       """
     }

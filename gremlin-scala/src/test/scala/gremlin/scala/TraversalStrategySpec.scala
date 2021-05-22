@@ -16,27 +16,28 @@ import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.util.Random
 
-class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
+class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
 
   "sack step".can {
 
     /** http://tinkerpop.apache.org/docs/current/reference/#sack-step */
     "carry simple value" when {
       "using constant for initial sack" in new Fixture {
-        graph.configure(_.withSack(1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
+        graph.configure(_.withSack(1d)).V().sack().toList() shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
       }
 
       "using function for initial sack" in new Fixture {
-        graph.configure(_.withSack(() => 1d)).V.sack.toList shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
+        graph.configure(_.withSack(() => 1d)).V().sack().toList() shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
 
         val randomValues =
-          graph.configure(_.withSack(() => Random.nextDouble)).V.sack.toList
+          graph.configure(_.withSack(() => Random.nextDouble())).V().sack().toList()
         randomValues.toSet.size shouldBe 6
       }
     }
@@ -44,15 +45,15 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
     "transform the sack on the go" in new Fixture {
       val result = graph
         .configure(_.withSack(1d))
-        .V
+        .V()
         .repeat {
-          _.outE.sack { (curr: Double, edge) =>
+          _.outE().sack { (curr: Double, edge) =>
             curr * edge.value2(Weight)
-          }.inV
+          }.inV()
         }
         .times(2)
         .sack()
-        .toSet
+        .toSet()
 
       result shouldBe Set(1d, 0.4d)
     }
@@ -62,11 +63,11 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
         val result = graph
           .configure(_.withSack(1d))
           .V(1)
-          .outE
+          .outE()
           .sack(multiply, By(Weight))
-          .inV
-          .sack
-          .toSet
+          .inV()
+          .sack()
+          .toSet()
 
         result shouldBe Set(0.4d, 0.5d, 1d)
       }
@@ -75,11 +76,11 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
         val result = graph
           .configure(_.withSack(1d))
           .V(1)
-          .outE
-          .sack(multiply, By(__.value(Weight)))
-          .inV
-          .sack
-          .toSet
+          .outE()
+          .sack(multiply, By(__().value(Weight)))
+          .inV()
+          .sack()
+          .toSet()
 
         result shouldBe Set(0.4d, 0.5d, 1d)
       }
@@ -95,9 +96,9 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
 
       graph
         .configure(_.withSack(1d, splitOperator = identityWithCounterIncrease))
-        .V
-        .out
-        .toList
+        .V()
+        .out()
+        .toList()
       counter shouldBe 6
     }
 
@@ -108,20 +109,20 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
         .V(1)
         .out("knows")
         .in("knows")
-        .sack
-        .toList shouldBe List(2d, 2d)
+        .sack()
+        .toList() shouldBe List(2d, 2d)
       // without `sum` would be List(1d, 1d)
     }
 
     "be configured when starting from an element" when {
       "on a vertex" in new Fixture {
-        val v1: Vertex = graph.V(1).head
-        v1.start(_.withSack(1d)).outE(Knows).sack.toList shouldBe List(1d, 1d)
+        val v1: Vertex = graph.V(1).head()
+        v1.start(_.withSack(1d)).outE(Knows).sack().toList() shouldBe List(1d, 1d)
       }
 
       "on an edge" in new Fixture {
-        val e7: Edge = graph.E(7).head
-        e7.start(_.withSack(1d)).outV.outE(Knows).sack.toList shouldBe List(1d, 1d)
+        val e7: Edge = graph.E(7).head()
+        e7.start(_.withSack(1d)).outV().outE(Knows).sack().toList() shouldBe List(1d, 1d)
       }
     }
   }
@@ -142,7 +143,7 @@ class TraversalStrategySpec extends WordSpec with Matchers with MockFactory {
   }
 
   trait Fixture {
-    val graph = TinkerFactory.createModern.asScala
+    val graph = TinkerFactory.createModern.asScala()
     val Name = Key[String]("name")
     val Lang = Key[String]("lang")
     val Weight = Key[Double]("weight")

@@ -1,10 +1,11 @@
 package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import shapeless.test.illTyped
 
-class SchemaSpec extends WordSpec with Matchers {
+class SchemaSpec extends AnyWordSpec with Matchers {
 
   "a schema with defined Keys".can {
     val Software = "software"
@@ -18,21 +19,21 @@ class SchemaSpec extends WordSpec with Matchers {
     object Weight extends Key[Int]("weight")
 
     "create vertices" in {
-      implicit val graph = TinkerGraph.open.asScala
+      implicit val graph = TinkerGraph.open.asScala()
 
       val v0 = graph + (Software, Name -> "blueprints", Created -> 2010)
       val v1 = graph + (Software, Created -> 2009, Name -> "gremlin")
       val v2 = graph + (Software, Name -> "gremlinScala")
       val v3 = graph + (Person, Name -> "mpollmeier")
 
-      graph.V.toList().size shouldBe 4
-      graph.V.hasLabel(Software).toList().size shouldBe 3
-      graph.V.hasLabel(Person).toList().size shouldBe 1
+      graph.V().toList().size shouldBe 4
+      graph.V().hasLabel(Software).toList().size shouldBe 3
+      graph.V().hasLabel(Person).toList().size shouldBe 1
 
-      graph.V.has(Name).toList().size shouldBe 4
-      graph.V.has(Created).toList().size shouldBe 2
+      graph.V().has(Name).toList().size shouldBe 4
+      graph.V().has(Created).toList().size shouldBe 2
 
-      graph.asJava.close()
+      graph.asJava().close()
     }
 
     "read type safe properties" when {
@@ -58,10 +59,10 @@ class SchemaSpec extends WordSpec with Matchers {
         }
 
         "support traversal" in new Fixture {
-          val name = paris.out(EuroStar).value(Name).head
+          val name = paris.out(EuroStar).value(Name).head()
           val someString: String = name //no implicit conversion, it already is a String
 
-          val distance = paris.outE(EuroStar).value(Distance).head
+          val distance = paris.outE(EuroStar).value(Distance).head()
           val someInt: Int = distance //no implicit conversion, it already is an Int
         }
       }
@@ -94,7 +95,7 @@ class SchemaSpec extends WordSpec with Matchers {
         object Population extends Key[Int]("population")
         object Distance extends Key[Int]("distance")
 
-        implicit val graph = TinkerGraph.open.asScala
+        implicit val graph = TinkerGraph.open.asScala()
         val paris = graph + (City, Name -> "paris")
         val london = graph + (City, Name -> "london")
         val rail = paris --- (EuroStar, Distance -> 495) --> london
