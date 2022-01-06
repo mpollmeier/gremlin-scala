@@ -94,5 +94,4 @@ case class TraversalSource(underlying: GraphTraversalSource) {
 
   def withRemote(connection: RemoteConnection): TraversalSource =
     TraversalSource(traversal().withRemote(connection))
-
 }

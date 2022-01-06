@@ -2,6 +2,7 @@ package gremlin.scala
 
 import java.util
 import java.util.concurrent.CompletableFuture
+
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
 import org.apache.tinkerpop.gremlin.process.remote.traversal.{
   AbstractRemoteTraversal,
@@ -32,8 +33,7 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
       }
 
       "using function for initial sack" in new Fixture {
-        graph.configure(_.withSack(() => 1d)).V().sack().toList() shouldBe List(1d, 1d, 1d, 1d, 1d,
-          1d)
+        graph.configure(_.withSack(() => 1d)).V().sack().toList() shouldBe List(1d, 1d, 1d, 1d, 1d, 1d)
 
         val randomValues =
           graph.configure(_.withSack(() => Random.nextDouble())).V().sack().toList()
@@ -47,8 +47,8 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
         .V()
         .repeat {
           _.outE().sack { (curr: Double, edge) =>
-              curr * edge.value2(Weight)
-            }.inV()
+            curr * edge.value2(Weight)
+          }.inV()
         }
         .times(2)
         .sack()
