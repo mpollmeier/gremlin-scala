@@ -1,2 +1,2 @@
-addSbtPlugin("io.shiftleft" % "sbt-ci-release-early" % "2.0.13")
-addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.16")
+addSbtPlugin("io.shiftleft" % "sbt-ci-release-early" % "2.0.19")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.3")
