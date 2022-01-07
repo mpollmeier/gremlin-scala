@@ -1,8 +1,9 @@
 package gremlin.scala
 
 import java.util.function.{BinaryOperator, Supplier, UnaryOperator}
-import org.apache.commons.configuration.Configuration
+import org.apache.commons.configuration2.Configuration
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
+import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
 import shapeless.HNil
 
@@ -86,11 +87,11 @@ case class TraversalSource(underlying: GraphTraversalSource) {
       underlying.withSideEffect(key, initialValue: Supplier[A], reducer: BinaryOperator[A]))
 
   def withRemote(configFile: String): TraversalSource =
-    TraversalSource(underlying.withRemote(configFile))
+    TraversalSource(traversal().withRemote(configFile))
 
   def withRemote(configuration: Configuration): TraversalSource =
-    TraversalSource(underlying.withRemote(configuration))
+    TraversalSource(traversal().withRemote(configuration))
 
   def withRemote(connection: RemoteConnection): TraversalSource =
-    TraversalSource(underlying.withRemote(connection))
+    TraversalSource(traversal().withRemote(connection))
 }
