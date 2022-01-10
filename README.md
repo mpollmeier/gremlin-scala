@@ -2,10 +2,9 @@
 
 [![Build Status](https://github.com/mpollmeier/gremlin-scala/workflows/release/badge.svg)](https://github.com/mpollmeier/gremlin-scala/actions?query=workflow%3Arelease)
 [![Join the chat at https://gitter.im/mpollmeier/gremlin-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mpollmeier/gremlin-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Scaladex](https://index.scala-lang.org/mpollmeier/gremlin-scala/gremlin-scala/latest.svg)](https://index.scala-lang.org/mpollmeier/gremlin-scala/gremlin-scala/)
-[![scaladoc](http://www.javadoc.io/badge/com.michaelpollmeier/gremlin-scala_2.12.svg?color=blue&label=scaladoc)](http://www.javadoc.io/doc/com.michaelpollmeier/gremlin-scala_2.12)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.michaelpollmeier/gremlin-scala_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.michaelpollmeier/gremlin-scala_2.13)
+[![scaladoc](http://www.javadoc.io/badge/com.michaelpollmeier/gremlin-scala_2.13.svg?color=blue&label=scaladoc)](http://www.javadoc.io/doc/com.michaelpollmeier/gremlin-scala_2.13)
 
-<!-- [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.michaelpollmeier/gremlin-scala_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.michaelpollmeier/gremlin-scala_2.12) -->
 ## Gremlin-Scala for Apache Tinkerpop 3
 
 A wrapper to use [Apache Tinkerpop3](https://github.com/apache/incubator-tinkerpop) - a JVM graph traversal library - from Scala.
