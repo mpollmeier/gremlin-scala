@@ -1,14 +1,14 @@
-val gremlinVersion = "3.5.1"
-val scalaTestVersion = "3.2.10"
+val gremlinVersion = "3.5.3"
+val scalaTestVersion = "3.2.12"
 
 ThisBuild / organization := "com.michaelpollmeier"
-ThisBuild / scalaVersion := "2.13.7"
-ThisBuild / crossScalaVersions := Seq("2.11.12", "2.12.15", "2.13.7")
+ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / crossScalaVersions := Seq("2.11.12", "2.12.15", "2.13.8")
 
 ThisBuild / libraryDependencies ++= Seq(
   "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-  "com.chuusai" %% "shapeless" % "2.3.7",
-  "org.slf4j" % "slf4j-nop" % "1.7.32" % Test,
+  "com.chuusai" %% "shapeless" % "2.3.9",
+  "org.slf4j" % "slf4j-nop" % "1.7.36" % Test,
   "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
   "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
   "org.scalatest" %% "scalatest-shouldmatchers" % scalaTestVersion % Test,
