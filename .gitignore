@@ -3,3 +3,4 @@ private-key.pem
 .idea/
 /.bsp
 /gnupg-*
+/.sdkmanrc
