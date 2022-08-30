@@ -19,7 +19,6 @@ object Dependencies {
     "org.scalatest" %% "scalatest-shouldmatchers" % V.scalaTest % Test,
     "org.scalatest" %% "scalatest-wordspec" % V.scalaTest % Test,
     "org.scalatest" %% "scalatest-funspec" % V.scalaTest % Test,
-    "org.scalamock" %% "scalamock" % V.scalamock % Test,
   )
 
   val common_scala2: Seq[ModuleID] = Seq(

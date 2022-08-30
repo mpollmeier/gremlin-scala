@@ -14,7 +14,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Step, Traversal
 import org.apache.tinkerpop.gremlin.process.traversal.Traverser.Admin
 import org.apache.tinkerpop.gremlin.structure.util.empty.EmptyGraph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -22,7 +21,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 import scala.util.Random
 
-class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
+class TraversalStrategySpec extends AnyWordSpec with Matchers {
 
   "sack step".can {
 
@@ -152,10 +151,6 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
   trait RemoteGraphFixture {
     val graph = EmptyGraph.instance().asScala()
 
-    // Stub out a remote connection that responds to g.V() with 2 vertices
-    val connection = stub[RemoteConnection]
-    val remoteGraph = graph.configure(_.withRemote(connection))
-
     // effectively a g.V() bytecode
     val expectedBytecode: Bytecode = new Bytecode()
     expectedBytecode.addStep("V")
@@ -168,6 +163,17 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
 
     // Create a future that completes immediately and provides a remote traversal providing vertices
     val vertexResult = new CompletableFuture[RemoteTraversal[_ <: Any, TVertex]]
+
+    // Stub out a remote connection that responds to g.V() with 2 vertices
+    val connection = new RemoteConnection {
+      override def submitAsync[E](bytecode: Bytecode): CompletableFuture[RemoteTraversal[_, E]] =
+        if (bytecode == expectedBytecode) vertexResult.asInstanceOf[CompletableFuture[RemoteTraversal[_, E]]]
+        else ???
+      override def close(): Unit = ()
+    }
+
+    val remoteGraph = graph.configure(_.withRemote(connection))
+
     val traversal = new AbstractRemoteTraversal[Int, TVertex] {
       val it = mockVertices.iterator
 
@@ -185,7 +191,5 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers with MockFactory {
     }
     vertexResult.complete(traversal)
 
-    // when expected byte code provided, return vertex result.
-    (connection.submitAsync[TVertex] _ when expectedBytecode).returns(vertexResult)
   }
 }
