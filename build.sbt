@@ -1,23 +1,15 @@
-val gremlinVersion = "3.5.3"
-val scalaTestVersion = "3.2.12"
+
+val Scala211 = "2.11.12"
+val Scala212 = "2.12.16"
+val Scala213 = "2.13.8"
+val Scala3   = "3.1.3"
 
 ThisBuild / organization := "com.michaelpollmeier"
-ThisBuild / scalaVersion := "2.13.8"
-ThisBuild / crossScalaVersions := Seq("2.11.12", "2.12.15", "2.13.8")
+ThisBuild / scalaVersion := Scala213
+ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
 
-ThisBuild / libraryDependencies ++= Seq(
-  "org.apache.tinkerpop" % "gremlin-core" % gremlinVersion,
-  "com.chuusai" %% "shapeless" % "2.3.9",
-  "org.slf4j" % "slf4j-nop" % "1.7.36" % Test,
-  "org.apache.tinkerpop" % "tinkergraph-gremlin" % gremlinVersion % Test,
-  "org.apache.tinkerpop" % "gremlin-test" % gremlinVersion % Test,
-  "org.scalatest" %% "scalatest-shouldmatchers" % scalaTestVersion % Test,
-  "org.scalatest" %% "scalatest-wordspec" % scalaTestVersion % Test,
-  "org.scalatest" %% "scalatest-funspec" % scalaTestVersion % Test,
-  "org.scalamock" %% "scalamock" % "5.2.0" % Test
-)
-ThisBuild / resolvers += "Apache public".at("https://repository.apache.org/content/groups/public/")
-ThisBuild / resolvers += Resolver.mavenLocal
+ThisBuild / libraryDependencies ++= Dependencies.common
+ThisBuild / resolvers ++= Dependencies.resolvers
 ThisBuild / scalacOptions ++= Seq(
   // "-Xlint"
   // "-Xfatal-warnings",
