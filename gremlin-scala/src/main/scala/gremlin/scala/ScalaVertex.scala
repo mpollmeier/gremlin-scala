@@ -3,7 +3,8 @@ package gremlin.scala
 import java.util
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
 import org.apache.tinkerpop.gremlin.structure.{Direction, T, VertexProperty}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.collection.compat.immutable.LazyList
 
 case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   override def element = vertex
@@ -145,9 +146,9 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
   def setPropertyList[A <: AnyRef](key: Key[A], values: List[A]): VertexProperty[A] =
     setPropertyList(key.name, values)
 
-  override def properties[A: DefaultsToAny]: Stream[VertexProperty[A]] =
-    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
+  override def properties[A: DefaultsToAny]: LazyList[VertexProperty[A]] =
+    vertex.properties[A](keys.map(_.name).toSeq: _*).asScala.to(LazyList)
 
-  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[VertexProperty[A]] =
-    vertex.properties[A](wantedKeys: _*).asScala.toStream
+  override def properties[A: DefaultsToAny](wantedKeys: String*): LazyList[VertexProperty[A]] =
+    vertex.properties[A](wantedKeys: _*).asScala.to(LazyList)
 }

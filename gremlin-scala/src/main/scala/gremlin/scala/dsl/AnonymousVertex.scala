@@ -2,7 +2,7 @@ package gremlin.scala.dsl
 
 import gremlin.scala._
 import java.util.{Iterator => JIterator}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object AnonymousVertex {
   import org.apache.tinkerpop.gremlin.structure._

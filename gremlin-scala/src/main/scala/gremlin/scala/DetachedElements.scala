@@ -1,6 +1,6 @@
 package gremlin.scala
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 // useful e.g. for optional step with a default
 

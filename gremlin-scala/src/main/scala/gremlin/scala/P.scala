@@ -2,7 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.process.traversal.{P => JavaP}
 import java.util.{Collection => JCollection}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /** the scala version of tinkerpop's P, mostly to avoid unnecessarily complicated constructs
   * like P.within(vertices.asJava: JCollection[Vertex]) */

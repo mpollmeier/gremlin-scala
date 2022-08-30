@@ -2,7 +2,7 @@ package gremlin.scala
 
 import org.apache.tinkerpop.gremlin.structure.util.detached.DetachedFactory
 import org.apache.tinkerpop.gremlin.structure.util.Attachable
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object GraphHelper {
 

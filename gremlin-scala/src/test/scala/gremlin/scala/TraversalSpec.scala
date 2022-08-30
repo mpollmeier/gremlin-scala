@@ -14,7 +14,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.DefaultTraversalMetri
 import scala.language.existentials
 import shapeless.test.illTyped
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.{FiniteDuration, MILLISECONDS}
 
 class TraversalSpec extends AnyWordSpec with Matchers {
@@ -710,7 +710,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
         .`match`(_.as("creators").out("created").has(Name -> "lop").as("projects"),
                  _.as("projects").in("created").has(Age -> 29).as("cocreators"))
         .select("creators", "cocreators")
-        .by("name")
+        .order(By("name"))
 
       traversal.toSet() shouldBe Set(
         Map("creators" -> "marko", "cocreators" -> "marko").asJava,
@@ -731,7 +731,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
             .as("c")
         )
         .select("a", "c")
-        .by("name")
+        .order(By("name"))
       traversal.toSet() shouldBe Set(Map("a" -> "marko", "c" -> "ripple").asJava)
     }
   }

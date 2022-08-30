@@ -5,7 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import shapeless.{::, HNil}
 import java.util.{Collection => JCollection, Map => JMap}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class SelectSpec extends AnyWordSpec with Matchers {
   def graph = TinkerFactory.createModern.asScala()

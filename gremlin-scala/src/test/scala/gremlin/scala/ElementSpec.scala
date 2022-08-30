@@ -3,7 +3,7 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.VertexProperty.Cardinality
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import TestGraph._
 
 // TODO: rewrite using new type safe steps

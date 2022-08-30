@@ -17,7 +17,7 @@ import gremlin.scala.{
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import shapeless.test.illTyped
 
 case class CCSimple(s: String, i: Int)

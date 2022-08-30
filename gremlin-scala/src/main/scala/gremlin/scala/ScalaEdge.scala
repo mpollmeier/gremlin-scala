@@ -1,6 +1,7 @@
 package gremlin.scala
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.collection.compat.immutable.LazyList
 
 case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   override def element = edge
@@ -35,11 +36,11 @@ case class ScalaEdge(edge: Edge) extends ScalaElement[Edge] {
   def toCC[CC <: Product: Marshallable] =
     implicitly[Marshallable[CC]].toCC(edge)
 
-  override def properties[A: DefaultsToAny]: Stream[Property[A]] =
-    edge.properties[A](keys.map(_.name).toSeq: _*).asScala.toStream
+  override def properties[A: DefaultsToAny]: LazyList[Property[A]] =
+    edge.properties[A](keys.map(_.name).toSeq: _*).asScala.to(LazyList)
 
-  override def properties[A: DefaultsToAny](wantedKeys: String*): Stream[Property[A]] =
-    edge.properties[A](wantedKeys: _*).asScala.toStream
+  override def properties[A: DefaultsToAny](wantedKeys: String*): LazyList[Property[A]] =
+    edge.properties[A](wantedKeys: _*).asScala.to(LazyList)
 
   //TODO: wait until this is consistent in T3 between Vertex and Edge
   //currently Vertex.outE returns a GraphTraversal, Edge.inV doesnt quite exist

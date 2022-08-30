@@ -17,7 +17,7 @@ import java.util.{
 }
 import java.util.stream.{Stream => JStream}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop

@@ -221,7 +221,7 @@ object Marshallable {
     val ret = c.Expr[Marshallable[CC]] {
       q"""
           new _root_.gremlin.scala.Marshallable[$tpe] {
-            import _root_.scala.collection.JavaConverters._
+            import _root_.scala.jdk.CollectionConverters._
             def fromCC(cc: $tpe) =
               this.FromCC(
                 $idParam,
