@@ -13,7 +13,6 @@ object Dependencies {
   val common: Seq[ModuleID] = Seq(
     "org.apache.tinkerpop" % "gremlin-core" % V.gremlin,
     "org.scala-lang.modules" %% "scala-collection-compat" % V.scalaCollectionCompat,
-    "com.chuusai" %% "shapeless" % V.shapeless,
     "org.slf4j" % "slf4j-nop" % V.slf4j % Test,
     "org.apache.tinkerpop" % "tinkergraph-gremlin" % V.gremlin % Test,
     "org.apache.tinkerpop" % "gremlin-test" % V.gremlin % Test,
@@ -31,7 +30,6 @@ object Dependencies {
 
   def commonForVersion(scalaVersion: String): Seq[ModuleID] =
     common ++ {
-      println(s"SCALA VERSION IS: $scalaVersion")
       CrossVersion.partialVersion(scalaVersion) match {
         case Some((2, _)) => common_scala2
         case _ => common_scala3

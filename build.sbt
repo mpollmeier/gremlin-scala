@@ -8,8 +8,6 @@ ThisBuild / organization := "com.michaelpollmeier"
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
 
-ThisBuild / libraryDependencies ++= Dependencies.common
-ThisBuild / resolvers ++= Dependencies.resolvers
 ThisBuild / scalacOptions ++= Seq(
   // "-Xlint"
   // "-Xfatal-warnings",
@@ -48,5 +46,17 @@ publish / skip := true
 
 lazy val macros = project // macros must be in a separate compilation unit
   .in(file("macros"))
-  .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
-lazy val `gremlin-scala` = project.in(file("gremlin-scala")).dependsOn(macros)
+  .settings(
+    resolvers ++= Dependencies.resolvers,
+    libraryDependencies ++= Dependencies.commonForVersion(scalaVersion.value) :+
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+  )
+
+lazy val `gremlin-scala` =
+  project
+    .in(file("gremlin-scala"))
+    .settings(
+      resolvers ++= Dependencies.resolvers,
+      libraryDependencies ++= Dependencies.commonForVersion(scalaVersion.value)
+    )
+    .dependsOn(macros)
