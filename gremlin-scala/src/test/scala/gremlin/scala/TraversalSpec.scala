@@ -696,7 +696,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
                    _.as("b").in("created").as("c"),
                    _.as("c").has(Age -> 29))
           .select("a", "c")
-          .order(By("name"))
+          .by("name")
       traversal.toSet() shouldBe Set(
         Map("a" -> "marko", "c" -> "marko").asJava,
         Map("a" -> "josh", "c" -> "marko").asJava,
@@ -710,7 +710,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
         .`match`(_.as("creators").out("created").has(Name -> "lop").as("projects"),
                  _.as("projects").in("created").has(Age -> 29).as("cocreators"))
         .select("creators", "cocreators")
-        .order(By("name"))
+        .by("name")
 
       traversal.toSet() shouldBe Set(
         Map("creators" -> "marko", "cocreators" -> "marko").asJava,
@@ -731,7 +731,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
             .as("c")
         )
         .select("a", "c")
-        .order(By("name"))
+        .by("name")
       traversal.toSet() shouldBe Set(Map("a" -> "marko", "c" -> "ripple").asJava)
     }
   }
