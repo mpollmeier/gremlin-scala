@@ -37,7 +37,7 @@ case class ScalaVertex(vertex: Vertex) extends ScalaElement[Vertex] {
         val p = property(key)
         if (p.isPresent) p.remove
       case Cardinality.list | Cardinality.set =>
-        vertex.properties(key.name).asScala.foreach { p: VertexProperty[_] =>
+        vertex.properties(key.name).asScala.foreach { (p: VertexProperty[_]) =>
           p.remove
         }
     }

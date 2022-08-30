@@ -24,14 +24,14 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
     */
   def aggregate(into: mutable.Buffer[EndDomain]): NodeSteps[EndDomain, Labels] =
     new NodeSteps[EndDomain, Labels](
-      raw.sideEffect { v: Vertex =>
+      raw.sideEffect { (v: Vertex) =>
         into += v.toCC[EndDomain]
       }
     )
 
   def filterOnEnd(predicate: EndDomain => Boolean): NodeSteps[EndDomain, Labels] =
     new NodeSteps[EndDomain, Labels](
-      raw.filterOnEnd { v: Vertex =>
+      raw.filterOnEnd { (v: Vertex) =>
         predicate(v.toCC[EndDomain])
       }
     )
@@ -46,7 +46,7 @@ class NodeSteps[EndDomain <: DomainRoot, Labels <: HList](override val raw: Grem
      access the current traversal element via the variable `_`.
     */
   def sideEffect(fun: EndDomain => Any): NodeSteps[EndDomain, Labels] =
-    new NodeSteps[EndDomain, Labels](raw.sideEffect { v: Vertex =>
+    new NodeSteps[EndDomain, Labels](raw.sideEffect { (v: Vertex) =>
       fun(v.toCC[EndDomain])
     })
 

@@ -162,7 +162,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def getSideEffect[A](sideEffectKey: String): A = traversal.asAdmin().getSideEffects.get(sideEffectKey)
 
   def map[A](fun: End => A) =
-    GremlinScala[A, Labels](traversal.map[A] { t: Traverser[End] =>
+    GremlinScala[A, Labels](traversal.map[A] { (t: Traverser[End]) =>
       fun(t.get)
     })
 
@@ -171,14 +171,14 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   def flatMap[A](fun: End => GremlinScala[A]): GremlinScala.Aux[A, Labels] =
     GremlinScala[A, Labels](
-      traversal.flatMap[A] { t: Traverser[End] =>
+      traversal.flatMap[A] { (t: Traverser[End]) =>
         fun(t.get).toList().iterator.asJava: JIterator[A]
       }
     )
 
   def flatMapWithTraverser[A](fun: Traverser[End] => GremlinScala[A]) =
     GremlinScala[A, Labels](
-      traversal.flatMap[A] { e: Traverser[End] =>
+      traversal.flatMap[A] { (e: Traverser[End]) =>
         fun(e).toList().iterator.asJava: JIterator[A]
       }
     )
@@ -605,7 +605,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     val folded: Seq[GraphTraversal[_, JList[Any]]] = asTravs.map(_.fold)
     val unionTrav: GraphTraversal[_, JList[JList[Any]]] = traversal.union(folded: _*).fold
 
-    GremlinScala[JList[JList[Any]], Labels](unionTrav).map { results: JList[JList[Any]] =>
+    GremlinScala[JList[JList[Any]], Labels](unionTrav).map { (results: JList[JList[Any]]) =>
       // create the hlist - we know the types we will end up with: `Ends`, but they're not preserved in the tp3 (java) traversal, therefor we need to cast
       val hlist = results.asScala.toList.foldRight(HNil: HList)(_ :: _)
       tupler(hlist.asInstanceOf[EndsHList])

@@ -29,7 +29,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
   /* executes traversal and converts results into cpg domain type */
   def toList(): List[EndDomain] = raw.toList().map(converter.toDomain)
-  def toStream(): JStream[EndDomain] = raw.toStream().map { end: EndGraph => converter.toDomain(end) }
+  def toStream(): JStream[EndDomain] = raw.toStream().map { (end: EndGraph) => converter.toDomain(end) }
   def toSet(): Set[EndDomain] = raw.toSet().map(converter.toDomain)
   def iterate(): Unit = raw.iterate()
   def exec(): Unit = iterate()
@@ -91,7 +91,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
       newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
       constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
     constr {
-      raw.map { endGraph: EndGraph =>
+      raw.map { (endGraph: EndGraph) =>
         newConverter.toGraph(fun(converter.toDomain(endGraph)))
       }
     }
@@ -103,7 +103,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
       newConverter: Converter[NewSteps#EndDomain0]
   ): NewSteps =
     constr {
-      raw.flatMap { endGraph: EndGraph =>
+      raw.flatMap { (endGraph: EndGraph) =>
         val newSteps: NewSteps = fun(converter.toDomain(endGraph))
         newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0]]
       // not sure why I need the cast here - should be safe though
@@ -303,7 +303,7 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     * Step that orders nodes according to f.
     * */
   def orderBy[A](fun: EndDomain => A): Steps[EndDomain, EndGraph, Labels] =
-    new Steps[EndDomain, EndGraph, Labels](raw.order(By { v: EndGraph =>
+    new Steps[EndDomain, EndGraph, Labels](raw.order(By { (v: EndGraph) =>
       fun(converter.toDomain(v))
     }))
 

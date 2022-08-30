@@ -6,19 +6,25 @@ val Scala3   = "3.1.3"
 
 ThisBuild / organization := "com.michaelpollmeier"
 ThisBuild / scalaVersion := Scala213
-ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213)
+ThisBuild / crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3)
 
-ThisBuild / scalacOptions ++= Seq(
-  // "-Xlint"
-  // "-Xfatal-warnings",
-  // , "-Xlog-implicits"
-  //"-Ydebug",
-  "-target:jvm-1.8",
-  "-language:implicitConversions",
-  "-language:existentials",
-  "-feature",
-  "-deprecation" //hard to handle when supporting multiple scala versions...
-)
+def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
+  Seq(
+    // "-Xlint"
+    // "-Xfatal-warnings",
+    // , "-Xlog-implicits"
+    //"-Ydebug",
+    "-language:implicitConversions",
+    "-language:existentials",
+    "-feature",
+    "-deprecation" //hard to handle when supporting multiple scala versions...
+  ) ++ (CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, _)) => Seq("-target:jvm-1.8")
+    case _ => Seq("-explain")
+  })
+}
+
+ThisBuild / scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
 ThisBuild / Test / console / initialCommands :=
   """|import gremlin.scala._
