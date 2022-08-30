@@ -48,8 +48,7 @@ lazy val macros = project // macros must be in a separate compilation unit
   .in(file("macros"))
   .settings(
     resolvers ++= Dependencies.resolvers,
-    libraryDependencies ++= Dependencies.commonForVersion(scalaVersion.value) :+
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    libraryDependencies ++= Dependencies.macroDepsForVersion(scalaVersion.value)
   )
 
 lazy val `gremlin-scala` =
