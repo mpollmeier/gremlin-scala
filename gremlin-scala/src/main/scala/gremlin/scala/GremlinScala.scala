@@ -216,7 +216,6 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
              H0,
              T0 <: HList,
              LabelNames <: HList,
-             TupleWithValue,
              Values <: HList,
              Z,
              ValueTuples](stepLabelsTuple: StepLabelsAsTuple)(
