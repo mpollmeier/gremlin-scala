@@ -425,7 +425,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   /** Organize objects in the stream into a Map, group keys and values with a modulator */
   def group[ModulatedKeys, ModulatedValues](keysBy: By[ModulatedKeys],
                                             valuesBy: By[ModulatedValues]) =
-    GremlinScala[JMap[ModulatedKeys, JCollection[ModulatedValues]], Labels](
+    GremlinScala[JMap[ModulatedKeys, valuesBy.ValueFold[ModulatedValues]], Labels](
       valuesBy(keysBy(traversal.group())))
 
   @deprecated("use group(by(...))", "3.0.0.1")

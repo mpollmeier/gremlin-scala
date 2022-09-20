@@ -4,7 +4,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import shapeless.{::, HNil}
-import java.util.{Collection => JCollection, Map => JMap}
+import java.util.{Map => JMap}
 import scala.collection.JavaConverters._
 
 class SelectSpec extends AnyWordSpec with Matchers {
@@ -161,7 +161,7 @@ class SelectSpec extends AnyWordSpec with Matchers {
         .V()
         .hasLabel("software")
         .group(By(__().value(Key[String]("name"))), By(__().in("created")))
-        .unfold[JMap.Entry[String, JCollection[Vertex]]]()
+        .unfold[JMap.Entry[String, Vertex]]()
         .selectKeys
         .toList()
       result shouldBe List("ripple", "lop")
