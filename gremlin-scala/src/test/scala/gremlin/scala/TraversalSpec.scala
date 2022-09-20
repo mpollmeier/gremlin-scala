@@ -467,12 +467,11 @@ class TraversalSpec extends AnyWordSpec with Matchers {
     }
     "modulate key by label and value by traversal without folding" in new Fixture {
       type Label = String
-      type Name = String
-      private val results: JMap[Label, Name] =
-        graph.V().group(By.label, By(__[Vertex]().value(Name))).head()
+      private val results: JMap[Label, JLong] =
+        graph.V().group(By.label, By(__[Vertex]().value(Name).dedup().count())).head()
 
-      results.get("software") should be("lop").or(be("ripple"))
-      results.get("person") should be("marko").or(be("vadas")).or(be("josh")).or(be("peter"))
+      results.get("software") shouldBe 2L
+      results.get("person") shouldBe 4L
     }
     "modulate key by label and value by traversal with folding" in new Fixture {
       type Label = String
