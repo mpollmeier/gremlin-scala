@@ -429,11 +429,56 @@ class TraversalSpec extends AnyWordSpec with Matchers {
       results.get("person") should contain(graph.V(6).head())
     }
 
-    "modulate key and value" in new Fixture {
+    "modulate key by label and value by property key" in new Fixture {
       type Label = String
       type Name = String
       val results: JMap[Label, JCollection[Name]] =
         graph.V().group(By.label, By(Name)).head()
+
+      results.get("software") should contain("lop")
+      results.get("software") should contain("ripple")
+      results.get("person") should contain("marko")
+      results.get("person") should contain("vadas")
+      results.get("person") should contain("josh")
+      results.get("person") should contain("peter")
+    }
+    "modulate key by label and value by label" in new Fixture {
+      type Label = String
+      val results: JMap[Label, JCollection[Label]] =
+        graph.V().group(By.label, By.label).head()
+
+      results.get("software") should contain("software")
+      (results.get("software") should contain).only("software")
+      results.get("person") should contain("person")
+      (results.get("person") should contain).only("person")
+    }
+    "modulate key by label and value by function" in new Fixture {
+      type Label = String
+      type Name = String
+      val results: JMap[Label, JCollection[Name]] =
+        graph.V().group(By.label, By((_: Vertex).value2(Name))).head()
+
+      results.get("software") should contain("lop")
+      results.get("software") should contain("ripple")
+      results.get("person") should contain("marko")
+      results.get("person") should contain("vadas")
+      results.get("person") should contain("josh")
+      results.get("person") should contain("peter")
+    }
+    "modulate key by label and value by traversal without folding" in new Fixture {
+      type Label = String
+      type Name = String
+      private val results: JMap[Label, Name] =
+        graph.V().group(By.label, By(__[Vertex]().value(Name))).head()
+
+      results.get("software") should be("lop").or(be("ripple"))
+      results.get("person") should be("marko").or(be("vadas")).or(be("josh")).or(be("peter"))
+    }
+    "modulate key by label and value by traversal with folding" in new Fixture {
+      type Label = String
+      type Name = String
+      val results: JMap[Label, JList[Name]] =
+        graph.V().group(By.label, By(__[Vertex]().value(Name).fold())).head()
 
       results.get("software") should contain("lop")
       results.get("software") should contain("ripple")
@@ -1128,7 +1173,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
   }
 
   trait Fixture {
-    implicit val graph = TinkerFactory.createModern.asScala()
+    implicit val graph: ScalaGraph = TinkerFactory.createModern.asScala()
     val g = graph.traversal
     val Name = Key[String]("name")
     val Nickname = Key[String]("nickname")
