@@ -854,6 +854,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def hasLabel(label: String, labels: String*)(implicit ev: End <:< Element) =
     GremlinScala[End, Labels](traversal.hasLabel(label, labels: _*))
 
+  def hasLabel(predicate: P[Label])(implicit ev: End <:< Element) =
+    GremlinScala[End, Labels](traversal.hasLabel(predicate))
+
   def hasLabel[CC <: Product: ru.WeakTypeTag]()(
       implicit ev: End <:< Element): GremlinScala.Aux[End, Labels] = {
     val tpe = implicitly[ru.WeakTypeTag[CC]].tpe
