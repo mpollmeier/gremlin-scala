@@ -4,6 +4,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure.T
 import java.util.function.{Function => JFunction}
+import java.util.{Collection => JCollection}
 
 /**
   * By step can be used in combination with all sorts of other steps
@@ -11,6 +12,9 @@ import java.util.function.{Function => JFunction}
   * http://tinkerpop.apache.org/docs/current/reference/#by-step
   * n.b. `By` can be used in place of `OrderBy`, hence extending OrderBy */
 trait By[Modulated] extends OrderBy[Modulated] {
+
+  /** When used as the latter By of group method */
+  type ValueFold[X]
   def apply[End](traversal: GraphTraversal[_, End]): GraphTraversal[_, End]
 }
 trait OrderBy[Modulated] {
@@ -21,6 +25,7 @@ object By {
 
   /* modulate by property */
   def apply[Modulated](key: Key[Modulated]) = new By[Modulated] {
+    override type ValueFold[A] = JCollection[A]
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by(key.name)
   }
@@ -33,19 +38,21 @@ object By {
     }
 
   /* modulate by label - alias for `apply[String](T.label)` */
-  def label[Modulated] = new By[String] {
+  def label = new By[Label] {
+    override type ValueFold[A] = JCollection[A]
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by(T.label)
   }
 
   /* modulate by label and order - alias for `apply[String](T.label, Order)` */
-  def label[Modulated](order: Order) = new OrderBy[String] {
+  def label(order: Order) = new OrderBy[Label] {
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by(T.label, order)
   }
 
   /* modulate by T(oken) */
   def apply[Modulated](token: T) = new By[Modulated] {
+    override type ValueFold[A] = JCollection[A]
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by(token)
   }
@@ -58,6 +65,7 @@ object By {
 
   /* modulate by anonymous traversal, e.g. __.inE.value(Name) */
   def apply[Modulated](by: GremlinScala[Modulated]) = new By[Modulated] {
+    override type ValueFold[A] = A
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by(by.traversal)
   }
@@ -72,6 +80,7 @@ object By {
   /* modulate by function
    * n.b. prefer one of the other modulators, see http://tinkerpop.apache.org/docs/current/reference/#a-note-on-lambdas */
   def apply[From, Modulated](fun: From => Modulated) = new By[Modulated] {
+    override type ValueFold[A] = JCollection[A]
     override def apply[End](traversal: GraphTraversal[_, End]) =
       traversal.by[From](new JFunction[From, AnyRef] {
         override def apply(from: From): AnyRef = fun(from).asInstanceOf[AnyRef]
@@ -99,6 +108,7 @@ object By {
 
   /* identity modulator */
   def apply[Modulated]() = new By[Modulated] {
+    override type ValueFold[A] = JCollection[A]
     override def apply[End](traversal: GraphTraversal[_, End]) = traversal.by()
   }
 }
