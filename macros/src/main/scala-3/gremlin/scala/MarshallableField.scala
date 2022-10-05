@@ -4,6 +4,8 @@ package gremlin.scala
 import scala.annotation.{implicitNotFound, targetName}
 import scala.deriving.Mirror
 import MacroUtils.*
+import scala.jdk.CollectionConverters.*
+import java.{util => ju}
 
 @implicitNotFound(
   "Could not find an implicit MarshallableField[${T}]\n" +
@@ -14,18 +16,26 @@ import MacroUtils.*
   " - import gremlin.scala.MarshallingFeatureSet.FullMonty.given"
 )
 trait MarshallableField[T]:
-  def inspect(): String
+  type Repr = T
+  type Encoded
+  def encode(value: T): Encoded
+  def decode(value: Encoded): T
 
 object MarshallableField:
 
   import scala.quoted.*
   import scala.compiletime.erasedValue
 
-  inline given MarshallableField[Int] = () => "Int"
-  inline given MarshallableField[Long] = () => "Long"
-  inline given MarshallableField[Float] = () => "Float"
-  inline given MarshallableField[Double] = () => "Double"
-  inline given MarshallableField[String] = () => "String"
+  def identityInstance[T]: MarshallableField[T] = new MarshallableField[T]:
+    type Encoded = T
+    def encode(value: T): Encoded = value
+    def decode(value: Encoded): T = value
+
+  inline given MarshallableField[Int] = identityInstance[Int]
+  inline given MarshallableField[Long] = identityInstance[Long]
+  inline given MarshallableField[Float] = identityInstance[Float]
+  inline given MarshallableField[Double] = identityInstance[Double]
+  inline given MarshallableField[String] = identityInstance[String]
 
   inline given [T, Coll[_] <: Iterable[_], FeatureSet <: MarshallingFeatureSet]
     (using featureSet: FeatureSet)
@@ -35,22 +45,33 @@ object MarshallableField:
       case _: Seq[T] =>
         inline erasedValue[featureSet.SeqFlag] match
           case _: FeatureEnabled =>
-            () => s"Seq[${nested.inspect()}]"
+            new MarshallableField[Coll[T]] :
+              type Encoded = ju.List[T]
+              def encode(value: Seq[T]): Encoded = value.asJava
+              def decode(value: Encoded): Seq[T] = value.asScala.to(Seq)
           case _ => compiletime.error("Seq inspection not enabled")
       case _: Set[T] =>
         inline erasedValue[featureSet.SetFlag] match
           case _: FeatureEnabled =>
-            () => s"Set[${nested.inspect()}]"
+            new MarshallableField[Coll[T]] :
+              type Encoded = ju.Set[T]
+              def encode(value: Set[T]): Encoded = value.asJava
+              def decode(value: Encoded): Set[T] = value.asScala.to(Set)
           case _ => compiletime.error("Set inspection not enabled")
       case _ => compiletime.error("Unknown collection type")
 
-  inline given [K, V, M[_,_] <: Map[_,_], FeatureSet <: MarshallingFeatureSet]
+  inline given [K, V, FeatureSet <: MarshallingFeatureSet]
     (using featureSet: FeatureSet)
     (using keyInstance: MarshallableField[K], valInstance: MarshallableField[V])
-  : MarshallableField[M[K,V]] =
+  : MarshallableField[Map[K,V]] =
     inline erasedValue[featureSet.MapFlag] match
       case _: FeatureEnabled =>
-        () => s"Map[${keyInstance.inspect()}, ${valInstance.inspect()}]"
+        new MarshallableField[Map[K,V]] :
+          type Encoded = ju.Map[keyInstance.Encoded, valInstance.Encoded]
+          def encode(value: Map[K,V]): Encoded =
+            value.map((k,v) => keyInstance.encode(k) -> valInstance.encode(v)).asJava
+          def decode(value: Encoded): Map[K,V] =
+            value.asScala.map((k,v) => keyInstance.decode(k) -> valInstance.decode(v)).to(Map)
       case _ => compiletime.error("Seq inspection not enabled")
 
   inline given [P <: Product, FeatureSet <: MarshallingFeatureSet]
@@ -61,80 +82,6 @@ object MarshallableField:
   private def productMacro[
     P: Type,
     FeatureSet <: MarshallingFeatureSet : Type,
-  ](using Quotes): Expr[MarshallableField[P]] =
-    import quotes.reflect._
-    val className = Type.show[P]
-    val featureSetType = TypeTree.of[FeatureSet].tpe
-
-    // Every type member in `FeatureSet` adds another level of nesting to the resulting
-    // `RefinedType` tree, so we drag 'em all out using recursion
-
-    val flags =
-      def loop(acc: Map[String, Boolean], tpe: TypeRepr): Map[String, Boolean] =
-        tpe match {
-          case Refinement(parent, flagName, TypeBounds(_,TypeRef(_,enabledType))) =>
-            val isEnabled = enabledType == "FeatureEnabled"
-            val nextAcc = acc + (flagName -> isEnabled)
-            loop(nextAcc, parent)
-          case _ => acc
-        }
-      loop(Map.empty, TypeTree.of[FeatureSet].tpe)
-
-    val anyValEnabled: Boolean = flags("AnyValFlag")
-    val caseClassEnabled: Boolean = flags("CaseClassFlag")
-
-    def marshallableFieldTypeFor(tt: TypeRepr): AppliedType =
-      val AppliedType(reference, _) = TypeRepr.of[MarshallableField[_]]: @unchecked
-      AppliedType(reference, List(tt))
-
-    def withNestedInstance[T](tt: TypeRepr)(fn: Expr[MarshallableField[_]] => Expr[T]): Expr[T] =
-      Implicits.search(marshallableFieldTypeFor(tt)) match {
-        case iss: ImplicitSearchSuccess =>
-          val foundExpr = iss.tree.asExpr.asInstanceOf[Expr[MarshallableField[_]]]
-          fn(foundExpr)
-        case isf: ImplicitSearchFailure =>
-          '{compiletime.error(${Expr(isf.explanation)})}
-      }
-
-    Type.of[P] match
-      case '[AnyVal] =>
-        if anyValEnabled then
-          TypeTree.of[P].tpe.typeSymbol.caseFields.head.tree match {
-            case ValDef(valueName, tpt, _) =>
-              withNestedInstance(tpt.tpe) { nestedExpr =>
-                val classNameExpr = Expr(className)
-                val valueNameExpr = Expr(valueName)
-                '{
-                new MarshallableField[P] {
-                  val nestedInspect: String = $nestedExpr.inspect()
-                  val className: String = $classNameExpr
-                  val valueName: String = $valueNameExpr
-                  def inspect() = s"AnyVal: $className($valueName: $nestedInspect)"
-                }
-                }
-              }
-            case _ => '{compiletime.error("AnyVal doesn't appear to have a constructor param")}
-          }
-        else '{compiletime.error("AnyVal inspection not enabled")}
-      case _ =>
-        if caseClassEnabled then
-          '{
-            new MarshallableField[P] {
-              def inspect() = ${Expr(s"Case Class: $className")}
-            }
-          }
-        else '{compiletime.error("case class inspection not enabled")}
-
-  object UnknownInstance:
-    inline given [T]: MarshallableField[T] = ${unknownMacro[T]}
-
-    private def unknownMacro[T](using Type[T])(using Quotes): Expr[MarshallableField[T]] =
-      import quotes.reflect._
-      val name = TypeTree.of[T].show
-      '{
-        new MarshallableField[T] {
-          def inspect() = ${Expr("Unknown: " + name)}
-        }
-      }
-
+  ](using q: Quotes): Expr[MarshallableField[P]] =
+    new MarshallableFieldMacros[q.type, P, FeatureSet].handleProduct
 
