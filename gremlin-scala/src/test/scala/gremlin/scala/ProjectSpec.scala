@@ -3,7 +3,6 @@ package gremlin.scala
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerFactory
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import shapeless.syntax.std.tuple._
 
 class ProjectSpec extends AnyWordSpec with Matchers {
 

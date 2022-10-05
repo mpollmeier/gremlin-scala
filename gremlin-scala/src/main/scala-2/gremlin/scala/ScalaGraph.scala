@@ -4,7 +4,7 @@ import org.apache.commons.configuration2.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Graph.Variables
 import org.apache.tinkerpop.gremlin.structure.{T, Transaction}
-import shapeless._
+import shapeless.HNil
 
 object ScalaGraph {
   def apply(graph: Graph): ScalaGraph =

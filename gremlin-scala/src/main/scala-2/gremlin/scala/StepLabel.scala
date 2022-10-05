@@ -3,7 +3,7 @@ package gremlin.scala
 import java.util.UUID.randomUUID
 import java.util.{Map => JMap}
 import scala.annotation.implicitNotFound
-import shapeless._
+import shapeless.{HList, HNil, Poly2}
 import shapeless.poly._
 
 // type safety for labelled steps

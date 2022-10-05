@@ -59,7 +59,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   /** alias for `toList`, because typing kills */
   def l(): List[End] = toList()
 
-  def toList(): List[End] = traversal.toList().asScala.toList
+  def toList(): List[End] = traversal.toList.asScala.toList
 
   def toIterator(): Iterator[End] = traversal.asScala
 
