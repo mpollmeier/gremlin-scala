@@ -45,18 +45,20 @@ object MarshallableField:
       case _: Seq[T] =>
         inline erasedValue[featureSet.SeqFlag] match
           case _: FeatureEnabled =>
-            new MarshallableField[Coll[T]] :
+            new MarshallableField[Seq[T]] {
               type Encoded = ju.List[T]
               def encode(value: Seq[T]): Encoded = value.asJava
               def decode(value: Encoded): Seq[T] = value.asScala.to(Seq)
+            }.asInstanceOf[MarshallableField[Coll[T]] {type Encoded = ju.List[T]}]
           case _ => compiletime.error("Seq inspection not enabled")
       case _: Set[T] =>
         inline erasedValue[featureSet.SetFlag] match
           case _: FeatureEnabled =>
-            new MarshallableField[Coll[T]] :
+            new MarshallableField[Set[T]] {
               type Encoded = ju.Set[T]
               def encode(value: Set[T]): Encoded = value.asJava
               def decode(value: Encoded): Set[T] = value.asScala.to(Set)
+            }.asInstanceOf[MarshallableField[Coll[T]] {type Encoded = ju.Set[T]}]
           case _ => compiletime.error("Set inspection not enabled")
       case _ => compiletime.error("Unknown collection type")
 

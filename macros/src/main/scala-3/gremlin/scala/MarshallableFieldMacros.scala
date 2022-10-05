@@ -6,7 +6,7 @@ import scala.compiletime.erasedValue
 class MarshallableFieldMacros[
   Q <: Quotes,
   P: Type,
-  FeatureSet <: MarshallingFeatureSet
+  FeatureSet <: MarshallingFeatureSet : Type
 ](using val q: Q):
   import q.reflect.*
 
@@ -78,7 +78,7 @@ class MarshallableFieldMacros[
                     '{value}.asTerm.select(getterSym).asExpr
                   }.asInstanceOf[nestedInstance.Repr]
                 ).asInstanceOf[underlying]
-                def decode(value: Encoded): P =
+                def decode(value: underlying): P =
                   ${
                     val arg = '{value}.asTerm
                     Apply(companionApply, arg :: Nil).asExprOf[P]
