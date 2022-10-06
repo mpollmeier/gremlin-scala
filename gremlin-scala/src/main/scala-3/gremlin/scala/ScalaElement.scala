@@ -2,7 +2,6 @@ package gremlin.scala
 
 import scala.jdk.CollectionConverters._
 import scala.collection.compat.immutable.LazyList
-import shapeless.HNil
 
 trait ScalaElement[ElementType <: Element] {
   def element: ElementType
@@ -10,11 +9,11 @@ trait ScalaElement[ElementType <: Element] {
   def graph: ScalaGraph = element.graph
 
   /** start a new traversal from this element */
-  def start(): GremlinScala.Aux[ElementType, HNil] = element.graph().inject(element)
+  def start(): GremlinScala.Aux[ElementType, EmptyTuple] = element.graph().inject(element)
 
   /** start a new traversal from this element and configure it */
-  def start(configure: TraversalSource => TraversalSource): GremlinScala.Aux[ElementType, HNil] =
-    GremlinScala[ElementType, HNil](
+  def start(configure: TraversalSource => TraversalSource): GremlinScala.Aux[ElementType, EmptyTuple] =
+    GremlinScala[ElementType, EmptyTuple](
       configure(TraversalSource(element.graph)).underlying.inject(element)
     )
 

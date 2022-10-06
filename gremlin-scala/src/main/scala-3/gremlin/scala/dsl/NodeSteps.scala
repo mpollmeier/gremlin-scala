@@ -7,10 +7,14 @@ import scala.collection.mutable
 /* Root class for all your vertex based DSL steps
  * TODO: add support for using Edge instead of Vertex?
  */
-class NodeSteps[EndDomain <: DomainRoot, Labels <: Tuple](override val raw: GremlinScala[Vertex])(
-    using marshaller: Marshallable[EndDomain])
-    extends Steps[EndDomain, Vertex, Labels](raw)(
-      Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)) {
+class NodeSteps[
+  EndDomain <: DomainRoot,
+  Labels <: Tuple
+](override val raw: GremlinScala[Vertex])(
+  using marshaller: Marshallable[EndDomain]
+) extends Steps[EndDomain, Vertex, Labels](raw)(
+  Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)
+) {
 
   /* follow the incoming edges of the given type as long as possible */
   def walkIn(edgeType: String): GremlinScala[Vertex] =

@@ -31,7 +31,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalExplanation
 import org.apache.tinkerpop.gremlin.process.traversal.{Bytecode, Path, Scope, Traversal}
 import org.apache.tinkerpop.gremlin.structure.{Column, Direction, T}
 import scala.concurrent.duration.FiniteDuration
-import scala.reflect.runtime.{universe => ru}
 import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
 
@@ -39,7 +38,8 @@ object GremlinScala {
 
   /** constructor */
   def apply[End, Labels0 <: Tuple](
-      traversal: GraphTraversal[_, End]): GremlinScala.Aux[End, Labels0] =
+    traversal: GraphTraversal[_, End]
+  ): GremlinScala.Aux[End, Labels0] =
     new GremlinScala[End](traversal) { type Labels = Labels0 }
 
   /** convenience type constructor
@@ -207,25 +207,28 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     *   * get's the actual values from the Tinkerpop3 java select as a Map[String, Any]
     *   * uses the types from the StepLabels to get the values from the Map (using a type level fold)
     */
-  def select[StepLabelsAsTuple <: Product,
-             StepLabels <: Tuple,
-             H0,
-             T0 <: Tuple,
-             LabelNames <: Tuple,
-             TupleWithValue,
-             Values <: Tuple,
-             Z,
-             ValueTuples](stepLabelsTuple: StepLabelsAsTuple)(
-      implicit toHList: ToHList.Aux[StepLabelsAsTuple, StepLabels],
-      hasOne: IsHCons.Aux[StepLabels, H0, T0],
-      hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
-      stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
-      trav: ToTraversable.Aux[LabelNames, List, String],
-      folder: RightFolder.Aux[StepLabels,
-                              (EmptyTuple, JMap[String, Any]),
-                              combineLabelWithValue.type,
-                              (Values, Z)],
-      tupler: Tupler.Aux[Values, ValueTuples]
+  transparent inline def select[
+    StepLabelsTuple <: NonEmptyTuple,
+//    StepLabels <: NonEmptyTuple,
+//    H0,
+//    T0 <: Tuple,
+//    LabelNames <: Tuple,
+//    TupleWithValue,
+//    Values <: Tuple,
+//    Z,
+//    ValueTuples
+  ](stepLabelsTuple: StepLabelsAsTuple)(
+    using
+    toHList: ToHList.Aux[StepLabelsAsTuple, StepLabels],
+    hasOne: IsHCons.Aux[StepLabels, H0, T0],
+    hasTwo: IsHCons[T0], // witnesses that stepLabels has > 1 elements
+    stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
+    trav: ToTraversable.Aux[LabelNames, List, String],
+    folder: RightFolder.Aux[StepLabels,
+                            (EmptyTuple, JMap[String, Any]),
+                            combineLabelWithValue.type,
+                            (Values, Z)],
+    tupler: Tupler.Aux[Values, ValueTuples]
   ): GremlinScala.Aux[ValueTuples, Labels] = {
     val stepLabels: StepLabels = toHList(stepLabelsTuple)
     val labels: List[String] = stepLabels.map(GetLabelName).toList

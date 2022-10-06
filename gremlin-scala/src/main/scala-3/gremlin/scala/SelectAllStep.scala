@@ -7,22 +7,18 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.map.ScalarMapStep
 import org.apache.tinkerpop.gremlin.process.traversal.traverser.TraverserRequirement
 
 import scala.jdk.CollectionConverters._
-import shapeless.{HList, HNil}
-import shapeless.ops.hlist._
-
+import scala.compiletime.erasedValue
 import java.util
 
-class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])(
-    implicit tupler: Tupler.Aux[Labels, LabelsTuple])
-    extends ScalarMapStep[S, LabelsTuple](traversal.asAdmin)
-    with TraversalParent {
+class SelectAllStep[S, Labels <: NonEmptyTuple](traversal: Traversal[_, _])
+  extends ScalarMapStep[S, Labels](traversal.asAdmin)
+  with TraversalParent
+{
 
   override def getRequirements: util.Set[TraverserRequirement] = Set(TraverserRequirement.PATH).asJava
 
-  protected def map(traverser: Admin[S]): LabelsTuple = {
-    val labels: Labels = toHList(toList(traverser.path))
-    tupler(labels)
-  }
+  protected def map(traverser: Admin[S]): Labels =
+    toTuple(toList(traverser.path))
 
   def toList(path: Path): List[Any] = {
     val labels = path.labels
@@ -31,9 +27,12 @@ class SelectAllStep[S, Labels <: HList, LabelsTuple](traversal: Traversal[_, _])
     (0 until path.size).filter(hasUserLabel).map(path.get[Any]).toList
   }
 
-  private def toHList[T <: HList](path: List[_]): T =
-    if (path.isEmpty)
-      HNil.asInstanceOf[T]
-    else
-      (path.head :: toHList[IsHCons[T]#T](path.tail)).asInstanceOf[T]
+  inline private def toTuple[T <: Tuple](path: List[_]): T =
+    inline erasedValue[T] match
+      case _: (th *: tt) =>
+        inline path match
+          case Nil => EmptyTuple.asInstanceOf[T] //TODO: this should probably error
+          case (h: th) :: t => (h *: toTuple[tt](t)).asInstanceOf[T]
+      case x: EmptyTuple => x
+
 }

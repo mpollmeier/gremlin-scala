@@ -3,25 +3,32 @@ package gremlin.scala
 import java.util.UUID.randomUUID
 import java.util.{Map => JMap}
 import scala.annotation.implicitNotFound
-import shapeless.{HList, HNil, Poly2}
-import shapeless.poly._
+
 
 // type safety for labelled steps
 case class StepLabel[A](name: String = randomUUID.toString)
 
 object StepLabel {
 
-  object GetLabelName extends (StepLabel ~>> String) {
-    def apply[B](label: StepLabel[B]) = label.name
-  }
+  val getLabelName: [B] => StepLabel[B] => String =
+    [B] => (label: StepLabel[B]) => label.name
 
-  object combineLabelWithValue extends Poly2 {
-    implicit def atLabel[A, L <: HList] =
-      at[StepLabel[A], (L, JMap[String, Any])] {
-        case (label, (acc, values)) =>
-          (values.get(label.name).asInstanceOf[A] :: acc, values)
-      }
-  }
+  type ValueMap = JMap[String, Any]
+
+  val getLabelValueFromMap: [B] => (StepLabel[B], ValueMap) => B =
+    [B] => (label: StepLabel[B], values: ValueMap) => values.get(label.name).asInstanceOf[B]
+
+//  val combineLabelWithValue:
+//    [A, L <: Tuple] => StepLabel[A] => L => ValueMap => (L, ValueMap) =
+//    [A,L] =>
+//
+//    extends Poly2 {
+//    implicit def atLabel[A, L <: Tuple] =
+//      at[StepLabel[A], (L, JMap[String, Any])] {
+//        case (label, (acc, values)) =>
+//          (values.get(label.name).asInstanceOf[A] :: acc, values)
+//      }
+
 
   trait ExtractLabelType[A] {
     type Out
@@ -35,16 +42,22 @@ object StepLabel {
   }
 
   trait LowPriorityExtractLabelTypeImplicits {
-    implicit def forSingle[A] = new ExtractLabelType[StepLabel[A]] {
-      type Out = A
-    }
+    given forSingle[A]: ExtractLabelType[StepLabel[A]] =
+      ExtractLabelType[StepLabel[A]] { type Out = A }
 
-    implicit def forHNil = new ExtractLabelType[HNil] { type Out = HNil }
+    given forHNil: ExtractLabelType[EmptyTuple] =
+      ExtractLabelType[EmptyTuple] { type Out = EmptyTuple }
 
-    implicit def forHList[H, T <: HList, HOut, TOut <: HList](
-        implicit hExtractLabelType: ExtractLabelType.Aux[H, HOut],
-        tExtractLabelType: ExtractLabelType.Aux[T, TOut])
-      : ExtractLabelType.Aux[H :: T, HOut :: TOut] =
-      new ExtractLabelType[H :: T] { type Out = HOut :: TOut }
+    given forHList[
+      H,
+      T <: Tuple,
+      HOut,
+      TOut <: Tuple
+    ](
+      using
+      hExtractLabelType: ExtractLabelType.Aux[H, HOut],
+      tExtractLabelType: ExtractLabelType.Aux[T, TOut]
+    ): ExtractLabelType.Aux[H *: T, HOut *: TOut] =
+      ExtractLabelType[H *: T] { type Out = HOut *: TOut }
   }
 }

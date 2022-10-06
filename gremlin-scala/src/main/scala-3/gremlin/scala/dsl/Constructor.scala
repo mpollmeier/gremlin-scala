@@ -51,13 +51,13 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
   given forSet[A, AGraphType, Labels <: Tuple](
     using aConverter: Converter.Aux[A, AGraphType]
   ): Constructor[Set[A], Labels] =
-    new Constructor[Set[A], Labels] {
+    Constructor[Set[A], Labels] {
       type GraphType = Set[AGraphType]
       type StepsType = Steps[Set[A], Set[AGraphType], Labels]
       def apply(raw: GremlinScala[GraphType]) = Steps[Set[A], Set[AGraphType], Labels](raw)
     }
 
-  given val forEmptyTuple: Constructor[EmptyTuple, EmptyTuple] =
+  given forEmptyTuple: Constructor[EmptyTuple, EmptyTuple] =
     Constructor[EmptyTuple, EmptyTuple] {
       type GraphType = EmptyTuple
       type StepsType = Steps[EmptyTuple, EmptyTuple, EmptyTuple]
@@ -100,8 +100,8 @@ trait LowestPriorityConstructorImplicits {
     graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple],
     eq: StepsType0#EndDomain0 =:= EndDomainHList,
     converter: Converter.Aux[T, GraphTypeTuple]
-  ) =
-    new Constructor[T, Labels] {
+  ): Constructor[T, Labels] =
+    Constructor[T, Labels] {
       type GraphType = GraphTypeTuple
       type StepsType = Steps[T, GraphType, Labels]
       def apply(raw: GremlinScala[GraphType]): StepsType =

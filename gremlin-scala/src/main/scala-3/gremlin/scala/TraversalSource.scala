@@ -5,7 +5,6 @@ import org.apache.commons.configuration2.Configuration
 import org.apache.tinkerpop.gremlin.process.remote.RemoteConnection
 import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
-import shapeless.HNil
 
 object TraversalSource {
   def apply(graph: Graph): TraversalSource =
@@ -15,33 +14,33 @@ object TraversalSource {
 case class TraversalSource(underlying: GraphTraversalSource) {
   def graph: Graph = underlying.getGraph
 
-  def addV(): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](underlying.addV())
+  def addV(): GremlinScala.Aux[Vertex, EmptyTuple] =
+    GremlinScala[Vertex, EmptyTuple](underlying.addV())
 
-  def addV(label: String): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](underlying.addV(label))
+  def addV(label: String): GremlinScala.Aux[Vertex, EmptyTuple] =
+    GremlinScala[Vertex, EmptyTuple](underlying.addV(label))
 
-  def addE(label: String): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](underlying.addE(label))
+  def addE(label: String): GremlinScala.Aux[Edge, EmptyTuple] =
+    GremlinScala[Edge, EmptyTuple](underlying.addE(label))
 
-  def inject[S](starts: S*): GremlinScala.Aux[S, HNil] =
-    GremlinScala[S, HNil](underlying.inject(starts: _*))
+  def inject[S](starts: S*): GremlinScala.Aux[S, EmptyTuple] =
+    GremlinScala[S, EmptyTuple](underlying.inject(starts: _*))
 
   // start traversal with all vertices
-  def V(): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](underlying.V())
+  def V(): GremlinScala.Aux[Vertex, EmptyTuple] =
+    GremlinScala[Vertex, EmptyTuple](underlying.V())
 
   // start traversal with all edges
-  def E(): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](underlying.E())
+  def E(): GremlinScala.Aux[Edge, EmptyTuple] =
+    GremlinScala[Edge, EmptyTuple](underlying.E())
 
   // start traversal with some vertices identified by given ids
-  def V(vertexIds: Any*): GremlinScala.Aux[Vertex, HNil] =
-    GremlinScala[Vertex, HNil](underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
+  def V(vertexIds: Any*): GremlinScala.Aux[Vertex, EmptyTuple] =
+    GremlinScala[Vertex, EmptyTuple](underlying.V(vertexIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   // start traversal with some edges identified by given ids
-  def E(edgeIds: Any*): GremlinScala.Aux[Edge, HNil] =
-    GremlinScala[Edge, HNil](underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
+  def E(edgeIds: Any*): GremlinScala.Aux[Edge, EmptyTuple] =
+    GremlinScala[Edge, EmptyTuple](underlying.E(edgeIds.asInstanceOf[Seq[AnyRef]]: _*))
 
   def withSack[A](initialValue: A): TraversalSource =
     withSack(() => initialValue)

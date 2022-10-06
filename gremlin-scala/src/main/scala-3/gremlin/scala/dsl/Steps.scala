@@ -5,9 +5,6 @@ import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
 import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
-import shapeless.{::, HList, HNil}
-import shapeless.ops.hlist.{IsHCons, Mapper, Prepend, RightFolder, ToTraversable, Tupler}
-import shapeless.ops.product.ToHList
 
 /** root type for all domain types */
 trait DomainRoot extends Product {
@@ -21,9 +18,9 @@ trait StepsRoot {
   def raw: GremlinScala[EndGraph0]
 }
 
-class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph])(
-    implicit val converter: Converter.Aux[EndDomain, EndGraph])
-    extends StepsRoot {
+class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph])(
+  using val converter: Converter.Aux[EndDomain, EndGraph]
+) extends StepsRoot {
   type EndDomain0 = EndDomain
   type EndGraph0 = EndGraph
 
@@ -87,9 +84,10 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
   def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain => NewEndDomain)(
-      implicit
-      newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
-      constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
+    using
+    newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
+    constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]
+  ): NewSteps =
     constr {
       raw.map { (endGraph: EndGraph) =>
         newConverter.toGraph(fun(converter.toDomain(endGraph)))
@@ -98,9 +96,9 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
 
   /* TODO: track/use NewLabelsGraph as given by `fun` */
   def flatMap[NewSteps <: StepsRoot](fun: EndDomain => NewSteps)(
-      implicit
-      constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
-      newConverter: Converter[NewSteps#EndDomain0]
+    using
+    constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
+    newConverter: Converter[NewSteps#EndDomain0]
   ): NewSteps =
     constr {
       raw.flatMap { (endGraph: EndGraph) =>
@@ -110,8 +108,9 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
       }
     }
 
-  def filter(predicate: Steps[EndDomain, EndGraph, Labels] => Steps[_, _, _])
-    : Steps[EndDomain, EndGraph, Labels] = {
+  def filter(
+    predicate: Steps[EndDomain, EndGraph, Labels] => Steps[_, _, _]
+  ): Steps[EndDomain, EndGraph, Labels] = {
     val rawWithFilter: GremlinScala[EndGraph] =
       raw.filter { gs =>
         predicate(
@@ -121,8 +120,9 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     new Steps[EndDomain, EndGraph, Labels](rawWithFilter)
   }
 
-  def filterNot(predicate: Steps[EndDomain, EndGraph, Labels] => Steps[_, _, _])
-    : Steps[EndDomain, EndGraph, Labels] = {
+  def filterNot(
+    predicate: Steps[EndDomain, EndGraph, Labels] => Steps[_, _, _]
+  ): Steps[EndDomain, EndGraph, Labels] = {
     val rawWithFilter: GremlinScala[EndGraph] =
       raw.filterNot { gs =>
         predicate(
@@ -133,56 +133,54 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   }
 
   // labels the current step and preserves the type - use together with `select` step
-  def as[NewLabels <: HList](stepLabel: String)(
-      implicit prependDomain: Prepend.Aux[Labels, EndDomain :: HNil, NewLabels])
-    : Steps[EndDomain, EndGraph, NewLabels] =
-    new Steps[EndDomain, EndGraph, NewLabels](
-      raw.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]].as(stepLabel))
+  def as(stepLabel: String): Steps[EndDomain, EndGraph, Labels :* EndDomain] =
+    Steps[EndDomain, EndGraph, Labels :* EndDomain](
+      raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel)
+    )
 
-  def as[NewLabels <: HList](stepLabel: StepLabel[EndDomain])(
-      implicit prependDomain: Prepend.Aux[Labels, EndDomain :: HNil, NewLabels])
-    : Steps[EndDomain, EndGraph, NewLabels] =
-    new Steps[EndDomain, EndGraph, NewLabels](
-      raw.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]].as(stepLabel.name))
+  def as(stepLabel: StepLabel[EndDomain]): Steps[EndDomain, EndGraph, Labels :* EndDomain] =
+    new Steps[EndDomain, EndGraph, Labels :* EndDomain](
+      raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel.name))
 
   // select all labels
-  def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
-      implicit
-      conv1: Converter.Aux[Labels, LabelsGraph],
-      tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
-      tupler2: Tupler.Aux[Labels, LabelsTuple],
-      conv2: Converter.Aux[LabelsTuple, LabelsGraphTuple]
-  ) = new Steps[LabelsTuple, LabelsGraphTuple, Labels](
-    raw.asInstanceOf[GremlinScala.Aux[EndGraph, LabelsGraph]].select()
-  )
+  def select[LabelsGraph]()(using conv: Converter.Aux[Labels, LabelsGraph]) =
+    Steps[LabelsTuple, LabelsGraphTuple, Labels](
+      raw.asInstanceOf[GremlinScala.Aux[EndGraph, LabelsGraph]].select()
+    )
 
   // select one specific label
   def select[Label, LabelGraph](label: StepLabel[Label])(
-      implicit conv1: Converter.Aux[Label, LabelGraph]) =
-    new Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](label.name)))
+    using conv1: Converter.Aux[Label, LabelGraph]
+  ) =
+    Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](label.name)))
 
   // select multiple specific labels
-  def select[StepLabelsTuple <: Product,
-             StepLabels <: HList,
-             H0,
-             T0 <: HList,
-             SelectedTypes <: HList,
-             SelectedTypesTuple <: Product,
-             SelectedGraphTypesTuple <: Product,
-             LabelNames <: HList,
-             Z](stepLabelsTuple: StepLabelsTuple)(
-      implicit toHList: ToHList.Aux[StepLabelsTuple, StepLabels],
-      hasOne: IsHCons.Aux[StepLabels, H0, T0],
-      hasTwo: IsHCons[T0], // witnesses that labels has > 1 elements
-      extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
-      tupler: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
-      conv: Converter.Aux[SelectedTypesTuple, SelectedGraphTypesTuple],
-      stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
-      trav: ToTraversable.Aux[LabelNames, List, String],
-      folder: RightFolder.Aux[StepLabels,
-                              (HNil, JMap[String, Any]),
-                              combineLabelWithValue.type,
-                              (SelectedTypes, Z)]
+  def select[
+    StepLabelsTuple <: Product,
+    StepLabels <: Tuple,
+    H0,
+    T0 <: Tuple,
+    SelectedTypes <: Tuple,
+    SelectedTypesTuple <: Product,
+    SelectedGraphTypesTuple <: Product,
+    LabelNames <: Tuple,
+    Z
+  ](stepLabelsTuple: StepLabelsTuple)(
+    using
+    toHList: ToHList.Aux[StepLabelsTuple, StepLabels],
+    hasOne: IsHCons.Aux[StepLabels, H0, T0],
+    hasTwo: IsHCons[T0], // witnesses that labels has > 1 elements
+    extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
+    tupler: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
+    conv: Converter.Aux[SelectedTypesTuple, SelectedGraphTypesTuple],
+    stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
+    trav: ToTraversable.Aux[LabelNames, List, String],
+    folder: RightFolder.Aux[
+      StepLabels,
+      (HNil, JMap[String, Any]),
+      combineLabelWithValue.type,
+      (SelectedTypes, Z)
+    ]
   ): Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels] = {
     val stepLabels: StepLabels = toHList(stepLabelsTuple)
     val labels: List[String] = stepLabels.map(GetLabelName).toList
@@ -208,9 +206,10 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     provide a termination and emit criteria.
     */
   def repeat[NewEndDomain >: EndDomain](
-      repeatTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[NewEndDomain, EndGraph, _])(
-      implicit newConverter: Converter.Aux[NewEndDomain, EndGraph])
-    : Steps[NewEndDomain, EndGraph, Labels] =
+    repeatTraversal: Steps[EndDomain, EndGraph, EmptyTuple] => Steps[NewEndDomain, EndGraph, _]
+  )(
+    using newConverter: Converter.Aux[NewEndDomain, EndGraph]
+  ): Steps[NewEndDomain, EndGraph, Labels] =
     new Steps[NewEndDomain, EndGraph, Labels](
       raw.repeat { rawTraversal =>
         repeatTraversal(
@@ -224,9 +223,10 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     If used before the repeat step it as "while" characteristics.
     If used after the repeat step it as "do-while" characteristics
     */
-  def until(untilTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])
-    : Steps[EndDomain, EndGraph, Labels] =
-    new Steps[EndDomain, EndGraph, Labels](
+  def until(
+    untilTraversal: Steps[EndDomain, EndGraph, EmptyTuple] => Steps[_, _, _]
+  ): Steps[EndDomain, EndGraph, Labels] =
+    Steps[EndDomain, EndGraph, Labels](
       raw.until { rawTraversal =>
         untilTraversal(
           new Steps[EndDomain, EndGraph, HNil](rawTraversal)
@@ -239,26 +239,27 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
     * executed.
     */
   def times(maxLoops: Int): Steps[EndDomain, EndGraph, Labels] =
-    new Steps[EndDomain, EndGraph, Labels](raw.times(maxLoops))
+    Steps[EndDomain, EndGraph, Labels](raw.times(maxLoops))
 
   /**
     Emit is used with the repeat step to emit the elements of the repeatTraversal after each
     iteration of the repeat loop.
     */
   def emit(): Steps[EndDomain, EndGraph, Labels] =
-    new Steps[EndDomain, EndGraph, Labels](raw.emit())
+    Steps[EndDomain, EndGraph, Labels](raw.emit())
 
   /**
     Emit is used with the repeat step to emit the elements of the repeatTraversal after each
     iteration of the repeat loop.
     The emitTraversal defines under which condition the elements are emitted.
     */
-  def emit(emitTraversal: Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])
-    : Steps[EndDomain, EndGraph, Labels] =
-    new Steps[EndDomain, EndGraph, Labels](
+  def emit(
+    emitTraversal: Steps[EndDomain, EndGraph, EmptyTuple] => Steps[_, _, _]
+  ): Steps[EndDomain, EndGraph, Labels] =
+    Steps[EndDomain, EndGraph, Labels](
       raw.emit { rawTraversal =>
         emitTraversal(
-          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+          new Steps[EndDomain, EndGraph, EmptyTuple](rawTraversal)
         ).raw
       }
     )
@@ -266,13 +267,14 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   /**
     * The or step is a filter with multiple `or` related filter traversals.
     */
-  def or(orTraversals: (Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])*)
-    : Steps[EndDomain, EndGraph, Labels] = {
+  def or(
+    orTraversals: (Steps[EndDomain, EndGraph, EmptyTuple] => Steps[_, _, _])*
+  ): Steps[EndDomain, EndGraph, Labels] = {
     val rawOrTraversals = orTraversals.map {
       orTraversal => (rawTraversal: GremlinScala[EndGraph]) =>
         orTraversal(
-          new Steps[EndDomain, EndGraph, HNil](
-            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]])
+          new Steps[EndDomain, EndGraph, EmptyTuple](
+            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]])
         ).raw
     }
 
@@ -284,13 +286,14 @@ class Steps[EndDomain, EndGraph, Labels <: HList](val raw: GremlinScala[EndGraph
   /**
     * The and step is a filter with multiple `and` related filter traversals.
     */
-  def and(andTraversals: (Steps[EndDomain, EndGraph, HNil] => Steps[_, _, _])*)
-    : Steps[EndDomain, EndGraph, Labels] = {
+  def and(
+    andTraversals: (Steps[EndDomain, EndGraph, EmptyTuple] => Steps[_, _, _])*
+  ): Steps[EndDomain, EndGraph, Labels] = {
     val rawAndTraversals = andTraversals.map {
       andTraversal => (rawTraversal: GremlinScala[EndGraph]) =>
         andTraversal(
-          new Steps[EndDomain, EndGraph, HNil](
-            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, HNil]])
+          new Steps[EndDomain, EndGraph, EmptyTuple](
+            rawTraversal.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]])
         ).raw
     }
 
