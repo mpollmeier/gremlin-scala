@@ -5,6 +5,7 @@ import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
 import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
+import compiletime.ops.int.*
 
 /** root type for all domain types */
 trait DomainRoot extends Product {
@@ -133,18 +134,18 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   }
 
   // labels the current step and preserves the type - use together with `select` step
-  def as(stepLabel: String): Steps[EndDomain, EndGraph, Labels :* EndDomain] =
-    Steps[EndDomain, EndGraph, Labels :* EndDomain](
+  def as(stepLabel: String): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+    Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel)
     )
 
-  def as(stepLabel: StepLabel[EndDomain]): Steps[EndDomain, EndGraph, Labels :* EndDomain] =
-    new Steps[EndDomain, EndGraph, Labels :* EndDomain](
+  def as(stepLabel: StepLabel[EndDomain]): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+    new Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel.name))
 
   // select all labels
   def select[LabelsGraph]()(using conv: Converter.Aux[Labels, LabelsGraph]) =
-    Steps[LabelsTuple, LabelsGraphTuple, Labels](
+    Steps[Labels, LabelsGraph, Labels](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, LabelsGraph]].select()
     )
 
@@ -154,51 +155,39 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   ) =
     Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](label.name)))
 
+  def getLabelValueFromMap[A](sl: StepLabel[A], values: JMap[String, Any]): A =
+    values.get(sl.name).asInstanceOf[A]
+
   // select multiple specific labels
   def select[
-    StepLabelsTuple <: Product,
-    StepLabels <: Tuple,
-    H0,
-    T0 <: Tuple,
-    SelectedTypes <: Tuple,
-    SelectedTypesTuple <: Product,
-    SelectedGraphTypesTuple <: Product,
-    LabelNames <: Tuple,
-    Z
-  ](stepLabelsTuple: StepLabelsTuple)(
+    StepLabels <: NonEmptyTuple,
+    SelectedTypes <: NonEmptyTuple,
+    SelectedGraphTypes <: NonEmptyTuple,
+    LabelNames <: Tuple
+  ](stepLabels: StepLabels)(
     using
-    toHList: ToHList.Aux[StepLabelsTuple, StepLabels],
-    hasOne: IsHCons.Aux[StepLabels, H0, T0],
-    hasTwo: IsHCons[T0], // witnesses that labels has > 1 elements
+    Tuple.Union[StepLabels] <:< StepLabel[_],
+    Tuple.Size[StepLabels] <= 2,
+  )(
+    using
     extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
-    tupler: Tupler.Aux[SelectedTypes, SelectedTypesTuple],
-    conv: Converter.Aux[SelectedTypesTuple, SelectedGraphTypesTuple],
-    stepLabelToString: Mapper.Aux[GetLabelName.type, StepLabels, LabelNames],
-    trav: ToTraversable.Aux[LabelNames, List, String],
-    folder: RightFolder.Aux[
-      StepLabels,
-      (HNil, JMap[String, Any]),
-      combineLabelWithValue.type,
-      (SelectedTypes, Z)
-    ]
-  ): Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels] = {
-    val stepLabels: StepLabels = toHList(stepLabelsTuple)
-    val labels: List[String] = stepLabels.map(GetLabelName).toList
+    conv: Converter.Aux[SelectedTypes, SelectedGraphTypes],
+  ): Steps[SelectedTypes, SelectedGraphTypes, Labels] = {
+    val labels: List[String] = stepLabels.map(_.name).toList()
     val label1 = labels.head
     val label2 = labels.tail.head
     val remainder = labels.tail.tail
 
-    val selectTraversal =
-      raw.traversal.select[Any](label1, label2, remainder: _*)
-    val newRaw: GremlinScala[SelectedGraphTypesTuple] =
+    val selectTraversal = raw.traversal.select[Any](label1, label2, remainder: _*)
+    val newRaw: GremlinScala[SelectedGraphTypes] =
       GremlinScala(selectTraversal).map { selectValues =>
-        val resultTuple = stepLabels.foldRight((HNil: HNil, selectValues))(combineLabelWithValue)
-        val values: SelectedTypes = resultTuple._1
-        tupler(values)
-          .asInstanceOf[SelectedGraphTypesTuple] //dirty but does the trick
+        val values: SelectedTypes = stepLabels map {
+          case sl: StepLabel[a] => getLabelValueFromMap[a](sl, selectValues)
+        }
+        values.asInstanceOf[SelectedGraphTypes] //dirty but does the trick
       }
 
-    new Steps[SelectedTypesTuple, SelectedGraphTypesTuple, Labels](newRaw)
+    new Steps[SelectedTypes, SelectedGraphTypes, Labels](newRaw)
   }
 
   /**
@@ -213,7 +202,7 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
     new Steps[NewEndDomain, EndGraph, Labels](
       raw.repeat { rawTraversal =>
         repeatTraversal(
-          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+          new Steps[EndDomain, EndGraph, EmptyTuple](rawTraversal)
         ).raw
       }
     )
@@ -229,7 +218,7 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
     Steps[EndDomain, EndGraph, Labels](
       raw.until { rawTraversal =>
         untilTraversal(
-          new Steps[EndDomain, EndGraph, HNil](rawTraversal)
+          new Steps[EndDomain, EndGraph, EmptyTuple](rawTraversal)
         ).raw
       }
     )

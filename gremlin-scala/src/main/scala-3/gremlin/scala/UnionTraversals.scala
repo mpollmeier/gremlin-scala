@@ -8,6 +8,6 @@ class UnionTraversals[Start, Ends <: Tuple](
 ) {
   def join[End](
     trav: GremlinScala.Aux[Start, EmptyTuple] => GremlinScala[End]
-  ): UnionTraversals[Start, Ends :* JList[End]] =
-    UnionTraversals[Start, Ends :* JList[End]](travsUntyped :+ trav)
+  ): UnionTraversals[Start, Tuple.Append[Ends, JList[End]]] =
+    UnionTraversals[Start, Tuple.Append[Ends, JList[End]]](travsUntyped :+ trav)
 }

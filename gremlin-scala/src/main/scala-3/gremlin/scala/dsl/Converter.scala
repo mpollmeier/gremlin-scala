@@ -17,18 +17,18 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
   /* need to explicitly create these for the base types, otherwise it there would
    * be ambiguous implicits (given Converter.forDomainNode) */
 
-  given def forUnit: Converter.Identity[Unit] = identityConverter[Unit]
-  given val forString: Converter.Identity[Label] = identityConverter[String]
-  given val forInt: Converter.Identity[Int] = identityConverter[Int]
-  given val forLong: Converter.Identity[Long] = identityConverter[Long]
-  given val forDouble: Converter.Identity[Double] = identityConverter[Double]
-  given val forFloat: Converter.Identity[Float] = identityConverter[Float]
-  given val forBoolean: Converter.Identity[Boolean] = identityConverter[Boolean]
-  given val forInteger: Converter.Identity[Integer] = identityConverter[Integer]
-  given val forJLong: Converter.Identity[java.lang.Long] = identityConverter[java.lang.Long]
-  given val forJDouble: Converter.Identity[java.lang.Double] = identityConverter[java.lang.Double]
-  given val forJFloat: Converter.Identity[java.lang.Float] = identityConverter[java.lang.Float]
-  given val forJBoolean: Converter.Identity[java.lang.Boolean] = identityConverter[java.lang.Boolean]
+  given forUnit: Converter.Identity[Unit] = identityConverter[Unit]
+  given forString: Converter.Identity[Label] = identityConverter[String]
+  given forInt: Converter.Identity[Int] = identityConverter[Int]
+  given forLong: Converter.Identity[Long] = identityConverter[Long]
+  given forDouble: Converter.Identity[Double] = identityConverter[Double]
+  given forFloat: Converter.Identity[Float] = identityConverter[Float]
+  given forBoolean: Converter.Identity[Boolean] = identityConverter[Boolean]
+  given forInteger: Converter.Identity[Integer] = identityConverter[Integer]
+  given forJLong: Converter.Identity[java.lang.Long] = identityConverter[java.lang.Long]
+  given forJDouble: Converter.Identity[java.lang.Double] = identityConverter[java.lang.Double]
+  given forJFloat: Converter.Identity[java.lang.Float] = identityConverter[java.lang.Float]
+  given forJBoolean: Converter.Identity[java.lang.Boolean] = identityConverter[java.lang.Boolean]
 
   def identityConverter[A]: Converter.Identity[A] = new Converter[A] {
     type GraphType = A
@@ -71,40 +71,38 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
     def toDomain(value: GraphType) = EmptyTuple
   }
 
-  given forHList[H, HGraphType, T <: Tuple, TGraphType <: Tuple](
-      using
-      hConverter: Converter.Aux[H, HGraphType],
-      tConverter: Converter.Aux[T, TGraphType]
+  given forTuples[H, T <: Tuple, HGraphType, TGraphType <: Tuple](
+    using
+    hConverter: Converter.Aux[H, HGraphType],
+    tConverter: Converter.Aux[T, TGraphType]
   ): Converter.Aux[H *: T, HGraphType *: TGraphType] =
     new Converter[H *: T] {
       type GraphType = HGraphType *: TGraphType
 
       def toGraph(values: H *: T): GraphType = values match {
-        case h :: t => hConverter.toGraph(h) :: tConverter.toGraph(t)
+        case h *: t => hConverter.toGraph(h) *: tConverter.toGraph(t)
       }
 
       def toDomain(values: GraphType): H *: T = values match {
-        case h :: t => hConverter.toDomain(h) :: tConverter.toDomain(t)
+        case h *: t => hConverter.toDomain(h) *: tConverter.toDomain(t)
       }
     }
 }
 
 trait LowestPriorityConverterImplicits {
   // for all Products, e.g. tuples, case classes etc
-  given forGeneric[T, Repr <: Tuple, GraphType <: Tuple, GraphTypeTuple <: Product](
-      implicit
-      gen: Generic.Aux[T, Repr],
-      converter: Converter.Aux[Repr, GraphType],
-      tupler: Tupler.Aux[GraphType, GraphTypeTuple],
-      toHList: ToHList.Aux[GraphTypeTuple, GraphType]
-  ): Converter.Aux[T, GraphTypeTuple] =
-    new Converter[T] {
-      type GraphType = GraphTypeTuple
+  given forProduct[Prod <: Product, ProdGraphType <: Tuple](
+    using m: scala.deriving.Mirror.ProductOf[Prod]
+  )(
+    using converter: Converter.Aux[m.MirroredElemTypes, ProdGraphType],
+  ): Converter.Aux[Prod, ProdGraphType] =
+    new Converter[Prod] {
+      type GraphType = ProdGraphType
 
-      def toGraph(value: T): GraphTypeTuple =
-        tupler(converter.toGraph(gen.to(value)))
+      def toGraph(value: Prod): GraphType =
+        converter.toGraph(Tuple.fromProductTyped(value))
 
-      def toDomain(value: GraphTypeTuple): T =
-        gen.from(converter.toDomain(toHList(value)))
+      def toDomain(value: GraphType): Prod =
+        m.fromProduct(converter.toDomain(value))
     }
 }

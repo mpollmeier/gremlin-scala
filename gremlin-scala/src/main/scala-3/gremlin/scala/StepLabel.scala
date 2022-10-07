@@ -6,29 +6,11 @@ import scala.annotation.implicitNotFound
 
 
 // type safety for labelled steps
-case class StepLabel[A](name: String = randomUUID.toString)
+case class StepLabel[A](name: String = randomUUID.toString) {
+  def getLabelValueFromMap(values: JMap[String, Any]): A = values.get(name).asInstanceOf[A]
+}
 
 object StepLabel {
-
-  val getLabelName: [B] => StepLabel[B] => String =
-    [B] => (label: StepLabel[B]) => label.name
-
-  type ValueMap = JMap[String, Any]
-
-  val getLabelValueFromMap: [B] => (StepLabel[B], ValueMap) => B =
-    [B] => (label: StepLabel[B], values: ValueMap) => values.get(label.name).asInstanceOf[B]
-
-//  val combineLabelWithValue:
-//    [A, L <: Tuple] => StepLabel[A] => L => ValueMap => (L, ValueMap) =
-//    [A,L] =>
-//
-//    extends Poly2 {
-//    implicit def atLabel[A, L <: Tuple] =
-//      at[StepLabel[A], (L, JMap[String, Any])] {
-//        case (label, (acc, values)) =>
-//          (values.get(label.name).asInstanceOf[A] :: acc, values)
-//      }
-
 
   trait ExtractLabelType[A] {
     type Out
@@ -43,21 +25,16 @@ object StepLabel {
 
   trait LowPriorityExtractLabelTypeImplicits {
     given forSingle[A]: ExtractLabelType[StepLabel[A]] =
-      ExtractLabelType[StepLabel[A]] { type Out = A }
+      new ExtractLabelType[StepLabel[A]] { type Out = A }
 
-    given forHNil: ExtractLabelType[EmptyTuple] =
-      ExtractLabelType[EmptyTuple] { type Out = EmptyTuple }
+    given forEmptyTuple: ExtractLabelType[EmptyTuple] =
+      new ExtractLabelType[EmptyTuple] { type Out = EmptyTuple }
 
-    given forHList[
-      H,
-      T <: Tuple,
-      HOut,
-      TOut <: Tuple
-    ](
+    given forTuple[H, T <: Tuple, HOut, TOut <: Tuple](
       using
       hExtractLabelType: ExtractLabelType.Aux[H, HOut],
       tExtractLabelType: ExtractLabelType.Aux[T, TOut]
     ): ExtractLabelType.Aux[H *: T, HOut *: TOut] =
-      ExtractLabelType[H *: T] { type Out = HOut *: TOut }
+      new ExtractLabelType[H *: T] { type Out = HOut *: TOut }
   }
 }
