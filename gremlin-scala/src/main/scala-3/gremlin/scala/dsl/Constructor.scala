@@ -73,9 +73,9 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     HStepsType,
     TStepsType
   ](using
-    hConstr: Constructor.Aux[H, Labels, HGraphType, HStepsType],
-    tConstr: Constructor.Aux[T, Labels, TGraphType, TStepsType],
-    converter: Converter.Aux[H :: T, HGraphType *: TGraphType]
+    Constructor.Aux[H, Labels, HGraphType, HStepsType],
+    Constructor.Aux[T, Labels, TGraphType, TStepsType],
+    Converter.Aux[H *: T, HGraphType *: TGraphType]
   ): Constructor.Aux[
     H *: T,
     Labels,
@@ -93,23 +93,19 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
 trait LowestPriorityConstructorImplicits {
   // for all Products, e.g. tuples, case classes etc
   given forGeneric[
-    T,
-    Repr <: Tuple,
+    T <: Tuple,
     GraphTypeTuple <: Tuple,
     Labels <: Tuple,
     StepsType0 <: StepsRoot,
     EndDomainTuple <: Tuple
   ](using
-    gen: Generic.Aux[T, Repr],
-    constr: Constructor.Aux[Repr, Labels, GraphTypeHList, StepsType0],
-    graphTypeTupler: Tupler.Aux[GraphTypeHList, GraphTypeTuple],
-    eq: StepsType0#EndDomain0 =:= EndDomainHList,
+    constr: Constructor.Aux[T, Labels, GraphTypeTuple, StepsType0],
+    eq: StepsType0#EndDomain0 =:= EndDomainTuple,
     converter: Converter.Aux[T, GraphTypeTuple]
   ): Constructor[T, Labels] =
     new Constructor[T, Labels] {
       type GraphType = GraphTypeTuple
       type StepsType = Steps[T, GraphType, Labels]
-      def apply(raw: GremlinScala[GraphType]): StepsType =
-        new Steps[T, GraphType, Labels](raw)
+      def apply(raw: GremlinScala[GraphType]): StepsType = new Steps[T, GraphType, Labels](raw)
     }
 }

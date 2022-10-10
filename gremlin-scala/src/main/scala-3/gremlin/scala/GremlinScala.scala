@@ -33,7 +33,7 @@ import org.apache.tinkerpop.gremlin.structure.{Column, Direction, T}
 import scala.concurrent.duration.FiniteDuration
 import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
-import scala.util.NotGiven
+import compiletime.ops.int.*
 
 object GremlinScala {
 
@@ -213,10 +213,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     StepLabels <: NonEmptyTuple,
   ](stepLabels: StepLabels)(
     using
-    NotGiven[Tuple.Drop[StepLabels,1] =:= EmptyTuple], //at least two elems
+    Tuple.Size[StepLabels] >= 2, //at least two elems
     Tuple.Union[StepLabels] <:< StepLabel[_], //all elems are StepLabels
-  ): GremlinScala.Aux[NonEmptyTuple, Labels] = {
-    val labels: List[StepLabel[_]] = stepLabels.map(_.getLabelName).toList()
+  ): GremlinScala.Aux[Tuple, Labels] = {
+    val labels: List[String] = StepLabel.extractLabelNames(stepLabels)
     val label1 = labels.head
     val label2 = labels.tail.head
     val remainder = labels.tail.tail
@@ -224,7 +224,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     val selectTraversal = traversal.select[Any](label1, label2, remainder: _*)
 
     GremlinScala(selectTraversal).map { selectValues =>
-      stepLabels.map(_.getLabelValueFromMap(selectValues))
+      StepLabel.extractValues(stepLabels, selectValues)
     }
   }
 

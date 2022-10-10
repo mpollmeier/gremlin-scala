@@ -51,7 +51,7 @@ package object scala {
   given[A]: Conversion[A => Unit, Consumer[A]] with
     def apply(fn: A => Unit) = (a: A) => fn(a)
 
-  given[A,B]: Conversion[A => B, JFunction[A, B]] with
+  given toJavaFunction[A,B]: Conversion[A => B, JFunction[A, B]] with
     def apply(fn: A => B) = (a: A) => fn(a)
 
   given[A]: Conversion[A => A, UnaryOperator[A]] with
@@ -82,7 +82,7 @@ package object scala {
       * Load a vertex or edge values into a case class
       */
     def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
-  
+
   // Arrow syntax implicits
   extension(label: Label)
     def ---(from: Vertex) = SemiEdge(from, label)

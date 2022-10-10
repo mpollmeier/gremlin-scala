@@ -1,5 +1,6 @@
 package gremlin.scala.dsl
 
+import gremlin.scala.given
 import gremlin.scala._
 import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
@@ -155,8 +156,6 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   ) =
     Steps[Label, LabelGraph, Labels](raw.select(StepLabel[LabelGraph](label.name)))
 
-  def getLabelValueFromMap[A](sl: StepLabel[A], values: JMap[String, Any]): A =
-    values.get(sl.name).asInstanceOf[A]
 
   // select multiple specific labels
   def select[
@@ -167,13 +166,11 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   ](stepLabels: StepLabels)(
     using
     Tuple.Union[StepLabels] <:< StepLabel[_],
-    Tuple.Size[StepLabels] <= 2,
-  )(
-    using
-    extractLabelType: StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
-    conv: Converter.Aux[SelectedTypes, SelectedGraphTypes],
+    Tuple.Size[StepLabels] >= 2,
+    StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
+    Converter.Aux[SelectedTypes, SelectedGraphTypes],
   ): Steps[SelectedTypes, SelectedGraphTypes, Labels] = {
-    val labels: List[String] = stepLabels.map(_.name).toList()
+    val labels: List[String] = StepLabel.extractLabelNames(stepLabels)
     val label1 = labels.head
     val label2 = labels.tail.head
     val remainder = labels.tail.tail
@@ -181,9 +178,7 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
     val selectTraversal = raw.traversal.select[Any](label1, label2, remainder: _*)
     val newRaw: GremlinScala[SelectedGraphTypes] =
       GremlinScala(selectTraversal).map { selectValues =>
-        val values: SelectedTypes = stepLabels map {
-          case sl: StepLabel[a] => getLabelValueFromMap[a](sl, selectValues)
-        }
+        val values = StepLabel.extractValues(stepLabels, selectValues)
         values.asInstanceOf[SelectedGraphTypes] //dirty but does the trick
       }
 

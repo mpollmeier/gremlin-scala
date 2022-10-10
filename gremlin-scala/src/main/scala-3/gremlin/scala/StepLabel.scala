@@ -12,6 +12,20 @@ case class StepLabel[A](name: String = randomUUID.toString) {
 
 object StepLabel {
 
+  inline def extractLabelNames[T <: Tuple](tup: T): List[String] =
+    inline tup match {
+      case (h: StepLabel[_]) *: t => h.name :: extractLabelNames(t)
+      case h *: t => compiletime.error("Not a tuple of StepLabels")
+      case EmptyTuple => Nil
+    }
+
+  inline transparent def extractValues[T <: Tuple](tup: T, values: JMap[String, Any]): Tuple =
+    inline tup match {
+      case (h: StepLabel[a]) *: t => values.get(h.name).asInstanceOf[a] *: extractValues(t, values)
+      case h *: t => compiletime.error("Not a tuple of StepLabels")
+      case EmptyTuple => EmptyTuple
+    }
+    
   trait ExtractLabelType[A] {
     type Out
   }
@@ -24,17 +38,13 @@ object StepLabel {
   }
 
   trait LowPriorityExtractLabelTypeImplicits {
-    given forSingle[A]: ExtractLabelType[StepLabel[A]] =
-      new ExtractLabelType[StepLabel[A]] { type Out = A }
+    given [A]: ExtractLabelType[StepLabel[A]] = new ExtractLabelType[StepLabel[A]] { type Out = A }
 
-    given forEmptyTuple: ExtractLabelType[EmptyTuple] =
-      new ExtractLabelType[EmptyTuple] { type Out = EmptyTuple }
+    given ExtractLabelType[EmptyTuple] = new ExtractLabelType[EmptyTuple] { type Out = EmptyTuple }
 
-    given forTuple[H, T <: Tuple, HOut, TOut <: Tuple](
-      using
-      hExtractLabelType: ExtractLabelType.Aux[H, HOut],
-      tExtractLabelType: ExtractLabelType.Aux[T, TOut]
-    ): ExtractLabelType.Aux[H *: T, HOut *: TOut] =
+    given [H, T <: Tuple, HOut, TOut <: Tuple]
+      (using ExtractLabelType.Aux[H, HOut], ExtractLabelType.Aux[T, TOut])
+    : ExtractLabelType.Aux[H *: T, HOut *: TOut] =
       new ExtractLabelType[H *: T] { type Out = HOut *: TOut }
   }
 }
