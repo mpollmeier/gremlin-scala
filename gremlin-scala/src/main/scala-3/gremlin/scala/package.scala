@@ -4,9 +4,10 @@ import java.util.function.{BiConsumer, BiFunction, BiPredicate, BinaryOperator, 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
-
 import scala.ann
+
 import _root_.scala.language.implicitConversions
+import _root_.scala.annotation.targetName
 
 package object scala {
   type Vertex = structure.Vertex
@@ -63,7 +64,7 @@ package object scala {
   given[A, B, C]: Conversion[(A,B) => C, BiFunction[A, B, C]] with
     def apply(fn: (A,B) => C) = (a: A, b: B) => fn(a, b)
 
-  given[A, B]: Conversion[(A, B) => Unit, BiConsumer[A, B]] with
+  given toJavaBiConsumer[A, B]: Conversion[(A, B) => Unit, BiConsumer[A, B]] with
     def apply(fn: (A, B) => Unit) = (a: A, b: B) => fn(a, b)
 
   given[A]: Conversion[A => Boolean, JPredicate[A]] with
@@ -77,11 +78,11 @@ package object scala {
 
 
   // Marshalling implicits
-  extension (gs: GremlinScala[Vertex | Edge])
-    /**
-      * Load a vertex or edge values into a case class
-      */
-    def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
+  extension (gs: GremlinScala[Vertex])
+    @targetName("vertexToCC") def toCC[CC <: Product: Marshallable] = gs.map(_.toCC[CC])
+
+  extension (gs: GremlinScala[Edge])
+    @targetName("edgeToCC") def toCC[CC <: Product : Marshallable] = gs.map(_.toCC[CC])
 
   // Arrow syntax implicits
   extension(label: Label)

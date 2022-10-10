@@ -73,7 +73,10 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   def count(): Long =
     raw.count().head()
 
-  override def clone() = new Steps[EndDomain, EndGraph, Labels](raw.clone())
+  override def clone() = {
+    val clonedRaw: GremlinScala[EndGraph] = raw.clone()
+    new Steps[EndDomain, EndGraph, Labels](raw = clonedRaw)
+  }
 
   def dedup(): Steps[EndDomain, EndGraph, Labels] =
     new Steps[EndDomain, EndGraph, Labels](raw.dedup())

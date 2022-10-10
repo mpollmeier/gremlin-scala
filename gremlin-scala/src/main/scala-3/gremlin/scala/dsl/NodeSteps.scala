@@ -3,6 +3,7 @@ package gremlin.scala.dsl
 import gremlin.scala._
 import java.util.{Map => JMap}
 import scala.collection.mutable
+import gremlin.scala.given
 
 /* Root class for all your vertex based DSL steps
  * TODO: add support for using Edge instead of Vertex?
@@ -13,7 +14,7 @@ class NodeSteps[
 ](override val raw: GremlinScala[Vertex])(
   using marshaller: Marshallable[EndDomain]
 ) extends Steps[EndDomain, Vertex, Labels](raw)(
-  Converter.forDomainNode[EndDomain](marshaller, raw.traversal.asAdmin.getGraph.get)
+  using Converter.forDomainNode[EndDomain](using marshaller, raw.traversal.asAdmin.getGraph.get)
 ) {
 
   /* follow the incoming edges of the given type as long as possible */
