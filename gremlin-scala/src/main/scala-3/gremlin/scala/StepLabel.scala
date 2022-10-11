@@ -6,22 +6,27 @@ import scala.annotation.implicitNotFound
 
 
 // type safety for labelled steps
-case class StepLabel[A](name: String = randomUUID.toString) {
-  def getLabelValueFromMap(values: JMap[String, Any]): A = values.get(name).asInstanceOf[A]
-}
+case class StepLabel[A](name: String = randomUUID.toString)
 
 object StepLabel {
 
-  inline def extractLabelNames[T <: Tuple](inline tup: T): List[String] =
+  inline def extractLabelNames[T <: Tuple]
+    (inline tup: T)
+    (using Tuple.Union[T] <:< StepLabel[_])
+  : List[String] =
     inline tup match {
-      case (th: StepLabel[_]) *: tt => th.name :: extractLabelNames(tt)
       case EmptyTuple => Nil
+      case (h: StepLabel[_]) *: t =>
+        h.name :: extractLabelNames(t)
     }
 
-  inline transparent def extractValues[T <: Tuple](inline tup: T, values: JMap[String, Any]): Tuple =
+  inline transparent def extractValues[T <: Tuple]
+    (inline tup: T, values: JMap[String, Any])
+  : Tuple =
     inline tup match {
-      case (h: StepLabel[a]) *: t => values.get(h.name).asInstanceOf[a] *: extractValues(t, values)
       case EmptyTuple => EmptyTuple
+      case (h: StepLabel[a]) *: t =>
+        values.get(h.name).asInstanceOf[a] *: extractValues(t, values)
     }
     
   trait ExtractLabelType[A] {
