@@ -33,6 +33,6 @@ class SelectAllStep[S, Labels <: Tuple](traversal: Traversal[_, _])
         inline path match
           case Nil => EmptyTuple.asInstanceOf[T] //TODO: this should probably error
           case (h: th) :: t => (h *: toTuple[tt](t)).asInstanceOf[T]
-      case x: EmptyTuple => x
+      case _: EmptyTuple => EmptyTuple.asInstanceOf[T]
 
 }
