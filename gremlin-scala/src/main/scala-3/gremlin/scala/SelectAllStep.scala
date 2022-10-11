@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 import scala.compiletime.erasedValue
 import java.util
 
-class SelectAllStep[S, Labels <: NonEmptyTuple](traversal: Traversal[_, _])
+class SelectAllStep[S, Labels <: Tuple](traversal: Traversal[_, _])
   extends ScalarMapStep[S, Labels](traversal.asAdmin)
   with TraversalParent
 {
@@ -18,7 +18,7 @@ class SelectAllStep[S, Labels <: NonEmptyTuple](traversal: Traversal[_, _])
   override def getRequirements: util.Set[TraverserRequirement] = Set(TraverserRequirement.PATH).asJava
 
   protected def map(traverser: Admin[S]): Labels =
-    toTuple(toList(traverser.path))
+    toTuple[Labels](toList(traverser.path))
 
   def toList(path: Path): List[Any] = {
     val labels = path.labels

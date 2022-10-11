@@ -4,7 +4,6 @@ import java.util.function.{BiConsumer, BiFunction, BiPredicate, BinaryOperator, 
 import org.apache.tinkerpop.gremlin.process.traversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.structure
-import scala.ann
 
 import _root_.scala.language.implicitConversions
 import _root_.scala.annotation.targetName

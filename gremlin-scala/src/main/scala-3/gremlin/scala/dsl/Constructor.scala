@@ -19,7 +19,9 @@ object Constructor extends LowPriorityConstructorImplicits {
 trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
   given forSimpleType[A, Labels <: Tuple](
-    using converter: Converter.Aux[A, A]
+    using
+    Tuple.Union[Labels] <:< StepLabel[_],
+    Converter.Aux[A, A]
   ): Constructor[A, Labels] =
     new Constructor[A, Labels] {
       type GraphType = A
@@ -40,7 +42,9 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     }
 
   given forList[A, AGraphType, Labels <: Tuple](
-    using aConverter: Converter.Aux[A, AGraphType]
+    using
+    Tuple.Union[Labels] <:< StepLabel[_],
+    Converter.Aux[A, AGraphType]
   ): Constructor[List[A], Labels] =
     new Constructor[List[A], Labels] {
       type GraphType = List[AGraphType]
@@ -49,7 +53,9 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     }
 
   given forSet[A, AGraphType, Labels <: Tuple](
-    using aConverter: Converter.Aux[A, AGraphType]
+    using
+    Tuple.Union[Labels] <:< StepLabel[_],
+    Converter.Aux[A, AGraphType]
   ): Constructor[Set[A], Labels] =
     new Constructor[Set[A], Labels] {
       type GraphType = Set[AGraphType]
@@ -75,7 +81,8 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
   ](using
     Constructor.Aux[H, Labels, HGraphType, HStepsType],
     Constructor.Aux[T, Labels, TGraphType, TStepsType],
-    Converter.Aux[H *: T, HGraphType *: TGraphType]
+    Converter.Aux[H *: T, HGraphType *: TGraphType],
+    Tuple.Union[Labels] <:< StepLabel[_],
   ): Constructor.Aux[
     H *: T,
     Labels,
@@ -91,20 +98,16 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
 }
 
 trait LowestPriorityConstructorImplicits {
+
   // for all Products, e.g. tuples, case classes etc
-  given forGeneric[
-    T <: Tuple,
-    GraphTypeTuple <: Tuple,
-    Labels <: Tuple,
-    StepsType0 <: StepsRoot,
-    EndDomainTuple <: Tuple
-  ](using
-    constr: Constructor.Aux[T, Labels, GraphTypeTuple, StepsType0],
-    eq: StepsType0#EndDomain0 =:= EndDomainTuple,
-    converter: Converter.Aux[T, GraphTypeTuple]
-  ): Constructor[T, Labels] =
+  given forGeneric[T <: Tuple, Labels <: Tuple]
+  (using Tuple.Union[Labels] <:< StepLabel[_])
+  (using cons: Constructor[T, Labels])
+  (using cons.StepsType <:< StepsRoot)
+  (using Converter.Aux[T, cons.GraphType])
+  : Constructor[T, Labels] =
     new Constructor[T, Labels] {
-      type GraphType = GraphTypeTuple
+      type GraphType = cons.GraphType
       type StepsType = Steps[T, GraphType, Labels]
       def apply(raw: GremlinScala[GraphType]): StepsType = new Steps[T, GraphType, Labels](raw)
     }

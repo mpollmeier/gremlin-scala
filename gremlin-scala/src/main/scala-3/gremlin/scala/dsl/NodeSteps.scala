@@ -13,6 +13,8 @@ class NodeSteps[
   Labels <: Tuple
 ](override val raw: GremlinScala[Vertex])(
   using marshaller: Marshallable[EndDomain]
+)(
+  using Tuple.Union[Labels] <:< StepLabel[_],
 ) extends Steps[EndDomain, Vertex, Labels](raw)(
   using Converter.forDomainNode[EndDomain](using marshaller, raw.traversal.asAdmin.getGraph.get)
 ) {

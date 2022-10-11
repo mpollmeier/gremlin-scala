@@ -12,18 +12,18 @@ case class StepLabel[A](name: String = randomUUID.toString) {
 
 object StepLabel {
 
-  inline def extractLabelNames[T <: Tuple](tup: T): List[String] =
+  inline def extractLabelNames[T <: NonEmptyTuple](inline tup: T): List[String] =
     inline tup match {
-      case (h: StepLabel[_]) *: t => h.name :: extractLabelNames(t)
-      case h *: t => compiletime.error("Not a tuple of StepLabels")
-      case EmptyTuple => Nil
+      case (h: StepLabel[_]) *: EmptyTuple => h.name :: Nil
+      case (h: StepLabel[_]) *: (t: NonEmptyTuple) => h.name :: extractLabelNames(t)
+      case _ => compiletime.error("Not a tuple of StepLabels")
     }
 
-  inline transparent def extractValues[T <: Tuple](tup: T, values: JMap[String, Any]): Tuple =
+  inline transparent def extractValues[T <: Tuple](inline tup: T, values: JMap[String, Any]): Tuple =
     inline tup match {
       case (h: StepLabel[a]) *: t => values.get(h.name).asInstanceOf[a] *: extractValues(t, values)
-      case h *: t => compiletime.error("Not a tuple of StepLabels")
       case EmptyTuple => EmptyTuple
+      case _ => compiletime.error("Not a tuple of StepLabels")
     }
     
   trait ExtractLabelType[A] {

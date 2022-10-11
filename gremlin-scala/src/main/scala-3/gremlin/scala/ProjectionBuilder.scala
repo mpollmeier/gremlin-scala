@@ -26,5 +26,5 @@ class ProjectionBuilder[T <: Tuple] private[gremlin] (
 }
 
 object ProjectionBuilder {
-  def apply() = new ProjectionBuilder[Nil.type](Nil, scala.Predef.identity, _ => Nil)
+  def apply() = new ProjectionBuilder[EmptyTuple](Nil, scala.Predef.identity, _ => EmptyTuple)
 }

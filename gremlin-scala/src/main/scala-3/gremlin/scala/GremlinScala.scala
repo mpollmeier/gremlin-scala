@@ -18,7 +18,6 @@ import java.util.{
 import java.util.stream.{Stream => JStream}
 
 import scala.jdk.CollectionConverters._
-import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import org.apache.tinkerpop.gremlin.process.traversal.Order
 import org.apache.tinkerpop.gremlin.process.traversal.Pop
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.{
@@ -35,8 +34,9 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.{Future, Promise}
 import compiletime.ops.int.*
 import scala.quoted.{Expr, Quotes, Type}
-object GremlinScala {
 
+
+object GremlinScala {
   /** constructor */
   def apply[End, Labels0 <: Tuple](
     traversal: GraphTraversal[_, End]
@@ -147,8 +147,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
                  otherProjectKeys: String*): GremlinScala.Aux[JMap[String, A], Labels] =
     GremlinScala[JMap[String, A], Labels](traversal.project(projectKey, otherProjectKeys: _*))
 
-  def project[H <: Product](
-      builder: ProjectionBuilder[Nil.type] => ProjectionBuilder[H]): GremlinScala[H] =
+  def project[H <: Tuple](
+      builder: ProjectionBuilder[EmptyTuple] => ProjectionBuilder[H]
+  ): GremlinScala[H] =
     builder(ProjectionBuilder()).build(this)
 
   /** You might think that predicate should be `GremlinScala[End] => GremlinScala[Boolean]`,
@@ -221,9 +222,10 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   }
 
   /** select all labelled steps - see `as` step and `SelectSpec` */
-  def select[LabelsTuple]() =
-    GremlinScala[LabelsTuple, Labels](
-      traversal.asAdmin.addStep(new SelectAllStep[End, LabelsTuple](traversal)))
+  def select() =
+    GremlinScala[Labels, Labels](
+      traversal.asAdmin.addStep(new SelectAllStep[End, Labels](traversal))
+    )
 
   def select[A](stepLabel: StepLabel[A]) =
     GremlinScala[A, Labels](traversal.select(stepLabel.name))
@@ -395,11 +397,11 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
 
   /** labels the current step and preserves the type - see `select` step */
   def as(name: String, moreNames: String*) =
-    GremlinScala[End, End *: EmptyTuple](traversal.as(name, moreNames: _*))
+    GremlinScala[End, Tuple.Append[Labels, End]](traversal.as(name, moreNames: _*))
 
   /** labels the current step and preserves the type - see `select` step */
   def as(stepLabel: StepLabel[End]) =
-    GremlinScala[End, End *: EmptyTuple](traversal.as(stepLabel.name))
+    GremlinScala[End, Tuple.Append[Labels, End]](traversal.as(stepLabel.name))
 
   def label() = GremlinScala[String, Labels](traversal.label())
 
@@ -908,7 +910,7 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
   def out(labels: String*)(using End <:< Vertex) =
     GremlinScala[Vertex, Labels](traversal.out(labels: _*))
 
-  def outE()(implicit ev: End <:< Vertex) =
+  def outE()(using End <:< Vertex) =
     GremlinScala[Edge, Labels](traversal.outE())
 
   def outE(labels: String*)(using End <:< Vertex) =

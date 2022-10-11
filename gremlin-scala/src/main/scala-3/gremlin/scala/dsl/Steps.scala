@@ -2,7 +2,6 @@ package gremlin.scala.dsl
 
 import gremlin.scala.given
 import gremlin.scala._
-import gremlin.scala.StepLabel.{combineLabelWithValue, GetLabelName}
 import java.util.{Map => JMap}
 import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
@@ -99,16 +98,29 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
       }
     }
 
+  type EndDomainOf[S <: StepsRoot] = S match {
+    case Steps[endDomain, endGraph, labels] => endDomain
+  }
+
+  type EndGraphOf[S <: StepsRoot] = S match {
+    case Steps[endDomain, endGraph, labels] => endGraph
+  }
+
   /* TODO: track/use NewLabelsGraph as given by `fun` */
-  def flatMap[NewSteps <: StepsRoot](fun: EndDomain => NewSteps)(
+  def flatMap[
+    NewSteps <: StepsRoot,
+    NewEndDomain,
+    NewEndGraph
+  ](fun: EndDomain => NewSteps)(
     using
-    constr: Constructor.Aux[NewSteps#EndDomain0, Labels, NewSteps#EndGraph0, NewSteps],
-    newConverter: Converter[NewSteps#EndDomain0]
-  ): NewSteps =
+    NewEndDomain =:= EndDomainOf[NewSteps],
+    NewEndGraph =:= EndGraphOf[NewSteps],
+    Converter[NewEndDomain]
+  )(using constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
     constr {
       raw.flatMap { (endGraph: EndGraph) =>
         val newSteps: NewSteps = fun(converter.toDomain(endGraph))
-        newSteps.raw.asInstanceOf[GremlinScala[NewSteps#EndGraph0]]
+        newSteps.raw.asInstanceOf[GremlinScala[NewEndGraph]]
       // not sure why I need the cast here - should be safe though
       }
     }
@@ -138,17 +150,38 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   }
 
   // labels the current step and preserves the type - use together with `select` step
-  def as(stepLabel: String): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+  def as(stepLabel: String)(): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
     Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel)
     )
 
-  def as(stepLabel: StepLabel[EndDomain]): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+  def as(stepLabel: StepLabel[EndDomain])(): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
     new Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel.name))
 
+// REF
+//
+//  def select[LabelsGraph <: HList, LabelsGraphTuple, LabelsTuple]()(
+//    implicit
+//    conv1: Converter.Aux[Labels, LabelsGraph],
+//    tupler1: Tupler.Aux[LabelsGraph, LabelsGraphTuple],
+//    tupler2: Tupler.Aux[Labels, LabelsTuple],
+//    conv2: Converter.Aux[LabelsTuple, LabelsGraphTuple]
+//  ) = new Steps[LabelsTuple, LabelsGraphTuple, Labels](
+//    raw.asInstanceOf[GremlinScala.Aux[EndGraph, LabelsGraph]].select()
+//  )
+//
+// [Labels] ─ converter ─▷ [LabelsGraph]
+//   │                            ╰─── tupler ───╮
+//   ╰─ tupler ─▷ [LabelsTuple]                  ▽
+//                      ╰────── converter ─▷ [LabelsGraphTuple]
+//
+// class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph])(
+//   using val converter: Converter.Aux[EndDomain, EndGraph]
+// )
+
   // select all labels
-  def select[LabelsGraph]()(using conv: Converter.Aux[Labels, LabelsGraph]) =
+  def select[LabelsGraph <: Tuple]()(using Converter.Aux[Labels, LabelsGraph]) =
     Steps[Labels, LabelsGraph, Labels](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, LabelsGraph]].select()
     )
