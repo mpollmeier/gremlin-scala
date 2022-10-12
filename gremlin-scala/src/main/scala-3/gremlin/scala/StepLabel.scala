@@ -12,7 +12,6 @@ object StepLabel {
 
   inline def extractLabelNames[T <: Tuple]
     (inline tup: T)
-    (using Tuple.Union[T] <:< StepLabel[_])
   : List[String] =
     inline tup match {
       case EmptyTuple => Nil
@@ -20,7 +19,7 @@ object StepLabel {
         h.name :: extractLabelNames(t)
     }
 
-  inline transparent def extractValues[T <: Tuple]
+  inline def extractValues[T <: Tuple]
     (inline tup: T, values: JMap[String, Any])
   : Tuple =
     inline tup match {

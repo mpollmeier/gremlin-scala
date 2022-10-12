@@ -194,14 +194,14 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
 
 
   // select multiple specific labels
-  def select[
+  transparent inline def select[
     StepLabels <: NonEmptyTuple,
     SelectedTypes <: NonEmptyTuple,
     SelectedGraphTypes <: NonEmptyTuple,
     LabelNames <: Tuple
   ](stepLabels: StepLabels)(
     using
-    Tuple.Union[StepLabels] <:< StepLabel[_],
+    Tuple.Union[StepLabels] <:< StepLabel[?],
     Tuple.Size[StepLabels] >= 2,
     StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
     Converter.Aux[SelectedTypes, SelectedGraphTypes],
