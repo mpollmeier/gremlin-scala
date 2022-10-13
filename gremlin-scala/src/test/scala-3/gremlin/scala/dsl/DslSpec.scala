@@ -106,8 +106,9 @@ class DslSpec extends AnyWordSpec with Matchers {
   }
 
   "filterNot with traversal on domain type" in {
-    val notRipple = PersonSteps(TinkerFactory.createModern)
-      .filterNot(_.created.isRipple)
+    val notRipple =
+      PersonSteps(TinkerFactory.createModern)
+        .filterNot(_.created.isRipple)
 
     notRipple.toList().size shouldBe 3
   }
@@ -135,13 +136,19 @@ class DslSpec extends AnyWordSpec with Matchers {
 
   "allow side effects" in {
     var i = 0
-    PersonSteps(TinkerFactory.createModern).sideEffect(_ => i = i + 1).iterate()
+    PersonSteps(TinkerFactory.createModern)
+      .sideEffect(_ => i += 1)
+      .iterate()
     i shouldBe 4
   }
 
   "deduplicates" in {
     val results: List[Person] =
-      PersonSteps(TinkerFactory.createModern).created.createdBy.dedup().toList()
+      PersonSteps(TinkerFactory.createModern)
+        .created
+        .createdBy
+        .dedup()
+        .toList()
     results.size shouldBe 3
   }
 
@@ -202,8 +209,8 @@ object TestDomain {
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[EmptyTuple](graph.V().hasLabel[Person]())
   }
-  class PersonSteps[Labels <: Tuple](override val raw: GremlinScala[Vertex])
-      extends NodeSteps[Person, Labels](raw) {
+  class PersonSteps[Labels <: Tuple](raw: GremlinScala[Vertex])
+    extends NodeSteps[Person, Labels](raw)(using Marshallable[Person]) {
 
     def created = new SoftwareSteps[Labels](raw.out("created"))
 
@@ -214,26 +221,27 @@ object TestDomain {
       new PersonSteps[Labels](raw.has(Key("name") -> name))
   }
 
-  class SoftwareSteps[Labels <: Tuple](override val raw: GremlinScala[Vertex])
-      extends NodeSteps[Software, Labels](raw) {
-
+  class SoftwareSteps[Labels <: Tuple]
+    (override val raw: GremlinScala[Vertex])
+  extends NodeSteps[Software, Labels](raw) {
     def createdBy = new PersonSteps[Labels](raw.in("created"))
-
     def isRipple = new SoftwareSteps[Labels](raw.has(Key("name") -> "ripple"))
   }
 
-  implicit def toPersonSteps[Labels <: Tuple](
-      steps: Steps[Person, Vertex, Labels]): PersonSteps[Labels] =
-    new PersonSteps[Labels](steps.raw)
+  given[Labels <: Tuple]: Conversion[Steps[Person, Vertex, Labels], PersonSteps[Labels]] with
+    def apply(steps: Steps[Person, Vertex, Labels]) = new PersonSteps[Labels](steps.raw)
 
-  implicit def personStepsConstructor[Labels <: Tuple]
-    : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
+  given personStepsConstructor
+    [Labels <: Tuple]
+  : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
     Constructor.forDomainNode[Person, Labels, PersonSteps[Labels]](new PersonSteps[Labels](_))
 
-  implicit def softwareStepsConstructor[Labels <: Tuple]
-    : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
+  given softwareStepsConstructor
+    [Labels <: Tuple]
+  : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
     Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
-  implicit def liftPerson(person: Person)(implicit graph: Graph): PersonSteps[EmptyTuple] =
-    new PersonSteps[EmptyTuple](graph.asScala().V(person.id.get))
+  given Conversion[Person, PersonSteps[EmptyTuple]] with
+    def apply(person: Person) = new PersonSteps[EmptyTuple](graph.asScala().V(person.id.get))
+
 }
