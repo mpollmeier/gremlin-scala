@@ -183,7 +183,7 @@ class MarshallableSpec extends AnyWordSpec with Matchers {
     "define their custom marshaller" in new Fixture {
       val ccWithOptionNone = CCWithOption(Int.MaxValue, None)
 
-      implicit val marshaller = new Marshallable[CCWithOption] {
+      implicit val marshaller: Marshallable[CCWithOption] = new Marshallable[CCWithOption] {
         import gremlin.scala.PropertyOps
         def fromCC(cc: CCWithOption) =
           FromCC(None, "CCWithOption", List("i" -> cc.i, "s" -> cc.s.getOrElse("undefined")))

@@ -5,7 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
 trait TestGraph {
-  implicit val graph = TinkerFactory.createClassic.asScala()
+  implicit val graph: ScalaGraph = TinkerFactory.createClassic.asScala()
   def v(i: Int) = graph.V(i: Integer).head()
   def e(i: Int) = graph.E(i: Integer).head()
 

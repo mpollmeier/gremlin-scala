@@ -416,9 +416,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
       val results: JMap[String, JCollection[Vertex]] =
         graph
           .V()
-          .group(By { v: Vertex =>
-            v.label
-          })
+          .group(By(v: Vertex => v.label))
           .head()
 
       results.get("software") should contain(graph.V(3).head())
@@ -1128,7 +1126,7 @@ class TraversalSpec extends AnyWordSpec with Matchers {
   }
 
   trait Fixture {
-    implicit val graph = TinkerFactory.createModern.asScala()
+    implicit val graph: ScalaGraph = TinkerFactory.createModern.asScala()
     val g = graph.traversal
     val Name = Key[String]("name")
     val Nickname = Key[String]("nickname")

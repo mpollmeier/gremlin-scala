@@ -18,7 +18,7 @@ package object scala {
   type Label = String
   type P[A] = traversal.P[A]
 
-  extension[G <: Graph](g: G) def asScala() = ScalaGraph(g)
+  extension(g: Graph) def asScala() = ScalaGraph(g)
   extension(g: ScalaGraph) def asJava() = g.graph
   extension(e: Edge) def asScala() = ScalaEdge(e)
   extension(e: ScalaEdge) def asJava() = e.edge

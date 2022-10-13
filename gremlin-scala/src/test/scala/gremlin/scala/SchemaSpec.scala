@@ -19,7 +19,7 @@ class SchemaSpec extends AnyWordSpec with Matchers {
     object Weight extends Key[Int]("weight")
 
     "create vertices" in {
-      implicit val graph = TinkerGraph.open.asScala()
+      implicit val graph: ScalaGraph = TinkerGraph.open.asScala()
 
       val v0 = graph + (Software, Name -> "blueprints", Created -> 2010)
       val v1 = graph + (Software, Created -> 2009, Name -> "gremlin")

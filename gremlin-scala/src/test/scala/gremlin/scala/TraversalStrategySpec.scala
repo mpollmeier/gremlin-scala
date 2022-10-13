@@ -87,7 +87,7 @@ class TraversalStrategySpec extends AnyWordSpec with Matchers {
 
     "use provided split operator when cloning sack" in new Fixture {
       var counter = 0
-      val identityWithCounterIncrease = { value: Double =>
+      val identityWithCounterIncrease = { (value: Double) =>
         counter += 1
         value
       }

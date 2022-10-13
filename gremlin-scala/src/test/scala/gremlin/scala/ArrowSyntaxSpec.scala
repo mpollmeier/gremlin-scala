@@ -170,7 +170,7 @@ class ArrowSyntaxSpec extends AnyWordSpec with Matchers {
   // }
 
   trait Fixture {
-    implicit val graph = TinkerGraph.open.asScala()
+    implicit val graph: ScalaGraph = TinkerGraph.open.asScala()
     val paris: Vertex = graph + "Paris"
     val london = graph + "London"
 

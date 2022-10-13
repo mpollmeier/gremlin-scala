@@ -24,7 +24,7 @@ class MonadSpec extends AnyWordSpec with Matchers {
 
     withClue("right identity") {
       def m = __(30)
-      val lhs = m.flatMap { x: Int =>
+      val lhs = m.flatMap { (x: Int) =>
         __(x)
       }.head()
       lhs shouldBe 30

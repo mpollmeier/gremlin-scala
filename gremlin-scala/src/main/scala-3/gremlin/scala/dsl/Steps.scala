@@ -6,6 +6,7 @@ import java.util.{Map => JMap}
 import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
 import compiletime.ops.int.*
+import gremlin.scala.StepLabel.TypesFromStepLabels
 
 /** root type for all domain types */
 trait DomainRoot extends Product {
@@ -150,12 +151,12 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   }
 
   // labels the current step and preserves the type - use together with `select` step
-  def as(stepLabel: String)(): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+  def as(stepLabel: String): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
     Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel)
     )
 
-  def as(stepLabel: StepLabel[EndDomain])(): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
+  def as(stepLabel: StepLabel[EndDomain]): Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]] =
     new Steps[EndDomain, EndGraph, Tuple.Append[Labels, EndDomain]](
       raw.asInstanceOf[GremlinScala.Aux[EndGraph, EmptyTuple]].as(stepLabel.name))
 
@@ -202,8 +203,8 @@ class Steps[EndDomain, EndGraph, Labels <: Tuple](val raw: GremlinScala[EndGraph
   ](stepLabels: StepLabels)(
     using
     Tuple.Union[StepLabels] <:< StepLabel[?],
-    Tuple.Size[StepLabels] >= 2,
-    StepLabel.ExtractLabelType.Aux[StepLabels, SelectedTypes],
+    Tuple.Size[StepLabels] >= 2 =:= true,
+    SelectedTypes =:= TypesFromStepLabels[StepLabels],
     Converter.Aux[SelectedTypes, SelectedGraphTypes],
   ): Steps[SelectedTypes, SelectedGraphTypes, Labels] = {
     val labels: List[String] = StepLabel.extractLabelNames(stepLabels)

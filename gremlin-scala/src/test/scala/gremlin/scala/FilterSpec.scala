@@ -46,7 +46,7 @@ class FilterSpec extends AnyWordSpec with Matchers {
   }
 
   "has - sugar" in new Fixture {
-    implicit val g = TinkerGraph.open.asScala()
+    implicit val g: ScalaGraph = TinkerGraph.open.asScala()
     g + ("software", Name -> "blueprints", Created -> 2010)
 
     g.V()

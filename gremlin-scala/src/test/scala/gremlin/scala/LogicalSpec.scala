@@ -104,7 +104,7 @@ class LogicalSpec extends AnyWordSpec with Matchers {
   }
 
   trait Fixture {
-    implicit val graph = TinkerGraph.open.asScala()
+    implicit val graph: ScalaGraph = TinkerGraph.open.asScala()
 
     val Person = "person"
     val Name = Key[String]("name")
