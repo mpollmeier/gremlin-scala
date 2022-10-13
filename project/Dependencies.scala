@@ -27,7 +27,9 @@ object Dependencies {
   )
 
   val common_scala3: Seq[ModuleID] = Seq(
-    "org.typelevel" %% "shapeless3-deriving" % V.shapeless3
+    "org.typelevel" %% "shapeless3-deriving" % V.shapeless3,
+    "org.typelevel" %% "shapeless3-typeable" % V.shapeless3 % Test,
+    "org.typelevel" %% "shapeless3-test" % V.shapeless3 % Test,
   )
 
   def commonForVersion(scalaVersion: String): Seq[ModuleID] =
