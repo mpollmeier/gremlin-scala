@@ -89,9 +89,11 @@ package object scala {
     def -->(right: Vertex) = SemiDoubleEdge(right, label)
 
   extension[T <: NonEmptyTuple](labelAndValues: T)
-    def label: String = labelAndValues.head
-    def keyValues: Tuple.Tail[T] = labelAndValues.tail
-    def properties: List[KeyValue[_]] = keyValues.toList
-    def ---(from: Vertex) = SemiEdge(from, label, properties: _*)
-    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties: _*)
+    (using Tuple.Head[T] =:= String)
+    (using Tuple.Union[Tuple.Tail[T]] <:< KeyValue[?])
+    inline def label: String = labelAndValues.head
+    inline def keyValues: Tuple.Tail[T] = labelAndValues.tail
+    inline def properties: List[KeyValue[?]] = keyValues.toList.asInstanceOf[List[KeyValue[?]]]
+    inline def ---(from: Vertex): SemiEdge = SemiEdge(from, label, properties: _*)
+    inline def -->(right: Vertex): SemiDoubleEdge = SemiDoubleEdge(right, label, properties: _*)
 }
