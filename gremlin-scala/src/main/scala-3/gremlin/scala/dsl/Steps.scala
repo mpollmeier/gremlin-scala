@@ -6,7 +6,7 @@ import java.util.{Map => JMap}
 import java.util.stream.{Stream => JStream}
 import scala.collection.mutable
 import compiletime.ops.int.*
-import gremlin.scala.StepLabel.TypesFromStepLabels
+import StepLabel.TypesFromStepLabels
 
 /** root type for all domain types */
 trait DomainRoot extends Product {

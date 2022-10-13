@@ -19,15 +19,16 @@ object StepLabel {
         h.name :: extractLabelNames(t)
     }
 
-  inline def extractValues[T <: Tuple]
-    (inline tup: T, values: JMap[String, Any])
-  : Tuple =
+  inline def extractValues[T <: Tuple](inline tup: T, values: JMap[String, Any]): TypesFromStepLabels[T] =
+    untypedExtractValues[T](tup, values).asInstanceOf[TypesFromStepLabels[T]]
+
+  private inline def untypedExtractValues[T <: Tuple](inline tup: T, values: JMap[String, Any]): Tuple =
     inline tup match {
       case EmptyTuple => EmptyTuple
       case (h: StepLabel[a]) *: t =>
-        values.get(h.name).asInstanceOf[a] *: extractValues(t, values)
+        values.get(h.name).asInstanceOf[a] *: untypedExtractValues(t, values)
     }
-    
+
   type TypesFromStepLabels[Tup <: Tuple] = Tup match {
     case EmptyTuple => EmptyTuple
     case StepLabel[a] *: tail => a *: TypesFromStepLabels[tail]

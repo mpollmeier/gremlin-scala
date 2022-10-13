@@ -88,22 +88,10 @@ package object scala {
     def ---(from: Vertex) = SemiEdge(from, label)
     def -->(right: Vertex) = SemiDoubleEdge(right, label)
 
-//  implicit class SemiEdgeProductFunctions[
-//      LabelAndValuesAsTuple <: Product,
-//      LabelAndValues <: Tuple,
-//      Lbl <: String,
-//      KeyValues <: Tuple
-//  ](labelAndValuesAsTuple: LabelAndValuesAsTuple)(
-//      implicit toHList: ToHList.Aux[LabelAndValuesAsTuple, LabelAndValues],
-//      startsWithLabel: IsHCons.Aux[LabelAndValues, Lbl, KeyValues], // first element has to be a Label
-//      keyValueToList: ToTraversable.Aux[KeyValues, List, KeyValue[_]] // all other elements have to be KeyValue[_]
-//  ) {
-//    lazy val labelAndValues = labelAndValuesAsTuple.toHList
-//    lazy val label: String = labelAndValues.head
-//    lazy val keyValues: KeyValues = labelAndValues.tail
-//    lazy val properties: List[KeyValue[_]] = keyValues.toList
-//
-//    def ---(from: Vertex) = SemiEdge(from, label, properties: _*)
-//    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties: _*)
-//  }
+  extension[T <: NonEmptyTuple](labelAndValues: T)
+    def label: String = labelAndValues.head
+    def keyValues: Tuple.Tail[T] = labelAndValues.tail
+    def properties: List[KeyValue[_]] = keyValues.toList
+    def ---(from: Vertex) = SemiEdge(from, label, properties: _*)
+    def -->(right: Vertex) = SemiDoubleEdge(right, label, properties: _*)
 }

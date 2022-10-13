@@ -35,6 +35,7 @@ import scala.concurrent.{Future, Promise}
 import compiletime.ops.int.*
 import scala.quoted.{Expr, Quotes, Type}
 
+import StepLabel.TypesFromStepLabels
 
 object GremlinScala {
   /** constructor */
@@ -243,9 +244,9 @@ class GremlinScala[End](val traversal: GraphTraversal[_, End]) {
     StepLabels <: NonEmptyTuple,
   ](stepLabels: StepLabels)(
     using
-    Tuple.Size[StepLabels] >= 2, //at least two elems
+    Tuple.Size[StepLabels] >= 2 =:= true, //at least two elems
     Tuple.Union[StepLabels] <:< StepLabel[_], //all elems are StepLabels
-  ): GremlinScala.Aux[Tuple, Labels] = {
+  ): GremlinScala.Aux[TypesFromStepLabels[StepLabels], Labels] = {
     val labels: List[String] = StepLabel.extractLabelNames(stepLabels)
     val label1 = labels.head
     val label2 = labels.tail.head
