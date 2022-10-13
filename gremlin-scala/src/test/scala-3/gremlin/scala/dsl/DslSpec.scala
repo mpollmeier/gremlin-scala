@@ -209,8 +209,9 @@ object TestDomain {
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[EmptyTuple](graph.V().hasLabel[Person]())
   }
-  class PersonSteps[Labels <: Tuple](raw: GremlinScala[Vertex])
-    extends NodeSteps[Person, Labels](raw)(using Marshallable[Person]) {
+  class PersonSteps[Labels <: Tuple]
+    (raw: GremlinScala[Vertex])
+  extends NodeSteps[Person, Labels](raw) {
 
     def created = new SoftwareSteps[Labels](raw.out("created"))
 
@@ -228,7 +229,8 @@ object TestDomain {
     def isRipple = new SoftwareSteps[Labels](raw.has(Key("name") -> "ripple"))
   }
 
-  given[Labels <: Tuple]: Conversion[Steps[Person, Vertex, Labels], PersonSteps[Labels]] with
+  given[Labels <: Tuple]
+  : Conversion[Steps[Person, Vertex, Labels], PersonSteps[Labels]] with
     def apply(steps: Steps[Person, Vertex, Labels]) = new PersonSteps[Labels](steps.raw)
 
   given personStepsConstructor
@@ -241,7 +243,7 @@ object TestDomain {
   : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
     Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
-  given Conversion[Person, PersonSteps[EmptyTuple]] with
+  given (using graph: Graph): Conversion[Person, PersonSteps[EmptyTuple]] with
     def apply(person: Person) = new PersonSteps[EmptyTuple](graph.asScala().V(person.id.get))
 
 }
