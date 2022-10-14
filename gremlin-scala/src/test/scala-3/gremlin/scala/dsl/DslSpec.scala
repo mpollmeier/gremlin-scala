@@ -8,6 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
+import gremlin.scala.dsl.Converter.given
 
 class DslSpec extends AnyWordSpec with Matchers {
   import TestDomain._
@@ -81,12 +82,33 @@ class DslSpec extends AnyWordSpec with Matchers {
   "finds combination of person/software in for comprehension" in {
     implicit val graph = TinkerFactory.createModern
 
-    val traversal = for {
-      person <- PersonSteps(graph)
-      software <- person.created
-    } yield (person.name, software)
+//    val traversal = for {
+//      person <- PersonSteps(graph)
+//      software <- person.created
+//    } yield (person.name, software)
 
-    val tuples = traversal.toSet() shouldBe Set(
+    summon[Converter[String]]
+    summon[Converter[Software]]
+    summon[Converter[(String, Software)]]
+    summon[Converter[Software *: EmptyTuple]]
+
+    summon[Constructor[String, EmptyTuple]]
+    summon[Constructor[Software, EmptyTuple]]
+
+    summon[Constructor[EmptyTuple, EmptyTuple]]
+    summon[Constructor[String *: EmptyTuple, EmptyTuple]]
+    summon[Constructor[Software *: EmptyTuple, EmptyTuple]]
+
+    summon[Constructor[(String, Software), EmptyTuple]]
+
+    val traversal =
+      PersonSteps(graph).flatMap { person =>
+        person.created.map { software =>
+          (person.name, software)
+        }
+      }
+
+    traversal.toSet() shouldBe Set(
       ("marko", Software("lop", "java")),
       ("josh", Software("lop", "java")),
       ("peter", Software("lop", "java")),
@@ -202,9 +224,16 @@ class DslSpec extends AnyWordSpec with Matchers {
 }
 
 object TestDomain {
-  @label("person") case class Person(@id id: Option[Integer], name: String, age: Integer)
-      extends DomainRoot
-  @label("software") case class Software(name: String, lang: String) extends DomainRoot
+  @label("person") case class Person(
+    @id id: Option[Integer],
+    name: String,
+    age: Integer
+  ) extends DomainRoot
+
+  @label("software") case class Software(
+    name: String,
+    lang: String
+  ) extends DomainRoot
 
   object PersonSteps {
     def apply(graph: Graph) = new PersonSteps[EmptyTuple](graph.V().hasLabel[Person]())
@@ -233,6 +262,9 @@ object TestDomain {
   : Conversion[Steps[Person, Vertex, Labels], PersonSteps[Labels]] with
     def apply(steps: Steps[Person, Vertex, Labels]) = new PersonSteps[Labels](steps.raw)
 
+  given (using graph: Graph): Conversion[Person, PersonSteps[EmptyTuple]] with
+    def apply(person: Person) = new PersonSteps[EmptyTuple](graph.asScala().V(person.id.get))
+
   given personStepsConstructor
     [Labels <: Tuple]
   : Constructor.Aux[Person, Labels, Vertex, PersonSteps[Labels]] =
@@ -243,7 +275,5 @@ object TestDomain {
   : Constructor.Aux[Software, Labels, Vertex, SoftwareSteps[Labels]] =
     Constructor.forDomainNode[Software, Labels, SoftwareSteps[Labels]](new SoftwareSteps[Labels](_))
 
-  given (using graph: Graph): Conversion[Person, PersonSteps[EmptyTuple]] with
-    def apply(person: Person) = new PersonSteps[EmptyTuple](graph.asScala().V(person.id.get))
 
 }

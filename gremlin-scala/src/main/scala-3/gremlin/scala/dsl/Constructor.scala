@@ -18,11 +18,7 @@ object Constructor extends LowPriorityConstructorImplicits {
 
 trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits {
 
-  given forSimpleType[A, Labels <: Tuple](
-    using
-    Tuple.Union[Labels] <:< StepLabel[_],
-    Converter.Aux[A, A]
-  ): Constructor[A, Labels] =
+  given forSimpleType[A, Labels <: Tuple](using Converter.Aux[A, A]): Constructor[A, Labels] =
     new Constructor[A, Labels] {
       type GraphType = A
       type StepsType = Steps[A, A, Labels]
@@ -82,7 +78,6 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
     Constructor.Aux[H, Labels, HGraphType, HStepsType],
     Constructor.Aux[T, Labels, TGraphType, TStepsType],
     Converter.Aux[H *: T, HGraphType *: TGraphType],
-    Tuple.Union[Labels] <:< StepLabel[_],
   ): Constructor.Aux[
     H *: T,
     Labels,
@@ -100,15 +95,15 @@ trait LowPriorityConstructorImplicits extends LowestPriorityConstructorImplicits
 trait LowestPriorityConstructorImplicits {
 
   // for all Products, e.g. tuples, case classes etc
-  given forGeneric[T <: Tuple, Labels <: Tuple]
-  (using Tuple.Union[Labels] <:< StepLabel[_])
-  (using cons: Constructor[T, Labels])
-  (using cons.StepsType <:< StepsRoot)
-  (using Converter.Aux[T, cons.GraphType])
-  : Constructor[T, Labels] =
-    new Constructor[T, Labels] {
+  given forProduct[Prod <: Product, Labels <: Tuple]
+    (using m: scala.deriving.Mirror.ProductOf[Prod])
+    (using cons: Constructor[m.MirroredElemTypes, Labels])
+    (using cons.StepsType <:< StepsRoot)
+    (using Converter.Aux[Prod, cons.GraphType])
+  : Constructor[Prod, Labels] =
+    new Constructor[Prod, Labels] {
       type GraphType = cons.GraphType
-      type StepsType = Steps[T, GraphType, Labels]
-      def apply(raw: GremlinScala[GraphType]): StepsType = new Steps[T, GraphType, Labels](raw)
+      type StepsType = Steps[Prod, GraphType, Labels]
+      def apply(raw: GremlinScala[GraphType]): StepsType = new Steps[Prod, GraphType, Labels](raw)
     }
 }

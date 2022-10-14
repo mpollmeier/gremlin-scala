@@ -1,6 +1,6 @@
 package gremlin.scala.dsl
 
-import gremlin.scala._
+import gremlin.scala.*
 
 trait Converter[DomainType] {
   type GraphType
@@ -65,7 +65,7 @@ trait LowPriorityConverterImplicits extends LowestPriorityConverterImplicits {
       def toGraph(as: Set[A]): Set[AGraphType] = as.map(aConverter.toGraph)
     }
 
-  given forHNil: Converter.Aux[EmptyTuple, EmptyTuple] = new Converter[EmptyTuple] {
+  given forEmptyTuple: Converter.Aux[EmptyTuple, EmptyTuple] = new Converter[EmptyTuple] {
     type GraphType = EmptyTuple
     def toGraph(value: EmptyTuple) = EmptyTuple
     def toDomain(value: GraphType) = EmptyTuple
