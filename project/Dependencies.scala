@@ -15,7 +15,7 @@ object Dependencies {
     "org.apache.tinkerpop" % "gremlin-core" % V.gremlin,
     "org.scala-lang.modules" %% "scala-collection-compat" % V.scalaCollectionCompat,
     "org.slf4j" % "slf4j-nop" % V.slf4j % Test,
-    "org.apache.tinkerpop" % "tinkergraph-gremlin" % V.gremlin % Test,
+    "org.apache.tinkerpop" % "tinkergraph-gremlin" % V.gremlin,// % Test,
     "org.apache.tinkerpop" % "gremlin-test" % V.gremlin % Test,
     "org.scalatest" %% "scalatest-shouldmatchers" % V.scalaTest % Test,
     "org.scalatest" %% "scalatest-wordspec" % V.scalaTest % Test,

@@ -8,7 +8,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
-import gremlin.scala.dsl.Converter.given
 
 class DslSpec extends AnyWordSpec with Matchers {
   import TestDomain._
@@ -87,8 +86,16 @@ class DslSpec extends AnyWordSpec with Matchers {
 //      software <- person.created
 //    } yield (person.name, software)
 
+    summon[Marshallable[EmptyTuple]]
+    summon[Marshallable[Software]]
+
+    summon[Converter[EmptyTuple]]
     summon[Converter[String]]
-    summon[Converter[Software]]
+    val cs = summon[Converter[Software]]
+    MacroUtils.compileTimePrintTypeName[cs.GraphType]("Converter[Software] GraphType")
+    Converter.forDomainNode[Software]
+    Converter.forProduct[Software, (String, String)]
+    Converter.forProduct[Software, EmptyTuple]
     summon[Converter[(String, Software)]]
     summon[Converter[Software *: EmptyTuple]]
 
@@ -96,17 +103,51 @@ class DslSpec extends AnyWordSpec with Matchers {
     summon[Constructor[Software, EmptyTuple]]
 
     summon[Constructor[EmptyTuple, EmptyTuple]]
-    summon[Constructor[String *: EmptyTuple, EmptyTuple]]
-    summon[Constructor[Software *: EmptyTuple, EmptyTuple]]
+//    summon[Constructor[String *: EmptyTuple, EmptyTuple]]
+//    summon[Constructor[Software *: EmptyTuple, EmptyTuple]]
 
     summon[Constructor[(String, Software), EmptyTuple]]
 
+//    def map[NewEndDomain, NewEndGraph, NewSteps <: StepsRoot](fun: EndDomain => NewEndDomain)(
+//      using
+//      newConverter: Converter.Aux[NewEndDomain, NewEndGraph],
+//      constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]
+//    ): NewSteps
+//
+//    type EndDomainOf[S <: StepsRoot] = S match {
+//      case Steps[endDomain, endGraph, labels] => endDomain
+//    }
+//
+//    type EndGraphOf[S <: StepsRoot] = S match {
+//      case Steps[endDomain, endGraph, labels] => endGraph
+//    }
+//    def flatMap[
+//      NewSteps <: StepsRoot,
+//      NewEndDomain,
+//      NewEndGraph
+//    ](fun: EndDomain => NewSteps)(
+//      using
+//      NewEndDomain =:= EndDomainOf[NewSteps],
+//      NewEndGraph =:= EndGraphOf[NewSteps],
+//      Converter[NewEndDomain]
+//    )(using constr: Constructor.Aux[NewEndDomain, Labels, NewEndGraph, NewSteps]): NewSteps =
+
     val traversal =
-      PersonSteps(graph).flatMap { person =>
-        person.created.map { software =>
-          (person.name, software)
+      PersonSteps(graph) //Steps[EndDomain = Person, EndGraph = Vertex, Labels = EmptyTuple]
+        .flatMap { person => //fn: Person => NewSteps <: StepsRoot
+                             // using Converter.Aux[NewSteps.EndDomain, NewEndGraph]
+                             // using Constructor.Aux[NewSteps.EndDomain, EmptyTuple, NewEndGraph, NewSteps]
+          val oldSteps = person.created //SoftwareSteps[Labels] <:< NodeSteps[Software, Labels]
+          oldSteps.map { software => //fn: Software => (String, Software)
+                                     // using Converter.Aux[(String, Software), NewEndGraph]
+                                     // using Constructor.Aux[(String, Software), EmptyTuple, NewEndGraph, NewSteps]
+            // needs a Constructor.Aux[(String, Software), EmptyTuple, NewEndGraph, NewSteps]
+              // needs a Constructor.Aux[(String, Software), EmptyTuple, NewEndGraph, NewSteps]
+            (person.name, software)
+          }
         }
-      }
+
+
 
     traversal.toSet() shouldBe Set(
       ("marko", Software("lop", "java")),
